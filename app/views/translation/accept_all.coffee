@@ -1,0 +1,1 @@
+$("#translations_form").replaceWith('<%= escape_javascript render('translation/translations_published', { symbolset: @symbolset }) %>')

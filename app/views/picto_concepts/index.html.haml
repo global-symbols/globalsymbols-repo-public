@@ -1,0 +1,39 @@
+- title t('views.picto_concepts.index.page_title', symbol: @symbol.best_label_for(locale).text)
+- content_for(:topbar, render('pictos/topbar', picto: @symbol))
+%main.container-xl
+  .row
+    .col-md-3
+      =render 'pictos/edit_menu', picto: @symbol
+    .col-md-6
+      %h1.text-center= t('dictionary.concept.other')
+      %p= t('views.picto_concepts.index.intro')
+      %p.mb-4= t('views.picto_concepts.index.add_concept_invitation')
+      .card.mb-5
+        .card-header.text-center
+          = t('views.picto_concepts.index.add_concept.heading')
+        .card-body
+          %p.mb-4= t('views.picto_concepts.index.add_concept.instruction')
+
+          = bootstrap_form_with url: symbolset_symbol_concepts_path, layout: :horizontal, label_col: 'col-sm-3', control_col: 'col-sm-9', local: true do |f|
+            = f.text_field :concept
+            .text-right
+              = f.primary t('views.picto_concepts.index.add_concept.button')
+
+      .card.mb-5#symbolset-collaborators
+        .card-header.text-center
+          = t('views.picto_concepts.index.existing_concepts.heading')
+        .list-group.list-group-flush
+        - if @picto_concepts.any?
+          - @picto_concepts.each do |pc|
+            .list-group-item.flex-column
+              .d-flex.w-100.align-items-center
+                %div.mr-3= pc.concept.coding_framework.name
+                %div.flex-fill
+                  %a{href: pc.concept.www_uri, target: :_blank}= render 'application/language_string', text: pc.concept.subject, language: pc.concept.language
+                %small.text-muted= t('views.picto_concepts.index.existing_concepts.added_at', date: l(pc.concept.created_at.to_date))
+                %a.ml-3.close{href: symbolset_symbol_concept_path(@symbol.symbolset, @symbol, pc), "aria-label" => t('views.picto_concepts.index.existing_concepts.remove_aria_label'), data: {method: :delete, confirm: t('views.picto_concepts.index.existing_concepts.remove_confirm', subject: pc.concept.subject)}}
+                  %span{"aria-hidden" => 'true'} ×
+        - else
+          .list-group-item.text-center= t('views.picto_concepts.index.existing_concepts.none_found')
+    .col-md-3
+      = render 'pictos/right_preview', picto: @symbol

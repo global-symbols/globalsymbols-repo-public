@@ -1,0 +1,63 @@
+- example = local_assigns.has_key? :example
+.print-keep-together
+  .card.mb-3
+    .card-header.d-flex.justify-content-between
+      - if example
+        %span
+          = t('views.surveys._print_question.example_heading')
+          = ' · '
+          %span.text-muted= t('views.surveys._print_question.example_text')
+      - else
+        %span= t('views.surveys._print_question.symbol_counter', number: (counter + 1))
+        %small.text-muted #{picto.id}
+    .card-body
+      .row
+        .col-md-3
+          %img.img-fluid.mb-3{src: image_src, alt: picto.best_label_for(locale).text}
+          %table.table-bordered.table-sm
+            %tbody
+              - picto.labels.each do |label|
+                %tr{class: "survey-label survey-label-#{label.language.iso639_3}"}
+                  %th.text-right= label.language.name
+                  %td= label.text
+        .col
+          -#%p Rate this symbol on a scale where 1 is 'completely unacceptable' and 5 is 'completely acceptable', by placing a check in the correct box.
+          %table.table.table-bordered.survey-rating-table.text-center
+            %thead
+              %tr
+                %td
+                - 5.times do |i|
+                  -#%th{scope: :col, style: 'width: 4rem'}= i+1
+                %th{scope: :col, style: 'width: 4rem'}
+                  = t('dictionary.numbers.1')
+                  -#%br
+                  -#%small Completely Unacceptable
+                %th{scope: :col, style: 'width: 4rem'}= t('dictionary.numbers.2')
+                %th{scope: :col, style: 'width: 4rem'}= t('dictionary.numbers.3')
+                %th{scope: :col, style: 'width: 4rem'}= t('dictionary.numbers.4')
+                %th{scope: :col, style: 'width: 4rem'}
+                  = t('dictionary.numbers.5')
+                  -#%br
+                  -#%small Completely Acceptable
+            %tbody
+              %tr
+                %th.text-right{scope: :row}= t('views.surveys._shared.questions.feelings_rating')
+                - 5.times do |i|
+                  %td= image_tag('check-red.svg', alt: :check) if example and i == 1
+              %tr
+                %th.text-right{scope: :row}= t('views.surveys._shared.questions.representation_rating')
+                - 5.times do |i|
+                  %td= image_tag('check-red.svg', alt: :check) if example and i == 3
+              %tr
+                %th.text-right{scope: :row}= t('views.surveys._shared.questions.contrast_rating')
+                - 5.times do |i|
+                  %td= image_tag('check-red.svg', alt: :check) if example and i == 3
+              %tr
+                %th.text-right{scope: :row}= t('views.surveys._shared.questions.cultural_rating')
+                - 5.times do |i|
+                  %td= image_tag('check-red.svg', alt: :check) if example and i == 4
+          .card
+            .card-body.d-flex.justify-content-between
+              %span= t('views.surveys._shared.questions.comments')
+              - if example
+                %span.text-danger= t('views.surveys._print_question.example_comment')

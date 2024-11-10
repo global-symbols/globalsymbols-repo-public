@@ -1,0 +1,16 @@
+-url = @survey.persisted? ? symbolset_survey_path(@survey.symbolset) : symbolset_surveys_path
+= bootstrap_form_with url: url, model: @survey, layout: :horizontal, label_col: 'col-sm-4', control_col: 'col-sm-8', id: :survey_form do |f|
+  = f.text_field :name, help: t('views.survey_editor._form.name_helper')
+  = f.text_field :introduction, help: t('views.survey_editor._form.introduction_helper')
+  - if @survey.persisted?
+    = f.date_field :close_at, help: t('views.survey_editor._form.close_at_helper')
+  = f.collection_select :language_id, Language.where(active: true), :id, :name, label: t('views.survey_editor._form.language_label'), help: t('views.survey_editor._form.language_helper'), include_blank: t('views.survey_editor._form.language_blank_option')
+  = f.form_group do
+    = f.check_box :show_symbol_descriptions, custom: :switch, label: t('views.survey_editor._form.show_symbol_descriptions_label')
+    %small.text-muted
+      = t('views.survey_editor._form.show_symbol_descriptions_helper')
+  .row.mt-5
+    .col
+      = link_to t('dictionary.back'), :back, class: 'btn btn-outline-secondary'
+    .col.text-right
+      = f.primary @survey.persisted? ? t('views.survey_editor._form.save_button') : t('views.survey_editor._form.create_button')

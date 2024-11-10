@@ -1,0 +1,31 @@
+- title t('devise.views.registrations.new.page_title')
+%main.container-xl
+  .justify-content-md-center
+    %h1.mb-4= t('devise.views.registrations.new.heading')
+    = bootstrap_form_for(resource, as: resource_name, url: registration_path(resource_name), layout: :vertical, label_col: 'col-sm-5', control_col: 'col-sm-7') do |f|
+      -# = devise_error_messages!
+      -# = f.alert_message t('devise.views.registrations._form.please_fix_errors')
+
+      .row
+        .col-sm
+          = f.text_field :prename, autocomplete: 'given-name', autofocus: true, required: true
+        .col-sm
+          = f.text_field :surname, autocomplete: 'family-name', required: true
+
+      .row
+        .col-sm
+          = f.text_field :company, autocomplete: 'organization'
+        .col-sm
+          = f.collection_select :language_id, Language.where(active: true), :id, :name, help: t('devise.views.registrations._form.language_helper')
+
+      = f.email_field :email, autocomplete: 'email', required: true
+
+      .row
+        .col-sm
+          = f.password_field :password, autocomplete: 'new-password', help: t('devise.views.registrations._form.password_helper', var: @minimum_password_length), required: true
+        .col-sm
+          = f.password_field :password_confirmation, autocomplete: 'new-password', label: t('devise.views.registrations._form.confirm_password'), required: true
+      .form-group.mt-3
+        .text-center
+          = f.primary t('devise.views.registrations.new.sign_up_button')
+    = render 'devise/shared/links', cache: true

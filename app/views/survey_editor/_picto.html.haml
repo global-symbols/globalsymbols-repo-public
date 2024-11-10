@@ -1,0 +1,23 @@
+- picto = survey_picto.picto
+- image_url = picto.images.last.present? ? picto.images.last.imagefile.url : '//placehold.it/362x200'
+-# If the survey has a Language set, we need to check whether this Picto has a label in the Survey.language.
+- picto_has_missing_label = (survey_picto.survey.language.present? and picto.labels.where(language: survey_picto.survey.language).empty?)
+
+.card.mb-4{class: ('border-danger' if picto_has_missing_label)}
+  .card-body
+    .px-2.text-center
+      %img.img-fluid{alt: picto.best_label_for(locale).text, src: image_url, style: 'height: 4rem'}
+      %p.mt-3.mb-0= picto.best_label_for(survey_picto.survey.language.try(:iso639_1)).text
+  - if picto_has_missing_label
+    %ul.list-group.list-group-flush
+      %li.list-group-item.list-group-item-danger.pt-0.pb-1
+        %small= t('views.survey_editor._picto.no_label_for_language', language_name: survey_picto.survey.language.name)
+  .card-footer
+    .row
+      .col.text-muted
+        %a{href: symbolset_symbol_path(picto.symbolset, picto)}
+          %small.text-muted= t('dictionary.view')
+        - if survey_picto.survey.status == 'planning'
+          ·
+          = link_to remove_symbol_symbolset_survey_path(survey_picto.survey.symbolset, survey_picto.survey, {survey_picto_id: survey_picto}), method: :post, data: {confirm: t('views.survey_editor._picto.remove_confirm')} do
+            %small.text-muted= t('dictionary.remove')

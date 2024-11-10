@@ -1,0 +1,13 @@
+- title t('views.concepts.show.page_title', subject: @concept.subject, coding_framework: @concept.coding_framework.name)
+%main.container-xl
+  .row
+    .col
+      %h3= @concept.subject
+      %p.lead
+        = t('views.concepts.show.defined_in')
+        %a{href: @concept.www_uri}= @concept.coding_framework.name
+  - if @pictos.length > 0
+    .row.row-cols-2.row-cols-sm-4.row-cols-lg-5.text-center
+      - @pictos.each do |picto|
+        .col.mb-4
+          = render 'pictos/picto_card', picto: picto, cache: true

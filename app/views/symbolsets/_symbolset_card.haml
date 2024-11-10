@@ -1,0 +1,20 @@
+%a.card.mb-4.text-center{href: symbolset_path(symbolset_card)}
+  .card-body.d-flex.flex-column
+    .px-2.mb-4.d-flex.justify-content-center.symbolset-logo
+      %img.img-fluid.align-self-center{ alt: t('views.symbolsets._symbolset_card.image.alt',
+        symbolset_name: symbolset_card.name),
+        src: (symbolset_card.logo.present? ? symbolset_card.logo.url : asset_path('logo-square.svg')),
+        class: ('greyscale-faded' unless symbolset_card.logo.present?),
+      }
+    %h3.card-title{translate: :no}= symbolset_card.name
+    %p.card-title
+      %small
+        = t('dictionary.by')
+        = render 'application/language_string', translate: :no, text: symbolset_card.publisher
+    - if defined? show_description and show_description
+      %p.card-text.text-muted
+        %small= symbolset_card.description
+  .card-footer
+    %small
+      = number_with_delimiter symbolset_card.pictos.where(archived: false, visibility: :everybody).count
+      = t('dictionary.symbol', count: symbolset_card.pictos.where(archived: false, visibility: :everybody).count)

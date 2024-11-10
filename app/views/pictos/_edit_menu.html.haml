@@ -1,0 +1,4 @@
+.list-group
+  %a.list-group-item.list-group-item-action{class: ("active" if request.path == edit_symbolset_symbol_path(picto.symbolset, picto)), href: edit_symbolset_symbol_path(picto.symbolset, picto)}= t('dictionary.edit')
+  %a.list-group-item.list-group-item-action{class: ("active" if request.path == symbolset_symbol_labels_path(picto.symbolset, picto)), href: symbolset_symbol_labels_path(picto.symbolset, picto)}= t('dictionary.label.other')
+  %a.list-group-item.list-group-item-action{class: ("active" if request.path == symbolset_symbol_concepts_path(picto.symbolset, picto)), href: symbolset_symbol_concepts_path(picto.symbolset, picto)}= t('dictionary.concept.other')

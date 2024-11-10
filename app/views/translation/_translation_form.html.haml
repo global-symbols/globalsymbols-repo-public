@@ -1,0 +1,33 @@
+#translations_form
+  - if source_language and destination_language
+    - if pictos.any?
+
+      - translated_labels = Label.unscoped.joins(:source, picto: :symbolset).where(pictos: { id: pictos.pluck(:id) }, language: destination_language)
+
+      - unapproved_suggestions = Label.unscoped.joins(:source, picto: :symbolset).where(pictos: { id: pictos.pluck(:id) }, sources: {slug: 'translation-suggestion'}, language: destination_language)
+
+      - if translated_labels.count < pictos.count
+        .row.my-4
+          .col
+            = bootstrap_form_for Label.new, url: translation_suggest_all_path(symbolset.id), method: :post, remote: true, html: {id: "get_all_suggestions_for_symbolset", class: 'text-center'} do |f|
+              = f.hidden_field :source_language_id, value: source_language.id
+              = f.hidden_field :destination_language_id, value: destination_language.id
+              = f.primary t('views.translations._translation_form.button_translate'), data: {disable_with: t('views.translations._translation_form.button_translate_working')}
+
+      - if unapproved_suggestions.any?
+        .row.my-4
+          .col
+            = bootstrap_form_for Label.new, url: translation_accept_all_path(symbolset.id), method: :post, remote: true, html: {id: "get_all_suggestions_for_symbolset", class: 'text-center'} do |f|
+              = f.hidden_field :source_language_id, value: source_language.id
+              = f.hidden_field :destination_language_id, value: destination_language.id
+              = f.primary t('views.translations._translation_form.publish_button', language_name: destination_language.name), data: {disable_with: t('views.translations._translation_form.publish_button_working')}
+
+      = render 'translation/symbols_table', { pictos: pictos, source_language: source_language, destination_language: destination_language}
+    - else
+      .text-center.mt-5
+        .h2.font-weight-normal= t('views.translations._translation_form.translation_complete_heading')
+
+        .my-5
+          %i.fas.fa-check-circle.display-4.text-success
+
+        %p= t('views.translations._translation_form.translation_complete_text', language_name: destination_language.name)

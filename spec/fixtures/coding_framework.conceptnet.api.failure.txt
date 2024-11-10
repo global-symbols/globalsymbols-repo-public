@@ -1,0 +1,9 @@
+HTTP/1.1 200 OK
+Server: nginx/1.10.3 (Ubuntu)
+Date: Wed, 27 Feb 2019 12:57:16 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 205
+Connection: keep-alive
+Access-Control-Allow-Origin: *
+
+{"@context": ["http://api.conceptnet.io/ld/conceptnet5.6/context.ld.json"], "@id": "/c/en/failure_arg", "edges": [], "error": {"details": "'/c/en/failure_arg' is not a node in ConceptNet.", "status": 404}}

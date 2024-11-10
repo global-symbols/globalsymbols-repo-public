@@ -1,0 +1,11 @@
+- image_url = label.picto.images.last.present? ? label.picto.images.last.imagefile.url : '//placehold.it/362x200'
+%a.card.mb-4.h-100{href: symbolset_symbol_path(label.picto.symbolset, label.picto)}
+  .card-body.d-flex.flex-column.justify-content-between
+    .mb-3.text-center
+      .card-body-picto{style: "background-image: url(#{image_url})"}
+      -#%img.img-fluid{alt: picto.best_label_for(locale).text, src: image_url}
+    %h3.card-title.mb-0
+      = label.text
+
+    - if label.picto.visibility != 'everybody'
+      %i.text-muted.fas.fa-lock.pl-2{title: t('views.pictos._topbar.not_publicly_visible'), 'data-toggle': 'tooltip'}

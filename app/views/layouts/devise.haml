@@ -1,0 +1,40 @@
+!!!
+%html.h-100.w-100.d-table
+  %head
+    %meta{content: 'text/html; charset=UTF-8', 'http-equiv' => 'Content-Type'}/
+    -#%title= t('doorkeeper.layouts.application.title')
+
+    = display_meta_tags site: 'Global Symbols', separator: '·', reverse: true
+
+    = render 'application/favicon'
+    %meta{charset: 'utf-8'}/
+    %meta{content: 'IE=edge', 'http-equiv' => 'X-UA-Compatible'}/
+    %meta{content: 'width=device-width, initial-scale=1.0', name: 'viewport'}/
+
+    -# Deferred loaders for CDN stylesheets.
+    %link{rel: :preload, href: 'https://fonts.googleapis.com/css?family=Lato:300,400&display=swap', as: :style, onload: "this.onload=null;this.rel='stylesheet'"}
+
+    -# If no JS is available, load the CDN stylesheets directly.
+    %noscript
+      %link{rel: :stylesheet, href: 'https://fonts.googleapis.com/css?family=Lato:300,400&display=swap'}
+
+    %script{src: 'https://code.jquery.com/jquery-3.5.1.slim.min.js', integrity: 'sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=', crossorigin: :anonymous, defer: true}
+
+    = stylesheet_link_tag    'application', media: 'all'
+    = javascript_include_tag 'application', 'data-turbolinks-track': 'reload', defer: true
+    = csrf_meta_tags
+  %body.bg-light-1.py-3.mh-100.d-table-cell.align-middle.auth-layout
+    .container-sm{style: 'max-width: 570px'}
+      .card.shadow-lg.border-0
+        .card-img-top.bg-primary.text-center
+          %img{src: asset_path('doorkeeper/authorisation-banner.svg'), alt: 'Global Symbols'}
+        - if flash[:alert].present?
+          .alert.alert-warning.rounded-0.border-0.mb-0= flash[:alert]
+        - if flash[:notice].present?
+          .alert.alert-info.rounded-0.border-0.mb-0= flash[:notice]
+        .px-4.pt-2.pb-5= yield
+
+      %footer.text-center.mt-5
+        %label.col-form-label.col-form-label-sm.sr-only{for: :select_locale}Language
+        %select.w-auto.custom-select.custom-select-sm.my-1.ml-2#select_locale
+          = options_for_select(translation_languages, I18n.locale)

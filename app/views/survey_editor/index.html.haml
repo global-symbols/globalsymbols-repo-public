@@ -1,0 +1,39 @@
+- title t('views.survey_editor.index._title', symbolset_name: @symbolset.name)
+- content_for(:topbar, render('symbolsets/topbar', symbolset: @symbolset))
+
+%main.container-xl
+  -#.row.justify-content-center
+    .col-md-8
+      %h3.mb-4.text-center Active Surveys
+      = render partial: 'survey', collection: @symbolset.surveys.where.not(status: :archived)
+  -#.row.justify-content-center
+    .col-md-8
+      %h3.my-4.text-center Archived Surveys
+      = render partial: 'survey', collection: @symbolset.surveys.where(status: :archived)
+
+  .row
+    .col-md-4
+      .d-flex.justify-content-between
+        %h1.mb-4= t('dictionary.survey.other')
+        %span
+          %a.btn.btn-primary{href: new_symbolset_survey_path}= t('views.survey_editor.index.button_new_survey')
+      .list-group
+        - Survey.statuses.each do |status, id|
+          %a.list-group-item.list-group-item-action{href: "#list-#{status}", role: :tab, class: (:active if id == 0), 'data-toggle': :list}
+            .d-flex.justify-content-between.align-items-center
+              = status.titlecase
+              - survey_count = @surveys.where(status: status).count
+              - if survey_count > 0
+                %span.badge.badge-primary.badge-pill= survey_count
+      %p.mt-3.text-center
+        %small
+          = t('views.survey_editor.index.get_help', link: link_to(t('views.survey_editor.index.get_help_link'), 'http://blog.globalsymbols.com/en/training/voting/', target: :_blank)).html_safe
+    .col
+      .tab-content
+        - Survey.statuses.each do |status, id|
+          .tab-pane.fade{role: :tabpanel, class: ('active show' if id == 0), id: "list-#{status}"}
+            %h1.mb-4.text-center= status.titlecase
+            - surveys = @surveys.where(status: status)
+            = render partial: 'survey', collection: surveys
+            - if surveys.empty?
+              .lead.text-center.mt-5= t('views.survey_editor.index.no_surveys_at_stage', stage: status.titlecase)

@@ -1,0 +1,69 @@
+wb = xlsx_package.workbook
+
+wb.styles do |styles|
+
+  wb.add_worksheet(name: I18n.t('views.survey_editor.export_xlsx.sheet_name')) do |sheet|
+  
+    hyperlink_style = sheet.styles.add_style(u: true, fg_color: "0563C1")
+
+    # Headings row
+    headings_row = sheet.add_row [
+      Axlsx::RichText.new(I18n.t('views.survey_editor.export_xlsx.header_participant_number'), b: true),
+      Axlsx::RichText.new(I18n.t('views.survey_editor.export_xlsx.header_participant_name'), b: true),
+      Axlsx::RichText.new(I18n.t('views.survey_editor.export_xlsx.header_symbol_id'), b: true),
+      Axlsx::RichText.new(I18n.t('views.survey_editor.export_xlsx.header_label'), b: true),
+      Axlsx::RichText.new(I18n.t('dictionary.symbolset.one'), b: true),
+      Axlsx::RichText.new(I18n.t('views.survey_editor.export_xlsx.header_overall_rating'), b: true),
+      Axlsx::RichText.new(I18n.t('views.survey_editor.export_xlsx.header_representation_rating'), b: true),
+      Axlsx::RichText.new(I18n.t('views.survey_editor.export_xlsx.header_contrast_rating'), b: true),
+      Axlsx::RichText.new(I18n.t('views.survey_editor.export_xlsx.header_cultural_rating'), b: true),
+      Axlsx::RichText.new(I18n.t('views.survey_editor.export_xlsx.header_comment'), b: true)
+    ]
+    
+    # Add a comment to the Participant Name column.
+    sheet.add_comment ref: headings_row.cells.second, author: I18n.t('dictionary.global_symbols'), text: I18n.t('views.survey_editor.export_xlsx.comment_participant_name'), visible: false
+    
+    # Data rows
+    @comments.each do |comment|
+      participant_number = @survey.responses.pluck(:id).index(comment.survey_response.id) + 1
+      row = sheet.add_row [
+        participant_number,
+        Axlsx::RichText.new(comment.survey_response.name),
+        Axlsx::RichText.new(comment.picto.id),#, u: true, color: '0563C1'),
+        Axlsx::RichText.new(comment.picto.best_label_for(locale).text),#, u: true, color: '0563C1'),
+        Axlsx::RichText.new(comment.picto.symbolset.name),#, u: true, color: '0563C1'),
+        comment.rating,
+        comment.representation_rating,
+        comment.contrast_rating,
+        comment.cultural_rating,
+        comment.comment
+      ], style: [hyperlink_style, nil, hyperlink_style, hyperlink_style, hyperlink_style]
+
+      # Col 1 Hyperlink: to the individual response page
+      sheet.add_hyperlink location: symbolset_survey_response_url(@survey.symbolset, @survey, comment.survey_response), ref: row.cells.first
+      
+      # Col 2 Hyperlink: to the symbol stats page
+      sheet.add_hyperlink location: symbolset_survey_symbols_url(@survey.symbolset, @survey), ref: row.cells.third
+
+      # Col 3 Hyperlink: to the symbol itself, in it's parent symbolset (not necessaily the same symbolset as the survey!)
+      sheet.add_hyperlink location: symbolset_symbol_url(comment.picto.symbolset, comment.picto), ref: row.cells.fourth
+
+      # Col 4 Hyperlink: to the symbol's symbolset
+      sheet.add_hyperlink location: symbolset_url(comment.picto.symbolset), ref: row.cells.fifth
+    end
+    
+    # Freeze top row only
+    # To freeze top row and first column, use commented values.
+    sheet.sheet_view.pane do |pane|
+      pane.top_left_cell = "A2" # B2
+      pane.state = :frozen_split
+      pane.y_split = 1
+      pane.x_split = 0 # 1
+      pane.active_pane = :bottom_right
+    end
+    
+    # Add filtering that covers the whole sheet
+    sheet.auto_filter = "A1:#{sheet.rows.last.cells.last.reference}"
+    
+  end
+end

@@ -1,0 +1,9 @@
+- title t('devise.views.registrations.edit.page_title')
+%main.container-xl
+  .justify-content-md-center.text-center
+    %h1.mb-4= t('devise.views.registrations.account_saved.heading')
+
+    %p.my-5
+      %i.fas.fa-check-circle.display-4.text-success
+
+    %a.btn.btn-primary{href: root_path}= t('devise.views.registrations.account_saved.return_to_gs_button')

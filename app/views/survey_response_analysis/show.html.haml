@@ -1,0 +1,25 @@
+- title "#{@survey.name}"
+- content_for(:topbar, render('survey_editor/topbar', survey: @survey, crumb_link: symbolset_survey_responses_path, crumb_name: 'Individual Responses'))
+%main.container-xl
+  .row
+    .col-md-3
+      = render 'sidebar'
+    .col
+      %table.table.table-banded.table-hover.text-center
+        %thead
+          %tr
+            %th= t('dictionary.symbol.one')
+            %th= t('activerecord.attributes.comment.rating')
+            %th= t('activerecord.attributes.comment.representation_rating_short')
+            %th= t('activerecord.attributes.comment.contrast_rating_short')
+            %th= t('activerecord.attributes.comment.cultural_rating_short')
+            %th= t('activerecord.attributes.comment.comment')
+        - @response.comments.each do |comment|
+          %tr
+            %td
+              %img{src: comment.picto.images.first.imagefile.url, style: 'max-height: 4rem'}
+            %td.align-middle=  comment.rating
+            %td.align-middle=  comment.representation_rating
+            %td.align-middle=  comment.contrast_rating
+            %td.align-middle=  comment.cultural_rating
+            %td.align-middle=  comment.comment

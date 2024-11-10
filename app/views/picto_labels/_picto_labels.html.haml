@@ -1,0 +1,21 @@
+.card.mb-5#picto_labels
+  .card-header.text-center
+    = t('views.picto_labels._picto_labels.heading', {label_type: type})
+  .list-group.list-group-flush
+    - if labels.any?
+      - labels.each do |label|
+        .list-group-item.flex-column
+          .d-flex.w-100.align-items-center
+            %div.col-sm-3.mr-3.text-muted= label.language.name
+            %div.flex-fill= render 'pictos/label', label: label, cache: true
+            %small.text-muted
+              - if label.source.suggestion
+                = form_for label, url: publish_translation_symbolset_symbol_label_path(id: label.id), html: {class: 'd-inline'} do |f|
+                  = link_to t('dictionary.publish'), nil, onclick: "$('##{f.options[:html][:id]}').submit(); false"
+                ·
+              %a{href: edit_symbolset_symbol_label_path(id: label.id)}= t('dictionary.edit')
+            - if labels.count > minimum_labels
+              %a.ml-3.close{href: symbolset_symbol_label_path(id: label.id), "aria-label" => t('views.picto_labels._picto_labels.remove_label_aria_label'), data: {method: :delete, confirm: t('views.picto_labels._picto_labels.remove_label_confirm', text: label.text)}}
+                %span{"aria-hidden" => 'true'} ×
+    - else
+      .list-group-item.text-center= t('views.picto_labels._picto_labels.no_labels_found')

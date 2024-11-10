@@ -1,0 +1,9 @@
+- title "#{@survey.name}"
+- content_for(:topbar, render('survey_editor/topbar', survey: @survey, crumb_link: symbolset_survey_responses_path, crumb_name: t('views.survey_response_analysis.index.crumb_name')))
+%main.container-xl
+  .row
+    .col-md-3
+      = render 'sidebar', responses: @responses
+    .col
+      %h3= t('views.survey_response_analysis.index.heading')
+      -#- @survey.responses.each do |response|

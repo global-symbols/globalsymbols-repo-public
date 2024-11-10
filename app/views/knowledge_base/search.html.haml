@@ -1,0 +1,24 @@
+:ruby
+  title 'Search Knowledge Base'
+
+%main.mt-0
+  %article
+    = render 'pages/topbar' do
+      Knowledge Base
+    .container-xl.mt-4
+      .row.justify-content-center
+
+        .col{role: :main}
+
+          .d-flex.justify-content-center.bg-light.py-5
+            = bootstrap_form_with url: search_knowledge_base_index_path, local: true, method: :get, layout: :horizontal, label_col: 'col', control_col: 'col-sm-12', class: 'form-inline col-8' do |f|
+              = f.text_field :query, input_group_class: 'input-group-lg', class: 'is-search', wrapper: { class: 'mb-0 input-group-lg w-100'}, label_as_placeholder: true, label: t('views.knowledge_base.index.search_input_placeholder'), required: true, value: @query, minlength: 2
+
+          %h2.my-4 Results
+
+          - @articles.each do |article|
+            .card.mb-2
+              .card-body
+                %a{href: knowledge_base_path(article.id)}
+                  %h3.h4= article.title
+                %small= article.description

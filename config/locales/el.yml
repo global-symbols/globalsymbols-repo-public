@@ -1,0 +1,1011 @@
+el:
+  devise:
+    views:
+      passwords:
+        edit:
+          confirm_password_label: Επιβεβαίωση νέου κωδικού πρόσβασης
+          new_password_helper: '%{var} χαρακτήρες ελάχιστοι'
+          heading: Αλλαγή του κωδικού πρόσβασής σας
+          new_password_label: Νέος κωδικός πρόσβασης
+          button: Αλλαγή κωδικού πρόσβασης
+        new:
+          heading: Επαναφορά κωδικού πρόσβασης
+          email_helper: Η διεύθυνση ηλεκτρονικού ταχυδρομείου που χρησιμοποιήσατε
+            για να εγγραφείτε στα Global Symbols
+          button: Σύνδεση επαναφοράς ηλεκτρονικού ταχυδρομείου
+          page_title: Διαχείριση λογαριασμού
+        instructions: Εισαγάγετε τη διεύθυνση ηλεκτρονικού ταχυδρομείου του λογαριασμού
+          σας και θα σας στείλουμε έναν σύνδεσμο για να επαναφέρετε τον κωδικό πρόσβασής
+          σας.
+      _shared:
+        _links:
+          new_confirmation: Δεν λάβατε οδηγίες επιβεβαίωσης;
+          sign_in: Είσοδος
+          sign_up: Δημιουργία λογαριασμού
+          forgotten_password: Ξέχασες τον κωδικό πρόσβασης?
+          new_unlock: Δεν λάβατε οδηγίες ξεκλειδώματος;
+      sessions:
+        errors:
+          messages:
+            expired: έχει λήξει, ζητήστε ένα νέο
+            not_locked: δεν ήταν κλειδωμένη
+            already_confirmed: έχει ήδη επιβεβαιωθεί, δοκιμάστε να συνδεθείτε
+            confirmation_period_expired: Πρέπει να επιβεβαιωθεί εντός %{period}, ζητήστε
+              ένα νέο
+            not_found: δεν βρέθηκε
+            not_saved:
+              one: '1 σφάλμα απαγόρευσε την αποθήκευση αυτού του %{resource}:'
+              other: 'Τα σφάλματα %{count} απαγόρευαν την αποθήκευση αυτού του %{resource}:'
+        new:
+          page_title: Είσοδος
+          sign_in_button: Είσοδος
+      registrations:
+        _form:
+          language_helper: Τα σύμβολα θα εμφανίζονται στην προτιμώμενη γλώσσα, όπου
+            είναι δυνατόν.
+          password_helper: '%{var} χαρακτήρες ελάχιστοι'
+          new_password_helper: '%{var} χαρακτήρες ελάχιστοι. Αφήστε κενό αν δεν θέλετε
+            να το αλλάξετε.'
+          cancel_account_confirm: Είσαι σίγουρος? Ο λογαριασμός σας στο Global Symbols
+            θα διαγραφεί οριστικά.
+          cancel_account_button: Διαγραφή του λογαριασμού μου
+          confirm_password: Επιβεβαίωση κωδικού πρόσβασης
+          please_fix_errors: Διορθώστε αυτά τα σφάλματα.
+          new_password: Νέος κωδικός πρόσβασης
+          new_password_confirmation: Επιβεβαίωση νέου κωδικού πρόσβασης
+          current_password_helper: Χρειαζόμαστε τον τρέχοντα κωδικό πρόσβασής σας
+            για να επιβεβαιώσουμε τις αλλαγές σας.
+          button_save_changes: Αποθήκευση αλλαγών
+          cancel_account_header: Ακύρωση του λογαριασμού μου
+          cancel_account_text: Αν θέλετε να κλείσετε τον λογαριασμό σας Global Symbols…
+          button_change_password: Αλλαγή κωδικού πρόσβασης
+        edit:
+          heading: Διαχείριση λογαριασμού
+          page_title: Διαχείριση λογαριασμού
+          awaiting_confirmation: 'Αυτή τη στιγμή αναμένει επιβεβαίωση για: %{unconfirmed_email}'
+        new:
+          heading: Δημιουργία λογαριασμού
+          sign_up_button: Δημιουργία λογαριασμού
+          page_title: Δημιουργία λογαριασμού
+        change_password:
+          heading: Αλλαγή κωδικού πρόσβασης
+          manage_account: Διαχείριση λογαριασμού
+          submit: Αλλαγή κωδικού πρόσβασης
+          account_indicator: Συνδέθηκε ως %{email}
+        account_saved:
+          heading: Ο λογαριασμός ενημερώθηκε
+          return_to_gs_button: Επιστροφή στα Global Symbols
+    mailer:
+      password_change:
+        subject: Αλλαγή κωδικού πρόσβασης
+      unlock_instructions:
+        subject: Ξεκλειδώστε τις οδηγίες
+      email_changed:
+        subject: Αλλαγή ηλεκτρονικού ταχυδρομείου
+      confirmation_instructions:
+        subject: Οδηγίες επιβεβαίωσης
+      reset_password_instructions:
+        subject: Επαναφορά οδηγιών κωδικού πρόσβασης
+    confirmations:
+      confirmed: Η διεύθυνση ηλεκτρονικού ταχυδρομείου σας έχει επιβεβαιωθεί με επιτυχία.
+      send_instructions: Θα λάβετε ένα μήνυμα ηλεκτρονικού ταχυδρομείου με οδηγίες
+        για το πώς να επιβεβαιώσετε τη διεύθυνση ηλεκτρονικού ταχυδρομείου σας σε
+        λίγα λεπτά.
+      send_paranoid_instructions: Εάν η διεύθυνση ηλεκτρονικού ταχυδρομείου σας υπάρχει
+        στη βάση δεδομένων μας, θα λάβετε ένα μήνυμα ηλεκτρονικού ταχυδρομείου με
+        οδηγίες για το πώς να επιβεβαιώσετε τη διεύθυνση ηλεκτρονικού ταχυδρομείου
+        σας σε λίγα λεπτά.
+    failure:
+      invalid: Μη έγκυρος %{authentication_keys} ή κωδικός πρόσβασης.
+      last_attempt: Έχετε άλλη μια προσπάθεια πριν κλειδώσετε τον λογαριασμό σας.
+      not_found_in_database: Μη έγκυρος %{authentication_keys} ή κωδικός πρόσβασης.
+      timeout: Η συνεδρία σας έληξε. Συνδεθείτε ξανά για να συνεχίσετε.
+      inactive: Ο λογαριασμός σας δεν έχει ενεργοποιηθεί ακόμα.
+      locked: Ο λογαριασμός σας είναι κλειδωμένος.
+      unauthenticated: Πρέπει να συνδεθείτε ή να εγγραφείτε πριν συνεχίσετε.
+      unconfirmed: Πρέπει να επιβεβαιώσετε τη διεύθυνση ηλεκτρονικού ταχυδρομείου
+        σας πριν συνεχίσετε.
+      already_authenticated: Είστε ήδη συνδεδεμένοι.
+    omniauth_callbacks:
+      failure: Δεν ήταν δυνατή η έλεγχος ταυτότητας από %{kind} επειδή "%{reason}".
+      success: Με επιτυχή έλεγχο ταυτότητας από το λογαριασμό %{kind}.
+    passwords:
+      no_token: Δεν μπορείτε να αποκτήσετε πρόσβαση σε αυτήν τη σελίδα χωρίς να προέρχονταν
+        από ένα μήνυμα ηλεκτρονικού ταχυδρομείου επαναφοράς κωδικού πρόσβασης. Εάν
+        προέρχεστε από ένα μήνυμα ηλεκτρονικού ταχυδρομείου επαναφοράς κωδικού πρόσβασης,
+        βεβαιωθείτε ότι χρησιμοποιήσατε την πλήρη διεύθυνση URL που παρέχεται.
+      updated: Ο κωδικός πρόσβασής σας έχει αλλάξει με επιτυχία. Τώρα είστε συνδεδεμένοι.
+      updated_not_active: Ο κωδικός πρόσβασής σας έχει αλλάξει με επιτυχία.
+      send_instructions: Σας στείλαμε ένα μήνυμα ηλεκτρονικού ταχυδρομείου επαναφοράς
+        κωδικού πρόσβασης.
+      send_paranoid_instructions: Εάν η διεύθυνση ηλεκτρονικού ταχυδρομείου σας υπάρχει
+        στη βάση δεδομένων μας, θα λάβετε έναν σύνδεσμο ανάκτησης κωδικού πρόσβασης
+        στη διεύθυνση ηλεκτρονικού ταχυδρομείου σας σε λίγα λεπτά.
+    registrations:
+      destroyed: Αντίο! Ο λογαριασμός σας ακυρώθηκε με επιτυχία. Ελπίζουμε να σας
+        ξαναδούμε σύντομα.
+      signed_up_but_inactive: Έχετε εγγραφεί με επιτυχία. Ωστόσο, δεν μπορούσαμε να
+        σας συνδεθούμε επειδή ο λογαριασμός σας δεν έχει ενεργοποιηθεί ακόμα.
+      signed_up_but_locked: Έχετε εγγραφεί με επιτυχία. Ωστόσο, δεν μπορούσαμε να
+        σας συνδεθούμε επειδή ο λογαριασμός σας είναι κλειδωμένος.
+      signed_up: Καλώς ήρθες! Έχετε εγγραφεί με επιτυχία.
+      signed_up_but_unconfirmed: Ένα μήνυμα με έναν σύνδεσμο επιβεβαίωσης έχει σταλεί
+        στη διεύθυνση ηλεκτρονικού ταχυδρομείου σας. Ακολουθήστε τον σύνδεσμο για
+        να ενεργοποιήσετε το λογαριασμό σας.
+      update_needs_confirmation: Ενημερώσατε τον λογαριασμό σας με επιτυχία, αλλά
+        πρέπει να επαληθεύσουμε τη νέα σας διεύθυνση ηλεκτρονικού ταχυδρομείου. Ελέγξτε
+        το email σας και ακολουθήστε τον σύνδεσμο επιβεβαίωσης για να επιβεβαιώσετε
+        τη νέα σας διεύθυνση ηλεκτρονικού ταχυδρομείου.
+      updated: Ο λογαριασμός σας ενημερώθηκε με επιτυχία.
+    sessions:
+      signed_out: Έχετε αποσυνδεθεί.
+      already_signed_out: Έχετε αποσυνδεθεί.
+      signed_in: Καλωσόρισες ξανά!
+    unlocks:
+      send_paranoid_instructions: Αν ο λογαριασμός σας υπάρχει, θα λάβετε ένα μήνυμα
+        ηλεκτρονικού ταχυδρομείου με οδηγίες για το πώς να τον ξεκλειδώσετε σε λίγα
+        λεπτά.
+      send_instructions: Θα λάβετε ένα μήνυμα ηλεκτρονικού ταχυδρομείου με οδηγίες
+        για το πώς να ξεκλειδώσετε το λογαριασμό σας σε λίγα λεπτά.
+      unlocked: Ο λογαριασμός σας έχει ξεκλειδωθεί με επιτυχία. Παρακαλώ συνδεθείτε
+        για να συνεχίσετε.
+  doorkeeper:
+    scopes:
+      boardset:write: Γράψτε στα σύνολα πινάκων σας
+      boardset:read: Διαβάστε τα σύνολα πινάκων σας
+      public: Αποκτήστε πρόσβαση στα δημόσια δεδομένα σας
+      identity:read:user: Ανάγνωση δεδομένων στο λογαριασμό χρήστη σας
+  activerecord:
+    models:
+      comment: σχόλιο
+      licence: άδεια
+      language: Γλώσσα
+      picto: σύμβολο
+      category: κατηγορία
+      picto_concept: Έννοια Πίκτο
+      symbolset: Σύνολο συμβόλων
+      coding_framework: Πλαίσιο κωδικοποίησης
+      concept: έννοια
+      image: εικόνα
+      label: ετικέτα
+      survey: έρευνα
+      survey_picto: Έρευνα Πίκτο
+      survey_response: Απάντηση έρευνας
+      symbolset_user: συνεργάτης
+      user: χρήστης
+    attributes:
+      coding_framework:
+        api_uri_base: Βάση API URI
+        structure: δομή
+        www_uri_base: Βάση WWW URI
+        name: Όνομα
+      comment:
+        rating: Βαθμολογία
+        representation_rating_short: αντιπροσώπευση
+        comment: σχόλιο
+        representation_rating: Αξιολόγηση αναπαράστασης
+        contrast_rating_short: αντιπαραβάλλω
+        cultural_rating: Πολιτιστική Αξιολόγηση
+        cultural_rating_short: πολιτιστικός
+        resolved: Επιλυθεί
+        read: διαβάζω
+        contrast_rating: Αξιολόγηση αντίθεσης
+      language:
+        category: κατηγορία
+        active: δραστήριος
+        name: Όνομα
+        scope: εμβέλεια
+      licence:
+        version: εκδοχή
+        logo: λογότυπο
+        url: Διεύθυνση URL
+        name: Όνομα
+        properties: Καταλύματα
+      picto:
+        part_of_speech_options:
+          noun: ουσιαστικό
+          adverb: επίρρημα
+          preposition: πρόθεση
+          conjunction: σύζευξη
+          article: άρθρο
+          verb: ρήμα
+          interjection: παρεμβολή
+          modifier: Τροποποιητής
+          adjective: επίθετο
+          pronoun: αντωνυμία
+        image: εικόνα
+        visibility_options:
+          everybody: όλοι
+          collaborators: Συνεργάτες συνόλου συμβόλων
+        part_of_speech: Μέρος της ομιλίας
+        publisher_ref: Αναφορά εκδότη
+        visibility: Ορατό από
+      concept:
+        subject: θέμα
+      survey:
+        status: κατάσταση
+        close_at: Κλείσιμο στο
+        name: Όνομα
+        introduction: Εισαγωγή
+        show_symbol_descriptions: Εμφάνιση περιγραφών συμβόλων
+      survey_response:
+        role: ρόλος
+        organisation: οργανισμός
+        name: Όνομα
+      symbolset:
+        description: περιγραφή
+        publisher: εκδότης
+        name: Όνομα
+        logo: λογότυπο
+        publisher_url: Διεύθυνση URL εκδότη
+        statuses:
+          published: δημοσιευμένος
+          ingesting: Κατάποση
+          draft: προσχέδιο
+        status: κατάσταση
+      user:
+        prename: όνομα
+        surname: επώνυμο
+        company: εταιρεία
+        location: τοποθεσία
+        language_id: Προτιμώμενη γλώσσα
+        email: Διεύθυνση ηλεκτρονικού ταχυδρομείου
+        password: κωδικός πρόσβασης
+        remember_me: Να με θυμάσαι
+        current_password: Τρέχων κωδικός πρόσβασης
+      category:
+        name: Όνομα
+      label:
+        text: ετικέτα
+        text_diacritised: Διακριτή ετικέτα
+        description: περιγραφή
+  errors:
+    messages:
+      expired: έχει λήξει, ζητήστε ένα νέο
+      not_found: δεν βρέθηκε
+      confirmation_period_expired: Πρέπει να επιβεβαιωθεί εντός %{period}, ζητήστε
+        ένα νέο
+      not_saved:
+        one: '1 σφάλμα απαγόρευσε την αποθήκευση αυτού του %{resource}:'
+        other: 'Τα σφάλματα %{count} απαγόρευαν την αποθήκευση αυτού του %{resource}:'
+      not_locked: δεν ήταν κλειδωμένη
+      accepted: πρέπει να γίνει δεκτή
+      empty: Δεν μπορεί να είναι άδειο
+      blank: Δεν μπορεί να είναι κενό
+      present: πρέπει να είναι κενό
+      not_a_number: δεν είναι αριθμός
+      not_an_integer: πρέπει να είναι ακέραιος
+      greater_than: Πρέπει να είναι μεγαλύτερο από %{count}
+      greater_than_or_equal_to: Πρέπει να είναι μεγαλύτερο ή ίσο με %{count}
+      equal_to: Πρέπει να είναι ίσο με %{count}
+      less_than: Πρέπει να είναι μικρότερο από %{count}
+      less_than_or_equal_to: Πρέπει να είναι μικρότερο ή ίσο με %{count}
+      other_than: Πρέπει να είναι εκτός %{count}
+      too_long:
+        one: είναι πολύ μεγάλο (το μέγιστο είναι 1 χαρακτήρας)
+        other: είναι πολύ μεγάλο (το μέγιστο είναι %{count} χαρακτήρες)
+      too_short:
+        one: Είναι πολύ μικρό (το ελάχιστο είναι 1 χαρακτήρας)
+        other: είναι πολύ μικρό (το ελάχιστο είναι %{count} χαρακτήρες)
+      wrong_length:
+        one: είναι το λάθος μήκος (θα πρέπει να είναι 1 χαρακτήρας)
+        other: έχει λάθος μήκος (θα πρέπει να είναι %{count} χαρακτήρες)
+      size_too_big: Είναι πολύ μεγάλο (το μέγιστο είναι %{file_size})
+      already_confirmed: έχει ήδη επιβεβαιωθεί, δοκιμάστε να συνδεθείτε
+      wrong_size: Είναι λάθος μέγεθος (θα πρέπει να είναι %{file_size})
+      size_too_small: Είναι πολύ μικρό (το ελάχιστο είναι %{file_size})
+      model_invalid: 'Η επικύρωση απέτυχε: %{errors}'
+      inclusion: δεν περιλαμβάνεται στον κατάλογο
+      exclusion: κρατείται
+      invalid: δεν είναι έγκυρη
+      confirmation: Δεν ταιριάζει με το %{attribute}
+      odd: πρέπει να είναι περίεργο
+      even: πρέπει να είναι ομοιόμορφη
+  dictionary:
+    settings: ρυθμίσεις
+    collaborator:
+      one: συνεργάτης
+      other: Συνεργάτες
+    label:
+      one: ετικέτα
+      other: Ετικέτες
+    response:
+      one: Απάντηση
+      other: Απαντήσεις
+    survey:
+      one: Κριτική
+      other: Κριτικές
+    symbol:
+      one: σύμβολο
+      other: Σύμβολα
+    go_back: Πήγαινε πίσω
+    numbers:
+      '3': '3'
+      '4': '4'
+      '1': '1'
+      '2': '2'
+      '5': '5'
+    back: πλάτη
+    import: εισαγωγή
+    sign_in: Είσοδος
+    remove: αφαιρώ
+    search: αναζήτηση
+    page_not_found: Η σελίδα δεν βρέθηκε
+    concept:
+      one: έννοια
+      other: Έννοιες
+    symbolset:
+      one: Σύνολο συμβόλων
+      other: Σύνολα συμβόλων
+    unauthorised: Μη εξουσιοδοτημένη
+    view: άποψη
+    change: αλλαγή
+    download: καταφόρτωση
+    archive: αρχείο
+    un-archive: Μη αρχειοθετημένο
+    publish: δημοσιεύω
+    edit: επεξεργασία
+    global_symbols: Global Symbols
+    by: διά
+  unauthorized:
+    manage:
+      picto: Μπορείτε να διαχειριστείτε μόνο σύνολα συμβόλων στα οποία είστε συνεργάτης.
+      all: Δεν μπορείτε να κάνετε %{action} αυτό το %{subject}.
+    update:
+      project: Δεν επιτρέπεται η ενημέρωση αυτού του έργου.
+  languages:
+    pt: Πορτογαλικά
+    en: Αγγλικά
+    fr: Γαλλικά
+    de: Γερμανικά
+    hr: Κροατικά
+    sr: Σερβικά
+    sr_Cyrl: Σερβικά (Κυριλλικά)
+    sr_Latn: Σερβικά (Λατινικά)
+    ro: Ρουμανικά
+    el: Ελληνικά
+    hy: Αρμενικά
+    tr: Τουρκικά
+    bg: Βουλγαρικά
+    ca: Καταλανικά
+    nl: Ολλανδικά
+    es: Ισπανικά
+    da: Δανικά
+    hi: Χίντι
+    it: Ιταλικά
+    mk: σλαβομακεδονικά
+    mr: Μαραθικά
+    ru: Ρωσικά
+    sh: σερβοκροατικά
+    cnr: Μαυροβούνια
+    ar: Αραβικά
+    zh: Κινεζικά
+    sq: Αλβανικά
+    gl: Γαλικικά
+    he: Εβραϊκά
+    sk: Σλοβακικά
+    sv: Σουηδικά
+    val: Βωβές
+    ur: Ουρντού
+    pl: Πολωνικά
+    hu: Ουγγρικά
+    an: Αραγονίας
+    br: βρετονικά
+    et: Εσθονικά
+    eu: Βασκικά
+    fa: Περσικά
+  layouts:
+    application:
+      menu:
+        sign_in: Είσοδος
+        facebook: Global Symbols στο Facebook
+        my_account: Ο λογαριασμός μου
+        resources: πόροι
+        board_builder: Board Builder
+        training: εκπαίδευση
+        news: ειδήσεις
+        sign_out: Αποσύνδεση
+        search_placeholder: Αναζήτηση %{var}
+        sign_up: Δημιουργία λογαριασμού
+        twitter: Global Symbols στο Twitter
+      footer:
+        about: περίπου
+        contact: επαφή
+        privacy_policy: Πολιτική Προστασίας Προσωπικών Δεδομένων
+        accessibility: προσβασιμότητα
+        terms: Όροι
+        language_label: Γλώσσα
+      skip_to_main_content: Μετάβαση στο κύριο περιεχόμενο
+  views:
+    picto_labels:
+      create:
+        alert_failure: Πρέπει να αντιμετωπίσετε κάποια προβλήματα για να μπορέσουμε
+          να προσθέσουμε αυτήν την ετικέτα.
+        notice_success: Προσθήκη της ετικέτας %{label} σε αυτό το σύμβολο.
+      _form:
+        diacritised_label_label: Διακριτή ετικέτα
+        label_label: Κείμενο ετικέτας
+        diacritised_label_helper: Μόνο για αραβικές γλώσσες. Αυτό αποθηκεύει πρόσθετες
+          λεπτομέρειες προφοράς.
+        description_helper: Περιγράψτε εν συντομία το σύμβολο για να βοηθήσετε στην
+          κατανόηση.
+        button_save: Αποθήκευση ετικέτας
+        button_add: Προσθήκη ετικέτας
+        language_helper: Η γλώσσα της ετικέτας.
+      _picto_labels:
+        heading: '%{label_type} Ετικέτες'
+        remove_label_aria_label: Κατάργηση ετικέτας
+        remove_label_confirm: Να καταργήσουμε το %{text} από αυτό το σύμβολο;
+        no_labels_found: Δεν βρέθηκαν ετικέτες
+      edit:
+        page_title: Ετικέτες για %{symbol}
+        intro: Οι ετικέτες βοηθούν άλλους ανθρώπους να κατανοήσουν τα σύμβολά σας.
+          Μας βοηθούν να κατανοήσουμε το νόημα του συμβόλου σας, οπότε βεβαιωθείτε
+          ότι είναι ακριβείς και συγκεκριμένες.
+        heading: Επεξεργασία ετικέτας
+      index:
+        intro: Οι ετικέτες βοηθούν άλλους ανθρώπους να κατανοήσουν τα σύμβολά σας.
+          Μας βοηθούν να κατανοήσουμε το νόημα του συμβόλου σας, οπότε βεβαιωθείτε
+          ότι είναι ακριβείς και συγκεκριμένες.
+        page_title: Ετικέτες για %{symbol}
+        instructions: Τα σύμβολα πρέπει να έχουν τουλάχιστον μία ετικέτα. Εάν το επιθυμείτε,
+          μπορείτε να προσθέσετε μια ετικέτα για περισσότερες από μία γλώσσες.
+        heading_add_label: Προσθήκη ετικέτας
+        status_published: δημοσιευμένος
+        status_suggested: Πρότεινε
+      destroy:
+        notice_success: Καταργήσαμε την ετικέτα %{label} από αυτό το σύμβολο.
+        alert_failure: Δεν ήταν δυνατή η κατάργηση της ετικέτας %{label} από αυτό
+          το σύμβολο.
+      publish_translation:
+        notice_success: Δημοσίευσε την ετικέτα %{language_name}.
+    pages:
+      home:
+        for_creators: Για δημιουργούς
+        for_creators_text: Διαχείριση και δημοσίευση συνόλων συμβόλων
+        for_communicators: Για επικοινωνιολόγους
+        for_communicators_text: Ανταλλαγή εικόνων για τη δημιουργία συνομιλιών
+        for_everyone_text: Ανακαλύψτε, αναμίξτε, ταιριάξτε και χρησιμοποιήστε το σύμβολο
+        for_everyone: Για όλους
+        explore_button: Εξερευνήστε περισσότερα σύνολα συμβόλων…
+        explore_heading: Εξερεύνηση συνόλων συμβόλων
+        board_builder:
+          heading: Global Symbols Board Builder
+          subheading: Πίνακες Επικοινωνίας με τον εύκολο τρόπο
+          create: Δημιουργήστε πίνακες για να βοηθήσετε στην επικοινωνία χρησιμοποιώντας
+            χιλιάδες δωρεάν εικόνες από τη βιβλιοθήκη μας, ακόμη και τις δικές σας.
+          design: Σχεδιασμός, κατασκευή, αποθήκευση και εκτύπωση πινάκων επικοινωνίας
+            στο διαδίκτυο.
+          storage: Όλα αποθηκεύονται με ασφάλεια στον λογαριασμό σας Global Symbols.
+          button_featured: Προτεινόμενα σύνολα πινάκων
+          button_try: Δοκιμάστε το Board Builder
+      search:
+        symbolset_dropdown_any_symbol_set: Οποιοδήποτε σύνολο συμβόλων
+        search_for: Αναζήτηση για
+        _title: αναζήτηση
+        no_results: Δεν μπορέσαμε να βρούμε ταιριαστά σύμβολα. Δοκιμάστε μια ευρύτερη
+          αναζήτηση.
+        search: αναζήτηση
+      contact:
+        lead_text: Είμαστε στην ευχάριστη θέση να λάβουμε ερωτήσεις, προτάσεις και
+          πληροφορίες σχετικά με τους σχετικούς πόρους.
+        _description: Επικοινωνήστε μαζί μας με γενικές ερωτήσεις ή για να δημοσιεύσετε
+          το σύνολο συμβόλων σας.
+        heading: Επικοινωνήστε μαζί μας
+        email_us: Στείλτε μας email
+    picto_concepts:
+      destroy:
+        alert_failure: Δεν ήταν δυνατή η κατάργηση της έννοιας %{concept} από αυτό
+          το σύμβολο.
+        notice_success: Καταργήσαμε την έννοια %{concept} από αυτό το σύμβολο.
+      index:
+        intro: Οι έννοιες βοηθούν τους υπολογιστές να κατανοήσουν τα σύμβολά σας,
+          επομένως βεβαιωθείτε ότι είναι ακριβή και συγκεκριμένα.
+        add_concept_invitation: Μπορούμε να προσθέσουμε οποιαδήποτε ιδέα μπορείτε
+          να βρείτε στο ConceptNet.
+        add_concept:
+          instruction: Για να προσθέσετε μια έννοια σε αυτό το σύμβολο, εισαγάγετε
+            μια λέξη. Θα προσθέσουμε την ιδέα αν μπορέσουμε να την βρούμε.
+          heading: Προσθήκη έννοιας
+          button: Προσθήκη έννοιας
+          add: προσθέτω
+        existing_concepts:
+          heading: Υπάρχουσες Έννοιες
+          added_at: Προσθήκη %{date}
+          none_found: Αυτό το σύμβολο δεν έχει έννοιες
+          remove_confirm: Να καταργήσουμε το %{subject} από αυτό το σύμβολο;
+          remove_aria_label: Κατάργηση έννοιας
+        page_title: Έννοιες για %{symbol}
+      create:
+        notice_success: Προστέθηκε η έννοια %{concept} σε αυτό το σύμβολο.
+        alert_failure: Δεν ήταν δυνατή η εύρεση μιας έννοιας που ονομάζεται %{concept}.
+          Δοκίμασε άλλη μια λέξη.
+        alert_already_exists: Το %{concept} είναι ήδη μια έννοια σε αυτό το σύμβολο.
+    translations:
+      _translation_form:
+        publish_button: Δημοσίευση όλων των μεταφράσεων %{language_name}
+        button_translate: Μετάφραση συμβόλων
+        button_translate_working: Μετάφραση συμβόλων…
+        publish_button_working: Δημοσίευση όλων των μεταφράσεων…
+        translation_complete_heading: Η μετάφραση ολοκληρώθηκε
+        translation_complete_text: Όλα τα σύμβολα έχουν μεταφραστεί σε %{language_name}.
+      _symbols_table:
+        button_get_translation_working: Μετάφραση…
+        heading_source_language: '%{language_name} Προέλευση'
+        heading_destination_language: '%{language_name} Μετάφραση'
+        button_get_translation: Λάβετε μετάφραση
+        heading_type: δακτυλογραφώ
+      _suggestion_form:
+        button_publish: δημοσιεύω
+        label: μετάφραση
+        button_publish_working: εκδοτικός…
+      _translations_published:
+        heading: Μεταφράσεις δημοσιευμένες
+        labels_are_visible: Οι νέες μεταφράσεις είναι πλέον ορατές στα Global Symbols
+          και στις εφαρμογές.
+        next_steps: Βρείτε περισσότερα σύμβολα για μετάφραση ή επιλέξτε μια άλλη γλώσσα.
+        labels_saved: Οι νέες μεταφράσεις έχουν αποθηκευτεί.
+    surveys:
+      show:
+        provide_details_2: Τα στοιχεία σας θα εμφανίζονται στους διοργανωτές της έρευνας
+          σε σχέση με τα σχόλιά σας και δεν θα χρησιμοποιούνται ποτέ από τα Global
+          Symbols για οποιονδήποτε άλλο σκοπό.
+        close_at_message: Μπορείτε να συμμετάσχετε μέχρι το %{date}.
+        provide_details: Η παροχή των στοιχείων σας είναι προαιρετική και μπορεί να
+          βοηθήσει τους διοργανωτές της έρευνας.
+        closed_header: Αυτή η έρευνα δεν δέχεται σχόλια προς το παρόν.
+        closed_text: Επικοινωνήστε με τον διοργανωτή της έρευνας εάν περιμένατε να
+          μπορέσετε να συμμετάσχετε.
+        offline_participants: Για συμμετέχοντες που εργάζονται εκτός σύνδεσης…
+        offline_participants_button: Εκτύπωση φορμών σχολίων έρευνας
+        begin_button: Ξεκινήστε την έρευνα
+      _shared:
+        number_of_symbols:
+          one: Αυτή η έρευνα έχει το σύμβολο %{count} για να το ελέγξετε.
+          other: Αυτή η έρευνα έχει %{count} Σύμβολα για έλεγχο.
+        thank_you: Σας ευχαριστούμε για την ολοκλήρωση της έρευνας!
+        questions:
+          feelings_rating: Συναισθήματα για το σύμβολο στο σύνολό του
+          representation_rating: Αντιπροσωπεύει τη λέξη ή τη φράση
+          contrast_rating: Χρωματική αντίθεση
+          cultural_rating: Πολιτισμική ευαισθησία
+          comments: Πρόσθετα σχόλια
+      print:
+        print_button: Έρευνα εκτύπωσης
+        show_intro: Εμφάνιση της εισαγωγής της έρευνας
+        show_intro_helper: Αλλάξτε την εισαγωγή με την επεξεργασία της έρευνας.
+        show_instructions: Εμφάνιση των οδηγιών
+        show_instructions_helper: Αλλάξτε τις οδηγίες κάνοντας κλικ σε αυτές.
+        show_example_helper: Προσθέτει ένα παράδειγμα ερώτησης που εμφανίζει δείγματα
+          απαντήσεων.
+        symbol_label_language: Εμφάνιση ετικετών συμβόλων σε
+        symbol_label_language_all: Όλες οι διαθέσιμες γλώσσες
+        symbol_label_language_helper: Για καλύτερα αποτελέσματα, εκτυπώστε έγχρωμα
+          χρησιμοποιώντας ένα σύγχρονο πρόγραμμα περιήγησης και απενεργοποιήστε κεφαλίδες
+          και υποσέλιδα.
+        instructions_heading: οδηγίες
+        heading: Ρυθμίσεις εκτύπωσης
+        collect_names: Συλλογή ονομάτων συμμετεχόντων
+        show_example: Εμφάνιση παραδείγματος
+        introduction: Εισαγωγή
+        instructions_1: Αυτή η έρευνα θα σας ζητήσει να αξιολογήσετε τέσσερις πτυχές
+          κάθε συμβόλου και να δώσετε ορισμένα σχόλια.
+        instructions_2: Βαθμολογήστε κάθε σύμβολο σε μια κλίμακα όπου το 1 είναι «εντελώς
+          απαράδεκτο» και το 5 είναι «απολύτως αποδεκτό», τοποθετώντας μια επιταγή
+          στο σωστό πλαίσιο.
+        name_field: Το όνομά μου είναι
+      thank_you:
+        button_go_to_homepage: Προχωρήστε στο Global Symbols
+        feedback_is_saved: Αποθηκεύσαμε όλα τα σχόλιά σας.
+        button_restart_survey: Επανεκκίνηση της έρευνας
+      _print_question:
+        example_text: Αυτό δείχνει πώς μπορείτε να απαντήσετε σε ερωτήσεις
+        example_heading: Παράδειγμα ερώτησης
+        symbol_counter: Σύμβολο %{number}
+        example_comment: Αυτό το δέντρο μοιάζει με μπρόκολο.
+    survey_response_analysis:
+      new:
+        use_this_form_to: Χρησιμοποιήστε αυτήν τη φόρμα για να αποθηκεύσετε μια μεμονωμένη
+          έρευνα χαρτιού στα Global Symbols. Στη συνέχεια, θα συνυπολογιστούμε στα
+          στατιστικά στοιχεία της έρευνάς σας.
+        match_numbers: Οι αριθμοί που εμφανίζονται στην επάνω δεξιά γωνία κάθε πλαισίου
+          συμβόλων θα πρέπει να ταιριάζουν με αυτούς που εμφανίζονται στις έντυπες
+          φόρμες, για να βεβαιωθείτε ότι εισάγετε τις σωστές βαθμολογίες για κάθε
+          σύμβολο.
+        label_overall_rating: Συναισθήματα για το σύμβολο
+        label_contrast_rating: Χρωματική αντίθεση
+        label_cultural_rating: Πολιτισμική ευαισθησία
+        save_button: Αποθήκευση απαντήσεων
+        cancel_confirm: Είσαι σίγουρος? Θα χάσετε οποιαδήποτε αποτελέσματα μέχρι στιγμής.
+        heading: Προσθήκη σχολίων χαρτιού
+        label_representation_rating: Αντιπροσωπεύει τη λέξη
+      _sidebar:
+        participant_number: Συμμετέχων %{number}
+        heading: Απαντήσεις
+      index:
+        heading: Ατομικές απαντήσεις
+        crumb_name: Ατομικές απαντήσεις
+      create:
+        notice_success: Αυτή η απάντηση στο χαρτί σώθηκε.
+    collaborators:
+      create:
+        alert_no_gs_account: Το %{email_address} δεν έχει ακόμη λογαριασμό Global
+          Symbols.
+        notice_success: Προστέθηκε %{email_address} ως συνεργάτης.
+      index:
+        page_title: Συνεργάτες για %{name}
+        add_heading: Προσθήκη συνεργάτη
+        add_text: Για να επιτρέψετε σε κάποιον άλλο να επεξεργαστεί αυτό το σύνολο
+          συμβόλων, εισαγάγετε τη διεύθυνση ηλεκτρονικού ταχυδρομείου που χρησιμοποίησε
+          για να εγγραφεί στα Global Symbols.
+        existing_heading: Υπάρχοντες Συνεργάτες
+        add_button: Προσθήκη συνεργάτη
+        existing_text: Αυτά τα άτομα επιτρέπεται να επεξεργαστούν αυτό το σύνολο συμβόλων.
+        existing_none_found: Δεν επιτρέπεται σε κανέναν χρήστη να επεξεργαστεί αυτό
+          το σύνολο συμβόλων.
+        added_at: Προσθήκη %{date}
+        remove_confirm: Να καταργήσουμε το %{email} από αυτό το σύνολο συμβόλων;
+        remove_aria_label: Κατάργηση συνεργάτη
+      destroy:
+        notice_success: Καταργήσαμε το %{email_address} ως συνεργάτη.
+    symbolsets:
+      show:
+        no_symbols_for_collaborator: Προσθήκη συμβόλου για να ξεκινήσετε τη δημιουργία
+          του συνόλου συμβόλων
+        _description: Εξερευνήστε το σύμβολο %{symbolset_name} που έχει οριστεί στα
+          Global Symbols. Αποκτήστε δωρεάν εικόνες και σύμβολα για επικοινωνία.
+      _topbar:
+        button_edit: επεξεργασία
+        button_review: αναθεώρηση
+        download: καταφόρτωση
+        button_add_symbol: Προσθήκη συμβόλου
+        button_archive: Αρχειοθετημένα σύμβολα
+        button_translate: μεταφράζω
+      _form:
+        description_helper: Αυτή η περιγραφή θα εμφανιστεί παράλληλα με το σύνολο
+          συμβόλων.
+        publisher_helper: Το όνομα του ατόμου ή του οργανισμού που δημοσιεύει το σύνολο
+          συμβόλων.
+        publisher_url_helper: Η διεύθυνση της ιστοσελίδας του εκδότη.
+        logo_helper: Αυτό το λογότυπο θα εμφανίζεται στη σελίδα "Σύνολα συμβόλων".
+          Αυτή θα πρέπει να είναι μια εικόνα, ιδανικά ένα SVG ή PNG, 300x200 pixels
+          με διαφανές φόντο.
+        licence_prompt: Επιλογή άδειας χρήσης
+        published_helper: Τα δημοσιευμένα σύνολα συμβόλων είναι ορατά σε όλους. Τα
+          πρόχειρα σύνολα συμβόλων είναι ορατά στους διαχειριστές και τους συνεργάτες
+          συνόλου συμβόλων.
+        logo_label: λογότυπο
+        publisher_placeholder: π.χ. Το Ίδρυμα PeopleSymbols
+        publisher_url_placeholder: π.χ. https://peoplesymbols.com
+        create_button: Δημιουργία συνόλου συμβόλων
+        save_button: Αποθήκευση συνόλου συμβόλων
+        publisher_url_label: Διεύθυνση URL εκδότη
+      index:
+        _title: Εξερεύνηση συνόλων συμβόλων
+        _description: Περιηγηθείτε σε χιλιάδες δωρεάν σύμβολα επικοινωνίας στα Global
+          Symbols.
+        heading: Εξερεύνηση συνόλων συμβόλων
+        create_symbol_set_button: Δημιουργία συνόλου συμβόλων
+      new:
+        heading: Δημιουργία συνόλου συμβόλων
+        _title: Δημιουργία συνόλου συμβόλων
+        introduction: Το νέο σύνολο συμβόλων θα δημιουργηθεί σε κατάσταση πρόχειρου.
+          Θα είναι ορατό μόνο σε εσάς και τους συνεργάτες που προσθέτετε, επιτρέποντάς
+          σας να προσθέσετε σύμβολα και να προετοιμάσετε το σύνολο συμβόλων.
+        guidance: Σας προτείνουμε να ελέγξετε τις οδηγίες για
+        guidance_link: Δημοσίευση του συνόλου συμβόλων σε Global Symbols
+      _shared:
+        none_found: Δεν μπορέσαμε να βρούμε σύμβολα εδώ!
+      review:
+        filter_all_symbols: Όλα τα σύμβολα
+        filter_without_a_concept: Χωρίς ιδέα
+        heading: αναθεώρηση
+      archive:
+        description: Τα αρχειοθετημένα σύμβολα δεν εμφανίζονται στο σύνολο συμβόλων,
+          στα αποτελέσματα αναζήτησης ή στις εφαρμογές
+        heading: Αρχειοθετημένα σύμβολα
+        none_found: Δεν υπάρχουν αρχειοθετημένα σύμβολα σε αυτό το σύνολο συμβόλων
+      _review_row:
+        remove_confirmation: Να καταργήσουμε το %{subject} από αυτό το σύμβολο;
+      _symbolset_card:
+        image:
+          alt: '%{symbolset_name} λογότυπο'
+      edit:
+        _title: Επεξεργασία %{symbolset_name}
+      import:
+        _title: Εισαγωγή στο %{symbolset_name}
+        heading: Εισαγωγή συμβόλων
+        introduction: Ανεβάστε τα υπάρχοντα σύμβολα σας σε Global Symbols.
+      translate:
+        form:
+          target_lang_prompt: Επιλογή γλώσσας προορισμού
+          target_lang_label: προς
+          source_lang_label: Μετάφραση από
+          source_lang_option: '%{language_name} (%{labels_count} σύμβολα, %{coverage_percentage}
+            κάλυψη)'
+        title: Μετάφραση %{symbolset_name}
+        heading: Ετικέτες μετάφρασης
+        description: Αυτόματη μετάφραση ετικετών συμβόλων σε νέες γλώσσες. Αυτό το
+          εργαλείο μεταφράζεται σε δέσμες συμβόλων %{symbols_limit} κάθε φορά.
+        button_find_untranslated: Εύρεση μη μεταφρασμένων συμβόλων
+    pictos:
+      _form:
+        save_button: Αποθήκευση συμβόλου
+        label_helper: Η ετικέτα περιγράφει το σύμβολό σας, ώστε οι χρήστες να μπορούν
+          να το βρουν. Μπορείτε να προσθέσετε ετικέτες σε πρόσθετες γλώσσες μετά τη
+          δημιουργία του συμβόλου.
+        language_helper: Η γλώσσα της ετικέτας.
+        diacritised_label_helper: Μόνο για αραβικές γλώσσες. Αυτό αποθηκεύει πρόσθετες
+          λεπτομέρειες προφοράς.
+        description_helper: Περιγράψτε εν συντομία το σύμβολο για να βοηθήσετε στην
+          κατανόηση.
+        create_button: Προσθήκη συμβόλου
+        to_download_symbols: για λήψη συμβόλων
+        image_helper: Ανεβάστε μια εικόνα μορφής SVG (προτιμώμενη) ή PNG.
+        label_label: Κείμενο ετικέτας
+      _topbar:
+        not_publicly_visible: Δεν είναι δημόσια ορατό
+        download_button: Λήψη %{file_type}
+      edit:
+        _title: Επεξεργασία %{picto_label} στο %{symbolset_name}
+        heading: Επεξεργασία συμβόλου
+      new:
+        heading: Προσθήκη συμβόλου
+        _title: Προσθήκη συμβόλου στο %{symbolset_name}
+      show:
+        _title: '%{picto_label} στο %{symbolset_name}'
+        concept_defined_in: Ορισμός στο %{coding_framework_name}
+        no_concepts: Αυτό το σύμβολο δεν έχει έννοιες για να το καθορίσει.
+        add_concept_button: Προσθήκη έννοιας
+        alternative_symbols_heading: Εναλλακτικά σύμβολα
+        _description: Σύμβολο '%{picto_label}', μέρος του συμβόλου %{symbolset_name}.
+          Βρείτε χιλιάδες δωρεάν σύμβολα για επικοινωνία.
+        archived_notice:
+          heading: Αρχειοθετημένο σύμβολο
+          text: Αυτό το σύμβολο δεν εμφανίζεται στο σύνολο συμβόλων, στα αποτελέσματα
+            αναζήτησης ή στις εφαρμογές
+      _comment_form:
+        save_button: Αποθήκευση σχολίου
+    survey_editor:
+      _form:
+        show_symbol_descriptions_helper: Εμφανίζει περιγραφές συμβόλων στους συμμετέχοντες.
+        introduction_helper: προαιρετικός. Αυτό φαίνεται στους συμμετέχοντες κατά
+          την έναρξη της έρευνας.
+        close_at_helper: προαιρετικός. Ορίστε μια προθεσμία για να απαντήσουν οι συμμετέχοντες.
+        language_label: Εμφάνιση ετικετών συμβόλων σε
+        language_blank_option: Όλες οι διαθέσιμες γλώσσες
+        show_symbol_descriptions_label: Εμφάνιση περιγραφών συμβόλων
+        create_button: Δημιουργία έρευνας
+        name_helper: Δώστε ένα όνομα που βοηθά τους συμμετέχοντες να προσδιορίσουν
+          αυτήν την έρευνα.
+        language_helper: Κατά τη λήψη αυτής της έρευνας, στους συμμετέχοντες εμφανίζονται
+          ετικέτες συμβόλων στην επιλεγμένη γλώσσα.
+        save_button: Αποθήκευση έρευνας
+      _picto:
+        remove_confirm: Είστε βέβαιοι ότι θέλετε να καταργήσετε αυτό το σύμβολο από
+          την έρευνα;
+        no_label_for_language: Δεν υπάρχει ετικέτα %{language_name}
+      _sidebar:
+        stages:
+          plan: σχέδιο
+          collect_feedback: Συλλογή σχολίων
+          analyse: Ανάλυση αποτελεσμάτων
+          archive: Αρχειοθέτηση ή διαγραφή
+          plan_description: Επιλογή συμβόλων που θα συμπεριληφθούν στην έρευνα
+          collect_feedback_description: Αφήστε τους συμμετέχοντες να ολοκληρώσουν
+            την Έρευνα
+          analyse_results_description: Ανασκόπηση των αποτελεσμάτων της έρευνας
+        heading: Στάδια
+      export_xlsx:
+        header_participant_number: Αριθμός συμμετεχόντων
+        header_label: ετικέτα
+        header_symbol_id: Αναγνωριστικό συμβόλου
+        header_overall_rating: Βαθμολογία
+        header_contrast_rating: αντιπαραβάλλω
+        header_cultural_rating: πολιτιστικός
+        header_comment: σχόλιο
+        comment_participant_name: Οι συμμετέχοντες δεν υποχρεούνται να παρέχουν τα
+          ονόματά τους, επομένως ορισμένα κελιά ενδέχεται να είναι κενά.
+        header_participant_name: Όνομα συμμετέχοντος
+        header_representation_rating: αντιπροσώπευση
+        sheet_name: Σχόλια
+      index:
+        button_new_survey: Δημιουργία έρευνας
+        no_surveys_at_stage: Δεν υπάρχουν έρευνες στο στάδιο %{stage}.
+        get_help_link: Βοήθεια και Εκπαίδευση
+        _title: Έρευνες σε %{symbolset_name}
+        get_help: Εξερεύνηση %{link} για έρευνες
+      new:
+        button_create: Δημιουργία έρευνας
+      show:
+        symbols_heading: Σύμβολα σε αυτήν την έρευνα
+        symbols_text: Προσθέστε σύμβολα σε αυτήν την έρευνα αναζητώντας τα σε Global
+          Symbols και επιλέγοντας «Προσθήκη στην έρευνα».
+        symbols_search_helper: Αναζήτηση συμβόλων για προσθήκη σε αυτήν την έρευνα
+        collect_feedback:
+          heading: Συλλογή σχολίων
+          text_2: Δεν θα μπορείτε να αλλάξετε τις επιλογές συμβόλων σας ενώ η έρευνα
+            συλλέγει σχόλια.
+          close_at_helper: προαιρετικός. Ορίστε μια προθεσμία για τις απαντήσεις στην
+            έρευνα.
+          button_begin_collecting: Έναρξη συλλογής σχολίων
+          invite_at_this_url: Προσκαλέστε τους χρήστες να κάνουν την έρευνά σας σε
+            αυτήν τη διεύθυνση URL.
+          paper_intro: Ορισμένοι συμμετέχοντες μπορεί να προτιμούν έντυπα έντυπων
+            ερευνών. Χρησιμοποιήστε αυτά τα εργαλεία συλλέξτε τα σχόλιά τους και αποθηκεύστε
+            τα εδώ.
+          confirm_stop: Αυτό θα σταματήσει τους ανθρώπους να ανταποκρίνονται στην
+            έρευνα. Είσαι σίγουρος?
+          stop_button: Τερματισμός της έρευνας
+          paper_print_button: Έντυπα έρευνας εκτύπωσης
+          paper_customisation_invitation: Για να προσαρμόσετε και να εκτυπώσετε φόρμες
+            έρευνας για τους συμμετέχοντες σας…
+          paper_add_paper_feedback_button: Προσθήκη σχολίων χαρτιού
+          paper_to_include_results: Για να συμπεριλάβετε αποτελέσματα από έντυπες
+            φόρμες έρευνας στα αποτελέσματα της έρευνάς σας…
+          survey_ended: Η συλλογή απαντήσεων για αυτήν την έρευνα έχει λήξει.
+          survey_ended_add_paper: Μπορείτε ακόμα να προσθέσετε σχόλια με μη αυτόματο
+            τρόπο από έντυπες φόρμες έρευνας.
+          text_1: Όταν αρχίσετε να συλλέγετε σχόλια, θα σας δώσουμε μια διεύθυνση
+            URL όπου οι χρήστες μπορούν να συμμετάσχουν στην έρευνα.
+          close_at_label: Αποδοχή απαντήσεων μέχρι
+          invite_deadline: Οι συμμετέχοντες έχουν διορία έως %{close_at} για να παρέχουν
+            απαντήσεις (%{link}).
+          responses_count:
+            one: Η έρευνά σας έχει απόκριση %{count}.
+            other: Η έρευνά σας έχει %{count} απαντήσεις.
+          paper_heading: Έντυπες Έρευνες
+        analyse_results:
+          heading: Ανάλυση αποτελεσμάτων
+          results_appear_here: Τα αποτελέσματα θα εμφανιστούν εδώ όταν οι χρήστες
+            αρχίσουν να ανταποκρίνονται στην έρευνά σας.
+          responses_count:
+            one: Το άτομο %{count} απάντησε στην έρευνά σας.
+            other: '%{count} άτομα απάντησαν στην έρευνά σας.'
+          button_individual_responses: Ατομικές απαντήσεις
+          button_stats: Στατιστικά συμβόλων
+          export:
+            heading: Εξαγωγή αποτελεσμάτων στο Excel
+            text_1: Χρησιμοποιήστε αυτό το εργαλείο για να κατεβάσετε όλα τα δεδομένα
+              της έρευνας, συμπεριλαμβανομένων των αξιολογήσεων και των σχολίων.
+            text_2: Αυτό διευκολύνει την εκτέλεση της δικής σας ανάλυσης στο Excel.
+              Σας προτείνουμε να χρησιμοποιήσετε Συγκεντρωτικούς Πίνακες για να υπολογίσετε
+              και να σχεδιάσετε τα μέσα αποτελέσματα για κάθε σύμβολο.
+            text_3: Κάθε γραμμή στο αρχείο Excel αντιπροσωπεύει την αναθεώρηση ενός
+              συμβόλου από έναν συμμετέχοντα στην έρευνα.
+        archive:
+          heading: Αρχειοθέτηση ή διαγραφή
+          survey_is_archived: Αυτή η έρευνα αρχειοθετείται. Μπορείτε ακόμα να αναλύσετε
+            τυχόν αποτελέσματα.
+          archive_button: Αρχειοθετήστε την Έρευνα
+          delete_confirm: Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτήν την έρευνα
+            και οποιεσδήποτε απαντήσεις;
+          delete_button: Διαγραφή της έρευνας
+          archive_description: Αρχειοθετήστε αυτήν την έρευνα όταν τελειώσετε με αυτήν.
+            Θα εξακολουθείτε να μπορείτε να αναλύσετε τυχόν αποτελέσματα αυτής της
+            έρευνας.
+          archive_confirm: Αυτό θα σταματήσει τους ανθρώπους να ανταποκρίνονται στην
+            έρευνα. Είσαι σίγουρος?
+          delete_description: Η διαγραφή αυτής της έρευνας θα διαγράψει οριστικά τα
+            αποτελέσματα που έχετε συγκεντρώσει. Δεν θα διαγραφούν σύμβολα.
+      _add_picto_to_survey:
+        option: '%{survey_name} στο %{symbolset_name}'
+        button: Προσθήκη στην έρευνα
+      add_symbol:
+        notice_success: Προσθηκεύσαμε το σύμβολο στην έρευνά σας. %{add_another_link}
+        notice_success_add_another: Να προσθέσω κι άλλο;
+        alert_failure: Αυτό το σύμβολο βρίσκεται ήδη στο %{survey_link}
+      destroy:
+        notice: Διαγράψαμε την έρευνά σας %{name}.
+      edit:
+        heading: Επεξεργασία έρευνας
+        _title: Επεξεργασία %{survey_name} στο %{symbolset_name}
+    survey_picto_analysis:
+      index:
+        intro: Αυτός ο πίνακας εμφανίζει τις μέσες αποκρίσεις για κάθε σύμβολο της
+          έρευνας, με βάση ένα σύνολο %{count} που ελήφθη.
+        column_heading_overall_average: Συνολικός μέσος όρος
+        column_heading_representation_rating_description: Αντιπροσωπεύει τη λέξη ή
+          τη φράση
+        column_heading_rating_description: Συναισθήματα για το σύμβολο στο σύνολό
+          του
+        column_heading_cultural_rating_description: Πολιτισμική καταλληλότητα
+        column_heading_contrast_rating_description: Χρωματική αντίθεση
+        crumb_name: Στατιστικά συμβόλων
+        heading: Στατιστικά συμβόλων
+        row_heading_averages: Μέσοι όροι
+    survey_questions:
+      _form:
+        comments_helper: προαιρετικός. Προσθέστε τυχόν σχόλια που θα μας βοηθήσουν
+          να βελτιώσουμε αυτό το σύμβολο.
+        please_fix_errors: Διορθώστε τα παρακάτω σφάλματα.
+        button_previous_question: Προηγούμενη ερώτηση
+        button_save_answer: Αποθήκευση απάντησης
+      show:
+        please_rate: Παρακαλώ βαθμολογήστε αυτό το σύμβολο σε μια κλίμακα όπου το
+          1 είναι "εντελώς απαράδεκτο" και το 5 είναι "απολύτως αποδεκτό".
+      _controller:
+        timed_out: Συγγνώμη - η έρευνά σας λήγει λόγω αδράνειας. Παρακαλώ ξεκινήστε
+          ξανά την έρευνα.
+    concepts:
+      show:
+        page_title: '%{θέμα} στο %{coding_framework}'
+        defined_in: Μια έννοια που ορίζεται στο
+    pagination:
+      first: πρώτος
+      next: επόμενος
+      last: τελευταίος
+      previous: Προηγούμενο
+    application:
+      _copy_to_clipboard:
+        button: αντίγραφο
+        button_title: Αντιγραφή στο Πρόχειρο
+    errors:
+      not_found:
+        description: Δεν μπορέσαμε να βρούμε τίποτα σε αυτή τη διεύθυνση
+    articles:
+      _topbar:
+        header_news: Global Symbols ειδήσεις
+      index:
+        title: ειδήσεις
+        more_button: Περισσότερα Άρθρα
+        description: Το Ιστολόγιο Global Symbols - Ενημερώσεις, ιδέες και έμπνευση
+          που θα σας βοηθήσουν να επικοινωνήσετε με σύμβολα.
+  date:
+    month_names:
+    - Δεκέμβριος
+    - Ιανουάριος
+    - Φεβρουάριος
+    - Μάρτιος
+    - Απρίλιος
+    - Μάιος
+    - Ιούνιος
+    - Ιούλιος
+    - Αύγουστος
+    - Σεπτέμβριος
+    - Οκτώβριος
+    - Νοέμβριος
+    abbr_month_names:
+    - Ιούν
+    - Ιαν
+    - Φεβ
+    - Μαρ
+    - Απρ
+    - Μάιος
+    - Ιούλ
+    - Αυγ
+    - Σεπ
+    - Οκτ
+    - Νοε
+    - Δεκ
+    formats:
+      default: '%e %b %Y'
+      short: '%d %b'
+      long: '%d %B %Y'
+    day_names:
+    - Κυριακή
+    - Δευτέρα
+    - Τρίτη
+    - Τετάρτη
+    - Πέμπτη
+    - Παρασκευή
+    - Σάββατο
+    abbr_day_names:
+    - Κυρ
+    - Δευ
+    - Τρ
+    - Τετ
+    - Πέμ
+    - Παρ
+    - Σάβ
+    order:
+    - έτος
+    - μήνας
+    - μέρα
+  time:
+    formats:
+      default: '%a, %d %b %Y %H:%M:%S %z'
+      short: '%d %b %H:%M'
+      long: '%B %d, %Y %H:%M'
+    am: Π.μ
+    pm: μ.μ.

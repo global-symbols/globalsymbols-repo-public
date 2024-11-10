@@ -1,0 +1,14 @@
+- title t('devise.views.sessions.new.page_title')
+%main.container
+  .justify-content-md-center
+    %h1.mb-4= t('devise.views.sessions.new.page_title')
+    = bootstrap_form_for(resource, as: resource_name, url: session_path(resource_name), layout: :vertical, label_col: 'col-sm-4', control_col: 'col-sm-8') do |f|
+      = f.email_field :email, autofocus: true, autocomplete: "email"
+      = f.password_field :password, autocomplete: "off"
+
+      .d-flex.justify-content-between.align-items-center.mt-4
+        .pl-3
+          - if devise_mapping.rememberable?
+            = f.check_box :remember_me, custom: :check_box
+        = f.primary t('devise.views.sessions.new.sign_in_button')
+    = render 'devise/shared/links', cache: true

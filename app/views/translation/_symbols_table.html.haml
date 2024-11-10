@@ -1,0 +1,32 @@
+%table.table.translation-table#translation_table
+  %thead
+    %tr
+      %th.text-center= t('dictionary.symbol.one')
+      %th.text-center= t('views.translations._symbols_table.heading_type')
+      %th.w-50= t('views.translations._symbols_table.heading_source_language', language_name: source_language.name)
+      %th.w-50= t('views.translations._symbols_table.heading_destination_language', language_name: destination_language.name)
+
+  %tbody
+    - pictos.each do |picto|
+      %tr
+        %td.text-center
+          %a{href: symbolset_symbol_path(picto.symbolset, picto) }
+            %img.rounded{src: picto.images.last.imagefile.url}
+        %td.align-middle.text-center.px-3= Picto.human_enum_name(:part_of_speech, picto.part_of_speech)
+        %td.align-middle
+          - best_label = picto.best_label_for(source_language)
+          %a{href: edit_symbolset_symbol_label_path(picto.symbolset, picto, best_label)}
+            = best_label.text
+        %td.align-middle
+          - suggestion = picto.labels.find_by(language: destination_language)
+          - if suggestion
+            - if suggestion.source.suggestion
+              = render 'translation/suggestion_form', { suggestion: suggestion }
+            - else
+              = render 'translation/label_link', { label: suggestion }
+          - else
+            = bootstrap_form_for Label.new, url: translation_suggest_path(picto.id), method: :post, remote: true, html: {id: "get_suggestion_for_picto_#{picto.id}"} do |f|
+              = f.hidden_field :source_language_id, value: source_language.id
+              = f.hidden_field :destination_language_id, value: destination_language.id
+              = f.hidden_field :picto_id, value: picto.id
+              = f.submit t('views.translations._symbols_table.button_get_translation'), data: {disable_with: t('views.translations._symbols_table.button_get_translation_working')}

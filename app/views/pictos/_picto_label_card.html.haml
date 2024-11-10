@@ -1,0 +1,9 @@
+- image_url = label.picto.images.last.present? ? label.picto.images.last.imagefile.url : '//placehold.it/362x200'
+%a.card.mb-4{href: symbolset_symbol_path(label.picto.symbolset, label.picto)}
+  .card-body
+    .px-2.mb-4.text-center
+      %img.img-fluid{alt: label.text, src: image_url}
+  .card-footer
+    .row
+      .col
+        %h3.mb-0.card-title= label.text

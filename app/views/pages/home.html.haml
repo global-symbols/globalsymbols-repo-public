@@ -1,0 +1,56 @@
+:ruby
+  description 'Browse thousands of free communication symbols and create your own communication boards at Global Symbols.'
+
+  set_meta_tags og: {
+    url: root_url,
+    type: 'website'
+  }
+
+%main.container-xl
+  .row.align-items-center.mt-5
+    .col-sm-6.pb-3.text-center
+      %img.img-fluid{src: asset_path('logo-with-text.svg'), style: 'max-height: 14rem', alt: 'Global Symbols'}
+    .col-sm-6.text-center.text-sm-left
+      %h2.display-1= t('views.pages.home.for_creators')
+      %p.lead= t('views.pages.home.for_creators_text')
+      %h2.display-1= t('views.pages.home.for_communicators')
+      %p.lead= t('views.pages.home.for_communicators_text')
+      %h2.display-1= t('views.pages.home.for_everyone')
+      %p.lead= t('views.pages.home.for_everyone_text')
+
+
+  .row.align-items-center.mt-5
+    .col-sm-6.pb-3.text-center.text-sm-right
+      %h2.display-1
+        %span.text-muted= t('views.pages.home.board_builder.heading')
+        = t('views.pages.home.board_builder.subheading')
+      %p.lead= t('views.pages.home.board_builder.create')
+      %p.lead= t('views.pages.home.board_builder.design')
+      %p.lead= t('views.pages.home.board_builder.storage')
+      %a.btn.btn-outline-primary{href: "/about/featured-board-sets"}= t('views.pages.home.board_builder.button_featured')
+      %a.btn.btn-primary{href: "https://app.globalsymbols.com/", target: '_blank'}= t('views.pages.home.board_builder.button_try')
+
+    .col-sm-6
+      %img.img-fluid{src: asset_path('home/boardbuilder-1.svg'), alt: 'Board Builder'}
+
+  .row
+    .col.mt-5
+      %h2.display-1.text-center.mb-3= t('views.pages.home.explore_heading')
+      .card-deck.gs-deck-4.symbolsets-card-deck
+        = render partial: 'symbolsets/symbolset_card', collection: @symbolsets, cached: -> record { [I18n.locale, record] }
+  .row.justify-content-sm-center
+    .col-sm-6
+      %a.btn.btn-primary.btn-block{href: symbolsets_path}= t('views.pages.home.explore_button')
+
+%script{type:"application/ld+json"}
+  :plain
+    {
+      "@context": "https://schema.org",
+      "@type":    "WebSite",
+      "url":      "https://globalsymbols.com",
+      "potentialAction": [{
+        "@type":  "SearchAction",
+        "target": "https://globalsymbols.com/search?locale=en&query={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }]
+    }

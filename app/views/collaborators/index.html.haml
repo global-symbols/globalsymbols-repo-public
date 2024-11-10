@@ -1,0 +1,37 @@
+- title t('views.collaborators.index.page_title', name: @symbolset.name)
+- content_for(:topbar, render('symbolsets/topbar', symbolset: @symbolset))
+%main.container-xl
+  .row
+    .col-md-3
+      =render 'symbolsets/settings_menu', symbolset: @symbolset
+    .col-md-6.text-center
+      %h1.mb-4= t('dictionary.collaborator.other')
+      .card.mb-5
+        .card-header.text-center
+          = t('views.collaborators.index.add_heading')
+        .card-body
+          %p.mb-4= t('views.collaborators.index.add_text')
+          = bootstrap_form_with url: symbolset_collaborators_path, layout: :horizontal, label_col: 'col-sm-3', control_col: 'col-sm-9' do |f|
+            = f.email_field :email, required: true
+            .text-right
+              = f.primary t('views.collaborators.index.add_button')
+
+      .card.mb-5#symbolset-collaborators
+        .card-header.text-center
+          = t('views.collaborators.index.existing_heading')
+        .card-body
+          %p.mb-0
+            - if @symbolset.symbolset_users.any?
+              = t('views.collaborators.index.existing_text')
+            - else
+              = t('views.collaborators.index.existing_none_found')
+        .list-group.list-group-flush
+        - @symbolset.symbolset_users.each do |ssu|
+          .list-group-item.flex-column
+            .d-flex.w-100.align-items-center
+              %div.mr-3
+                %img.rounded{src: "https://s.gravatar.com/avatar/#{Digest::MD5.hexdigest(ssu.user.email)}?s=100"}
+              %div.flex-fill= ssu.user.email
+              %small= t('views.collaborators.index.added_at', date: l(ssu.created_at.to_date))
+              %a.ml-3.close{href: symbolset_collaborator_path(@symbolset, ssu), "aria-label" => t('views.collaborators.index.remove_aria_label'), data: {method: :delete, confirm: t('views.collaborators.index.remove_confirm', email: ssu.user.email)}, class: (:invisible if ssu.user == current_user)}
+                %span{"aria-hidden" => 'true'} ×

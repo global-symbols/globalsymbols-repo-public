@@ -1,0 +1,7 @@
+- title t('views.survey_editor.edit._title', survey_name: @survey.name, symbolset_name: @survey.symbolset.name)
+- content_for(:topbar, render('topbar', survey: @survey))
+%main.container-xl
+  .row.justify-content-md-center
+    .col-md-6
+      %h3.mb-5= t('views.survey_editor.edit.heading')
+      = render 'form'

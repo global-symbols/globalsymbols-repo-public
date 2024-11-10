@@ -1,0 +1,1 @@
+Date::DATE_FORMATS[:long] = '%-d %B %Y' # e.g. 8 June 2019

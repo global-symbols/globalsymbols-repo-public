@@ -1,0 +1,7 @@
+- title t('views.pictos.new._title', symbolset_name: @picto.symbolset.name)
+- content_for(:topbar, render('symbolsets/topbar', symbolset: @picto.symbolset, stacking: true))
+%main.container-xl
+  .row.justify-content-md-center
+    .col-md-6
+      %h1.mb-4.text-center= t('views.pictos.new.heading')
+      = render 'form'

@@ -1,0 +1,8 @@
+- title "Create a Survey in #{@symbolset.name}"
+- content_for(:topbar, render('symbolsets/topbar', symbolset: @symbolset))
+
+%main.container-xl
+  .row.justify-content-md-center
+    .col-md-6
+      %h1.text-center.mb-4= t('views.survey_editor.new.button_create')
+      = render 'form'

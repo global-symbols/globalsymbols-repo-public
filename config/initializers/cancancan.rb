@@ -1,0 +1,1 @@
+# CanCan.accessible_by_strategy = :left_join

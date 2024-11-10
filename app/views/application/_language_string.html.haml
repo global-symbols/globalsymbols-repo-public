@@ -1,0 +1,5 @@
+-# Requires 'text' attribute
+-# Optional 'translate' attribute (defaults to 'no')
+-# Optional 'language' attribute (defaults to none)
+- translate = :no if local_assigns[:translate].nil?
+%span{translate: translate, lang: (language.iso639_1 if defined? language)}= text

@@ -1,0 +1,79 @@
+:ruby
+  title t('views.pictos.show._title', picto_label: @picto.best_label_for(locale).text, symbolset_name: @picto.symbolset.name)
+  description t('views.pictos.show._description', picto_label: @picto.labels.first.text, symbolset_name: @picto.symbolset.name)
+
+  set_meta_tags og: {
+    image: @picto.images.last.imagefile.url,
+    url: symbolset_symbol_url(@picto.symbolset, @picto),
+    type: 'object',
+    updated_time: @picto.updated_at.iso8601
+  }
+
+  content_for(:topbar, render('topbar', picto: @picto, cache: true))
+%main.container-xl
+  .row
+    .col-md-3
+      %img.img-fluid.show-picto-image{src: @picto.images.last.imagefile.url, alt: @picto.best_label_for(locale).text}
+    .col
+      - if @picto.archived
+        .alert.alert-primary
+          %strong= t('views.pictos.show.archived_notice.heading')
+          ·
+          = t('views.pictos.show.archived_notice.text')
+
+      %p.lead= @picto.best_label_for(locale).description
+      .table-responsive
+        %table.table.table-hover
+          %thead
+            %th{scope: :col}= t('activerecord.models.language')
+            %th{scope: :col}= t('activerecord.models.label')
+            %th{scope: :col}= t('activerecord.attributes.label.description')
+          %tbody
+            - @picto.labels.authoritative.includes(:language).each do |label|
+              %tr
+                %td.text-muted= label.language.name
+                %td
+                  = render 'application/language_string', language: label.language, text: label.text, cache: true
+                  -#- if can? :manage, @picto
+                    %a{href:edit_symbolset_symbol_label_path(@picto.symbolset, @picto, label)}
+                      %small Edit
+                %td= render 'application/language_string', language: label.language, text: label.description, cache: true
+
+      -#%h3 Rate and Comment
+      -#- if current_user
+        .card.p-3.bg-light
+          = render 'comment_form', picto: @picto, comment: @comment
+      -#- else
+        %p
+          You must be
+          = link_to 'logged in', new_user_session_path
+          to comment.
+
+      %h2.d-inline= t('dictionary.concept.other')
+      -#- if can? :manage, @picto
+        %a{href:symbolset_symbol_concepts_path(@picto.symbolset, @picto)} Edit
+      - if @picto.concepts.length > 0
+        .list-group
+        - @picto.concepts.includes(:coding_framework).each do |concept|
+          %a.list-group-item.list-group-item-action.flex-column.align-items-start{href: concept_path(concept)}
+            .d-flex.w-100.justify-content-between
+              %h5.mb-1= render 'application/language_string', text: concept.subject, language: concept.language, cache: true
+            %small= t('views.pictos.show.concept_defined_in', coding_framework_name: concept.coding_framework.name)
+      - else
+        %p.font-weight-light
+          = t('views.pictos.show.no_concepts')
+          - if can? :manage, @picto
+            %a{href:symbolset_symbol_concepts_path(@picto.symbolset, @picto)}= t('views.pictos.show.add_concept_button')
+      - if @alternative_pictos.any?
+        %h3.mt-3= t('views.pictos.show.alternative_symbols_heading')
+        .row
+          - @alternative_pictos.each do |picto|
+            .col-md-3
+              %a.card.text-center.mb-4{href: symbolset_symbol_path(picto.symbolset, picto)}
+                .card-body.p-2
+                  %img.img-fluid{src: picto.images.last.imagefile.url, alt: picto.best_label_for(locale).text}
+                .card-footer.small.text-muted
+                  In
+                  = render 'application/language_string', text: picto.symbolset.name, cache: true
+
+        = paginate @alternative_pictos

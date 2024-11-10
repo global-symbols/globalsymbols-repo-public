@@ -1,0 +1,1 @@
+$("#new_label_for_picto_<%= @label.id %>").replaceWith('<%= escape_javascript render('label_link', label: @label) %>!')

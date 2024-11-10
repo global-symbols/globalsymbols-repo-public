@@ -1,0 +1,5 @@
+.card-body
+  %h1.card-title= t('doorkeeper.authorizations.error.title')
+
+  .card-text
+    %code= @pre_auth.error_response.body[:error_description]

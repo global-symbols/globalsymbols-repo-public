@@ -1,0 +1,967 @@
+tr:
+  views:
+    pages:
+      search:
+        symbolset_dropdown_any_symbol_set: Herhangi Bir Sembol Kümesi
+        search: Ara
+        search_for: Arama
+        no_results: Eşleşen bir sembol bulamadık. Daha geniş bir arama deneyin.
+        _title: Ara
+      contact:
+        heading: Temasta kalın
+        lead_text: İlgili kaynaklar hakkında sorular, öneriler ve bilgiler almaktan
+          çok memnunuz.
+        _description: Genel sorular veya sembol setinizin yayınlanmasını sağlamak
+          için bizimle iletişime geçin.
+        email_us: Bize e-posta gönder
+      home:
+        for_creators_text: Sembol setini yönetme ve yayımlama
+        for_creators: Üreticiler için
+        for_communicators_text: Diyalog oluşturmak için resimleri değiştirmek
+        for_communicators: İletişimciler için
+        for_everyone_text: Sembolleri kişiselleştirin, keşfedin, karıştırın, eşleştirin
+          ve kullanın
+        explore_button: Diğer Sembol Kümelerini Keşfet…
+        board_builder:
+          heading: Global Symbols Board Builder
+          subheading: İletişim Panoları kolay yol
+          create: Kütüphanemizdeki binlerce ücretsiz görüntüyü ve hatta kendi görsellerinizi
+            kullanarak iletişime yardımcı olacak panolar oluşturun.
+          design: İletişim panolarını çevrimiçi olarak tasarlayın, oluşturun, kaydedin
+            ve yazdırın.
+          storage: Her şey Global Symbols hesabınızda güvenle saklanır.
+          button_featured: Öne Çıkan Pano Setleri
+          button_try: Board Builder deneyin
+        for_everyone: Herkes için
+        explore_heading: Sembol Kümelerini Keşfet
+    surveys:
+      _shared:
+        thank_you: Anketi tamamladığınız için teşekkür ederiz!
+        questions:
+          representation_rating: Sözcüğü veya tümceciği temsil eder
+          contrast_rating: Renk kontrastı
+          cultural_rating: Kültürel duyarlılık
+          comments: Ek açıklamalar
+          feelings_rating: Sembol hakkında genel hisler
+        number_of_symbols:
+          one: Bu ankette gözden geçirmeniz için %{count} Sembol var.
+          other: Bu ankette, incelemeniz gereken %{count} Semboller var.
+      show:
+        close_at_message: '%{date} tarihine kadar katılabilirsiniz.'
+        begin_button: Ankete Başlayın
+        provide_details: Bilgilerinizi vermek isteğinize bağlıdır ve anket düzenleyicilerine
+          yardımcı olabilir.
+        provide_details_2: Bilgileriniz, geri bildirimlerinizle bağlantılı olarak
+          anket düzenleyicilerine gösterilecek ve Global Symbols tarafından başka
+          bir amaç için kullanılmayacaktır.
+        closed_header: Bu anket şu anda geri bildirim kabul etmiyor.
+        closed_text: Katılmak isterseniz anket düzenleyicisine başvurun.
+        offline_participants: Çevrimdışı çalışan katılımcılar için…
+        offline_participants_button: Anket Geri Bildirim Formlarını Yazdır
+      print:
+        instructions_1: Bu anket, her sembolün dört özellik ile derecelendirmenizi
+          ve bazı yorumlar sağlamanızı isteyecektir.
+        heading: Yazdırma Ayarları
+        collect_names: Katılımcı adlarını topla
+        show_intro_helper: Anketi düzenleyerek girişi değiştirin.
+        show_instructions: Yönergeleri Göster
+        show_instructions_helper: Talimatları tıklayarak değiştirin.
+        symbol_label_language_all: Mevcut Tüm Diller
+        show_example_helper: Örnek yanıtları gösteren örnek bir soru ekler.
+        symbol_label_language_helper: En iyi sonuçları elde edin, modern bir tarayıcı
+          kullanarak renkli yazdırın ve üstbilgileri ve altbilgileri devre dışı bırakın.
+        print_button: Anketi Yazdır
+        name_field: Benim adım
+        introduction: Giriş
+        instructions_2: Her sembolü, doğru kutuya bir tik yerleştirerek 1'in 'tamamen
+          kabul edilemez' ve 5'in 'tamamen kabul edilebilir' olduğu bir ölçekte değerlendirin.
+        show_intro: Anket Başlangıcını Göster
+        show_example: Bir örnek göster
+        symbol_label_language: Sembol etiketlerini göster
+        instructions_heading: Talimatlar
+      _print_question:
+        symbol_counter: Sembol %{number}
+        example_heading: Örnek Soru
+        example_text: Bu, soruları nasıl yanıtlayacağınızı gösterir
+        example_comment: Bu ağaç brokoliye benziyor.
+      thank_you:
+        feedback_is_saved: Tüm geri bildirimlerinizi kaydettik.
+        button_go_to_homepage: Global Symbols ile devam
+        button_restart_survey: Anketi Yeniden Başlat
+    pictos:
+      _form:
+        image_helper: SVG (tercih edilen) veya PNG biçimli bir görüntü yükleyin.
+        label_helper: Etiket, insanların bulabilmesi için sembolünüzü açıklar. Sembolü
+          oluşturduktan sonra ek dillerde etiketler ekleyebilirsiniz.
+        language_helper: Etiketin dili.
+        label_label: Etiket metni
+        diacritised_label_helper: Sadece Arap dilleri için. Bu, ek telaffuz ayrıntısı
+          depolar.
+        description_helper: Anlama yardımcı olmak için sembolü kısaca açıklayın.
+        save_button: Sembolü Kaydet
+        create_button: Sembolü Ekle
+        to_download_symbols: sembolleri indirmek için
+      _topbar:
+        not_publicly_visible: Herkese açık olarak görünmüyor
+        download_button: '%{file_type} karşıdan yükle'
+      edit:
+        _title: '%{symbolset_name} içinde %{picto_label} düzenle'
+        heading: Sembolü Düzenle
+      new:
+        _title: '%{symbolset_name} içine Sembol Ekle'
+        heading: Sembol Ekle
+      show:
+        _title: '%{symbolset_name} içinde %{picto_label}'
+        concept_defined_in: '%{coding_framework_name} içinde tanımlandı'
+        alternative_symbols_heading: Alternatif Semboller
+        add_concept_button: Konsept Ekleme
+        no_concepts: Bu sembolün tanımlayacak kavramı yoktur.
+        _description: "'%{picto_label}' simgesi, %{symbolset_name} sembol kümesinin\
+          \ bir parçası. İletişim için binlerce ücretsiz sembol bulun."
+        archived_notice:
+          heading: Arşivlenmiş Sembol
+          text: Bu sembol sembol setinde, arama sonuçlarında veya uygulamalarda gösterilmez
+      _comment_form:
+        save_button: Açıklamayı Kaydet
+    survey_response_analysis:
+      index:
+        heading: Bireysel Yanıtlar
+        crumb_name: Bireysel Yanıtlar
+      _sidebar:
+        heading: Yanıt
+        participant_number: Katılımcı %{number}
+      new:
+        heading: Kağıt Geri Bildirimi Ekleme
+        use_this_form_to: Tek bir kağıt anketini Genel Semboller'e kaydetmek için
+          bu formu kullanın. Daha sonra anket istatistiklerinize sayılır.
+        label_overall_rating: Sembol hakkındaki hisler
+        match_numbers: Her sembol kutusunun sağ üst kısmında gösterilen sayılar, her
+          sembol için doğru derecelendirmeleri girdiğinizi garanti etmek için kağıt
+          formlarda gösterilenlerle eşleşmelidir.
+        label_representation_rating: Sözcüğü temsil eder
+        label_cultural_rating: Kültürel duyarlılık
+        label_contrast_rating: Renk kontrastı
+        save_button: Yanıtları Kaydet
+        cancel_confirm: Emin misiniz? Şimdiye kadarki tüm sonuçları kaybedeceksiniz.
+      create:
+        notice_success: Bu kağıt yanıtı kaydedildi.
+    symbolsets:
+      show:
+        no_symbols_for_collaborator: Sembol Kümenizi oluşturmaya başlamak için Sembol
+          Ekleyin
+        _description: Global Symbols'de %{symbolset_name} sembol setini keşfedin.
+          İletişim için ücretsiz resimler ve semboller.
+      _topbar:
+        download: Indir
+        button_add_symbol: Sembol Ekle
+        button_review: Inceleme
+        button_edit: Düzenle
+        button_archive: Arşivlenmiş Semboller
+        button_translate: Çevir
+      _form:
+        published_helper: Yayınlanan Sembol Kümeleri herkes tarafından görülebilir.
+          Taslak Sembol Kümeleri Yöneticiler ve Sembol Kümesi Ortak Çalışanları tarafından
+          görülebilir.
+        description_helper: Bu açıklama Sembol Kümesi'nin yanında görünecektir.
+        publisher_helper: Sembol kümesini yayımlayan kişi veya kuruluşun adı.
+        publisher_url_helper: Yayıncının web sitesinin adresi.
+        publisher_placeholder: örneğin PeopleSymbols Vakfı
+        logo_label: Logo
+        licence_prompt: Lisans Seçin
+        create_button: Sembol Set Oluştur
+        save_button: Sembol Seti Kaydet
+        logo_helper: Bu logo Sembol Kümeleri sayfasında görünecektir. Bu, ideal olarak
+          bir SVG veya PNG, şeffaf bir arka plana sahip 300x200 piksel bir görüntü
+          olmalıdır.
+        publisher_url_label: Yayımcı URL'si
+        publisher_url_placeholder: örneğin https://peoplesymbols.com
+      _review_row:
+        remove_confirmation: '%{subject} öğesini bu sembolden kaldıralım mı?'
+      import:
+        _title: '%{symbolset_name} içe aktar'
+        heading: Sembolleri İçeri Aktar
+        introduction: Mevcut sembollerinizi Global Symbols'e yükleyin.
+      edit:
+        _title: '%{symbolset_name} düzenle'
+      _symbolset_card:
+        image:
+          alt: '%{symbolset_name} logosu'
+      index:
+        _title: Sembol Setlerini Keşfet
+        heading: Sembol Setlerini Keşfet
+        _description: Global Symbols'da binlerce ücretsiz iletişim sembolüne göz atın.
+        create_symbol_set_button: Sembol Set Oluştur
+      new:
+        _title: Sembol Set Oluşturma
+        introduction: Yeni sembol kümeniz taslak durumunda oluşturulacak. Yalnızca
+          siz ve eklediğiniz ortak çalışanlar tarafından görülebilir, bu da sembol
+          eklemenize ve sembol setini hazırlamanıza olanak sağlar.
+        heading: Sembol Set Oluşturma
+        guidance_link: Sembol Setinizin Global Symbols'de yayımlanması
+        guidance: Yönergeleri gözden geçirmenizi öneririz
+      review:
+        heading: Inceleme
+        filter_without_a_concept: Konseptsiz
+        filter_all_symbols: Tüm Semboller
+      _shared:
+        none_found: Burada sembol bulamadık!
+      archive:
+        description: Arşivlenen semboller sembol setinde, arama sonuçlarında veya
+          uygulamalarda gösterilmez
+        heading: Arşivlenmiş Semboller
+        none_found: Bu sembol kümesinde arşivlenmiş sembol yok
+      translate:
+        heading: Etiketleri Çevir
+        description: Sembol etiketlerini otomatik olarak yeni dillere çevirin. Bu
+          araç aynı anda %{symbols_limit} sembolü çevirir.
+        button_find_untranslated: Çevrilmemiş Sembolleri Bul
+        form:
+          target_lang_prompt: Hedef dili seç
+          target_lang_label: Hedef
+          source_lang_label: Çeviri kaynağı
+          source_lang_option: '%{language_name} (%{labels_count} semboller, %{coverage_percentage}
+            tamamlandı)'
+        title: '%{symbolset_name} çevir'
+    survey_editor:
+      _add_picto_to_survey:
+        button: Ankete Ekle
+        option: '%{symbolset_name} içinde %{survey_name}'
+      _form:
+        name_helper: Katılımcıların bu anketi tanımlamasına yardımcı olacak bir ad
+          sağlayın.
+        close_at_helper: Isteğe bağlı. Katılımcıların yanıt vermesi için bir son tarih
+          belirleyin.
+        introduction_helper: Isteğe bağlı. Bu, katılımcılara ankete başladıklarında
+          gösterilir.
+        language_helper: Bu ankete katılırken katılımcılara seçilen dilde sembol etiketleri
+          gösterilir.
+        language_label: Sembol Etiketlerini Göster
+        show_symbol_descriptions_label: Sembol açıklamalarını göster
+        language_blank_option: Mevcut tüm diller
+        show_symbol_descriptions_helper: Katılımcılara sembol açıklamalarını görüntüler.
+        create_button: Anketi Yazdır
+        save_button: Anketi Kaydet
+      _picto:
+        remove_confirm: Bu Sembolü Anketten kaldırmak istediğinizden emin misiniz?
+        no_label_for_language: '%{language_name} etiketi yok'
+      _sidebar:
+        heading: Aşamalar
+        stages:
+          plan: Plan
+          collect_feedback: Geri Bildirim Topla
+          collect_feedback_description: Katılımcıların Anketi tamamlamasına izin verin
+          archive: Arşivleme veya Silme
+          analyse_results_description: Anket sonuçlarını gözden geçirin
+          analyse: Sonuçları Analiz Etme
+          plan_description: Ankete dahil etmek için Sembolleri Seçin
+      export_xlsx:
+        header_symbol_id: Sembol ID
+        header_participant_name: Katılımcı Adı
+        header_participant_number: Katılımcı Numarası
+        header_representation_rating: Gösterim
+        header_overall_rating: Değerlendirme
+        header_label: Etiket
+        header_cultural_rating: Kültürel
+        header_contrast_rating: Kontrast
+        comment_participant_name: Katılımcıların adlarını vermeleri gerekmez, bu nedenle
+          bazı hücreler boş olabilir.
+        sheet_name: Yorum
+        header_comment: Yorum
+      edit:
+        heading: Anketi Düzenle
+        _title: '%{symbolset_name} içinde %{survey_name} düzenle'
+      destroy:
+        notice: Anketinizi sildik %{name}.
+      index:
+        button_new_survey: Anket Oluştur
+        _title: '%{symbolset_name} içinde anketler'
+        get_help: Anketler için %{link} öğesini keşfedin
+        no_surveys_at_stage: '%{stage} aşamasında Anket yok.'
+        get_help_link: Yardım ve Eğitim
+      show:
+        symbols_heading: Bu Anketteki Semboller
+        symbols_search_helper: Bu Ankete Eklenecek Sembolleri Ara
+        collect_feedback:
+          heading: Geri Bildirim Topla
+          text_2: Anket geri bildirim toplarken sembol seçimlerinizi değiştiremezsiniz.
+          close_at_label: Yanıtları Şu Zamana Kadar Kabul Et
+          close_at_helper: Isteğe bağlı. Anket yanıtları için bir son tarih belirleyin.
+          invite_at_this_url: İnsanları bu URL'de anketinize davet edin.
+          button_begin_collecting: Geri Bildirim Toplamaya Başlayın
+          invite_deadline: Katılımcıların yanıt sağlamak için %{close_at} 'a kadar
+            zamanları var (%{link}).
+          responses_count:
+            one: Anketinizde %{count} yanıtı var.
+            other: Anketinizde %{count} yanıt var.
+          confirm_stop: Bu, insanların ankete yanıt vermelerini durduracaktır. Emin
+            misiniz?
+          paper_heading: Kağıt Anketleri
+          stop_button: Anketi Sonlandırın
+          paper_intro: Bazı katılımcılar kağıt anket formlarını tercih edebilir. Bu
+            araçları kullanın, geri bildirimlerini toplayın ve burada saklayın.
+          paper_customisation_invitation: Katılımcılarınız için anket formlarını özelleştirmek
+            ve yazdırmak için…
+          paper_print_button: Anket Formlarını Yazdır
+          paper_to_include_results: Anket sonuçlarınıza kağıt anket formlarından elde
+            edilen sonuçları eklemek için…
+          survey_ended: Bu anket için yanıt toplama sona erdi.
+          survey_ended_add_paper: Yine de kağıt anket formlarından manuel olarak geri
+            bildirim ekleyebilirsiniz.
+          text_1: Geri bildirim toplamaya başladığınızda, size insanların ankete katılabileceği
+            bir URL vereceğiz.
+          paper_add_paper_feedback_button: Kağıt Geri Bildirimi Ekleme
+        analyse_results:
+          heading: Sonuçları Analiz Etme
+          results_appear_here: İnsanlar Anketinize yanıt vermeye başladığında sonuçlar
+            burada görünecektir.
+          responses_count:
+            one: '%{count} kişi anketinize yanıt verdi.'
+            other: '%{count} kişiler anketinize yanıt verdi.'
+          button_individual_responses: Bireysel Yanıtlar
+          export:
+            heading: Sonuçları Excel'e Aktar
+            text_2: Bu, Excel'de kendi analizinizi gerçekleştirmenizi kolaylaştırır.
+              Her Sembolün ortalama sonuçlarını hesaplamak için Pivot Tablolar'ı kullanmanızı
+              öneririz.
+            text_1: Derecelendirmeler ve yorumlar da dahil olmak üzere tüm anket verilerini
+              indirmek için bu aracı kullanın.
+            text_3: Excel dosyasındaki her satır, tek bir katılımcının anketteki bir
+              sembolü gözden geçirmesini temsil eder.
+          button_stats: Sembol İstatistikleri
+        archive:
+          heading: Arşivle veya Sil
+          archive_description: Bu Anketi bitirdiğinizde arşivle. Bu Anketteki tüm
+            sonuçları analiz etmeye devam edebilirsiniz.
+          survey_is_archived: Bu anket Arşivlenmiştir. Yine de herhangi bir sonucu
+            analiz edebilirsiniz.
+          archive_confirm: Bu, insanların ankete yanıt vermelerini durduracaktır.
+            Emin misiniz?
+          delete_description: Bu Anketi silmek, topladığınız tüm sonuçları kalıcı
+            olarak siler. Hiçbir Sembol silinmez.
+          archive_button: Anketi Arşivleme
+          delete_confirm: Bu Anketi ve yanıtları silmek istediğinizden emin misiniz?
+          delete_button: Anketi Silme
+        symbols_text: Global Symbols arayarak ve 'Ankete Ekle'yi seçerek bu Ankete
+          Semboller ekleyin.
+      new:
+        button_create: Anket Oluştur
+      add_symbol:
+        notice_success: Sembolü Anketinize ekledik. %{add_another_link}
+        notice_success_add_another: Bir tane daha eklensin mi?
+        alert_failure: Bu sembol zaten %{survey_link} içinde
+    survey_picto_analysis:
+      index:
+        crumb_name: Sembol İstatistikleri
+        heading: Sembol İstatistikleri
+        intro: Bu tablo, alınan toplam %{count} öğesine dayanarak anketteki her sembol
+          için ortalama yanıtları gösterir.
+        row_heading_averages: Ortalamalar
+        column_heading_overall_average: Genel Ortalama
+        column_heading_contrast_rating_description: Renk kontrastı
+        column_heading_representation_rating_description: Sözcüğü veya tümceciği temsil
+          eder
+        column_heading_cultural_rating_description: Kültürel uygunluk
+        column_heading_rating_description: Sembol hakkında genel hisler
+    survey_questions:
+      _form:
+        please_fix_errors: Lütfen aşağıdaki hataları düzeltin.
+        comments_helper: Isteğe bağlı. Lütfen bu sembolü geliştirmemize yardımcı olacak
+          yorumları ekleyin.
+        button_save_answer: Yanıtı Kaydet
+        button_previous_question: Önceki Soru
+      _controller:
+        timed_out: Üzgünüz - anketiniz etkinliksizlik nedeniyle zaman aşımına uğramış.
+          Lütfen ankete tekrar başlayın.
+      show:
+        please_rate: Lütfen bu sembolü 1'in 'tamamen kabul edilemez' ve 5'in 'tamamen
+          kabul edilebilir' olduğu bir ölçekte değerlendirin.
+    collaborators:
+      index:
+        add_heading: Paydaş Ekleme
+        page_title: '%{name} için paydaşlar'
+        add_text: Başka birinin bu sembol kümesini düzenlemesine izin vermek için,
+          Global Symbols'e kaydolmak için kullandıkları e-posta adresini girin.
+        add_button: Paydaş Ekle
+        existing_text: Bu kişilerin bu sembol kümesini düzenlemesine izin verilir.
+        existing_heading: Varolan Paydaşlar
+        added_at: '%{date} eklendi'
+        remove_confirm: '%{email} öğesini bu sembol kümesinden kaldıralım mı?'
+        existing_none_found: Hiçbir kullanıcının bu sembol kümesini düzenlemesine
+          izin verilmez.
+        remove_aria_label: Paydaşı Kaldır
+      create:
+        alert_no_gs_account: '%{email_address} henüz Global Symbols hesabı yok.'
+        notice_success: '%{email_address} öğesini ortak çalışan olarak ekledik.'
+      destroy:
+        notice_success: '%{email_address} öğesini ortak çalışanlardan kaldırdık.'
+    concepts:
+      show:
+        page_title: '%{coding_framework} içinde %{subject}'
+        defined_in: şurada tanımlanan bir kavram
+    picto_concepts:
+      index:
+        add_concept_invitation: ConceptNet'te bulabileceğiniz herhangi bir konsepti
+          ekleyebiliriz.
+        intro: Konseptler, bilgisayarların sembollerinizi anlamalarına yardımcı olur,
+          bu nedenle doğru ve spesifik olduklarından emin olun.
+        add_concept:
+          instruction: Sembole konsept eklemek için bir kelime girin. Bu konsepti
+            bulabilirsek ekleyeceğiz.
+          heading: Konsept Ekleme
+          button: Konsept Ekle
+          add: eklemek
+        existing_concepts:
+          added_at: '%{tarih} eklendi'
+          heading: Varolan Konseptler
+          none_found: Bu Sembolün Konseptleri Yok
+          remove_confirm: '%{subject} öğesini bu sembolden kaldıralım mı?'
+          remove_aria_label: Konsepti Kaldır
+        page_title: '%{symbol} için Konseptler'
+      create:
+        notice_success: Bu sembole %{concept} kavramını ekledik.
+        alert_already_exists: '%{concept} bu sembol zaten bir konsept.'
+        alert_failure: '%{concept} adlı bir kavram bulamadık. Başka bir kelime dene.'
+      destroy:
+        notice_success: '%{concept} kavramını bu sembol kaldırdık.'
+        alert_failure: '%{concept} kavramını bu sembolden kaldıramadık.'
+    picto_labels:
+      _form:
+        language_helper: Etiketin dili.
+        diacritised_label_label: Aksatılan Etiket
+        label_label: Etiket Metni
+        diacritised_label_helper: Sadece Arap dilleri için. Bu, ek telaffuz ayrıntısı
+          depolar.
+        button_save: Etiketi Kaydet
+        description_helper: Anlama yardımcı olmak için sembolü kısaca açıklayın.
+        button_add: Etiket Ekle
+      _picto_labels:
+        remove_label_aria_label: Etiketi Kaldır
+        heading: '%{label_type} Etiketler'
+        remove_label_confirm: Bu sembolden %{text} kaldıralım mı?
+        no_labels_found: Etiket Bulunamadı
+      edit:
+        heading: Etiketi Düzenle
+        page_title: '%{symbol} etiketleri'
+        intro: Etiketler, diğer kişilerin sembollerinizi anlamalarına yardımcı olur.
+          Bu yüzden doğru ve spesifik olduklarından emin olun.
+      index:
+        page_title: '%{symbol} etiketleri'
+        intro: Etiketler, diğer kişilerin sembollerinizi anlamalarına yardımcı olur.
+          Bu yüzden doğru ve spesifik olduklarından emin olun.
+        instructions: Sembollerin en az bir etiketi olmalıdır. İsterseniz, birden
+          fazla dil için etiket ekleyebilirsiniz.
+        heading_add_label: Etiket Ekleme
+        status_published: Yayınlandı
+        status_suggested: Önerilen
+      create:
+        notice_success: Bu sembole %{label} etiketini ekledik.
+        alert_failure: Bu etiketi ekleyebilmemiz için önce bazı sorunları gidermeniz
+          gerekir.
+      destroy:
+        notice_success: Bu sembolden %{label} etiketini kaldırdık.
+        alert_failure: Bu sembolden %{label} etiketini kaldıramadık.
+      publish_translation:
+        notice_success: '%{language_name} etiketi yayımlandı.'
+    application:
+      _copy_to_clipboard:
+        button: Kopya
+        button_title: Panoya kopyala
+    pagination:
+      first: Ilk
+      last: Son
+      next: Sonraki
+      previous: Önceki
+    errors:
+      not_found:
+        description: Bu adreste hiçbir şey bulamadık
+    translations:
+      _translation_form:
+        button_translate: Sembolleri Çevir
+        translation_complete_text: Tüm semboller %{language_name} öğesine çevrildi.
+        button_translate_working: Semboller Çevriliyor…
+        publish_button: Tüm %{language_name} Çevirilerini Yayımla
+        publish_button_working: Tüm Çeviriler Yayımlanıyor…
+        translation_complete_heading: Çeviri Tamamlandı
+      _symbols_table:
+        heading_destination_language: '%{language_name} Çeviri'
+        heading_source_language: '%{language_name} Kaynak'
+        button_get_translation: Çeviri Al
+        button_get_translation_working: Çevriliyor…
+        heading_type: Tür
+      _translations_published:
+        heading: Yayınlanan Çeviriler
+        labels_are_visible: Yeni çeviriler artık Global Symbols ve uygulamalarda görülebilir.
+        next_steps: Çevrilecek daha fazla simge bulun veya başka bir dil seçin.
+        labels_saved: Yeni çeviriler kaydedildi.
+      _suggestion_form:
+        button_publish: Yayımlamak
+        button_publish_working: Yayımlanıyor…
+        label: Çeviri
+    articles:
+      _topbar:
+        header_news: Küresel Semboller Haberleri
+      index:
+        title: Haber
+        description: Küresel Semboller Blog - Sembollerle iletişim kurmanıza yardımcı
+          olacak güncellemeler, fikirler ve ilham.
+        more_button: Diğer Makaleler
+  devise:
+    views:
+      passwords:
+        edit:
+          confirm_password_label: Yeni parolayı onayla
+          new_password_helper: en az %{var} karakter
+          heading: Parolanızı Değiştirme
+          new_password_label: Yeni parola
+          button: Parolayı Değiştir
+        new:
+          heading: Parolayı sıfırla
+          email_helper: Global Symbols'a kaydolmak için kullandığınız e-posta adresi
+          button: E-posta Sıfırlama Bağlantısı
+          page_title: Hesabı Yönet
+        instructions: Hesabınızın e-posta adresini girin, şifrenizi sıfırlamak için
+          bir bağlantı gönderelim.
+      sessions:
+        errors:
+          messages:
+            expired: süresi doldu, lütfen yeni bir tane isteyin
+            not_locked: kilitli değildi
+            confirmation_period_expired: '%{period} içinde onaylanması gerekiyor,
+              lütfen yeni bir tane isteyin'
+            already_confirmed: zaten onaylandı, lütfen oturum açmayı deneyin
+            not_found: bulunamadı
+            not_saved:
+              one: '1 hatası bu %{resource} öğesinin kaydedilmesine engel oldu:'
+              other: '%{count} hatası, bu %{resource} kaynağının kaydedilmesini yasakladı:'
+        new:
+          page_title: Oturum Aç
+          sign_in_button: Oturum Aç
+      _shared:
+        _links:
+          new_confirmation: Onay talimatlarını almadınız mı?
+          sign_in: Oturum Aç
+          sign_up: Hesap Oluştur
+          forgotten_password: Şifrenizi mi unuttunuz?
+          new_unlock: Kilit açma talimatlarını almadınız mı?
+      registrations:
+        _form:
+          language_helper: Semboller mümkün olduğunca tercih ettiğiniz dilde gösterilecektir.
+          cancel_account_button: Hesabımı Sil
+          cancel_account_text: Global Symbols hesabınızı kapatmak istiyorsanız…
+          cancel_account_confirm: Emin misiniz? Global Symbols hesabınız kalıcı olarak
+            silinecek.
+          cancel_account_header: Hesabımı iptal et
+          button_save_changes: Değişiklikleri Kaydet
+          new_password_helper: en az %{var} karakter. Değiştirmek istemiyorsanız boş
+            bırakın.
+          current_password_helper: Değişikliklerinizi onaylamak için mevcut şifrenize
+            ihtiyacımız var.
+          new_password_confirmation: Yeni Parolayı Onayla
+          new_password: Yeni Parola
+          please_fix_errors: Lütfen bu hataları düzeltin.
+          confirm_password: Parolayı Onaylayın
+          password_helper: en az %{var} karakter
+          button_change_password: Parolayı Değiştir
+        edit:
+          page_title: Hesabı Yönet
+          heading: Hesabı Yönet
+          awaiting_confirmation: 'Şu anda şunun için onay bekleniyor: %{unconfirmed_email}'
+        new:
+          sign_up_button: Hesap Oluştur
+          heading: Hesap oluştur
+          page_title: Hesap Oluştur
+        change_password:
+          heading: Parolayı Değiştir
+          manage_account: Hesabı Yönet
+          submit: Parolayı Değiştir
+          account_indicator: '%{email} olarak oturum açıldı'
+        account_saved:
+          heading: Hesap Güncelleştirildi
+          return_to_gs_button: Global Symbols'e Dön
+    mailer:
+      password_change:
+        subject: Parola Değiştirildi
+      email_changed:
+        subject: E-posta Değiştirildi
+      unlock_instructions:
+        subject: Kilidi kaldırma yönergeleri
+      reset_password_instructions:
+        subject: Parola sıfırlama yönergeleri
+      confirmation_instructions:
+        subject: Onay talimatları
+    registrations:
+      signed_up_but_inactive: Başarıyla kaydoldunuz. Ancak, hesabınız henüz etkinleştirilmediğinden
+        oturum açamadık.
+      update_needs_confirmation: Hesabınızı başarıyla güncellediniz, ancak yeni e-posta
+        adresinizi doğrulamamız gerekiyor. Lütfen e-postanızı kontrol edin ve yeni
+        e-posta adresinizi onaylamak için onay bağlantısını tıklayın.
+      updated: Hesabınız başarıyla güncelleştirildi.
+      signed_up_but_unconfirmed: E-posta adresinize onay bağlantısı içeren bir mesaj
+        gönderildi. Hesabınızı etkinleştirmek için lütfen bağlantıyı tıklayın.
+      signed_up_but_locked: Başarıyla kaydoldunuz. Ancak, hesabınız kilitli olduğundan
+        oturum açamadık.
+      signed_up: Hoşgeldiniz! Başarıyla kaydoldunuz.
+      destroyed: Hoşçakalın! Hesabınız başarıyla iptal edildi. Yakında tekrar görüşmek
+        dileğiyle.
+    unlocks:
+      unlocked: Hesabınızın kilidi başarıyla açıldı. Devam etmek için lütfen oturum
+        açın.
+      send_paranoid_instructions: Hesabınız varsa, birkaç dakika içinde kilidini nasıl
+        açacağınıza dair talimatları içeren bir e-posta alırsınız.
+      send_instructions: Birkaç dakika içinde hesabınızın kilidini nasıl açacağınıza
+        dair talimatları içeren bir e-posta alacaksınız.
+    passwords:
+      send_paranoid_instructions: E-posta adresiniz veritabanımızda varsa, birkaç
+        dakika içinde e-posta adresinizde bir şifre kurtarma bağlantısı alacaksınız.
+      no_token: Parola sıfırlama e-postasından gelmeden bu sayfaya erişemezsiniz.
+        Parola sıfırlama e-postasından geliyorsanız, lütfen sağlanan tam URL'yi kullandığınızdan
+        emin olun.
+      send_instructions: Size bir şifre sıfırlama e-postası gönderdik.
+      updated_not_active: Parolanız başarıyla değiştirildi.
+      updated: Parolanız başarıyla değiştirildi. Şimdi oturumunuz açıldı.
+    confirmations:
+      send_paranoid_instructions: E-posta adresiniz veritabanımızda varsa, birkaç
+        dakika içinde e-posta adresinizi nasıl onaylayacağınıza ilişkin talimatları
+        içeren bir e-posta alacaksınız.
+      send_instructions: Birkaç dakika içinde e-posta adresinizi nasıl onaylayacağınıza
+        dair talimatları içeren bir e-posta alacaksınız.
+      confirmed: E-posta adresiniz başarıyla onaylandı.
+    sessions:
+      already_signed_out: Oturumu kapattınız.
+      signed_out: Oturumu kapattınız.
+      signed_in: Tekrar hoşgeldiniz!
+    omniauth_callbacks:
+      success: '%{kind} hesabından kimliği başarıyla doğrulandı.'
+      failure: '"%{reason}" olduğundan %{kind} öğesinden kimliğiniz doğrulatılamadı.'
+    failure:
+      unconfirmed: Devam etmeden önce e-posta adresinizi onaylamanız gerekir.
+      unauthenticated: Devam etmeden önce oturum açmanız veya kaydolmanız gerekir.
+      timeout: Oturumunuzun süresi doldu. Devam etmek için lütfen yeniden oturum açın.
+      not_found_in_database: Geçersiz %{authentication_keys} veya parola.
+      last_attempt: Hesabınız kilitlenmeden önce son bir denemeniz daha var.
+      locked: Hesabınız kilitli.
+      invalid: Geçersiz %{authentication_keys} veya parola.
+      inactive: Hesabınız henüz etkinleştirilmedi.
+      already_authenticated: Zaten oturum açtınız.
+  doorkeeper:
+    scopes:
+      public: Genel verilerinize erişme
+      boardset:read: Pano Setlerinizi Okuyun
+      identity:read:user: Kullanıcı hesabınızdaki verileri okuma
+      boardset:write: Pano Setlerinizi Yazın
+  activerecord:
+    models:
+      licence: Lisans
+      category: Kategori
+      comment: Yorum
+      language: Dil
+      label: Etiket
+      survey: Anket
+      picto_concept: Picto Konsepti
+      picto: Sembol
+      coding_framework: Kodlama Çerçevesi
+      image: Görüntü
+      concept: Kavram
+      survey_picto: Picto anketi
+      survey_response: Anket Yanıtı
+      symbolset: Sembol Seti
+      symbolset_user: Paydaşlar
+      user: Kullanıcı
+    attributes:
+      coding_framework:
+        api_uri_base: API URI Base
+        structure: Yapı
+        name: Ad
+        www_uri_base: WWW URI Base
+      comment:
+        rating: Değerlendirme
+        representation_rating_short: Temsil
+        contrast_rating: Karşıtlık Derecelendirmesi
+        contrast_rating_short: Karşıtlık
+        cultural_rating_short: Kültürel
+        comment: Yorum
+        read: Okuma
+        cultural_rating: Kültürel Derecelendirme
+        representation_rating: Temsil Derecelendirmesi
+        resolved: Çözüldü
+      language:
+        scope: Kapsam
+        category: Kategori
+        active: Etkin
+        name: Ad
+      licence:
+        url: URL
+        name: Adı
+        logo: Logo
+        properties: Özellikler
+        version: Sürüm
+      picto:
+        part_of_speech_options:
+          adjective: Sıfat
+          verb: Fiil
+          noun: İsim
+          pronoun: Zamir
+          adverb: Zarf
+          interjection: Ünlem
+          conjunction: Bağlaç
+          preposition: Edat
+          article: Artikel
+          modifier: Değiştirici
+        publisher_ref: Yayımcı Referansı
+        visibility_options:
+          everybody: Herkes
+          collaborators: Sembol Set Paydaşları
+        visibility: Tarafından görülebilir
+        part_of_speech: Sözcük Türü
+        image: Görüntü
+      survey:
+        status: Durum
+        name: Ad
+        show_symbol_descriptions: Sembol Açıklamalarını Göster
+        introduction: Giriş
+        close_at: Kapanışı Yaptığı Yer
+      survey_response:
+        name: Ad
+        role: Rolü
+        organisation: Organizasyon
+      symbolset:
+        name: Ad
+        publisher: Yayımcı
+        description: Açıklama
+        statuses:
+          published: Yayınlanan
+          ingesting: Ingesting
+          draft: Taslak
+        status: Durum
+        logo: Logo
+        publisher_url: Yayımcı URL'si
+      user:
+        email: E-posta Adresi
+        company: Şirket
+        surname: Soyad
+        prename: Ad
+        language_id: Tercih Edilen Dil
+        location: Konum
+        current_password: Geçerli parola
+        remember_me: Beni hatırla
+        password: parola
+      category:
+        name: Ad
+      concept:
+        subject: Konu
+      label:
+        text: Etiket
+        text_diacritised: Aksatılan Etiket
+        description: Açıklama
+  errors:
+    messages:
+      wrong_size: yanlış boyutta (%{file_size} olmalıdır)
+      size_too_small: çok küçük (en az %{file_size})
+      size_too_big: çok büyük (en çok:%{file_size})
+      already_confirmed: zaten onaylandı, lütfen oturum açmayı deneyin
+      confirmation_period_expired: '%{period} içinde onaylanması gerekiyor, lütfen
+        yeni bir tane isteyin'
+      expired: süresi doldu, lütfen yeni bir tane isteyin
+      not_found: bulunamadı
+      not_locked: kilitli değildi
+      not_saved:
+        one: '1 hatası bu %{resource} öğesinin kaydedilmesine engel oldu:'
+        other: '%{count} hatası, bu %{resource} kaynağının kaydedilmesini yasakladı:'
+      even: eşit olmalı
+      odd: garip olmalı
+      other_than: '%{count} dışında olmalıdır'
+      less_than_or_equal_to: '%{count} öğesinden küçük veya eşit olmalıdır'
+      less_than: '%{count}'
+      equal_to: '%{count} öğesine eşit olmalıdır'
+      greater_than_or_equal_to: '%{count} öğesinden büyük veya eşit olmalıdır'
+      greater_than: '%{count} öğesinden büyük olmalıdır'
+      not_an_integer: tamsayı olmalıdır
+      not_a_number: sayı değil
+      wrong_length:
+        one: yanlış uzunlukta (1 karakter olmalıdır)
+        other: yanlış uzunluk (%{count} karakter olmalıdır)
+      too_short:
+        one: çok kısa (en az 1 karakterdir)
+        other: çok kısa (en az %{count} karakter)
+      too_long:
+        one: çok uzun (en fazla 1 karakter)
+        other: çok uzun (maksimum %{count} karakter)
+      present: boş olmalıdır
+      blank: boş olamaz
+      empty: boş olamaz
+      accepted: kabul edilmelidir
+      confirmation: '%{öznitelikle eşleşmiyor}'
+      invalid: geçersiz
+      exclusion: ayrılmıştır
+      inclusion: listeye dahil değildir
+      model_invalid: 'Doğrulama başarısız oldu: %{hatalar}'
+  dictionary:
+    collaborator:
+      one: Işbirlikçi
+      other: işbirlikçiler
+    concept:
+      one: Kavram
+      other: Kavramlar
+    settings: Ayarlar
+    label:
+      one: Etiket
+      other: Etiketler
+    symbolset:
+      one: Sembol Kümesi
+      other: Sembol Kümeleri
+    response:
+      one: Yanıt
+      other: Yanıtlar
+    page_not_found: Sayfa Bulunamadı
+    global_symbols: Global Symbols
+    numbers:
+      '1': '1'
+      '4': '4'
+      '3': '3'
+      '2': '2'
+      '5': '5'
+    go_back: Geri Git
+    back: Geri
+    edit: Düzenle
+    import: İçe aktar
+    by: Tarafından
+    search: Ara
+    remove: Kaldır
+    view: Görünüm
+    sign_in: Oturum Aç
+    download: Indir
+    unauthorised: Yetkilendirilmemiş
+    symbol:
+      one: Sembolü
+      other: Semboller
+    change: Değiştir
+    survey:
+      one: Anket
+      other: Anketler
+    archive: Arşiv
+    un-archive: Arşivden Kaldır
+    publish: Yayımla
+  languages:
+    fr: Fransızca
+    en: İngilizce
+    sr_Cyrl: Sırpça (Kiril)
+    sr: Sırpça
+    hr: Hırvatça
+    de: Almanca
+    el: Yunanca
+    ro: Rumence
+    sr_Latn: Sırpça (Latin)
+    tr: Türkçe
+    hy: Ermenice
+    sq: Arnavutça
+    bg: Bulgarca
+    ca: Katalanca
+    nl: Flemenkçe
+    es: İspanyolca
+    cnr: Karadağlı
+    sh: Serbo-Hırvatça
+    ru: Rusça
+    pt: Portekizce
+    mr: Marathi
+    mk: Makedonca
+    it: İtalyanca
+    hi: Hintçe
+    da: Danca
+    zh: Çince
+    ar: Arapça
+    br: Bretonca
+    et: Estonca
+    eu: Bask dili
+    an: Aragonca
+    fa: Farsça
+    gl: Galiçya lehçesi
+    he: İbranice
+    hu: Macarca
+    pl: Lehçe
+    sk: Slovakça
+    sv: İsveç dili
+    val: Vehes
+    ur: Urduca
+  unauthorized:
+    update:
+      project: Bu projenin güncelleştirilmesine izin verilmiyor.
+    manage:
+      picto: Yalnızca ortak çalışan olduğunuz Sembol Kümelerini yönetebilirsiniz.
+      all: Bu %{subject} için %{action} yapamazsınız.
+  layouts:
+    application:
+      menu:
+        board_builder: Board Builder
+        training: Eğitim
+        sign_out: Oturumu Kapat
+        news: Haber
+        sign_up: Hesap Oluştur
+        my_account: Hesabım
+        search_placeholder: Ara %{var}
+        twitter: Twitter'da Global Symbols
+        resources: Kaynak
+        sign_in: Oturum Aç
+        facebook: Facebook'ta Global Symbols
+      footer:
+        privacy_policy: Gizlilik Politikası
+        contact: Iletişim
+        about: Hakkında
+        accessibility: Erişilebilirlik
+        terms: Koşullar
+        language_label: Dil
+      skip_to_main_content: Ana içeriğe geç
+  date:
+    formats:
+      default: '%e %b %Y'
+      short: '%d %b'
+      long: '%d %B %Y'
+    day_names:
+    - Pazar
+    - Pazartesi
+    - Salı
+    - Çarşamba
+    - Perşembe
+    - Cuma
+    - Cumartesi
+    abbr_day_names:
+    - güneş
+    - Pzt
+    - Sal
+    - Çrş
+    - Thu
+    - cumartesi
+    abbr_month_names:
+    - Ağustos
+    - Jan
+    - Şubat
+    - Mar
+    - Nisan
+    - Mayıs
+    - Haz
+    - Temmuz
+    - Kasım
+    - Aralık
+    month_names:
+    - Ocak
+    - Şubat
+    - Mart
+    - Nisan
+    - Mayıs
+    - Haziran
+    - Temmuz
+    - Ağustos
+    - Eylül
+    - Ekim
+    - Kasım
+    - Aralık
+    order:
+    - yıl
+    - ay
+    - gün
+  time:
+    am: Öğleden önce
+    formats:
+      default: '%a, %d %b %Y %H:%M:%S %z'
+      short: '%d %b %H:%M'
+      long: '%B %d, %Y %H:%M'
+    pm: öğleden sonra

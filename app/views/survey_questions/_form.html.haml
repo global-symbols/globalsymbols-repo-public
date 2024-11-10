@@ -1,0 +1,42 @@
+= bootstrap_form_with url: survey_question_path(@survey, @question), model: @feedback, method: :patch, layout: :horizontal, label_col: 'col-sm-4', control_col: 'col-sm-8', id: :survey_question_form do |f|
+  = f.alert_message t('views.survey_questions._form.please_fix_errors')
+  %table.table.table-bordered.table-hover.text-center
+    %thead
+      %tr
+        %td
+        %th{scope: :col}= t('dictionary.numbers.1')
+        %th{scope: :col}= t('dictionary.numbers.2')
+        %th{scope: :col}= t('dictionary.numbers.3')
+        %th{scope: :col}= t('dictionary.numbers.4')
+        %th{scope: :col}= t('dictionary.numbers.5')
+    %tbody
+      %tr
+        %th.text-right{scope: :row}= t('views.surveys._shared.questions.feelings_rating')
+        - 5.times do |i|
+          %td= f.radio_button :rating, i+1, label_class: 'sr-only', autofocus: true
+      %tr
+        %th.text-right{scope: :row}= t('views.surveys._shared.questions.representation_rating')
+        - 5.times do |i|
+          %td= f.radio_button :representation_rating, i+1, label_class: 'sr-only'
+      %tr
+        %th.text-right{scope: :row}= t('views.surveys._shared.questions.contrast_rating')
+        - 5.times do |i|
+          %td= f.radio_button :contrast_rating, i+1, label_class: 'sr-only'
+      %tr
+        %th.text-right{scope: :row}= t('views.surveys._shared.questions.cultural_rating')
+        - 5.times do |i|
+          %td= f.radio_button :cultural_rating, i+1, label_class: 'sr-only'
+      %tr
+
+  = f.text_field :comment, maxlength: 255, help: t('views.survey_questions._form.comments_helper')
+
+  .row.mt-5
+    .col
+      - if @question > 1
+        %a.btn.btn-outline-secondary{href: survey_question_path(@survey, @question - 1)}
+          %i.fas.fa-chevron-left.pr-2
+          = t('views.survey_questions._form.button_previous_question')
+    .col.text-right
+      = f.primary do
+        = t('views.survey_questions._form.button_save_answer')
+        %i.fas.fa-chevron-right.pl-2

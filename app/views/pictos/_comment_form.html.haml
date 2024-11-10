@@ -1,0 +1,10 @@
+= bootstrap_form_with url: comment_symbolset_symbol_path(@picto.symbolset, @picto), model: @comment, layout: :horizontal, label_col: 'col-sm-4', control_col: 'col-sm-8', id: :symbol_comment_form do |f|
+  = f.text_field :comment
+  = f.form_group :rating, label: { text: t('activerecord.attributes.comment.rating') } do
+    - [*1..5].each do |i|
+      = f.radio_button :rating, i, label: i, inline: true
+  = f.form_group :likert1, label: { text: "Arbitrary Likert Scale" } do
+    - [*1..5].each do |i|
+      = f.radio_button :likert1, i, label: i, inline: true
+  .offset-sm-4
+    = f.primary t('views.pictos._comment_form.save_button')

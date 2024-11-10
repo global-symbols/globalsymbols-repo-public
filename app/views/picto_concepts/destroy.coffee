@@ -1,0 +1,1 @@
+$("#picto-review-row-<%= @picto.id %>").replaceWith('<%= escape_javascript render("symbolsets/review_row", picto: @picto) %>')

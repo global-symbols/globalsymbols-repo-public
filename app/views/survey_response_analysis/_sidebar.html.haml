@@ -1,0 +1,12 @@
+.d-flex.justify-content-between
+  %h3.mb-4= t('views.survey_response_analysis._sidebar.heading')
+  %span
+    %a.btn.btn-primary.btn-sm{href: symbolset_survey_path(id: @survey.id)}= t('dictionary.back')
+.list-group
+  - @survey.responses.each_with_index do |response, index|
+    %a.list-group-item.list-group-item-action{href: symbolset_survey_response_path(id: response.id), class: (:active if response == @response)}
+      = t('views.survey_response_analysis._sidebar.participant_number', number: index+1)
+      %br
+      %small
+        = response.name
+        = "· #{response.organisation}" if response.organisation.present?

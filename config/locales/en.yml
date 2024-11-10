@@ -1,0 +1,939 @@
+en:
+  unauthorized:
+    manage:
+      all: "You cannot %{action} this %{subject}."
+      picto: "You can only manage Symbolsets that you are a collaborator on."
+    update:
+      project: "Not allowed to update this project."
+  devise:
+    confirmations:
+      confirmed: "Your email address has been successfully confirmed."
+      send_instructions: "You will receive an email with instructions for how to confirm\
+        \ your email address in a few minutes."
+      send_paranoid_instructions: "If your email address exists in our database, you\
+        \ will receive an email with instructions for how to confirm your email address\
+        \ in a few minutes."
+    failure:
+      already_authenticated: "You are already signed in."
+      inactive: "Your account is not activated yet."
+      invalid: "Invalid %{authentication_keys} or password."
+      locked: "Your account is locked."
+      last_attempt: "You have one more attempt before your account is locked."
+      not_found_in_database: "Invalid %{authentication_keys} or password."
+      timeout: "Your session expired. Please sign in again to continue."
+      unauthenticated: "You need to sign in or sign up before continuing."
+      unconfirmed: "You have to confirm your email address before continuing."
+    mailer:
+      confirmation_instructions:
+        subject: "Confirmation instructions"
+      reset_password_instructions:
+        subject: "Reset password instructions"
+      unlock_instructions:
+        subject: "Unlock instructions"
+      email_changed:
+        subject: "Email Changed"
+      password_change:
+        subject: "Password Changed"
+    omniauth_callbacks:
+      failure: "Could not authenticate you from %{kind} because \"%{reason}\"."
+      success: "Successfully authenticated from %{kind} account."
+    passwords:
+      no_token: "You can't access this page without coming from a password reset email.\
+        \ If you do come from a password reset email, please make sure you used the\
+        \ full URL provided."
+      send_instructions: "We've sent you a password reset email."
+      send_paranoid_instructions: "If your email address exists in our database, you\
+        \ will receive a password recovery link at your email address in a few minutes."
+      updated: "Your password has been changed successfully. You are now signed in."
+      updated_not_active: "Your password has been changed successfully."
+    registrations:
+      destroyed: "Bye! Your account has been successfully cancelled. We hope to see\
+        \ you again soon."
+      signed_up: "Welcome! You have signed up successfully."
+      signed_up_but_inactive: "You have signed up successfully. However, we could\
+        \ not sign you in because your account is not yet activated."
+      signed_up_but_locked: "You have signed up successfully. However, we could not\
+        \ sign you in because your account is locked."
+      signed_up_but_unconfirmed: "A message with a confirmation link has been sent\
+        \ to your email address. Please follow the link to activate your account."
+      update_needs_confirmation: "You updated your account successfully, but we need\
+        \ to verify your new email address. Please check your email and follow the\
+        \ confirm link to confirm your new email address."
+      updated: "Your account has been updated successfully."
+    sessions:
+      signed_in: "Welcome back!"
+      signed_out: "You have signed out."
+      already_signed_out: "You have signed out."
+    unlocks:
+      send_instructions: "You will receive an email with instructions for how to unlock\
+        \ your account in a few minutes."
+      send_paranoid_instructions: "If your account exists, you will receive an email\
+        \ with instructions for how to unlock it in a few minutes."
+      unlocked: "Your account has been unlocked successfully. Please sign in to continue."
+    views:
+      registrations:
+        new:
+          page_title: "Create Account"
+          heading: "Create account"
+          sign_up_button: "Create Account"
+        _form:
+          language_helper: "Symbols will be shown in your preferred language where\
+            \ possible."
+          password_helper: "%{var} characters minimum"
+          confirm_password: "Confirm Password"
+          please_fix_errors: "Please fix these errors."
+          new_password: "New Password"
+          new_password_confirmation: "Confirm New Password"
+          current_password_helper: "We need your current password to confirm your\
+            \ changes."
+          new_password_helper: "%{var} characters minimum. Leave blank if you don't\
+            \ want to change it."
+          button_save_changes: "Save Changes"
+          cancel_account_header: "Cancel my account"
+          cancel_account_text: If you would like to close your Global Symbols account…
+          cancel_account_confirm: "Are you sure? Your Global Symbols account will\
+            \ be permanently deleted."
+          cancel_account_button: "Delete my Account"
+          button_change_password: "Change Password"
+        edit:
+          heading: "Manage Account"
+          page_title: "Manage Account"
+          awaiting_confirmation: "Currently awaiting confirmation for: %{unconfirmed_email}"
+        change_password:
+          heading: "Change Password"
+          manage_account: "Manage Account"
+          submit: "Change Password"
+          account_indicator: "Signed in as %{email}"
+        account_saved:
+          heading: "Account Updated"
+          return_to_gs_button: "Return to Global Symbols"
+      passwords:
+        new:
+          heading: "Reset password"
+          email_helper: "The email address you used to sign up to Global Symbols"
+          button: "Email Reset Link"
+          page_title: "Manage Account"
+        instructions: "Enter your account email address and we'll send a link to reset\
+          \ your password."
+        edit:
+          heading: "Change your Password"
+          new_password_label: "New password"
+          new_password_helper: "%{var} characters minimum"
+          confirm_password_label: "Confirm new password"
+          button: "Change Password"
+      _shared:
+        _links:
+          sign_in: "Sign In"
+          sign_up: "Create Account"
+          forgotten_password: "Forgot your password?"
+          new_confirmation: "Didn't receive confirmation instructions?"
+          new_unlock: "Didn't receive unlock instructions?"
+      sessions:
+        new:
+          page_title: "Sign In"
+          sign_in_button: "Sign In"
+        errors:
+          messages:
+            already_confirmed: "was already confirmed, please try signing in"
+            confirmation_period_expired: "needs to be confirmed within %{period},\
+              \ please request a new one"
+            expired: "has expired, please request a new one"
+            not_found: "not found"
+            not_locked: "was not locked"
+            not_saved:
+              one: '1 error prohibited this %{resource} from being saved:'
+              other: '%{count} errors prohibited this %{resource} from being saved:'
+  doorkeeper:
+    scopes:
+      public: 'Access your public data'
+      identity:read:user: 'Read data in your user account'
+      boardset:read: 'Read your Board Sets'
+      boardset:write: 'Write to your Board Sets'
+  activerecord:
+    models:
+      category: "Category"
+      coding_framework: "Coding Framework"
+      comment: "Comment"
+      concept: "Concept"
+      image: "Image"
+      label: "Label"
+      language: "Language"
+      licence: "Licence"
+      picto: "Symbol"
+      picto_concept: "Picto Concept"
+      survey: "Survey"
+      survey_picto: "Survey Picto"
+      survey_response: "Survey Response"
+      symbolset: "Symbol Set"
+      symbolset_user: "Collaborator"
+      user: "User"
+    attributes:
+      category:
+        name: "Name"
+      coding_framework:
+        name: "Name"
+        structure: "Structure"
+        api_uri_base: "API URI Base"
+        www_uri_base: "WWW URI Base"
+      comment:
+        rating: "Rating"
+        representation_rating: "Representation Rating"
+        representation_rating_short: "Representation"
+        contrast_rating: "Contrast Rating"
+        contrast_rating_short: "Contrast"
+        cultural_rating: "Cultural Rating"
+        cultural_rating_short: "Cultural"
+        comment: "Comment"
+        read: "Read"
+        resolved: "Resolved"
+      concept:
+        subject: "Subject"
+      label:
+        text: "Label"
+        text_diacritised: "Diacritised Label"
+        description: "Description"
+      language:
+        active: "Active"
+        name: "Name"
+        scope: "Scope"
+        category: "Category"
+      licence:
+        name: "Name"
+        url: "URL"
+        version: "Version"
+        properties: "Properties"
+        logo: "Logo"
+      picto:
+        part_of_speech: "Part of Speech"
+        part_of_speech_options:
+          noun: 'Noun'
+          verb: 'Verb'
+          adjective: 'Adjective'
+          adverb: 'Adverb'
+          pronoun: 'Pronoun'
+          preposition: 'Preposition'
+          conjunction: 'Conjunction'
+          interjection: 'Interjection'
+          article: 'Article'
+          modifier: 'Modifier'
+        publisher_ref: "Publisher Reference"
+        image: "Image"
+        visibility: "Visible by"
+        visibility_options:
+          everybody: 'Everybody'
+          collaborators: 'Symbolset Collaborators'
+      survey:
+        name: "Name"
+        introduction: "Introduction"
+        status: "Status"
+        close_at: "Close At"
+        show_symbol_descriptions: "Show Symbol Descriptions"
+      survey_response:
+        name: "Name"
+        organisation: "Organisation"
+        role: "Role"
+      symbolset:
+        name: "Name"
+        description: "Description"
+        publisher: "Publisher"
+        publisher_url: "Publisher URL"
+        logo: "Logo"
+        status: "Status"
+        statuses:
+          published: "Published"
+          draft: "Draft"
+          ingesting: "Ingesting"
+      user:
+        email: "Email Address"
+        prename: "First Name"
+        surname: "Surname"
+        company: "Company"
+        location: "Location"
+        language_id: "Preferred Language"
+        password: "Password"
+        current_password: "Current password"
+        remember_me: "Remember me"
+  date:
+    formats:
+      # Use the strftime parameters for formats.
+      # When no format has been given, it uses default.
+      # You can provide other formats here if you like!
+      default: "%e %b %Y"
+      short: "%d %b"
+      long: "%d %B %Y"
+
+    day_names: [ Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday ]
+    abbr_day_names: [ Sun, Mon, Tue, Wed, Thu, Fri, Sat ]
+
+    # Don't forget the nil at the beginning; there's no such thing as a 0th month
+    month_names: [ ~, January, February, March, April, May, June, July, August, September, October, November, December ]
+    abbr_month_names: [ ~, Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec ]
+    # Used in date_select and datetime_select.
+    order:
+      - year
+      - month
+      - day
+  time:
+    formats:
+      default: "%a, %d %b %Y %H:%M:%S %z"
+      short: "%d %b %H:%M"
+      long: "%B %d, %Y %H:%M"
+    am: "am"
+    pm: "pm"
+  errors:
+    messages:
+      wrong_size: "is the wrong size (should be %{file_size})"
+      size_too_small: "is too small (minimum is %{file_size})"
+      size_too_big: "is too large (maximum is %{file_size})"
+      already_confirmed: "was already confirmed, please try signing in"
+      confirmation_period_expired: "needs to be confirmed within %{period}, please\
+        \ request a new one"
+      expired: "has expired, please request a new one"
+      not_found: "not found"
+      not_locked: "was not locked"
+      not_saved:
+        one: '1 error prohibited this %{resource} from being saved:'
+        other: '%{count} errors prohibited this %{resource} from being saved:'
+
+      model_invalid: "Validation failed: %{errors}"
+      inclusion: "is not included in the list"
+      exclusion: "is reserved"
+      invalid: "is invalid"
+      confirmation: "doesn't match %{attribute}"
+      accepted: "must be accepted"
+      empty: "can't be empty"
+      blank: "can't be blank"
+      present: "must be blank"
+      too_long:
+        one: "is too long (maximum is 1 character)"
+        other: "is too long (maximum is %{count} characters)"
+      too_short:
+        one: "is too short (minimum is 1 character)"
+        other: "is too short (minimum is %{count} characters)"
+      wrong_length:
+        one: "is the wrong length (should be 1 character)"
+        other: "is the wrong length (should be %{count} characters)"
+      not_a_number: "is not a number"
+      not_an_integer: "must be an integer"
+      greater_than: "must be greater than %{count}"
+      greater_than_or_equal_to: "must be greater than or equal to %{count}"
+      equal_to: "must be equal to %{count}"
+      less_than: "must be less than %{count}"
+      less_than_or_equal_to: "must be less than or equal to %{count}"
+      other_than: "must be other than %{count}"
+      odd: "must be odd"
+      even: "must be even"
+  dictionary:
+    collaborator:
+      one: Collaborator
+      other: Collaborators
+    concept:
+      one: Concept
+      other: Concepts
+    settings: "Settings"
+    label:
+      one: Label
+      other: Labels
+    symbolset:
+      one: Symbol Set
+      other: Symbol Sets
+    symbol:
+      one: Symbol
+      other: Symbols
+    response:
+      one: Response
+      other: Responses
+    survey:
+      one: Survey
+      other: Surveys
+    unauthorised: "Unauthorised"
+    go_back: "Go Back"
+    global_symbols: "Global Symbols"
+    numbers:
+      '1': '1'
+      '2': '2'
+      '3': '3'
+      '4': '4'
+      '5': '5'
+    back: Back
+    by: By
+    import: Import
+    edit: Edit
+    sign_in: "Sign in"
+    view: "View"
+    remove: "Remove"
+    search: "Search"
+    change: "change"
+    download: "Download"
+    page_not_found: "Page Not Found"
+    archive: "Archive"
+    un-archive: "Un-Archive"
+    publish: "Publish"
+
+  languages:
+    en: 'English'
+    fr: 'French'
+    de: 'German'
+    hr: 'Croatian'
+    sr: 'Serbian'
+    sr_Cyrl: 'Serbian (Cyrillic)'
+    sr_Latn: 'Serbian (Latin)'
+    ro: 'Romanian'
+    el: 'Greek'
+    hy: 'Armenian'
+    tr: 'Turkish'
+    sq: 'Albanian'
+    bg: 'Bulgarian'
+    ca: 'Catalan'
+    nl: 'Dutch'
+    es: 'Spanish'
+    ar: Arabic
+    zh: Chinese
+    da: Danish
+    hi: Hindi
+    it: Italian
+    mk: Macedonian
+    mr: Marathi
+    pt: Portuguese
+    ru: Russian
+    sh: Serbo-Croatian
+    cnr: Montenegrin
+    an: Aragonese
+    br: Breton
+    et: Estonian
+    eu: Basque
+    fa: Persian
+    gl: Galician
+    he: Hebrew
+    hu: Hungarian
+    pl: Polish
+    ps: Pashto
+    sk: Slovak
+    sv: Swedish
+    val: Vehes
+    uk: Ukranian
+    ur: Urdu
+
+  views:
+    pages:
+      home:
+        for_creators: "For creators"
+        for_creators_text: "Manage and publish Symbol Sets"
+        for_communicators: "For communicators"
+        for_communicators_text: "Exchange pictures to create conversations"
+        for_everyone: "For everyone"
+        for_everyone_text: "Discover, mix, match and make symbol use personal"
+        explore_heading: "Explore Symbol Sets"
+        explore_button: "Explore More Symbol Sets…"
+        board_builder:
+          heading: "Global Symbols Board Builder"
+          subheading: "Communication Boards the easy way"
+          create: "Create boards to aid communication using thousands of free images\
+            \ from our library, and even your own."
+          design: "Design, build, save and print communication boards online."
+          storage: "Everything is stored safely in your Global Symbols account."
+          button_featured: "Featured Board Sets"
+          button_try: "Try Board Builder"
+      search:
+        symbolset_dropdown_any_symbol_set: "Any Symbol Set"
+        search: "Search"
+        search_for: "Search for"
+        _title: "Search"
+        no_results: "We couldn't find any matching symbols. Try a broader search."
+      contact:
+        heading: "Get in Touch"
+        lead_text: "We are very happy to receive queries, suggestions and information\
+          \ about relevant resources."
+        email_us: "Email us"
+        _description: "Contact us with general enquiries, or to get your symbol set\
+          \ published."
+    surveys:
+      _shared:
+        number_of_symbols:
+          one: This survey has %{count} Symbol for you to review.
+          other: This survey has %{count} Symbols for you to review.
+        thank_you: "Thank you for completing the survey!"
+        questions:
+          feelings_rating: "Feelings about the symbol as a whole"
+          representation_rating: "Represents the word or phrase"
+          contrast_rating: "Colour contrast"
+          cultural_rating: "Cultural sensitivity"
+          comments: "Additional comments"
+      show:
+        close_at_message: "You can participate until %{date}."
+        begin_button: "Begin the Survey"
+        provide_details: "Providing your details is optional, and may help the survey\
+          \ organisers."
+        provide_details_2: "Your details will be shown to the survey organisers in\
+          \ connection with your feedback, and never used by Global Symbols for any\
+          \ other purpose."
+        closed_header: "This survey isn't accepting feedback at the moment."
+        closed_text: "Contact the survey organiser if you expected to be able to participate."
+        offline_participants: For participants working offline…
+        offline_participants_button: "Print Survey Feedback Forms"
+      print:
+        heading: "Print Settings"
+        collect_names: "Collect participant names"
+        show_intro: "Show the Survey Introduction"
+        show_intro_helper: "Change the introduction by editing the survey."
+        show_instructions: "Show the Instructions"
+        show_instructions_helper: "Change the instructions by clicking on them."
+        show_example: "Show an example"
+        show_example_helper: "Adds an example question showing sample answers."
+        symbol_label_language: "Show symbol labels in"
+        symbol_label_language_all: "All Available Languages"
+        symbol_label_language_helper: "For best results, print in colour using a modern\
+          \ browser and disable headers and footers."
+        print_button: "Print Survey"
+        name_field: "My name is"
+        introduction: "Introduction"
+        instructions_heading: "Instructions"
+        instructions_1: "This survey will ask you to rate four aspects of each symbol,\
+          \ and provide some comments."
+        instructions_2: "Rate each symbol on a scale where 1 is 'completely unacceptable'\
+          \ and 5 is 'completely acceptable', by placing a check in the correct box."
+      thank_you:
+        feedback_is_saved: "We've saved all your feedback."
+        button_go_to_homepage: "Proceed to Global Symbols"
+        button_restart_survey: "Restart the Survey"
+      _print_question:
+        example_heading: "Example Question"
+        example_text: "This shows how you can answer questions"
+        symbol_counter: "Symbol %{number}"
+        example_comment: "This tree looks like a broccoli."
+    symbolsets:
+      show:
+        no_symbols_for_collaborator: "Add a Symbol to start building your Symbol Set"
+        _description: "Explore the %{symbolset_name} symbol set at Global Symbols.\
+          \ Get free images and symbols for communication."
+      _topbar:
+        download: "Download"
+        button_add_symbol: "Add Symbol"
+        button_edit: "Edit"
+        button_review: "Review"
+        button_archive: "Archived Symbols"
+        button_translate: "Translate"
+      _form:
+        description_helper: "This description will appear alongside the Symbol Set."
+        published_helper: "Published Symbol Sets are visible to everyone. Draft Symbol\
+          \ Sets are visible to Admins and Symbol Set Collaborators."
+        publisher_helper: "The name of the person or organisation that publishes the\
+          \ symbol set."
+        publisher_url_helper: "The address of the publisher's website."
+        logo_helper: "This logo will appear on the Symbolsets page. This should be\
+          \ an image, ideally a SVG or PNG, 300x200 pixels with a transparent background."
+        logo_label: "Logo"
+        publisher_url_label: "Publisher URL"
+        publisher_placeholder: "e.g. The PeopleSymbols Foundation"
+        publisher_url_placeholder: "e.g. https://peoplesymbols.com"
+        licence_prompt: "Select a Licence"
+        create_button: "Create Symbol Set"
+        save_button: "Save Symbol Set"
+      _review_row:
+        remove_confirmation: "Shall we remove %{subject} from this symbol?"
+      _symbolset_card:
+        image:
+          alt: "%{symbolset_name} logo"
+      edit:
+        _title: "Edit %{symbolset_name}"
+      import:
+        _title: "Import to %{symbolset_name}"
+        heading: "Import Symbols"
+        introduction: "Upload your existing symbols into Global Symbols."
+      index:
+        _title: "Explore Symbol Sets"
+        heading: "Explore Symbol Sets"
+        create_symbol_set_button: "Create Symbol Set"
+        _description: "Browse thousands of free communication symbols at Global Symbols."
+      new:
+        _title: "Create a Symbol Set"
+        heading: "Create a Symbol Set"
+        introduction: "Your new symbol set will be created in a draft state. It will\
+          \ be visible only to you and collaborators you add, allowing you to add\
+          \ symbols and prepare the symbol set."
+        guidance: "We suggest you review the guidelines for"
+        guidance_link: "getting your Symbol Set published on Global Symbols"
+      _shared:
+        none_found: "We couldn't find any symbols here!"
+      review:
+        heading: "Review"
+        filter_all_symbols: "All Symbols"
+        filter_without_a_concept: "Without a Concept"
+      archive:
+        heading: "Archived Symbols"
+        none_found: "There are no archived symbols in this symbol set"
+        description: "Archived symbols are not shown in the symbol set, search results\
+          \ or apps"
+      translate:
+        heading: "Translate Labels"
+        description: "Automatically translate symbol labels to new languages. This tool translates in batches of %{symbols_limit} symbols at a time."
+        button_find_untranslated: "Find Untranslated Symbols"
+        form:
+          target_lang_prompt: "Select target language"
+          target_lang_label: "to"
+          source_lang_label: "Translate from"
+          source_lang_option: "%{language_name} (%{labels_count} symbols, %{coverage_percentage} coverage)"
+        title: "Translate %{symbolset_name}"
+    pictos:
+      _comment_form:
+        save_button: "Save Comment"
+      _form:
+        image_helper: "Upload a SVG (preferred) or PNG format image."
+        label_helper: "The label describes your symbol so people can find it. You\
+          \ can add labels in additional languages after creating the symbol."
+        language_helper: "The language of the label."
+        label_label: "Label text"
+        diacritised_label_helper: "For Arabic languages only. This stores additional\
+          \ pronunciation detail."
+        description_helper: "Briefly describe the symbol to aid understanding."
+        save_button: "Save Symbol"
+        create_button: "Add Symbol"
+        to_download_symbols: "to download symbols"
+      _topbar:
+        download_button: "Download %{file_type}"
+        not_publicly_visible: "Not publicly visible"
+      edit:
+        _title: "Edit %{picto_label} in %{symbolset_name}"
+        heading: "Edit Symbol"
+      new:
+        _title: "Add Symbol in %{symbolset_name}"
+        heading: "Add Symbol"
+      show:
+        _title: "%{picto_label} in %{symbolset_name}"
+        concept_defined_in: "Defined in %{coding_framework_name}"
+        no_concepts: "This symbol has no concepts to define it."
+        add_concept_button: "Add a Concept"
+        alternative_symbols_heading: "Alternative Symbols"
+        _description: "'%{picto_label}' symbol, part of the %{symbolset_name} symbolset.\
+          \ Find thousands of free symbols for communication."
+        archived_notice:
+          heading: "Archived Symbol"
+          text: "This symbol is not shown in the symbol set, search results or apps"
+    survey_editor:
+      _add_picto_to_survey:
+        button: "Add to Survey"
+        option: "%{survey_name} in %{symbolset_name}"
+      _form:
+        name_helper: "Provide a name that helps participants identify this survey."
+        introduction_helper: "Optional. This is shown to participants when they start\
+          \ the survey."
+        close_at_helper: "Optional. Set a deadline for participants to respond."
+        language_label: "Show Symbol Labels in"
+        language_helper: "When taking this survey, participants are shown symbol labels\
+          \ in the selected language."
+        language_blank_option: "All available languages"
+        show_symbol_descriptions_label: "Show symbol descriptions"
+        show_symbol_descriptions_helper: "Displays symbol descriptions to participants."
+        save_button: "Save Survey"
+        create_button: "Create Survey"
+      _picto:
+        no_label_for_language: "No %{language_name} label"
+        remove_confirm: "Are you sure you want to remove this Symbol from the Survey?"
+      _sidebar:
+        heading: "Stages"
+        stages:
+          plan: "Plan"
+          collect_feedback: "Collect Feedback"
+          analyse: "Analyse Results"
+          archive: "Archive or Delete"
+          plan_description: 'Pick Symbols to include in the Survey'
+          collect_feedback_description: 'Let participants complete the Survey'
+          analyse_results_description: 'Review the results of the Survey'
+      export_xlsx:
+        header_participant_number: "Participant Numbero"
+        header_participant_name: "Participant Name"
+        header_symbol_id: "Symbol ID"
+        header_label: "Label"
+        header_overall_rating: "Rating"
+        header_representation_rating: "Representation"
+        header_contrast_rating: "Contrast"
+        header_cultural_rating: "Cultural"
+        header_comment: "Comment"
+        comment_participant_name: "Participants are not required to provide their\
+          \ names, so some cells may be empty."
+        sheet_name: "Comments"
+      destroy:
+        notice: "We deleted your Survey %{name}."
+      edit:
+        _title: "Edit %{survey_name} in %{symbolset_name}"
+        heading: "Edit Survey"
+      index:
+        _title: "Surveys in %{symbolset_name}"
+        button_new_survey: "Create Survey"
+        no_surveys_at_stage: "There are no Surveys at the %{stage} stage."
+        get_help: "Explore %{link} for Surveys"
+        get_help_link: "Help and Training"
+      new:
+        button_create: "Create Survey"
+      show:
+        symbols_heading: "Symbols in this Survey"
+        symbols_text: "Add Symbols to this Survey by searching for them in Global\
+          \ Symbols and choosing 'Add to Survey'."
+        symbols_search_helper: "Search for Symbols to add to this Survey"
+        collect_feedback:
+          heading: "Collect Feedback"
+          text_1: "When you begin collecting feedback, we'll give you a URL where\
+            \ people can participate in the survey."
+          text_2: "You won't be able to change your symbol selections whilst the survey\
+            \ is collecting feedback."
+          close_at_label: "Accept Responses Until"
+          close_at_helper: "Optional. Set a deadline for survey responses."
+          button_begin_collecting: "Begin Collecting Feedback"
+          invite_at_this_url: "Invite people to take your survey at this URL."
+          invite_deadline: "Participants have until %{close_at} to provide responses\
+            \ (%{link})."
+          responses_count:
+            one: Your survey has %{count} response.
+            other: Your survey has %{count} responses.
+          confirm_stop: "This will stop people responding to the survey. Are you sure?"
+          stop_button: "End the Survey"
+          paper_heading: "Paper Surveys"
+          paper_intro: "Some participants may prefer paper survey forms. Use these\
+            \ tools collect their feedback and store it here."
+          paper_customisation_invitation: "To customise and print survey forms for\
+            \ your participants…"
+          paper_print_button: "Print Survey Forms"
+          paper_to_include_results: "To include results from paper survey forms in\
+            \ your survey results…"
+          paper_add_paper_feedback_button: "Add Paper Feedback"
+          survey_ended: "Response collection for this survey has ended."
+          survey_ended_add_paper: "You can still manually add feedback from paper\
+            \ survey forms."
+        analyse_results:
+          heading: "Analyse Results"
+          results_appear_here: "Results will appear here when people begin responding\
+            \ to your Survey."
+          responses_count:
+            one: '%{count} person responded to your survey.'
+            other: '%{count} people responded to your survey.'
+          button_individual_responses: "Individual Responses"
+          button_stats: "Symbol Statistics"
+          export:
+            heading: "Export Results to Excel"
+            text_1: "Use this tool to download all survey data, including ratings\
+              \ and comments."
+            text_2: "This makes it easy to perform your own analysis in Excel. We\
+              \ suggest you use Pivot Tables to calculate and chart average results\
+              \ for each Symbol."
+            text_3: "Each row in the Excel file represents a single participant's\
+              \ review of a symbol in the survey."
+        archive:
+          heading: "Archive or Delete"
+          survey_is_archived: "This survey is Archived. You can still analyse any\
+            \ results."
+          archive_description: "Archive this Survey when you have finished with it.\
+            \ You'll still be able to analyse any results in this Survey."
+          archive_confirm: "This will stop people responding to the survey. Are you\
+            \ sure?"
+          archive_button: "Archive the Survey"
+          delete_description: "Deleting this Survey will permanently delete any results\
+            \ you've gathered. No Symbols will be deleted."
+          delete_confirm: "Are you sure you want to delete this Survey and any responses?"
+          delete_button: "Delete the Survey"
+      add_symbol:
+        notice_success: "We added the symbol to your Survey. %{add_another_link}"
+        notice_success_add_another: "Add Another?"
+        alert_failure: "This symbol is already in %{survey_link}"
+    survey_picto_analysis:
+      index:
+        crumb_name: "Symbol Statistics"
+        heading: "Symbol Statistics"
+        intro: "This table shows the average responses for each symbol in the survey,\
+          \ based on a total of %{count} received."
+        column_heading_overall_average: "Overall Average"
+        row_heading_averages: "Averages"
+        column_heading_rating_description: "Feelings about the symbol as a whole"
+        column_heading_representation_rating_description: "Represents the word or\
+          \ phrase"
+        column_heading_contrast_rating_description: "Colour contrast"
+        column_heading_cultural_rating_description: "Cultural suitability"
+    survey_response_analysis:
+      _sidebar:
+        heading: "Responses"
+        participant_number: "Participant %{number}"
+      index:
+        crumb_name: "Individual Responses"
+        heading: "Individual Responses"
+      new:
+        heading: "Add Paper Feedback"
+        use_this_form_to: "Use this form to save a single paper survey to Global Symbols.\
+          \ It will then count towards your survey statistics."
+        match_numbers: "The numbers shown in the top-right of each symbol box should\
+          \ match those shown on the paper forms, to ensure you enter the correct\
+          \ ratings for each symbol."
+        label_overall_rating: "Feelings about the symbol"
+        label_representation_rating: "Represents the word"
+        label_contrast_rating: "Colour contrast"
+        label_cultural_rating: "Cultural sensitivity"
+        cancel_confirm: "Are you sure? You will lose any results so far."
+        save_button: "Save Responses"
+      create:
+        notice_success: "This paper response was saved."
+    survey_questions:
+      _form:
+        please_fix_errors: "Please fix the errors below."
+        comments_helper: "Optional. Please add any comments to help us improve this\
+          \ symbol."
+        button_previous_question: "Previous Question"
+        button_save_answer: "Save Answer"
+      show:
+        please_rate: "Please rate this symbol on a scale where 1 is 'completely unacceptable'\
+          \ and 5 is 'completely acceptable'."
+      _controller:
+        timed_out: "Sorry - your survey timed out due to inactivity. Please begin\
+          \ the survey again."
+    collaborators:
+      index:
+        page_title: "Collaborators for %{name}"
+        add_heading: "Add a Collaborator"
+        add_text: "To allow someone else to edit this symbol set, enter the email\
+          \ address they used to sign up to Global Symbols."
+        add_button: "Add Collaborator"
+        existing_heading: "Existing Collaborators"
+        existing_text: "These people are allowed to edit this symbol set."
+        existing_none_found: "No users are allowed to edit this symbol set."
+        added_at: "Added %{date}"
+        remove_confirm: "Shall we remove %{email} from this symbol set?"
+        remove_aria_label: "Remove Collaborator"
+      create:
+        notice_success: "We added %{email_address} as a collaborator."
+        alert_no_gs_account: "%{email_address} doesn't have a Global Symbols account\
+          \ yet."
+      destroy:
+        notice_success: "We removed %{email_address} as a collaborator."
+    concepts:
+      show:
+        page_title: "%{subject} in %{coding_framework}"
+        defined_in: "A concept defined in"
+    picto_concepts:
+      index:
+        intro: "Concepts help computers understand your symbols, so ensure they are\
+          \ accurate and specific."
+        add_concept_invitation: "We can add any concept you can find on ConceptNet."
+        add_concept:
+          heading: "Add a Concept"
+          instruction: "To add a concept to this symbol, enter a word. We'll add the\
+            \ concept if we can find it."
+          button: "Add Concept"
+          add: "Add"
+        existing_concepts:
+          heading: "Existing Concepts"
+          added_at: "Added %{date}"
+          none_found: "This Symbol has no Concepts"
+          remove_confirm: "Shall we remove %{subject} from this symbol?"
+          remove_aria_label: "Remove Concept"
+        page_title: "Concepts for %{symbol}"
+      create:
+        notice_success: "We added the %{concept} concept to this symbol."
+        alert_failure: "We couldn't find a concept called %{concept}. Try another\
+          \ word."
+        alert_already_exists: "%{concept} is already a concept on this symbol."
+      destroy:
+        notice_success: "We removed the %{concept} concept from this symbol."
+        alert_failure: "We couldn't remove the %{concept} concept from this symbol."
+    picto_labels:
+      _form:
+        language_helper: "The language of the label."
+        label_label: "Label Text"
+        diacritised_label_label: "Diacritised Label"
+        diacritised_label_helper: "For Arabic languages only. This stores additional\
+          \ pronunciation detail."
+        description_helper: "Briefly describe the symbol to aid understanding."
+        button_save: "Save Label"
+        button_add: "Add Label"
+      _picto_labels:
+        heading: "%{label_type} Labels"
+        remove_label_aria_label: "Remove Label"
+        remove_label_confirm: "Shall we remove %{text} from this symbol?"
+        no_labels_found: "No Labels were found"
+      edit:
+        page_title: "Labels for %{symbol}"
+        heading: "Edit Label"
+        intro: "Labels help other people understand your symbols. They help us understand\
+          \ the meaning of your symbol, so ensure they are accurate and specific."
+      index:
+        page_title: "Labels for %{symbol}"
+        intro: "Labels help other people understand your symbols. They help us understand\
+          \ the meaning of your symbol, so ensure they are accurate and specific."
+        instructions: "Symbols must have at least one label. If you wish, you can\
+          \ add a label for more than one language."
+        heading_add_label: "Add a Label"
+        status_published: "Published"
+        status_suggested: "Suggested"
+      create:
+        notice_success: "We added the %{label} label to this symbol."
+        alert_failure: "You must address some problems before we can add this label."
+      destroy:
+        notice_success: "We removed the %{label} label from this symbol."
+        alert_failure: "We couldn't remove the %{label} label from this symbol."
+      publish_translation:
+        notice_success: "Published the %{language_name} label."
+    knowledge_base:
+      index:
+        search_input_placeholder: 'Search Knowledge Base Articles'
+
+    application:
+      _copy_to_clipboard:
+        button_title: "Copy to Clipboard"
+        button: "Copy"
+    pagination:
+      next: "Next"
+      last: "Last"
+      first: "First"
+      previous: "Prev"
+    errors:
+      not_found:
+        description: "We couldn't find anything at this address"
+    translations:
+      _translation_form:
+        button_translate: "Translate Symbols"
+        button_translate_working: "Translating Symbols…"
+        publish_button: "Publish all %{language_name} Translations"
+        publish_button_working: "Publishing all Translations…"
+        translation_complete_heading: "Translation Complete"
+        translation_complete_text: "All symbols have been translated to %{language_name}."
+      _symbols_table:
+        heading_source_language: "%{language_name} Source"
+        heading_destination_language: "%{language_name} Translation"
+        button_get_translation: "Get Translation"
+        button_get_translation_working: "Translating…"
+        heading_type: "Type"
+      _suggestion_form:
+        button_publish: "Publish"
+        button_publish_working: "Publishing…"
+        label: "Translation"
+      _translations_published:
+        heading: "Translations Published"
+        labels_are_visible: "The new translations are now visible on Global Symbols and in apps."
+        next_steps: "Find more symbols to translate, or choose another language."
+        labels_saved: "The new translations have been saved."
+    articles:
+      _topbar:
+        header_news: "Global Symbols News"
+      index:
+        title: "News"
+        description: "The Global Symbols Blog - Updates, ideas, and inspiration to help you communicate with symbols."
+        more_button: "More Articles"
+
+  layouts:
+    application:
+      menu:
+        resources: "Resources"
+        board_builder: "Board Builder"
+        training: "Training"
+        news: "News"
+        sign_out: "Sign Out"
+        my_account: "My Account"
+        sign_in: "Sign In"
+        sign_up: "Create Account"
+        search_placeholder: "Search %{var}"
+        facebook: "Global Symbols on Facebook"
+        twitter: "Global Symbols on Twitter"
+      footer:
+        privacy_policy: "Privacy Policy"
+        terms: "Terms"
+        accessibility: "Accessibility"
+        about: "About"
+        contact: "Contact"
+        language_label: "Language"
+      skip_to_main_content: "Skip to main content"

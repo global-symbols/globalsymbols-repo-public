@@ -1,0 +1,16 @@
+= render 'symbolsets/topbar', symbolset: @survey.symbolset, stacking: true
+- show_edit = local_assigns.has_key? :show_edit
+.bg-light#symbol-topbar
+  .container-xl
+    .row.py-2
+      .col-auto
+        %h2.d-inline
+          %a{href: symbolset_surveys_path(survey.symbolset)}= t('dictionary.survey.other')
+          >
+          %a{href: symbolset_survey_path(survey.symbolset, survey)}= survey.name
+          - if defined? crumb_link and defined? crumb_name
+            >
+            %a{href: crumb_link}= crumb_name
+      .col.text-right
+        - if show_edit and current_user and can? :manage, survey
+          %a.btn.btn-sm.btn-primary{href: edit_symbolset_survey_path(survey.symbolset, survey)}= t('dictionary.edit')

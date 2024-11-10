@@ -1,0 +1,19 @@
+:ruby
+  title @symbolset.name
+  content_for(:topbar, render('topbar', symbolset: @symbolset), cache: true)
+
+%main.container-xl
+  .row
+    .col.text-center
+      %h1.mb-4= t('views.symbolsets.archive.heading')
+      %p= t('views.symbolsets.archive.description')
+  .row
+    .col
+      - if @pictos.length > 0
+        .row.row-cols-2.row-cols-sm-4.row-cols-lg-5.text-center
+          - @pictos.each do |picto|
+            .col.mb-4
+              = render 'pictos/picto_card', picto: picto, cache: true
+          = paginate @pictos
+      - else
+        = render 'errors/error_notice', status: :empty, text: t('views.symbolsets.archive.none_found')

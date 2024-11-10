@@ -1,0 +1,8 @@
+.d-flex.justify-content-between
+  %h3.mb-4= t('dictionary.symbol.other')
+  %span
+    %a.btn.btn-primary.btn-sm{href: symbolset_survey_path(id: @survey.id)}= t('dictionary.back')
+.list-group
+  - @survey.pictos.each do |picto|
+    %a.list-group-item.list-group-item-action.d-flex.justify-content-between.align-items-center{href: symbolset_survey_symbol_path(id: picto.id), class: (:active if picto == @picto)}
+      = picto.best_label_for(locale).text

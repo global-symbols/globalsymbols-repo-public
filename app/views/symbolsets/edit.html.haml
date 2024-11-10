@@ -1,0 +1,9 @@
+- title t('views.symbolsets.edit._title', symbolset_name: @symbolset.name)
+- content_for(:topbar, render('topbar', symbolset: @symbolset))
+%main.container-xl
+  .row
+    .col-md-3
+      =render 'settings_menu', symbolset: @symbolset
+    .col-md-6
+      %h1.mb-4.text-center= t('dictionary.settings')
+      = render 'form'

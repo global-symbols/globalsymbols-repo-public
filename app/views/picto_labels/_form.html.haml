@@ -1,0 +1,12 @@
+- url = @label.persisted? ? symbolset_symbol_label_path : symbolset_symbol_labels_path
+= bootstrap_form_with url: url, model: @label, layout: :horizontal, label_col: 'col', control_col: 'col-sm-8', id: :picto_label_form do |f|
+  = f.collection_select :language_id, Language.where(active: true), :id, :name, {disabled: @symbol.labels.pluck(:language_id), help: t('views.picto_labels._form.language_helper')}, class: 'gs-language-picker'
+  = f.text_field :text, label: t('views.picto_labels._form.label_label')
+  = f.text_field :text_diacritised, label: t('views.picto_labels._form.diacritised_label_label'), help: t('views.picto_labels._form.diacritised_label_helper'), wrapper: {class: 'd-none'}
+  = f.text_field :description, help: t('views.picto_labels._form.description_helper')
+  .row.mt-5
+    - if @label.persisted?
+      .col
+        %a.btn.btn-outline-secondary{href: symbolset_symbol_labels_path}= t('dictionary.back')
+    .col.text-right
+      = f.primary (@label.persisted? ? t('views.picto_labels._form.button_save') : t('views.picto_labels._form.button_add'))

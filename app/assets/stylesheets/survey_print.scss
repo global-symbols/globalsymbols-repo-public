@@ -1,0 +1,26 @@
+@media print {
+
+  // Remove header and footer
+  @page { margin: 0.5cm; }
+  //body { margin: 1.6cm; }
+
+  // Force printing of background colours on elements
+  body {-webkit-print-color-adjust: exact; color-adjust: exact}
+
+  // Remove spacing for fixed-top navbar
+  body {
+    padding-top: 0 !important;
+  }
+
+  // Prevent survey questions from breaking over pages
+  .print-keep-together {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  table.survey-rating-table {
+    border: none;
+    thead > tr > * { border-top: none !important; }
+    tr > * { border-left: none !important; }
+  }
+}

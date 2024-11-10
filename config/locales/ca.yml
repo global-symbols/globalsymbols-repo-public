@@ -1,0 +1,987 @@
+ca:
+  views:
+    symbolsets:
+      _form:
+        create_button: Crea un conjunt de símbols
+        logo_label: Logo
+        save_button: Desa el conjunt de símbols
+        licence_prompt: Seleccioneu una llicència
+        publisher_url_placeholder: per exemple, https://peoplesymbols.com
+        publisher_placeholder: per exemple, la Fundació PeopleSymbols
+        publisher_url_label: Adreça URL de l'editor
+        logo_helper: Aquest logotip apareixerà a la pàgina Conjunts de símbols. Aquesta
+          ha de ser una imatge, idealment un SVG o PNG, 300x200 píxels amb un fons
+          transparent.
+        publisher_url_helper: L'adreça del lloc web de l'editor.
+        publisher_helper: El nom de la persona o organització que publica el conjunt
+          de símbols.
+        published_helper: Els conjunts de símbols publicats són visibles per a tothom.
+          Els conjunts de símbols d'esborrany són visibles per als administradors
+          i els col·laboradors del conjunt de símbols.
+        description_helper: Aquesta descripció apareixerà al costat del conjunt de
+          símbols.
+      review:
+        filter_without_a_concept: Sense concepte
+        filter_all_symbols: Tots els símbols
+        heading: Revisió
+      _shared:
+        none_found: No hem pogut trobar cap símbol aquí!
+      new:
+        guidance_link: obtenir el vostre conjunt de símbols publicat a Global Symbols
+        guidance: Us suggerim que reviseu les directrius per
+        introduction: El conjunt de símbols nou es crearà en un estat d'esborrany.
+          Només serà visible per a vostè i els col·laboradors que afegiu, permetent-vos
+          afegir símbols i preparar el conjunt de símbols.
+        heading: Crea un conjunt de símbols
+        _title: Crea un conjunt de símbols
+      index:
+        _description: Navegueu per milers de símbols de comunicació gratuïts a Global
+          Symbols.
+        create_symbol_set_button: Crea un conjunt de símbols
+        heading: Explora els conjunts de símbols
+        _title: Explora els conjunts de símbols
+      import:
+        introduction: Pengeu els símbols existents als Global Symbols.
+        heading: Importa símbols
+        _title: Importa a %{symbolset_name}
+      edit:
+        _title: Edita %{symbolset_name}
+      _symbolset_card:
+        image:
+          alt: Logotip de %{symbolset_name}
+      _review_row:
+        remove_confirmation: Hem de suprimir %{subject} d'aquest símbol?
+      _topbar:
+        button_review: Revisió
+        button_edit: Editar
+        button_add_symbol: Afegeix un símbol
+        download: Descarregar
+        button_archive: Símbols arxivats
+        button_translate: Traduir
+      show:
+        _description: Exploreu el símbol %{symbolset_name} definit a Global Symbols.
+          Obtenir imatges i símbols gratuïts per a la comunicació.
+        no_symbols_for_collaborator: Afegir un símbol per començar a construir el
+          conjunt de símbols
+      archive:
+        description: Els símbols arxivats no es mostren al conjunt de símbols, als
+          resultats de la cerca ni a les aplicacions
+        heading: Símbols arxivats
+        none_found: No hi ha símbols arxivats en aquest conjunt de símbols
+      translate:
+        form:
+          target_lang_prompt: Seleccioneu l'idioma de destinació
+          source_lang_option: '%{language_name} (%{labels_count} símbols, cobertura
+            %{coverage_percentage})'
+          target_lang_label: a
+          source_lang_label: Tradueix des de
+        title: Tradueix %{symbolset_name}
+        heading: Traduir etiquetes
+        description: Tradueix automàticament etiquetes de símbols a nous idiomes.
+          Aquesta eina es tradueix en lots de símbols %{symbols_limit} alhora.
+        button_find_untranslated: Cerca símbols sense traduir
+    picto_labels:
+      edit:
+        heading: Edita l'etiqueta
+        intro: Les etiquetes ajuden altres persones a entendre els símbols. Ens ajuden
+          a entendre el significat del seu símbol, així que assegureu-vos que són
+          precisos i específics.
+        page_title: Etiquetes per a %{symbol}
+      destroy:
+        alert_failure: No hem pogut suprimir l'etiqueta %{label} d'aquest símbol.
+        notice_success: Hem suprimit l'etiqueta %{label} d'aquest símbol.
+      create:
+        alert_failure: Heu d'abordar alguns problemes per afegir aquesta etiqueta.
+        notice_success: Hem afegit l'etiqueta %{label} a aquest símbol.
+      index:
+        heading_add_label: Afegir una etiqueta
+        instructions: Els símbols han de tenir com a mínim una etiqueta. Si ho desitja,
+          pot afegir una etiqueta per a més d'un idioma.
+        intro: Les etiquetes ajuden altres persones a entendre els símbols. Ens ajuden
+          a entendre el significat del seu símbol, així que assegureu-vos que són
+          precisos i específics.
+        page_title: Etiquetes per a %{symbol}
+        status_published: Publicat
+        status_suggested: Suggerit
+      _picto_labels:
+        no_labels_found: No s'ha trobat cap etiqueta
+        remove_label_confirm: Hem de suprimir %{text} d'aquest símbol?
+        remove_label_aria_label: Suprimeix l'etiqueta
+        heading: Etiquetes %{label_type}
+      _form:
+        button_add: Afegeix una etiqueta
+        button_save: Desa l'etiqueta
+        description_helper: Descriure breument el símbol per ajudar a la comprensió.
+        diacritised_label_helper: Només per a llengües àrabs. Això emmagatzema detalls
+          addicionals de pronunciació.
+        diacritised_label_label: Etiqueta diacrítica
+        label_label: Text de l'etiqueta
+        language_helper: L'idioma de l'etiqueta.
+      publish_translation:
+        notice_success: S'ha publicat l'etiqueta %{language_name}.
+    pagination:
+      previous: Anterior
+      first: Primer
+      last: Últim
+      next: Següent
+    application:
+      _copy_to_clipboard:
+        button: Còpia
+        button_title: Copia al porta-retalls
+    picto_concepts:
+      destroy:
+        alert_failure: No hem pogut suprimir el concepte %{concept} d'aquest símbol.
+        notice_success: Hem suprimit el concepte %{concept} d'aquest símbol.
+      create:
+        alert_already_exists: "%{concept} ja és un concepte d'aquest símbol."
+        alert_failure: No hem pogut trobar un concepte anomenat %{concept}. Proveu
+          una altra paraula.
+        notice_success: Hem afegit el concepte %{concept} a aquest símbol.
+      index:
+        page_title: Conceptes per a %{symbol}
+        existing_concepts:
+          remove_aria_label: Suprimeix el concepte
+          remove_confirm: Hem de suprimir %{subject} d'aquest símbol?
+          none_found: Aquest símbol no té conceptes
+          added_at: S'ha afegit %{date}
+          heading: Conceptes existents
+        add_concept:
+          button: Afegeix concepte
+          instruction: Per afegir un concepte a aquest símbol, introduïu una paraula.
+            Afegirem el concepte si el podem trobar.
+          heading: Afegeix un concepte
+          add: sumar
+        add_concept_invitation: Podem afegir qualsevol concepte que puguis trobar
+          a ConceptNet.
+        intro: Els conceptes ajuden els ordinadors a entendre els vostres símbols,
+          de manera que assegureu-vos que siguin precisos i específics.
+    concepts:
+      show:
+        defined_in: Un concepte definit en
+        page_title: '%{subject} a %{coding_framework}'
+    collaborators:
+      destroy:
+        notice_success: Hem suprimit %{email_address} com a col·laborador.
+      create:
+        alert_no_gs_account: '%{email_address} encara no té un compte de Global Symbols.'
+        notice_success: Hem afegit %{email_address} com a col·laborador.
+      index:
+        remove_aria_label: Suprimeix el col·laborador
+        remove_confirm: Hem de suprimir %{email} d'aquest conjunt de símbols?
+        added_at: S'ha afegit %{date}
+        existing_none_found: No es permet que cap usuari editi aquest conjunt de símbols.
+        existing_text: Aquestes persones poden editar aquest conjunt de símbols.
+        existing_heading: Col·laboradors existents
+        add_button: Afegeix un col·laborador
+        add_text: Per permetre que una altra persona editi aquest conjunt de símbols,
+          introduïu l'adreça electrònica que utilitzava per registrar-se a Global
+          Symbols.
+        add_heading: Afegir un col·laborador
+        page_title: Col·laboradors per a %{name}
+    survey_questions:
+      _controller:
+        timed_out: "Ho sentim: l'enquesta s'ha fet un temps d'espera a causa de la\
+          \ inactivitat. Torneu a començar l'enquesta."
+      show:
+        please_rate: Si us plau, valoreu aquest símbol en una escala on 1 és "completament
+          inacceptable" i 5 és "completament acceptable".
+      _form:
+        button_save_answer: Desa la resposta
+        button_previous_question: Pregunta anterior
+        comments_helper: Opcional. Si us plau, afegiu qualsevol comentari que ens
+          ajudi a millorar aquest símbol.
+        please_fix_errors: Corregiu els errors a continuació.
+    survey_response_analysis:
+      create:
+        notice_success: Aquesta resposta en paper s'ha desat.
+      new:
+        save_button: Desa les respostes
+        cancel_confirm: Estàs segur? Vostè perdrà els resultats fins ara.
+        label_cultural_rating: Sensibilitat cultural
+        label_contrast_rating: Contrast de color
+        label_representation_rating: Representa la paraula
+        label_overall_rating: Sentiments sobre el símbol
+        match_numbers: Els números que es mostren a la part superior dreta de cada
+          quadre de símbols han de coincidir amb els que es mostren als formularis
+          de paper, per assegurar-vos d'introduir les puntuacions correctes per a
+          cada símbol.
+        use_this_form_to: Utilitzeu aquest formulari per desar una única enquesta
+          en paper a Global Symbols. A continuació, comptarà per a les estadístiques
+          de l'enquesta.
+        heading: Afegeix comentaris en paper
+      index:
+        heading: Respostes individuals
+        crumb_name: Respostes individuals
+      _sidebar:
+        participant_number: Participant %{number}
+        heading: Respostes
+    survey_picto_analysis:
+      index:
+        column_heading_cultural_rating_description: Idoneïtat cultural
+        column_heading_contrast_rating_description: Contrast de color
+        column_heading_representation_rating_description: Representa la paraula o
+          frase
+        column_heading_rating_description: Sentiments sobre el símbol en el seu conjunt
+        row_heading_averages: Mitjanes
+        column_heading_overall_average: Mitjana global
+        intro: En aquesta taula es mostren les respostes mitjanes de cada símbol de
+          l'enquesta, segons un total de %{count} rebudes.
+        heading: Estadístiques de Symbol
+        crumb_name: Estadístiques de Symbol
+    survey_editor:
+      show:
+        analyse_results:
+          responses_count:
+            one: La persona %{count} ha respost a l'enquesta.
+            other: '%{count} persones han respost a la vostra enquesta.'
+          results_appear_here: Els resultats es mostraran aquí quan els usuaris comencin
+            a respondre a l'enquesta.
+          heading: Analitzar resultats
+          export:
+            text_3: Cada fila del fitxer Excel representa la revisió d'un sol participant
+              d'un símbol a l'enquesta.
+            text_2: Això fa que sigui fàcil realitzar la vostra pròpia anàlisi a Excel.
+              Us suggerim que utilitzeu taules dinàmiques per calcular i traçar els
+              resultats mitjans de cada símbol.
+            text_1: Utilitzeu aquesta eina per baixar totes les dades de l'enquesta,
+              incloses les puntuacions i els comentaris.
+            heading: Exporta els resultats a Excel
+          button_stats: Estadístiques de Symbol
+          button_individual_responses: Respostes individuals
+        collect_feedback:
+          survey_ended_add_paper: Encara podeu afegir suggeriments manualment dels
+            formularis d'enquestes en paper.
+          survey_ended: S'ha acabat la recopilació de resposta d'aquesta enquesta.
+          paper_add_paper_feedback_button: Afegeix comentaris en paper
+          paper_to_include_results: Per incloure els resultats dels formularis d'enquestes
+            en paper als resultats de l'enquesta…
+          paper_print_button: Imprimeix els formularis de l'enquesta
+          paper_customisation_invitation: Per personalitzar i imprimir formularis
+            d'enquestes per als teus participants…
+          paper_intro: Alguns participants poden preferir formularis d'enquestes en
+            paper. Utilitzeu aquestes eines recollir els seus comentaris i emmagatzemar
+            aquí.
+          paper_heading: Enquestes en paper
+          stop_button: Finalitza l'enquesta
+          confirm_stop: Això impedirà que les persones que responen a l'enquesta.
+            Estàs segur?
+          responses_count:
+            one: L'enquesta té la resposta %{count}.
+            other: La vostra enquesta té %{count} respostes.
+          invite_deadline: Els participants tenen fins a %{close_at} per proporcionar
+            respostes (%{link}).
+          invite_at_this_url: Convideu els usuaris a fer l'enquesta en aquest URL.
+          button_begin_collecting: Comenceu a recopilar comentaris
+          close_at_helper: Opcional. Definiu un termini per a les respostes de l'enquesta.
+          close_at_label: Accepta les respostes fins
+          text_2: No podreu canviar les seleccions de símbols mentre l'enquesta recopila
+            suggeriments.
+          text_1: Quan comenceu a recopilar suggeriments, us donarem un URL on els
+            usuaris poden participar a l'enquesta.
+          heading: Recopila suggeriments
+        symbols_search_helper: Cerca símbols per afegir a aquesta enquesta
+        symbols_text: Afegiu símbols a aquesta enquesta cercant-los en Global Symbols
+          i escollint "Afegeix a l'enquesta".
+        symbols_heading: Símbols d'aquesta enquesta
+        archive:
+          delete_button: Suprimeix l'enquesta
+          delete_confirm: Esteu segur que voleu suprimir aquesta enquesta i qualsevol
+            resposta?
+          delete_description: Si suprimiu aquesta enquesta, se suprimiran permanentment
+            els resultats que heu recopilat. No se suprimiran símbols.
+          archive_button: Arxivar l'enquesta
+          archive_confirm: Això impedirà que les persones que responen a l'enquesta.
+            Estàs segur?
+          archive_description: Arxivar aquesta enquesta quan hagis acabat amb ell.
+            Encara podreu analitzar els resultats d'aquesta enquesta.
+          survey_is_archived: Aquesta enquesta està arxivada. Encara podeu analitzar
+            els resultats.
+          heading: Arxivar o suprimir
+      new:
+        button_create: Crea una enquesta
+      index:
+        get_help_link: Ajuda i Formació
+        get_help: Explora %{link} per a enquestes
+        no_surveys_at_stage: No hi ha enquestes a la fase %{stage}.
+        button_new_survey: Crea una enquesta
+        _title: Enquestes a %{symbolset_name}
+      edit:
+        heading: Edita l'enquesta
+        _title: Edita %{survey_name} a %{symbolset_name}
+      destroy:
+        notice: Hem suprimit l'enquesta %{name}.
+      export_xlsx:
+        sheet_name: Comentaris
+        comment_participant_name: Els participants no estan obligats a proporcionar
+          els seus noms, de manera que algunes cel·les poden estar buides.
+        header_comment: Comentari
+        header_cultural_rating: Cultural
+        header_contrast_rating: Contrast
+        header_representation_rating: Representació
+        header_overall_rating: Qualificació
+        header_label: Etiqueta
+        header_symbol_id: ID del símbol
+        header_participant_name: Nom del participant
+        header_participant_number: Nombre de participants
+      _sidebar:
+        stages:
+          analyse_results_description: Revisa els resultats de l'Enquesta
+          collect_feedback_description: Permet als participants completar l'Enquesta
+          plan_description: Trieu els símbols que s'han d'incloure a l'enquesta
+          archive: Arxivar o suprimir
+          analyse: Analitzar resultats
+          collect_feedback: Recopila suggeriments
+          plan: Pla
+        heading: Etapes
+      _picto:
+        remove_confirm: Esteu segur que voleu eliminar aquest símbol de l'enquesta?
+        no_label_for_language: No hi ha cap etiqueta %{language_name}
+      _form:
+        create_button: Crea una enquesta
+        save_button: Desa l'enquesta
+        show_symbol_descriptions_helper: Mostra les descripcions dels símbols als
+          participants.
+        show_symbol_descriptions_label: Mostra les descripcions dels símbols
+        language_blank_option: Tots els idiomes disponibles
+        language_helper: En fer aquesta enquesta, els participants es mostren etiquetes
+          de símbols en l'idioma seleccionat.
+        language_label: Mostra les etiquetes dels símbols a
+        close_at_helper: Opcional. Definiu un termini perquè els participants responguin.
+        introduction_helper: Opcional. Això es mostra als participants quan comencen
+          l'enquesta.
+        name_helper: Proporcioneu un nom que ajudi els participants a identificar
+          aquesta enquesta.
+      _add_picto_to_survey:
+        option: '%{survey_name} a %{symbolset_name}'
+        button: Afegeix-ho a l'enquesta
+      add_symbol:
+        alert_failure: Aquest símbol ja es troba a %{survey_link}
+        notice_success_add_another: Afegir un altre?
+        notice_success: Hem afegit el símbol a la vostra enquesta. %{add_another_link}
+    pictos:
+      show:
+        _description: Símbol "%{picto_label}", que forma part del conjunt de símbols
+          %{symbolset_name}. Trobar milers de símbols gratuïts per a la comunicació.
+        alternative_symbols_heading: Símbols alternatius
+        add_concept_button: Afegeix un concepte
+        no_concepts: Aquest símbol no té conceptes per definir-lo.
+        concept_defined_in: Definit a %{coding_framework_name}
+        _title: '%{picto_label} a %{symbolset_name}'
+        archived_notice:
+          text: Aquest símbol no es mostra al conjunt de símbols, als resultats de
+            la cerca ni a les aplicacions
+          heading: Símbol arxivat
+      new:
+        heading: Afegeix un símbol
+        _title: Afegeix un símbol a %{symbolset_name}
+      edit:
+        heading: Edita el símbol
+        _title: Edita %{picto_label} a %{symbolset_name}
+      _topbar:
+        not_publicly_visible: No visible públicament
+        download_button: Baixa %{file_type}
+      _form:
+        to_download_symbols: Per descarregar símbols
+        create_button: Afegeix un símbol
+        save_button: Desa el símbol
+        description_helper: Descriure breument el símbol per ajudar a la comprensió.
+        diacritised_label_helper: Només per a llengües àrabs. Això emmagatzema detalls
+          addicionals de pronunciació.
+        label_label: Text de l'etiqueta
+        language_helper: L'idioma de l'etiqueta.
+        label_helper: L'etiqueta descriu el símbol perquè els usuaris el puguin trobar.
+          Podeu afegir etiquetes en idiomes addicionals després de crear el símbol.
+        image_helper: Carregueu una imatge de format SVG (preferida) o PNG.
+      _comment_form:
+        save_button: Desa el comentari
+    surveys:
+      _print_question:
+        example_comment: Aquest arbre sembla un bròquil.
+        symbol_counter: Símbol %{number}
+        example_text: Això mostra com es pot respondre a les preguntes
+        example_heading: Pregunta d'exemple
+      thank_you:
+        button_restart_survey: Reinicia l'enquesta
+        button_go_to_homepage: Procedir als Global Symbols
+        feedback_is_saved: Hem desat tots els teus comentaris.
+      print:
+        instructions_2: Valora cada símbol en una escala on 1 sigui "completament
+          inacceptable" i 5 sigui "completament acceptable", col·locant una comprovació
+          a la casella correcta.
+        instructions_1: Aquesta enquesta li demanarà que valori quatre aspectes de
+          cada símbol, i proporcionar alguns comentaris.
+        instructions_heading: Instruccions
+        introduction: Introducció
+        name_field: El meu nom és
+        print_button: Imprimeix l'enquesta
+        symbol_label_language_helper: Per obtenir els millors resultats, imprimiu
+          en color utilitzant un navegador modern i desactiveu capçaleres i peus de
+          pàgina.
+        symbol_label_language_all: Tots els idiomes disponibles
+        symbol_label_language: Mostra les etiquetes dels símbols a
+        show_example_helper: Afegeix una pregunta d'exemple que mostra respostes d'exemple.
+        show_example: Mostra un exemple
+        show_instructions_helper: Canvieu les instruccions fent-hi clic.
+        show_instructions: Mostra les instruccions
+        show_intro_helper: Canvieu la introducció editant l'enquesta.
+        show_intro: Mostra la introducció de l'enquesta
+        collect_names: Recollir els noms dels participants
+        heading: Configuració d'impressió
+      show:
+        offline_participants_button: Imprimeix els formularis de comentaris de l'enquesta
+        offline_participants: Per als participants que treballen fora de línia…
+        closed_text: Poseu-vos en contacte amb l'organitzador de l'enquesta si teniu
+          previst poder participar-hi.
+        closed_header: Aquesta enquesta no accepta comentaris en aquest moment.
+        provide_details_2: Les vostres dades es mostraran als organitzadors de l'enquesta
+          en relació amb els vostres comentaris i mai seran utilitzades per Global
+          Symbols per a cap altra finalitat.
+        provide_details: Proporcionar les dades és opcional i pot ajudar els organitzadors
+          de l'enquesta.
+        begin_button: Comença l'enquesta
+        close_at_message: Podeu participar fins a %{date}.
+      _shared:
+        questions:
+          comments: Comentaris addicionals
+          cultural_rating: Sensibilitat cultural
+          contrast_rating: Contrast de color
+          representation_rating: Representa la paraula o frase
+          feelings_rating: Sentiments sobre el símbol en el seu conjunt
+        thank_you: Gràcies per completar l'enquesta!
+        number_of_symbols:
+          one: Aquesta enquesta té %{count} Símbol perquè reviseu.
+          other: Aquesta enquesta té %{count} Símbols que podeu revisar.
+    pages:
+      contact:
+        _description: Poseu-vos en contacte amb nosaltres amb consultes generals,
+          o per obtenir el seu conjunt de símbols publicat.
+        email_us: Envia'ns un correu electrònic
+        lead_text: Estem molt contents de rebre consultes, suggeriments i informació
+          sobre els recursos pertinents.
+        heading: Posa't en contacte
+      search:
+        no_results: No hem pogut trobar cap símbol coincident. Proveu una cerca més
+          àmplia.
+        _title: Cerca
+        search_for: Cercar
+        search: Cerca
+        symbolset_dropdown_any_symbol_set: Qualsevol conjunt de símbols
+      home:
+        explore_button: Explora més conjunts de símbols…
+        explore_heading: Explora els conjunts de símbols
+        for_everyone_text: Descobrir, barrejar, combinar i fer que l'ús de símbols
+          personals
+        for_everyone: Per a tothom
+        for_communicators_text: Intercanviar imatges per crear converses
+        for_communicators: Per a comunicadors
+        for_creators_text: Administra i publica conjunts de símbols
+        for_creators: Per a creadors
+        board_builder:
+          create: Creeu taulers per facilitar la comunicació utilitzant milers d'imatges
+            gratuïtes de la nostra biblioteca, i fins i tot les vostres.
+          subheading: Taulers de comunicació de la manera fàcil
+          heading: Global Symbols Board Builder
+          design: Dissenya, construeix, guarda i imprimeix taulers de comunicació
+            en línia.
+          storage: Tot s'emmagatzema de forma segura al teu compte de Global Symbols.
+          button_featured: Conjunts de taulers destacats
+          button_try: Proveu el Board Builder
+    errors:
+      not_found:
+        description: No hem pogut trobar res en aquesta adreça
+    translations:
+      _translations_published:
+        heading: Traduccions publicades
+        labels_are_visible: Les traduccions noves ara són visibles a Global Symbols
+          i a les aplicacions.
+        next_steps: Cerqueu més símbols per traduir o trieu un altre idioma.
+        labels_saved: Les traduccions noves s'han desat.
+      _translation_form:
+        publish_button: Publica totes les traduccions %{language_name}
+        publish_button_working: S'estan publicant totes les traduccions…
+        translation_complete_heading: Traducció completada
+        translation_complete_text: Tots els símbols s'han traduït a %{language_name}.
+        button_translate: Tradueix símbols
+        button_translate_working: S'estan traduint símbols…
+      _symbols_table:
+        heading_source_language: Origen %{language_name}
+        heading_destination_language: Traducció de %{language_name}
+        button_get_translation: Obtén la traducció
+        button_get_translation_working: Traduir…
+        heading_type: Tipus
+      _suggestion_form:
+        button_publish: Publicar
+        button_publish_working: Editorial…
+        label: Traducció
+    articles:
+      _topbar:
+        header_news: Notícies de Símbols Globals
+      index:
+        title: Notícies
+        description: 'El bloc de símbols globals: actualitzacions, idees i inspiració
+          per ajudar-vos a comunicar-vos amb símbols.'
+        more_button: Més articles
+  layouts:
+    application:
+      skip_to_main_content: Anar al contingut principal
+      footer:
+        contact: Contacte
+        about: Sobre
+        accessibility: Accessibilitat
+        terms: Termes
+        privacy_policy: Política de privacitat
+        language_label: Llengua
+      menu:
+        twitter: Global Symbols a Twitter
+        facebook: Global Symbols al Facebook
+        search_placeholder: Cerca %{var}
+        sign_up: ↑ «Padró municipal a data d
+        sign_in: Inicia la sessió
+        my_account: El meu compte
+        sign_out: Tancar la sessió
+        news: Notícies
+        training: Formació
+        board_builder: Board Builder
+        resources: Recursos
+  languages:
+    sr_Latn: serbi (llatí)
+    sr_Cyrl: Serbi (ciríl·lic)
+    sr: Serbi
+    hr: Croat
+    de: Alemany
+    fr: Francès
+    en: Anglès
+    tr: Turc
+    ro: Romanès
+    el: Grec
+    hy: Armeni
+    sq: Albanès
+    bg: Búlgar
+    ca: Català
+    nl: Holandès
+    es: Espanyol
+    cnr: Montenegrí
+    sh: serbocroat
+    ru: rus
+    pt: portuguès
+    mr: marathi
+    mk: macedònic
+    it: italià
+    hi: hindi
+    da: danès
+    zh: xinès
+    ar: àrab
+    sk: eslovac
+    sv: suec
+    val: Vehes
+    ur: urdú
+    an: Aragonès
+    br: bretó
+    et: estonià
+    eu: basc
+    fa: persa
+    gl: gallec
+    he: hebreu
+    hu: hongarès
+    pl: polonès
+  dictionary:
+    page_not_found: No s'ha trobat la pàgina
+    download: Descarregar
+    change: Canviar
+    search: Cerca
+    remove: Treure
+    view: Mostra
+    sign_in: Inicia la sessió
+    edit: Editar
+    import: Importació
+    by: Per
+    back: Tornada
+    numbers:
+      '5': '5'
+      '4': '4'
+      '3': '3'
+      '2': '2'
+      '1': '1'
+    global_symbols: Global Symbols
+    go_back: Tornar
+    unauthorised: No autoritzats
+    survey:
+      one: Enquesta
+      other: Enquestes
+    response:
+      one: Resposta
+      other: Respostes
+    symbol:
+      one: Símbol
+      other: Símbols
+    symbolset:
+      one: Conjunt de símbols
+      other: Conjunts de símbols
+    label:
+      one: Etiqueta
+      other: Etiquetes
+    settings: Configuració
+    concept:
+      one: Concepte
+      other: Conceptes
+    collaborator:
+      one: Col·laborador
+      other: Col·laboradors
+    archive: Arxiu
+    un-archive: Sense arxivar
+    publish: Publicar
+  errors:
+    messages:
+      size_too_big: és massa gran (el màxim és %{file_size})
+      size_too_small: és massa petit (el mínim és %{file_size})
+      wrong_size: és la mida incorrecta (hauria de ser %{file_size})
+      confirmation_period_expired: s'ha de confirmar dins del %{period}, si us plau,
+        sol·liciteu-ne un de nou
+      expired: ha caducat, si us plau, sol·liciteu-ne un de nou
+      not_found: no s'ha trobat
+      not_locked: no s'ha bloquejat
+      not_saved:
+        one: 'Un error ha prohibit desar aquest %{resource}:'
+        other: '%{count} errors van prohibir que es desés aquest %{resource}:'
+      already_confirmed: ja s'ha confirmat, proveu d'iniciar la sessió
+      even: ha de ser fins i tot
+      odd: ha de ser senar
+      other_than: ha de ser diferent de %{count}
+      less_than_or_equal_to: ha de ser menor o igual que %{count}
+      less_than: ha de ser inferior a %{count}
+      equal_to: ha de ser igual a %{count}
+      greater_than_or_equal_to: ha de ser més gran o igual que %{count}
+      greater_than: ha de ser més gran que %{count}
+      not_an_integer: ha de ser un enter
+      not_a_number: no és un número
+      wrong_length:
+        one: és una longitud incorrecta (ha de tenir 1 caràcter)
+        other: és la longitud incorrecta (ha de tenir %{count} caràcters)
+      too_short:
+        one: és massa curta (el mínim és d'1 caràcter)
+        other: és massa curt (el mínim és %{count} caràcters)
+      too_long:
+        one: és massa llarg (el màxim és d'1 caràcter)
+        other: és massa llarg (el màxim és de %{count} caràcters)
+      present: ha d'estar en blanc
+      blank: no pot estar en blanc
+      empty: no pot estar buit
+      accepted: s'ha d'acceptar
+      confirmation: no coincideix amb %{attribute}
+      invalid: no és vàlida
+      exclusion: està reservat
+      inclusion: no s'inclou a la llista
+      model_invalid: 'La validació ha fallat: %{errors}'
+  activerecord:
+    attributes:
+      user:
+        language_id: Idioma preferit
+        location: Ubicació
+        company: Empresa
+        surname: Cognom
+        prename: Nom i cognoms
+        email: Adreça de correu electrònic
+        current_password: Contrasenya actual
+        remember_me: Recorda'm
+        password: contrasenya
+      symbolset:
+        statuses:
+          ingesting: Ingerir
+          draft: Projecte
+          published: Publicat
+        status: Estat
+        logo: Logo
+        publisher_url: Adreça URL de l'editor
+        publisher: Editor
+        description: Descripció
+        name: Nom
+      survey_response:
+        role: Paper
+        organisation: Organització
+        name: Nom
+      survey:
+        show_symbol_descriptions: Mostra les descripcions dels símbols
+        close_at: Tanca a
+        status: Estat
+        introduction: Introducció
+        name: Nom
+      picto:
+        visibility_options:
+          collaborators: Col·laboradors de Symbolset
+          everybody: Tothom
+        visibility: Visible per
+        image: Imatge
+        publisher_ref: Referència de l'editor
+        part_of_speech_options:
+          modifier: Modificador
+          article: Article
+          interjection: Interjecció
+          conjunction: Conjuntament
+          preposition: Preposició
+          pronoun: Pronom
+          adverb: Adverbi
+          adjective: Adjectiu
+          verb: Verb
+          noun: Substantiu
+        part_of_speech: Part de la parla
+      licence:
+        logo: Logo
+        properties: Propietats
+        version: Versió
+        url: Url
+        name: Nom
+      language:
+        category: Categoria
+        scope: Abast
+        name: Nom
+        active: Actiu
+      label:
+        description: Descripció
+        text_diacritised: Etiqueta diacrítica
+        text: Etiqueta
+      concept:
+        subject: Tema
+      comment:
+        resolved: Resoldre
+        read: Llegir
+        comment: Comentari
+        cultural_rating_short: Cultural
+        cultural_rating: Qualificació Cultural
+        contrast_rating_short: Contrast
+        contrast_rating: Classificació del contrast
+        representation_rating_short: Representació
+        representation_rating: Classificació de la representació
+        rating: Qualificació
+      coding_framework:
+        www_uri_base: WWW URI Base
+        api_uri_base: Base URI de l'API
+        structure: Estructura
+        name: Nom
+      category:
+        name: Nom
+    models:
+      user: Usuari
+      symbolset_user: Col·laborador
+      symbolset: Conjunt de símbols
+      survey_response: Resposta de l'enquesta
+      survey_picto: Enquesta Picto
+      survey: Enquesta
+      picto_concept: Concepte Picto
+      picto: Símbol
+      licence: Llicència
+      language: Llengua
+      label: Etiqueta
+      image: Imatge
+      concept: Concepte
+      comment: Comentari
+      coding_framework: Marc de codificació
+      category: Categoria
+  doorkeeper:
+    scopes:
+      boardset:write: Escriu als teus conjunts de taulers
+      boardset:read: Llegeix els teus conjunts de taulers
+      identity:read:user: Llegir les dades del compte d'usuari
+      public: Accedeix a les teves dades públiques
+  devise:
+    views:
+      sessions:
+        errors:
+          messages:
+            not_saved:
+              one: 'Un error ha prohibit desar aquest %{resource}:'
+              other: '%{count} errors van prohibir que es desés aquest %{resource}:'
+            not_locked: no s'ha bloquejat
+            not_found: no s'ha trobat
+            expired: ha caducat, si us plau, sol·liciteu-ne un de nou
+            confirmation_period_expired: s'ha de confirmar dins del %{period}, si
+              us plau, sol·liciteu-ne un de nou
+            already_confirmed: ja s'ha confirmat, proveu d'iniciar la sessió
+        new:
+          sign_in_button: Inicia la sessió
+          page_title: Inicia la sessió
+      _shared:
+        _links:
+          new_unlock: No has rebut instruccions de desbloqueig?
+          new_confirmation: No has rebut instruccions de confirmació?
+          forgotten_password: Has oblidat la contrasenya?
+          sign_up: ↑ «Padró municipal a data d
+          sign_in: Inicia la sessió
+      passwords:
+        edit:
+          button: Canvia la contrasenya
+          confirm_password_label: Confirma la contrasenya nova
+          new_password_helper: "%{var} caràcters mínim"
+          new_password_label: Nova contrasenya
+          heading: Canviar la contrasenya
+        instructions: Introdueix l'adreça electrònica del teu compte i t'enviarem
+          un enllaç per restablir la contrasenya.
+        new:
+          page_title: Administra el compte
+          button: Enllaç de reinicialització del correu electrònic
+          email_helper: L'adreça electrònica que heu utilitzat per registrar-vos a
+            Global Symbols
+          heading: Reinicialitza la contrasenya
+      registrations:
+        edit:
+          awaiting_confirmation: "S'està esperant la confirmació de: %{unconfirmed_email}"
+          page_title: Administra el compte
+          heading: Administra el compte
+        _form:
+          cancel_account_button: Suprimeix el meu compte
+          cancel_account_confirm: N'estàs segur? El vostre compte de Global Symbols
+            se suprimirà permanentment.
+          cancel_account_text: Si voleu tancar el vostre compte de Global Symbols…
+          cancel_account_header: Cancel·lar el meu compte
+          button_save_changes: Desa els canvis
+          new_password_helper: '%{var} caràcters mínim. Deixeu-lo en blanc si no voleu
+            canviar-lo.'
+          current_password_helper: Necessitem la teva contrasenya actual per confirmar
+            els teus canvis.
+          new_password_confirmation: Confirma la contrasenya nova
+          new_password: Contrasenya nova
+          please_fix_errors: Corregiu aquests errors.
+          confirm_password: Confirmació de la contrasenya
+          password_helper: '%{var} caràcters mínim'
+          language_helper: Els símbols es mostraran en l'idioma que preferiu quan
+            sigui possible.
+          button_change_password: Canvia la contrasenya
+        new:
+          sign_up_button: ↑ «Padró municipal a data d
+          heading: ↑ «Padró municipal a data d
+          page_title: ↑ «Padró municipal a data d
+        change_password:
+          heading: Canvia la contrasenya
+          manage_account: Administra el compte
+          submit: Canvia la contrasenya
+          account_indicator: Ha iniciat la sessió com a %{email}
+        account_saved:
+          heading: Compte actualitzat
+          return_to_gs_button: Torna als Global Symbols
+    unlocks:
+      unlocked: El compte s'ha desbloquejat correctament. Inicieu la sessió per continuar.
+      send_paranoid_instructions: Si el compte existeix, rebràs un correu electrònic
+        amb instruccions sobre com desbloquejar-lo en pocs minuts.
+      send_instructions: Rebràs un correu electrònic amb instruccions sobre com desbloquejar
+        el teu compte en pocs minuts.
+    sessions:
+      already_signed_out: Has signat.
+      signed_out: Has signat.
+      signed_in: Benvingut de nou!
+    registrations:
+      updated: El compte s'ha actualitzat correctament.
+      update_needs_confirmation: Heu actualitzat el compte correctament, però hem
+        de verificar la vostra nova adreça electrònica. Comproveu el correu electrònic
+        i seguiu l'enllaç de confirmació per confirmar la vostra nova adreça de correu
+        electrònic.
+      signed_up_but_unconfirmed: S'ha enviat un missatge amb un enllaç de confirmació
+        a la vostra adreça electrònica. Seguiu l'enllaç per activar el compte.
+      signed_up_but_locked: Us heu registrat correctament. No obstant això, no hem
+        pogut iniciar la sessió perquè el compte està bloquejat.
+      signed_up_but_inactive: Us heu registrat correctament. No obstant això, no hem
+        pogut iniciar la sessió perquè el vostre compte encara no està activat.
+      signed_up: Benvingut! Us heu registrat correctament.
+      destroyed: Bye! El compte s'ha cancel·lat correctament. Esperem tornar-vos a
+        veure aviat.
+    passwords:
+      updated_not_active: La contrasenya s'ha canviat correctament.
+      updated: La contrasenya s'ha canviat correctament. Ara heu iniciat la sessió.
+      send_paranoid_instructions: Si la seva adreça de correu electrònic existeix
+        a la nostra base de dades, rebrà un enllaç de recuperació de contrasenya a
+        la seva adreça de correu electrònic en pocs minuts.
+      send_instructions: T'hem enviat un correu electrònic de restabliment de la contrasenya.
+      no_token: No podeu accedir a aquesta pàgina sense venir d'un correu electrònic
+        de reinicialització de contrasenya. Si veniu d'un correu electrònic de reinicialització
+        de la contrasenya, assegureu-vos que heu utilitzat l'URL complet proporcionat.
+    omniauth_callbacks:
+      success: S'ha autenticat correctament des del compte %{kind}.
+      failure: No s'ha pogut autenticar de %{kind} perquè "%{raó}".
+    mailer:
+      password_change:
+        subject: S'ha canviat la contrasenya
+      email_changed:
+        subject: S'ha canviat el correu electrònic
+      unlock_instructions:
+        subject: Desbloqueja les instruccions
+      reset_password_instructions:
+        subject: Restablir les instruccions de contrasenya
+      confirmation_instructions:
+        subject: Instruccions de confirmació
+    failure:
+      unconfirmed: Heu de confirmar la vostra adreça electrònica abans de continuar.
+      unauthenticated: Heu d'iniciar la sessió o registrar-vos abans de continuar.
+      timeout: La sessió ha caducat. Torneu a iniciar la sessió per continuar.
+      not_found_in_database: '%{authentication_keys} o contrasenya no vàlids.'
+      last_attempt: Teniu un intent més abans que el compte estigui bloquejat.
+      locked: El compte està bloquejat.
+      invalid: '%{authentication_keys} o contrasenya no vàlids.'
+      inactive: El compte encara no està activat.
+      already_authenticated: Ja heu iniciat la sessió.
+    confirmations:
+      send_paranoid_instructions: Si la seva adreça de correu electrònic existeix
+        a la nostra base de dades, rebrà un correu electrònic amb instruccions sobre
+        com confirmar la seva adreça de correu electrònic en pocs minuts.
+      send_instructions: Rebràs un correu electrònic amb instruccions sobre com confirmar
+        la teva adreça de correu electrònic en pocs minuts.
+      confirmed: La vostra adreça electrònica s'ha confirmat correctament.
+  unauthorized:
+    update:
+      project: No es permet actualitzar aquest projecte.
+    manage:
+      picto: Només podeu administrar els symbolsets en els que esteu col·laborador.
+      all: No podeu %{action} aquest %{subject}.
+  date:
+    day_names:
+    - Diumenge
+    - Dilluns
+    - Dimarts
+    - Dimecres
+    - Dijous
+    - Divendres
+    abbr_day_names:
+    - sol
+    - dilluns
+    - Dm
+    - dc
+    - Thu
+    - dv
+    - ds
+    month_names:
+    - Gener
+    - Febrer
+    - Març
+    - Abril
+    - Maig
+    - Juny
+    - Juliol
+    - Agost
+    - Setembre
+    - Octubre
+    - Novembre
+    - Desembre
+    abbr_month_names:
+    - Jan
+    - espatllar
+    - Febrer
+    - Maig
+    - juny
+    - Juliol
+    - Agost
+    - Setembre
+    - oct
+    - Novembre
+    - Desembre
+    order:
+    - any
+    - mes
+    - dia
+    formats:
+      default: '%e %b %Y'
+      short: '%d %b'
+      long: '%d %B %Y'
+  time:
+    formats:
+      default: '%a, %d %b %Y %H:%M:%S %z'
+      short: '%d %b %H:%M'
+      long: '%B %d, %Y %H:%M'
+    am: Sóc
+    pm: Pm

@@ -1,0 +1,25 @@
+- title t('views.symbolsets.import._title', symbolset_name: @symbolset.name)
+- content_for(:topbar, render('topbar', symbolset: @symbolset))
+%main.container-xl
+  .row
+    .col-md-3
+      =render 'settings_menu', symbolset: @symbolset
+    .col-md-6
+      %h3= t('views.symbolsets.import.heading')
+      %p= t('views.symbolsets.import.introduction')
+      %p.mb-5
+        Read our article on
+        %a{href: help_path(article: :importing_from_csv)} importing symbols from CSV
+        before continuing.
+      .card.mb-5
+        .card-header.text-center
+          Import
+        .card-body
+          %p.mb-4
+            Provide a CSV file of your symbols, using the
+            %a{href: help_path(article: :importing_from_csv)} column names
+            we specify.
+          = bootstrap_form_with url: import_symbolset_path(@symbolset), layout: :horizontal, label_col: 'col-sm-3', control_col: 'col-sm-9' do |f|
+            = f.file_field :csv_file, label: 'CSV File'
+            .text-right
+              = f.primary t('dictionary.import')

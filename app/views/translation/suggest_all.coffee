@@ -1,0 +1,1 @@
+$("#translations_form").replaceWith('<%= escape_javascript render('translation/translation_form', symbolset: @symbolset, pictos: @pictos, source_language: @source_language, destination_language: @destination_language) %>')

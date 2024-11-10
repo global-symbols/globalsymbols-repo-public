@@ -1,0 +1,125 @@
+:ruby
+  rich_data_organisation = {
+      '@type':    "Organization",
+      'url':      "https://globalsymbols.com",
+      'logo':     image_url('logo-square.svg'),
+      'sameAs':   [
+        'https://facebook.com/globalsymbols',
+        'https://twitter.com/globalsymbols'
+      ]
+  }
+!!!
+%html.bg-light{lang: :en, dir: text_direction}
+  %head
+    %meta{charset: 'utf-8'}
+    %meta{name: :viewport, content: 'width=device-width, initial-scale=1, shrink-to-fit=no'}
+    = render 'application/favicon', cache: true
+    = csrf_meta_tags
+    = csp_meta_tag
+
+
+    = display_meta_tags site: 'Global Symbols', separator: '·', reverse: true, image_src: image_url('default-sharing-image.png'),
+    og: { title: :full_title,
+      site_name: :site,
+      description: :description,
+      image: :image_src,
+      'image:width': 1200,
+      'image:height': 630,
+    },
+    twitter: { card: 'summary', site: '@globalsymbols' }
+
+    %script{src: 'https://code.jquery.com/jquery-3.5.1.slim.min.js', integrity: 'sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=', crossorigin: :anonymous, defer: true}
+
+    = stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload'
+    = javascript_include_tag 'application', 'data-turbolinks-track': 'reload', defer: true
+    
+    = render 'rich_data', data: rich_data_organisation, cache: true
+
+    %link{rel: :preconnect, href: 'https://www.google-analytics.com'}
+
+    / Global site tag (gtag.js) - Google Analytics
+    %script{async: true, src: 'https://www.googletagmanager.com/gtag/js?id=UA-24512836-6'}
+    :javascript
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-24512836-6');
+  %body
+    %a.sr-only.sr-only-focusable.position-fixed.p-3{href: '#content'}= t('layouts.application.skip_to_main_content')
+    %nav.navbar.navbar-expand-lg.navbar-dark.bg-primary.fixed-top.mb-5
+      .container-xl
+        %a.navbar-brand.p-0{href: root_path, translate: :no}
+          %img.d-inline-block.align-top{src: image_path('logo-square-white.svg'), alt: t('dictionary.global_symbols')}
+        %button.navbar-toggler{'aria-controls' => 'navbarSupportedContent', 'aria-expanded' => 'false', 'aria-label' => 'Toggle navigation', 'data-target' => '#navbarSupportedContent', 'data-toggle' => 'collapse', type: 'button'}
+          %span.navbar-toggler-icon
+        #navbarSupportedContent.collapse.navbar-collapse
+          %ul.navbar-nav.mr-auto
+            %li.nav-item{class: ("active" if request.path.starts_with?(symbolsets_path))}
+              %a.nav-link{href: symbolsets_path}= t('dictionary.symbolset.other')
+            %li.nav-item
+              %a.nav-link{href: news_index_path}= t('layouts.application.menu.news')
+            %li.nav-item
+              %a.nav-link{href: 'https://app.globalsymbols.com', target: '_blank'}= t('layouts.application.menu.board_builder')
+            -#%li.nav-item
+            -#  %a.nav-link{href: about_page_path('training-resources')}= t('layouts.application.menu.training')
+
+            %li.nav-item.dropdown
+              %a.nav-link.dropdown-toggle#navbarDropdownMenuLink{href: '#', 'data-toggle': :dropdown}= t('layouts.application.menu.resources')
+              .dropdown-menu{'aria-labelledby': :navbarDropdownMenuLink}
+                %a.dropdown-item{href: about_page_path('training-resources')}= t('layouts.application.menu.training')
+                %a.dropdown-item{href: knowledge_base_index_path}= t('layouts.application.menu.knowledge_base')
+
+          = bootstrap_form_with url: search_path, local: true, method: :get, layout: :horizontal, label_col: 'col', control_col: 'col-sm-12', class: 'form-inline my-2 my-lg-0 mr-4' do |f|
+            %a.btn.btn-sm.btn-outline-light.mr-2.social-button{href: 'https://facebook.com/globalsymbols', title: t('layouts.application.menu.facebook'), rel: :noopener}
+              %i.fab.fa-facebook-f
+              .sr-only= t('layouts.application.menu.facebook')
+            %a.btn.btn-sm.btn-outline-light.mr-4.social-button{href: 'https://twitter.com/globalsymbols', title: t('layouts.application.menu.twitter'), rel: :noopener}
+              %i.fab.fa-twitter
+              .sr-only= t('layouts.application.menu.twitter')
+            = f.hidden_field :symbolset, value: current_symbolset_id, id: :navbar_search_symbolset
+            = f.hidden_field :locale, value: I18n.locale
+            = f.text_field :query, input_group_class: 'input-group-sm', wrapper: { clsass: 'mb-0 input-group-sm'}, label_as_placeholder: true, label: t('layouts.application.menu.search_placeholder', var: (' '+current_symbolset.name if current_symbolset)), id: :navbar_search_query, required: true, append: f.primary('<i class="fas fa-search"></i>'.html_safe, render_as_button: true, class: 'btn btn-outline-light', title: :Search)
+          - if user_signed_in?
+            %a.btn.btn-sm.btn-outline-light{href: edit_user_registration_path, target: :blank }= t('layouts.application.menu.my_account')
+            %a.btn.btn-sm.btn-outline-light.ml-2{href: destroy_user_session_path, 'data-method': :delete }= t('layouts.application.menu.sign_out')
+          - else
+            %a.btn.btn-sm.btn-outline-light{href: new_user_session_path }= t('layouts.application.menu.sign_in')
+            %a.btn.btn-sm.btn-outline-light.ml-2{href: new_user_registration_path }= t('layouts.application.menu.sign_up')
+    #main
+      = content_for :topbar
+      - if notice
+        .alert.alert-success.mb-0
+          .container-xl.text-center= notice.html_safe
+      -if alert
+        .alert.alert-warning.mb-0{role: :alert}
+          .container-xl.text-center= alert.html_safe
+      = yield
+    %footer.text-center.d-print-none
+      .text-white.bg-primary.mt-5.p-3
+        .container-xl
+          %form
+            .form-row.align-items-center.justify-content-center
+              .col-auto
+                %label.col-form-label.col-form-label-sm{for: :select_locale}= t('layouts.application.footer.language_label')
+                %select.w-auto.custom-select.custom-select-sm.my-1.ml-2#select_locale
+                  = options_for_select(translation_languages, I18n.locale)
+
+          .mt-4
+            %small
+              %a.btn.btn-sm.btn-link.text-white{href: about_page_path('privacy-policy')}= t('layouts.application.footer.privacy_policy')
+              ·
+              %a.btn.btn-sm.btn-link.text-white{href: about_page_path('terms-and-conditions')}= t('layouts.application.footer.terms')
+              ·
+              %a.btn.btn-sm.btn-link.text-white{href: about_page_path('accessibility-statement')}= t('layouts.application.footer.accessibility')
+              ·
+              %a.btn.btn-sm.btn-link.text-white{href: about_path}= t('layouts.application.footer.about')
+              ·
+              %a.btn.btn-sm.btn-link.text-white{href: contact_path}= t('layouts.application.footer.contact')
+
+
+          %div.navbar-text{translate: :no}
+            %small= "© #{Date.today.year} Global Symbols CIC"
+
+    .d-none.d-print-block.text-center
+      %small= "© #{Date.today.year} Global Symbols CIC"
+    =render_breadcrumbs theme: :json_ld

@@ -1,0 +1,25 @@
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %meta{:charset => "utf-8"}/
+    %meta{:content => "IE=edge", "http-equiv" => "X-UA-Compatible"}/
+    %meta{:content => "width=device-width, initial-scale=1.0", :name => "viewport"}/
+    %title= t('doorkeeper.layouts.admin.title')
+    = stylesheet_link_tag "doorkeeper/admin/application"
+    = csrf_meta_tags
+  %body
+    %nav.navbar.navbar-expand-lg.navbar-dark.bg-dark.mb-5
+      = link_to t('doorkeeper.layouts.admin.nav.oauth2_provider'), oauth_applications_path, class: 'navbar-brand'
+      .collapse.navbar-collapse
+        %ul.navbar-nav.mr-auto
+          %li{:class => "nav-item #{'active' if request.path == oauth_applications_path}"}
+            = link_to t('doorkeeper.layouts.admin.nav.applications'), oauth_applications_path, class: 'nav-link'
+          - if respond_to?(:root_path)
+            %li.nav-item
+              = link_to t('doorkeeper.layouts.admin.nav.home'), root_path, class: 'nav-link'
+    .doorkeeper-admin.container
+      - if flash[:notice].present?
+        .alert.alert-info
+          = flash[:notice]
+      = yield

@@ -1,0 +1,1011 @@
+ro:
+  layouts:
+    application:
+      skip_to_main_content: Salt la conținutul principal
+      footer:
+        about: Despre
+        accessibility: Accesibilitate
+        terms: Termeni
+        privacy_policy: Politica de confidențialitate
+        contact: Contact
+        language_label: Limba
+      menu:
+        twitter: Global Symbols pe Twitter
+        facebook: Global Symbols pe Facebook
+        search_placeholder: Căutare %{var}
+        sign_up: Creare cont
+        sign_in: Conectare
+        my_account: Contul meu
+        sign_out: Deconectare
+        news: Noutăți
+        training: Instruire
+        resources: Resurse
+        board_builder: Board Builder
+  views:
+    pagination:
+      previous: Anterior
+      first: Primul
+      last: Ultimul
+      next: Următorul
+    application:
+      _copy_to_clipboard:
+        button: Copiere
+        button_title: Copiere în Clipboard
+    picto_labels:
+      destroy:
+        alert_failure: Nu am putut elimina %{label} label din acest simbol.
+        notice_success: Am eliminat %{label} label din acest simbol.
+      create:
+        alert_failure: Trebuie să rezolvați unele probleme înainte de a adăuga această
+          etichetă.
+        notice_success: Am adăugat %{label} label la acest simbol.
+      index:
+        heading_add_label: Adăugați o etichetă
+        instructions: Simbolurile trebuie să aibă cel puțin o etichetă. Dacă doriți,
+          puteți adăuga etichete pentru mai multe limbi.
+        intro: Etichetele ajută alte persoane să înțeleagă simbolurile dvs. Ele ne
+          ajută să înțelegem semnificația simbolului dvs, așa că asigurați-vă că ele
+          sunt corecte și specifice.
+        page_title: Etichete pentru %{symbol}
+        status_published: Publicat
+        status_suggested: Sugerat
+      edit:
+        intro: Etichetele ajută alte persoane să înțeleagă simbolurile dvs. Ele ne
+          ajută să înțelegem semnificația simbolului dvs, așa că asigurați-vă că acestea
+          sunt corecte și specifice.
+        heading: Editarea etichetei
+        page_title: Etichete pentru %{symbol}
+      _picto_labels:
+        no_labels_found: Nu s-a găsit nicio etichetă
+        remove_label_confirm: Să eliminăm %{text} din acest simbol?
+        remove_label_aria_label: Eliminarea etichetei
+        heading: Etichete %{label_type}
+      _form:
+        button_add: Adăugarea etichetei
+        button_save: Salvarea etichetei
+        description_helper: Descrieți pe scurt simbolul pentru a ajuta înțelegerea
+          acestuia.
+        diacritised_label_helper: Numai pentru limbile arabice. Aceasta stochează
+          detalii suplimentare de pronunție.
+        diacritised_label_label: Etichetă cu diacritice
+        label_label: Textul etichetei
+        language_helper: Limba acestei etichete.
+      publish_translation:
+        notice_success: S-a publicat eticheta %{language_name}.
+    picto_concepts:
+      destroy:
+        alert_failure: Nu am putut elimina %{concept} concept din acest simbol.
+        notice_success: Am eliminat %{concept} concept din acest simbol.
+      create:
+        alert_already_exists: '%{concept} este deja un concept al acestui simbol.'
+        alert_failure: Nu am găsit un concept numit %{concept}. Încercați alt cuvânt.
+        notice_success: Am adăugat %{concept} concept la acest simbol.
+      index:
+        page_title: Concepte pentru %{symbol}
+        existing_concepts:
+          remove_aria_label: Eliminarea conceptului
+          remove_confirm: Să eliminăm %{subject} din acest simbol?
+          none_found: Acest simbol nu are concepte
+          added_at: Adăugat %{date}
+          heading: Concepte existente
+        add_concept:
+          button: Adăugarea conceptului
+          instruction: Pentru a adăuga un concept la acest simbol, introduceți un
+            cuvânt. Vom adăuga conceptul dacă îl putem găsi.
+          heading: Adăugați un concept
+          add: adăuga
+        add_concept_invitation: Putem adăuga orice concept pe care îl puteți găsi
+          pe ConceptNet.
+        intro: Conceptele ajută computerele să vă înțeleagă simbolurile dvs, așa că
+          asigurați-vă că acestea sunt exacte și specifice.
+    concepts:
+      show:
+        defined_in: Un concept definit ca
+        page_title: '%{subject} în %{coding_framework}'
+    collaborators:
+      destroy:
+        notice_success: Am eliminat %{email_address} ca un colaborator.
+      create:
+        alert_no_gs_account: '%{email_address} nu are încă un cont la Global Symbols.'
+        notice_success: Am adăugat %{email_address} ca un colaborator.
+      index:
+        remove_aria_label: Eliminare colaborator
+        remove_confirm: Să eliminăm %{email} din acest set de simboluri?
+        added_at: Adăugat %{date}
+        existing_none_found: Nici un utilizator nu are voie să modifice acest set
+          de simboluri.
+        existing_text: Acestor persoane li se permite să editeze acest set de simboluri.
+        existing_heading: Colaboratori existenți
+        add_button: Adăugare colaborator
+        add_text: Pentru a permite altei persoane să editeze acest set de simboluri,
+          introduceți adresa de email pe care a utilizat-o pentru a se înscrie la
+          Global Symbols.
+        add_heading: Adăugați un colaborator
+        page_title: Colaboratori pentru %{name}
+    survey_questions:
+      _controller:
+        timed_out: Ne pare rău - studiul dvs a expirat datorită inactivității. Vă
+          rugăm să începeți studiul din nou.
+      show:
+        please_rate: Vă rugăm să evaluați acest simbol pe o scală unde 1 este 'complet
+          inacceptabil' și 5 este 'complet acceptabil'.
+      _form:
+        button_save_answer: Salvarea răspunsului
+        button_previous_question: Întrebarea anterioară
+        comments_helper: Opțional. Vă rugăm să adăugați comentarii pentru a ne ajuta
+          să îmbunătățim acest simbol.
+        please_fix_errors: Vă rugăm să remediați erorile de mai jos.
+    survey_response_analysis:
+      create:
+        notice_success: Acest răspuns pe suport de hârtie a fost salvat.
+      new:
+        save_button: Salvarea răspunsurilor
+        cancel_confirm: Sunteți sigur/ă? Veți pierde toate rezultatele de până acum.
+        label_cultural_rating: Diferențe culturale
+        label_contrast_rating: Contrast de culoare
+        label_representation_rating: Reprezintă cuvântul
+        label_overall_rating: Păreri despre simbol
+        match_numbers: Numerele afișate în colțul din dreapta sus ale fiecărui simbol
+          ar trebui să corespundă celor din formularele pe suport de hârtie, pentru
+          a fi sigur/ă că ați evaluat corect fiecare simbol.
+        use_this_form_to: Utilizați acest formular pentru a salva în Global Symbols
+          un singur chestionar pe hârtie. Acesta va conta apoi în statisticile studiului
+          dvs.
+        heading: Adăugare feedback pe suport de hârtie
+      index:
+        heading: Răspunsuri individuale
+        crumb_name: Răspunsuri individuale
+      _sidebar:
+        heading: Răspunsuri
+        participant_number: Participant %{number}
+    survey_editor:
+      show:
+        collect_feedback:
+          survey_ended_add_paper: Puteți încă să adăugați manual feedback -ul din
+            formularele studiului pe suport de hârtie.
+          survey_ended: Colectarea răspunsurilor pentru acest studiu s-a încheiat.
+          paper_add_paper_feedback_button: Adăugare feedback pe suport de hârtie
+          paper_to_include_results: Pentru a include rezultatele din formularele studiului
+            pe suport de hârtie în rezultatele studiului dvs…
+          paper_print_button: Imprimarea formularelor studiului
+          paper_customisation_invitation: Pentru a personaliza și imprima formularele
+            studiului pentru participanți…
+          paper_intro: Unii participanți pot prefera formulare ale studiului pe suport
+            de hârtie. Utilizați aceste instrumente, colectați feedback-ul lor și
+            stocați-l aici.
+          paper_heading: Studii pe hârtie
+          stop_button: Finalul studiului
+          confirm_stop: Aceasta va opri utilizatorii să răspundă la studiu. Sunteți
+            sigur/ă?
+          invite_deadline: Participanții au până la %{close_at} să ofere răspunsuri
+            (%{link}).
+          invite_at_this_url: Invitați utilizatorii să participe la studiul dvs la
+            acest URL.
+          button_begin_collecting: Începeți să colectați feedback
+          close_at_helper: Opțional. Setați un termen limită pentru răspunsurile la
+            studiu.
+          close_at_label: Acceptare răspunsuri până la
+          text_2: Nu veți putea modifica selecțiile de simboluri în timp ce se înregistrează
+            feedback pentru studiu.
+          text_1: Când începeți să colectați feedback, vă vom oferi un URL unde utilizatorii
+            pot participa la studiu.
+          heading: Colectare feedback
+          responses_count:
+            one: Studiul Dvs are %{count} răspuns.
+            few: Studiul Dvs are %{count} răspunsuri.
+            other: Studiul Dvs are %{count} răspunsuri.
+        symbols_search_helper: Căutați simboluri de adăugat la acest studiu
+        symbols_text: Adăugați simboluri în acest studiu căutându-le în Global Symbols
+          și alegând 'Adăugare la studiu'.
+        symbols_heading: Simboluri în acest studiu
+        archive:
+          delete_button: Ștergerea studiului
+          delete_confirm: Sunteți sigur/ă că doriți să ștergeți acest studiu și toate
+            răspunsurile aferente?
+          delete_description: Ștergerea acestui studiu va șterge definitiv toate rezultatele
+            pe care le-ați obținut. Nici un simbol nu va fi șters.
+          archive_button: Arhivarea studiului
+          archive_confirm: Aceasta va opri utilizatorii să mai răspundă la studiu.
+            Sunteți sigur/ă?
+          archive_description: Arhivați acest studiu atunci când l-ați finalizat.
+            Puteți în continuare să analizați orice rezultate din acest studiu.
+          survey_is_archived: Acest studiu este arhivat. Puteți analiza în continuare
+            orice rezultate.
+          heading: Arhivare sau Ștergere
+        analyse_results:
+          export:
+            text_3: Fiecare rând din documentul Excel conține răspunsurile privitoare
+              la un simbol ale unui singur participant la studiu.
+            text_2: Acesta facilitează efectuarea propriei analize în Excel. Vă sugerăm
+              să utilizați Tabele Pivot pentru a calcula și a reprezenta rezultatele
+              medii pentru fiecare simbol.
+            text_1: Utilizați acest instrument pentru a descărca toate datele studiului,
+              inclusiv evaluări și comentarii.
+            heading: Exportarea rezultatelor în Excel
+          button_stats: Statistici ale simbolului
+          button_individual_responses: Răspunsuri individuale
+          results_appear_here: Rezultatele vor apărea aici atunci când utilizatorii
+            încep să răspundă la studiu.
+          heading: Analiza rezultatelor
+          responses_count:
+            one: '%{count} persoană a răspuns la studiul Dvs.'
+            few: '%{count} persoane au răspuns la studiul Dvs.'
+            other: '%{count} persoane au răspuns la studiul Dvs.'
+      new:
+        button_create: Crearea studiului
+      index:
+        get_help_link: Ajutor și Instruire
+        get_help: Explorați %{link} pentru studii
+        no_surveys_at_stage: Nu există studii în etapa %{stage}.
+        button_new_survey: Crearea studiului
+        _title: Studii în %{symbolset_name}
+      edit:
+        heading: Editarea studiului
+        _title: Editarea %{survey_name} în %{symbolset_name}
+      destroy:
+        notice: Am șters studiul %{name}.
+      export_xlsx:
+        sheet_name: Comentarii
+        comment_participant_name: Participanții nu sunt obligați să furnizeze numele
+          lor, astfel încât unele căsuțe pot rămâne goale.
+        header_comment: Comentariu
+        header_representation_rating: Reprezentare
+        header_overall_rating: Evaluare
+        header_label: Eticheta
+        header_symbol_id: ID simbol
+        header_participant_name: Nume participant
+        header_participant_number: Număr participant
+        header_cultural_rating: Cultural
+        header_contrast_rating: Contrast
+      _sidebar:
+        stages:
+          analyse_results_description: Examinarea rezultatelor studiului
+          collect_feedback_description: Permite participanților să finalizeze studiul
+          plan_description: Alegerea simbolurilor pentru a fi incluse în studiu
+          archive: Arhivare sau Ștergere
+          analyse: Analiza rezultatelor
+          collect_feedback: Colectarea feedback-ului
+          plan: Plan
+        heading: Etape
+      _picto:
+        remove_confirm: Sunteți sigur/ă că doriți să eliminați acest simbol din studiu?
+        no_label_for_language: Nici o etichetă în %{language_name}
+      _form:
+        create_button: Crearea studiului
+        save_button: Salvarea studiului
+        show_symbol_descriptions_helper: Afișează descrierile simbolurilor participanților.
+        show_symbol_descriptions_label: Afișează descrierile simbolurilor
+        language_blank_option: Toate limbile disponibile
+        language_helper: Atunci când se face acest studiu, participanților li se afișează
+          etichetele simbolurilor în limba selectată.
+        language_label: Afișare etichete simbol în
+        close_at_helper: Opțional. Stabiliți un termen limită pentru ca participanții
+          să răspundă.
+        introduction_helper: Opțional. Aceasta este arătată participanților când încep
+          acest studiu.
+        name_helper: Furnizați un nume care ajută participanții să identifice acest
+          studiu.
+      _add_picto_to_survey:
+        option: '%{survey_name} în %{symbolset_name}'
+        button: Adăugare la studiu
+      add_symbol:
+        alert_failure: Acest simbol există deja în %{survey_link}
+        notice_success_add_another: Adăugați altul?
+        notice_success: Am adăugat simbolul la studiul dvs. %{add_another_link}
+    symbolsets:
+      _symbolset_card:
+        image:
+          alt: Eticheta %{symbolset_name}
+      review:
+        filter_without_a_concept: Fără concept asociat
+        filter_all_symbols: Toate simbolurile
+        heading: Examinare
+      _shared:
+        none_found: Nu am găsit nici un simbol aici!
+      new:
+        guidance_link: publicarea setului dvs de simboluri la Global Symbols
+        guidance: Vă sugerăm să revedeți instrucțiunile
+        introduction: Noul set de simboluri va fi creat în stadiu de schiță. El va
+          fi vizibil numai dvs și colaboratorilor pe care îi adăugați, permițându-vă
+          să adăugați simboluri și să pregătiți setul de simboluri.
+        heading: Crearea unui set de simboluri
+        _title: Crearea unui set de simboluri
+      index:
+        _description: Răsfoiți mii de simboluri gratuite de comunicare la Global Symbols.
+        create_symbol_set_button: Crearea setului de simboluri
+        heading: Explorarea seturilor de simboluri
+        _title: Explorarea seturilor de simboluri
+      import:
+        introduction: Încărcarea simbolurilor dvs deja existente în Global Symbols.
+        heading: Importarea simbolurilor
+        _title: Import în %{symbolset_name}
+      edit:
+        _title: Editare %{symbolset_name}
+      _review_row:
+        remove_confirmation: Să eliminăm %{subject} din acest simbol?
+      _form:
+        save_button: Salvarea setului de simboluri
+        create_button: Crearea setului de simboluri
+        licence_prompt: Selectarea unei licențe
+        publisher_url_placeholder: e.g. https://simboluriromanesti.com
+        publisher_placeholder: e.g. Fundația Simbolurilor
+        publisher_url_label: Editor URL
+        logo_label: Sigla
+        logo_helper: Această siglă va apărea pe pagina Seturi de simboluri. Aceasta
+          ar trebui să fie o imagine, ideal ca SVG sau PNG, 300x200 pixels cu fundal
+          transparent.
+        publisher_url_helper: Adresa de website a editorului.
+        publisher_helper: Numele persoanei sau organizației care publică setul de
+          simboluri.
+        published_helper: Seturile de simboluri publicate sunt vizibile tuturor. Seturile
+          de simboluri în stadiul de proiect sunt vizibile administratorilor și colaboratorilor.
+        description_helper: Această descriere va apărea alături de setul de simboluri.
+      _topbar:
+        button_review: Examinare
+        button_edit: Editare
+        button_add_symbol: Adăugare simbol
+        download: Descărcare
+        button_archive: Simboluri arhivate
+        button_translate: Traduce
+      show:
+        _description: Explorați %{symbolset_name} setul de simboluri în Global Symbols.
+          Obțineți imagini și simboluri gratuite pentru comunicare.
+        no_symbols_for_collaborator: Adăugarea unui simbol pentru a începe construirea
+          setului de simboluri
+      archive:
+        description: Simbolurile arhivate nu sunt afișate în setul de simboluri, în
+          rezultatele căutării sau în aplicații
+        heading: Simboluri arhivate
+        none_found: Nu există simboluri arhivate în acest set de simboluri
+      translate:
+        form:
+          source_lang_option: '%{language_name} (%{labels_count} simboluri, %{coverage_percentage}
+            acoperire)'
+          target_lang_prompt: Selectare limbă țintă
+          target_lang_label: pentru a
+          source_lang_label: Traducere din
+        heading: Traducere etichete
+        description: Traduceți automat etichetele simbolurilor în limbi noi. Acest
+          instrument se traduce în loturi de simboluri %{symbols_limit} la un moment
+          dat.
+        button_find_untranslated: Găsire simboluri netraduse
+        title: Traducere %{symbolset_name}
+    pictos:
+      show:
+        _description: "'%{picto_label}' simbol, parte din setul de simboluri %{symbolset_name}.\
+          \ Găsiți mii de simboluri gratuite pentru comunicare."
+        alternative_symbols_heading: Simboluri alternative
+        add_concept_button: Adăugarea unui concept
+        no_concepts: Acest simbol nu are concepte pentru a-l defini.
+        concept_defined_in: Este definit în %{coding_framework_name}
+        _title: '%{picto_label} în %{symbolset_name}'
+        archived_notice:
+          heading: Simbol arhivat
+          text: Acest simbol nu este afișat în setul de simboluri, în rezultatele
+            căutării sau în aplicații
+      new:
+        heading: Adăugare simbol
+        _title: Adăugarea simbolului în %{symbolset_name}
+      edit:
+        heading: Editarea simbolului
+        _title: Editare %{picto_label} în %{symbolset_name}
+      _topbar:
+        not_publicly_visible: Nu este vizibil publicului
+        download_button: Descărcare %{file_type}
+      _form:
+        to_download_symbols: pentru a descărca simboluri
+        create_button: Adăugare simbol
+        save_button: Salvarea simbolului
+        description_helper: Descrieți pe scurt simbolul pentru a ajuta înțelegerea
+          acestuia.
+        diacritised_label_helper: Numai pentru limbile arabice. Aceasta stochează
+          detalii suplimentare de pronunție.
+        label_label: Textul etichetei
+        language_helper: Limba etichetei.
+        label_helper: Eticheta descrie simbolul dvs, astfel încât utilizatorii să-l
+          poată găsi. Aveți posibilitatea să adăugați etichete în limbi suplimentare
+          după crearea simbolului.
+        image_helper: Încărcarea unei imagini în format SVG (preferabil) sau PNG.
+      _comment_form:
+        save_button: Salvare comentariu
+    surveys:
+      _print_question:
+        example_comment: Acest copac arată ca un brocoli.
+        symbol_counter: Simbol %{number}
+        example_text: Aceasta vă arată cum puteți răspunde la întrebări
+        example_heading: Întrebare exemplu
+      thank_you:
+        button_restart_survey: Repornirea studiului
+        button_go_to_homepage: Treceți la Global Symbols
+        feedback_is_saved: Am salvat toate feedback-urile dvs.
+      print:
+        instructions_2: Evaluați fiecare simbol pe o scală unde 1 este 'complet inacceptabil'
+          și 5 este 'complet acceptabil', bifând căsuța corectă.
+        instructions_1: Acest studiu vă va cere să evaluați patru aspecte ale fiecărui
+          simbol și să oferiți unele comentarii.
+        instructions_heading: Instrucțiuni
+        introduction: Introducere
+        name_field: Numele meu este
+        print_button: Imprimarea studiului
+        symbol_label_language_helper: Pentru cele mai bune rezultate, printați color
+          folosind un browser modern și dezactivați anteturile și subsolurile.
+        symbol_label_language_all: Toate limbile disponibile
+        symbol_label_language: Afișare etichete simbol în
+        show_example_helper: Adaugă un exemplu de întrebare care afișează răspunsuri
+          eșantion.
+        show_example: Prezentarea unui exemplu
+        show_instructions_helper: Modificarea instrucțiunilor prin clic pe ele.
+        show_instructions: Prezentarea instrucțiunilor
+        show_intro_helper: Modificarea introducerii prin editarea studiului.
+        show_intro: Prezentarea introducerii studiului
+        collect_names: Colectarea numelor participanților
+        heading: Setări imprimare
+      show:
+        offline_participants_button: Imprimare formulare de feedback ale studiului
+        offline_participants: Pentru participanții care lucrează neconectați la internet…
+        closed_text: Contactați organizatorul studiului dacă ați putea participa.
+        closed_header: Acest studiu nu acceptă feedback în acest moment.
+        provide_details_2: Detaliile dvs vor fi prezentate organizatorilor studiului
+          în legătură cu feedback-ul dvs și nu vor fi niciodată folosite de Global
+          Symbols în niciun alt scop.
+        provide_details: Oferirea detaliilor este opțională și poate ajuta organizatorii
+          studiului.
+        begin_button: Începerea Studiului
+        close_at_message: Puteți participa până la %{date}.
+      _shared:
+        questions:
+          comments: Comentarii adiționale
+          cultural_rating: Diferențe culturale
+          contrast_rating: Contrast de culoare
+          representation_rating: Reprezintă cuvântul sau fraza
+          feelings_rating: Păreri despre simbol ca un întreg
+        thank_you: Vă mulțumim pentru completarea studiului!
+        number_of_symbols:
+          one: Acest studiu are %{count} simbol pentru Dvs de revizuit.
+          few: Acest studiu are %{count} simboluri pentru Dvs de revizuit.
+          other: Acest studiu are %{count} simboluri pentru Dvs de revizuit.
+    pages:
+      home:
+        for_communicators: Pentru interlocutori
+        explore_button: Explorarea mai multor seturi de simboluri…
+        explore_heading: Explorarea seturilor de simboluri
+        for_everyone_text: Descoperirea, amestecarea, potrivirea și personalizarea
+          simbolurilor
+        for_everyone: Pentru toți
+        for_communicators_text: Schimb de imagini pentru a crea conversații
+        for_creators_text: Gestionarea și publicarea seturilor de simboluri
+        for_creators: Pentru creatori
+        board_builder:
+          subheading: Panouri de comunicare pe calea ușoară
+          design: Proiectați, construiți, salvați și imprimați panouri de comunicare
+            online.
+          storage: Totul este stocat în siguranță în contul dvs. Global Symbols.
+          button_featured: Seturi de panouri recomandate
+          button_try: Încercați Board Builder
+          heading: Global Symbols Board Builder
+          create: Creați panouri pentru a ajuta la comunicare folosind mii de imagini
+            gratuite din biblioteca noastră și chiar din propria dvs.
+      contact:
+        _description: Contactați-ne cu întrebări generale sau pentru a vă publica
+          setul de simboluri.
+        email_us: Trimiteți-ne un email
+        lead_text: Suntem foarte bucuroși să primim întrebări, sugestii și informații
+          despre resursele relevante.
+        heading: Contactați
+      search:
+        no_results: Nu am putut găsi nici un simbol potrivit. Încercați o căutare
+          mai amplă.
+        _title: Căutare
+        search_for: Căutare
+        search: Căutare
+        symbolset_dropdown_any_symbol_set: Orice set de simboluri
+    survey_picto_analysis:
+      index:
+        column_heading_cultural_rating_description: Adecvare culturală
+        column_heading_contrast_rating_description: Contrast de culoare
+        column_heading_representation_rating_description: Reprezintă cuvântul sau
+          expresia
+        column_heading_rating_description: Păreri despre simbol ca un întreg
+        row_heading_averages: Medii
+        column_heading_overall_average: Medie globală
+        intro: Acest tabel prezintă răspunsurile medii pentru fiecare simbol din studiu,
+          pe baza unui total de %{count} primite.
+        heading: Statistici simbol
+        crumb_name: Statistici simbol
+    errors:
+      not_found:
+        description: Nu am putut găsi nimic la această adresă
+    translations:
+      _suggestion_form:
+        label: Traducere
+        button_publish: Publica
+        button_publish_working: Publicare…
+      _translations_published:
+        heading: Traduceri Publicate
+        labels_are_visible: Noile traduceri sunt acum vizibile pe Global Symbols și
+          în aplicații.
+        next_steps: Găsiți mai multe simboluri de tradus sau alegeți altă limbă.
+        labels_saved: Noile traduceri au fost salvate.
+      _translation_form:
+        button_translate: Traducere simboluri
+        button_translate_working: Se traduc simbolurile…
+        publish_button: Publicare totală traduceri %{language_name}
+        publish_button_working: Se publică toate traducerile…
+        translation_complete_heading: Traducere terminată
+        translation_complete_text: Toate simbolurile au fost traduse în %{language_name}.
+      _symbols_table:
+        heading_source_language: Sursă %{language_name}
+        heading_destination_language: Traducere %{language_name}
+        button_get_translation: Obțineți traducerea
+        button_get_translation_working: Traducerea…
+        heading_type: Tip
+    articles:
+      _topbar:
+        header_news: Știri despre simboluri globale
+      index:
+        title: Noutăți
+        description: Global Symbols Blog - Actualizări, idei, și inspirație pentru
+          a vă ajuta să comunice cu simboluri.
+        more_button: Mai multe articole
+  activerecord:
+    attributes:
+      label:
+        text_diacritised: Etichetă cu diacritice
+        description: Descriere
+        text: Eticheta
+      user:
+        language_id: Limba preferată
+        location: Locație
+        company: Companie
+        surname: Nume de familie
+        prename: Prenume
+        email: Adresa de email
+        current_password: Parola curentă
+        remember_me: Adu-ți aminte de mine
+        password: parolă
+      symbolset:
+        statuses:
+          ingesting: Asimilare
+          draft: Proiect
+          published: Publicat
+        status: Statut
+        logo: Siglă
+        publisher_url: Editor URL
+        publisher: Editor
+        description: Descriere
+        name: Nume
+      survey_response:
+        role: Rol
+        organisation: Organizație
+        name: Nume
+      survey:
+        show_symbol_descriptions: Afișare descrieri simboluri
+        close_at: Închidere la
+        status: Statut
+        introduction: Introducere
+        name: Nume
+      picto:
+        visibility_options:
+          collaborators: Colaboratori la seturile de simboluri
+          everybody: Toți
+        visibility: Vizibil pentru
+        image: Imagine
+        publisher_ref: Despre Editor
+        part_of_speech_options:
+          article: Articol
+          interjection: Interjecție
+          conjunction: Conjuncție
+          preposition: Prepoziție
+          pronoun: Pronume
+          adjective: Adjectiv
+          verb: Verb
+          noun: Substantiv
+          adverb: Adverb
+          modifier: Modificator
+        part_of_speech: Parte de vorbire
+      licence:
+        logo: Siglă
+        properties: Proprietăți
+        version: Versiune
+        name: Nume
+        url: URL
+      language:
+        category: Categorie
+        scope: Domeniu
+        name: Nume
+        active: Activ
+      concept:
+        subject: Subiect
+      comment:
+        resolved: Rezolvare
+        read: Citire
+        comment: Comentariu
+        cultural_rating: Evaluare culturală
+        contrast_rating: Evaluare de contrast
+        representation_rating_short: Reprezentare
+        representation_rating: Reprezentarea evaluării
+        rating: Evaluare
+        cultural_rating_short: Cultural
+        contrast_rating_short: Contrast
+      coding_framework:
+        structure: Structura
+        name: Nume
+        www_uri_base: Baza WWW URI
+        api_uri_base: Baza URI API
+      category:
+        name: Nume
+    models:
+      user: Utilizator
+      symbolset_user: Colaborator
+      symbolset: Set de simboluri
+      survey_response: Concluziile studiului
+      survey_picto: Studiu Picto
+      survey: Studiu
+      picto: Simbol
+      licence: Licența
+      language: Limba
+      label: Eticheta
+      image: Imagine
+      concept: Concept
+      comment: Comentariu
+      coding_framework: Mod de codare
+      category: Categorie
+      picto_concept: Conceptul simbolului
+  languages:
+    sr_Latn: Sârba (Latină)
+    sr_Cyrl: Sârba (Chirilică)
+    sr: Sârba
+    hr: Croata
+    de: Germana
+    fr: Franceza
+    en: Engleza
+    ro: Română
+    el: Greacă
+    hy: Armeană
+    tr: Turcă
+    bg: Bulgară
+    ca: Catalană
+    nl: Olandeză
+    es: Spaniolă
+    sq: Albaneză
+    cnr: muntenegrean
+    sh: Sârbo-croată
+    ru: Rusă
+    pt: Portugheză
+    mr: Marathi
+    mk: macedoneană
+    it: Italiană
+    hi: Hindi
+    da: Daneză
+    zh: Chineză
+    ar: Arabă
+    an: aragoneză
+    br: bretonă
+    et: Estonă
+    eu: Bască
+    fa: Persană
+    gl: Galiciană
+    he: Ebraică
+    hu: Maghiară
+    pl: Poloneză
+    sk: Slovacă
+    sv: Suedeză
+    val: Vehes
+    ur: Urdu
+  dictionary:
+    page_not_found: Pagina nu este găsită
+    download: Descărcare
+    change: schimbă
+    search: Căutare
+    remove: Eliminare
+    view: Vizualizare
+    sign_in: Conectare
+    edit: Editare
+    by: De
+    back: Înapoi
+    go_back: Întoarceți-vă
+    unauthorised: Neautorizat
+    settings: Setări
+    collaborator:
+      one: Colaborator
+      few: Colaboratori
+      other: Colaboratoare
+    import: Import
+    numbers:
+      '5': '5'
+      '4': '4'
+      '3': '3'
+      '2': '2'
+      '1': '1'
+    global_symbols: Global Symbols
+    survey:
+      one: Studiu
+      few: Studii
+      other: Studii
+    response:
+      one: Răspuns
+      few: Răspunsuri
+      other: Răspunsuri
+    concept:
+      one: Concept
+      few: Concepte
+      other: Concepte
+    symbol:
+      one: Simbol
+      few: Simboluri
+      other: Simboluri
+    symbolset:
+      one: Set de simboluri
+      few: Seturi de simboluri
+      other: Seturi de simboluri
+    label:
+      one: Etichetă
+      few: Etichete
+      other: Etichete
+    archive: Arhiva
+    un-archive: Anulare arhivare
+    publish: Publica
+  doorkeeper:
+    scopes:
+      boardset:write: Scrierea în Tabelele / Planșele dvs
+      boardset:read: Citirea Tabelelor / Planșelor dvs
+      identity:read:user: Citirea datelor din contul dvs de utilizator
+      public: Accesarea datelor dvs publice
+  devise:
+    views:
+      sessions:
+        errors:
+          messages:
+            not_locked: nu era blocat
+            not_found: nu a fost găsit
+            expired: a expirat, vă rugăm faceți o nouă solicitare
+            confirmation_period_expired: trebuie să fie confirmată în %{period}, vă
+              rugăm faceți o nouă solicitare
+            already_confirmed: a fost confirmat deja, vă rugăm încercați să vă reconectați
+            not_saved:
+              one: '1 eroare a interzis salvarea acestuia %{resource}:'
+              few: '%{count} erori au interzis salvarea acestuia %{resource}:'
+              other: '%{count} erori au interzis salvarea acestuia %{resource}:'
+        new:
+          sign_in_button: Conectare
+          page_title: Conectare
+      registrations:
+        _shared:
+          _links:
+            new_unlock: Nu ați primit instrucțiunile de deblocare?
+            new_confirmation: Nu ați primit instrucțiunile de confirmare?
+            forgotten_password: Ați uitat parola dvs?
+            sign_up: Înscriere
+            sign_in: Conectare
+        _form:
+          new_password_helper: '%{var} characters minimum. Lăsați gol dacă nu doriți
+            să îl schimbați.'
+          password_helper: '%{var} numărul minim de caractere'
+          cancel_account_button: Ștergere cont
+          cancel_account_confirm: eşti sigur? Contul Global Symbols va fi șters definitiv.
+          cancel_account_text: Dacă doriți să închideți contul Global Symbols…
+          cancel_account_header: Anulează contul meu
+          button_save_changes: Salvează modificările
+          current_password_helper: Avem nevoie de parola dvs. actuală pentru a vă
+            confirma modificările.
+          new_password_confirmation: Confirmați parola nouă
+          new_password: Parolă nouă
+          please_fix_errors: Vă rugăm să remediați aceste erori.
+          confirm_password: Confirmați parola
+          language_helper: Simbolurile vor fi afișate în limba preferată, acolo unde
+            este posibil.
+          button_change_password: Modificare parolă
+        edit:
+          awaiting_confirmation: 'Se așteaptă confirmarea pentru: %{unconfirmed_email}'
+          page_title: Gestionează contul
+          heading: Gestionează contul
+        new:
+          sign_up_button: Creare cont
+          heading: Creare cont
+          page_title: Creare cont
+        change_password:
+          heading: Modificare parolă
+          manage_account: Gestionează contul
+          submit: Modificare parolă
+          account_indicator: Conectat ca %{email}
+        account_saved:
+          heading: Cont actualizat
+          return_to_gs_button: Revenirea la Global Symbols
+      passwords:
+        edit:
+          button: Modificare parolă
+          confirm_password_label: Confirmarea parolei noi
+          new_password_label: Parolă nouă
+          heading: Modificarea parolei
+          new_password_helper: "%{var} caractere minime"
+        instructions: Introduceți adresa de e-mail a contului și vă vom trimite un
+          link pentru a vă reseta parola.
+        new:
+          page_title: Gestionează contul
+          button: Link reinițializare e-mail
+          email_helper: Adresa de e-mail pe care ați folosit-o pentru a vă înscrie
+            la Global Symbols
+          heading: Reinițializare parolă
+      _shared:
+        _links:
+          new_confirmation: Nu ați primit instrucțiunile de confirmare?
+          sign_in: Conectare
+          sign_up: Creare cont
+          forgotten_password: Ați uitat parola dvs?
+          new_unlock: Nu ați primit instrucțiunile de deblocare?
+    failure:
+      not_found_in_database: '%{authentication_keys} sau parola incorecte.'
+      invalid: '%{authentication_keys} sau parola incorecte.'
+      unconfirmed: Trebuie să confirmați adresa dvs. de email înainte de a continua.
+      unauthenticated: Trebuie să vă conectați sau să vă înscrieți înainte de a continua.
+      timeout: Sesiunea dvs. a expirat. Vă rugăm să vă conectați din nou pentru a
+        continua.
+      last_attempt: Mai aveți încă o încercare înainte ca contul dvs. să fie blocat.
+      locked: Contul dvs. este blocat.
+      inactive: Contul dvs. nu este încă activat.
+      already_authenticated: Sunteți deja înscris.
+    unlocks:
+      unlocked: Contul dvs. a fost deblocat cu succes. Vă rugăm să vă conectați pentru
+        a continua.
+      send_paranoid_instructions: Dacă contul dvs. există, veți primi un email cu
+        instrucțiuni pentru deblocarea acestuia în câteva minute.
+      send_instructions: Veți primi un email cu instrucțiuni pentru deblocarea contului
+        dvs. în câteva minute.
+    sessions:
+      already_signed_out: V-ați deconectat.
+      signed_out: V-ați deconectat.
+      signed_in: Bine ați revenit!
+    registrations:
+      updated: Contul dvs. a fost actualizat cu succes.
+      update_needs_confirmation: V-ați actualizat contul cu succes, dar trebuie să
+        verificăm noua dvs. adresă de email. Vă rugăm să vă verificați adresa de email
+        și să urmați linkul de confirmare pentru a confirma noua dvs. adresă de email.
+      signed_up_but_unconfirmed: Un mesaj cu un link de confirmare a fost trimis la
+        adresa dvs. de email. Vă rugăm să urmați linkul pentru a vă activa contul.
+      signed_up_but_locked: V-ați înscris cu succes. Cu toate acestea, nu v-am putut
+        conecta deoarece contul dvs. este blocat.
+      signed_up_but_inactive: V-ați înscris cu succes. Cu toate acestea, nu v-am putut
+        conecta deoarece contul dvs. nu este încă activat.
+      signed_up: Bine ați venit! V-ați înscris cu succes.
+      destroyed: La revedere! Contul dvs. a fost anulat cu succes. Sperăm să ne revedem
+        în curând.
+    passwords:
+      updated_not_active: Parola dvs. a fost modificată cu succes.
+      updated: Parola dvs. a fost modificată cu succes. Acum sunteți conectat.
+      send_paranoid_instructions: Dacă adresa dvs. de email există deja în baza noastră
+        de date, veți primi un email cu un link de recuperare a parolei în câteva
+        minute.
+      send_instructions: V-am trimis un e-mail de resetare a parolei.
+      no_token: Nu puteți accesa această pagină fără a veni dintr-un email de resetare
+        a parolei. Dacă veniți dintr-un email de resetare a parolei, vă rugăm să vă
+        asigurați că folosiți întregul URL oferit acolo.
+    omniauth_callbacks:
+      success: Autentificat cu succes din %{kind} contul.
+      failure: Nu v-am putut identifica din %{kind} deoarece "%{reason}".
+    mailer:
+      password_change:
+        subject: Parolă modificată
+      email_changed:
+        subject: Email modificat
+      unlock_instructions:
+        subject: Instrucțiuni pentru deblocare
+      reset_password_instructions:
+        subject: Instrucțiuni pentru resetarea parolei
+      confirmation_instructions:
+        subject: Instrucțiuni de confirmare
+    confirmations:
+      send_paranoid_instructions: Dacă adresa dvs. de email există în baza noastră
+        de date, veți primi un email cu instrucțiuni pentru a confirma adresa dvs.
+        de email în câteva minute.
+      send_instructions: Veți primi un email cu instrucțiuni pentru a confirma adresa
+        dvs. de email în câteva minute.
+      confirmed: Adresa dvs. de email a fost confirmată cu succes.
+  unauthorized:
+    update:
+      project: Nu este permis să actualizați acest proiect.
+    manage:
+      picto: Puteți gestiona seturile de simboluri numai dacă sunteți colaborator.
+      all: Nu puteți %{action} aceasta %{subject}.
+  errors:
+    messages:
+      wrong_size: are dimensiunea greșită (ar trebui să fie %{file_size})
+      size_too_small: este prea mic (minim este %{file_size})
+      size_too_big: este prea mare (maxim este %{file_size})
+      already_confirmed: a fost confirmat deja, vă rugăm încercați să vă reconectați
+      confirmation_period_expired: trebuie să fie confirmată în %{period}, vă rugăm
+        faceți o nouă solicitare
+      expired: a expirat, vă rugăm faceți o nouă solicitare
+      not_locked: nu era blocat
+      not_saved:
+        one: '1 eroare a interzis salvarea acestuia %{resource}:'
+        few: '%{count} erori au interzis salvarea acestui%{resource}:'
+        other: '%{count} erori au interzis salvarea acestui%{resource}:'
+      not_found: nu a fost găsit
+      even: trebuie să fie chiar
+      odd: trebuie să fie ciudat
+      other_than: trebuie să fie altul decât %{count}
+      less_than_or_equal_to: trebuie să fie mai mic sau egal cu %{count}
+      less_than: trebuie să fie mai mic de %{count}
+      equal_to: trebuie să fie egal cu %{count}
+      greater_than_or_equal_to: trebuie să fie mai mare sau egal cu %{count}
+      greater_than: trebuie să fie mai mare decât %{count}
+      not_an_integer: trebuie să fie un întreg
+      not_a_number: nu este un număr
+      wrong_length:
+        one: este lungimea greșită (ar trebui să fie 1 caracter)
+        few: este lungimea greșită (ar trebui să aibă %{count} caractere)
+        other: este lungimea greșită (ar trebui să aibă %{count} caractere)
+      too_short:
+        one: este prea scurt (minim este de 1 caracter)
+        few: este prea scurt (minimum este %{count} caractere)
+        other: este prea scurt (minimum este %{count} caractere)
+      too_long:
+        one: este prea lung (maxim este de 1 caracter)
+        few: este prea lung (maximum este %{count} caractere)
+        other: este prea lung (maximum este %{count} caractere)
+      present: trebuie să fie necompletat
+      blank: nu poate fi necompletat
+      empty: nu poate fi gol
+      accepted: trebuie să fie acceptate
+      confirmation: nu se potrivește cu %{atribut}
+      invalid: nu este validă
+      exclusion: este rezervată
+      inclusion: nu este inclus în listă
+      model_invalid: 'Validarea nu a reușit: %{erori}'
+  date:
+    abbr_day_names:
+    - soare
+    - Marti
+    - miercuri
+    - Joi
+    - vineri
+    - sâmbătă
+    month_names:
+    - Ianuarie
+    - Februarie
+    - Martie
+    - Aprilie
+    - Mai
+    - Iunie
+    - Iulie
+    - August
+    - Septembrie
+    - Octombrie
+    - Noiembrie
+    - Decembrie
+    abbr_month_names:
+    - Ianuarie
+    - Februarie
+    - Mar
+    - Apr
+    - Mai
+    - Iun
+    - Iul
+    - Aug
+    - Sep
+    - oct
+    - Noiembrie
+    - Decembrie
+    order:
+    - an
+    - lună
+    - zi
+    formats:
+      default: '%e %b %Y'
+      short: '%d %b'
+      long: '%d %B %Y'
+    day_names:
+    - Duminică
+    - Luni
+    - Marți
+    - Miercuri
+    - Joi
+    - Vineri
+    - Sâmbătă
+  time:
+    formats:
+      default: '%a, %d %b %Y %H:%M:%S %z'
+      short: '%d %b %H:%M'
+      long: '%B %d, %Y %H:%M'
+    am: sunt
+    pm: Pm

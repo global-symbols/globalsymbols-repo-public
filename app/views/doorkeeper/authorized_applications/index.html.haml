@@ -1,0 +1,26 @@
+.card-body
+  %h1.card-title= t('doorkeeper.authorized_applications.index.title')
+  %p.card-text
+    - if @applications.count == 0
+      = t('doorkeeper.authorized_applications.index.none')
+    - else
+      = t('doorkeeper.authorized_applications.index.description')
+
+
+
+- if @applications.count > 0
+  %table.table.table-hover.table-sm
+    %thead
+      %tr
+        %th.pl-3= t('doorkeeper.authorized_applications.index.application')
+        %th= t('doorkeeper.authorized_applications.index.created_at')
+        %th
+    %tbody
+      - @applications.each do |application|
+        %tr
+          %td.pl-3= application.name
+          %td= application.created_at.strftime(t('doorkeeper.authorized_applications.index.date_format'))
+          %td= render 'delete_form', application: application
+
+.card-body.text-center
+  %a.btn.btn-primary{href: edit_user_registration_path}= t('doorkeeper.authorized_applications.index.return')

@@ -1,0 +1,41 @@
+- title @survey.name
+- content_for(:topbar, render('topbar'))
+
+%main.container-xl
+  .row.justify-content-center
+    .col-lg-6.col-md-8.col-sm-10.text-center
+      .card.mb-5
+        .card-body
+          - if @survey.is_open_for_feedback?
+
+            %p= @survey.introduction
+            %p= t('views.surveys._shared.number_of_symbols', count: @survey.pictos.count)
+            - if @survey.close_at.present?
+              %p= t('views.surveys.show.close_at_message', date: l(@survey.close_at.to_date))
+
+            .row.justify-content-center
+              .col-sm-10.mt-3
+                = bootstrap_form_with url: create_response_survey_path(@survey), model: @response, method: :post, layout: :vertical do |f|
+                  = f.text_field :name, maxlength: 255, label_as_placeholder: true
+                  = f.text_field :organisation, maxlength: 255, label_as_placeholder: true
+                  = f.text_field :role, maxlength: 255, label_as_placeholder: true
+
+                  = f.primary class: 'mb-2 btn btn-primary' do
+                    = t('views.surveys.show.begin_button')
+                    %i.fas.fa-chevron-right.pl-2
+                  %p.mb-5
+                    %small.text-muted
+                      = t('views.surveys.show.provide_details')
+                      %br
+                      = t('views.surveys.show.provide_details_2')
+
+          - else
+            %p.lead= t('views.surveys.show.closed_header')
+            %p= t('views.surveys.show.closed_text')
+
+          - if @survey.is_open_for_feedback?
+            %small.text-muted.d-block
+              = t('views.surveys.show.offline_participants')
+            %a.btn.btn-outline-secondary.btn-sm.mt-3{href: print_survey_path, target: :blank}
+              = t('views.surveys.show.offline_participants_button')
+              %i.fas.fa-chevron-right.pl-1

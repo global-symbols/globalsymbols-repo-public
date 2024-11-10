@@ -1,0 +1,20 @@
+- title t('views.picto_labels.index.page_title', symbol: @symbol.best_label_for(locale).text)
+- content_for(:topbar, render('pictos/topbar', picto: @symbol))
+%main.container-xl
+  .row
+    .col-md-3
+      =render 'pictos/edit_menu', picto: @symbol
+    .col-md-6
+      %h1.text-center= t('dictionary.label.other')
+      %p= t('views.picto_labels.index.intro')
+      %p.mb-4= t('views.picto_labels.index.instructions')
+      .card.mb-5
+        .card-header.text-center
+          = t('views.picto_labels.index.heading_add_label')
+        .card-body
+          =render 'form', label: @label, picto: @symbol
+
+      = render 'picto_labels', { type: t('views.picto_labels.index.status_published'), labels: @labels.authoritative, minimum_labels: 1 }
+      = render 'picto_labels', { type: t('views.picto_labels.index.status_suggested'), labels: @labels.suggestion, minimum_labels: 0 }
+    .col-md-3
+      = render 'pictos/right_preview', picto: @symbol

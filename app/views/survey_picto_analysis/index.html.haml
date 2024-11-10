@@ -1,0 +1,43 @@
+- title @survey.name
+- content_for(:topbar, render('survey_editor/topbar', survey: @survey, crumb_link: symbolset_survey_symbols_path, crumb_name: t('views.survey_picto_analysis.index.crumb_name')))
+%main.container-xl
+  .row
+    .col
+      %h3
+        = t('views.survey_picto_analysis.index.heading')
+      %p.lead= t('views.survey_picto_analysis.index.intro', count: @survey.responses.count)
+      %table.table.table-banded.table-hover.text-center.sortable
+        %thead
+          %tr
+            %th= t('dictionary.symbol.one')
+            %th= t('dictionary.label.one')
+            %th
+              %attr{title: t('views.survey_picto_analysis.index.column_heading_rating_description')}= t('activerecord.attributes.comment.rating')
+            %th
+              %attr{title: t('views.survey_picto_analysis.index.column_heading_representation_rating_description')}= t('activerecord.attributes.comment.representation_rating_short')
+            %th
+              %attr{title: t('views.survey_picto_analysis.index.column_heading_contrast_rating_description')}= t('activerecord.attributes.comment.contrast_rating_short')
+            %th
+              %attr{title: t('views.survey_picto_analysis.index.column_heading_cultural_rating_description')}= t('activerecord.attributes.comment.cultural_rating_short')
+            %th= t('views.survey_picto_analysis.index.column_heading_overall_average')
+        - @survey.pictos.each do |picto|
+          - comments = Comment.where(picto: picto).joins(:survey_response).where(survey_responses: {survey_id: @survey})
+          %tr
+            %td
+              %a{href: symbolset_symbol_path(picto.symbolset, picto)}
+                %img{src: picto.images.first.imagefile.url, style: 'max-height: 4rem'}
+            %td.align-middle= picto.best_label_for(locale).text
+            %td.align-middle= number_with_precision comments.average(:rating), precision: 2
+            %td.align-middle= number_with_precision comments.average(:representation_rating), precision: 2
+            %td.align-middle= number_with_precision comments.average(:contrast_rating), precision: 2
+            %td.align-middle= number_with_precision comments.average(:cultural_rating), precision: 2
+            %td.align-middle= number_with_precision ((comments.average(:rating) + comments.average(:representation_rating) + comments.average(:contrast_rating) + comments.average(:cultural_rating))/4), precision: 2
+        %tfoot
+          %tr
+            %th= t('views.survey_picto_analysis.index.row_heading_averages')
+            %td
+            %td= number_with_precision Comment.joins(:survey_response).where(survey_responses: {survey_id: @survey.id}).average(:rating), precision: 2
+            %td= number_with_precision Comment.joins(:survey_response).where(survey_responses: {survey_id: @survey.id}).average(:representation_rating), precision: 2
+            %td= number_with_precision Comment.joins(:survey_response).where(survey_responses: {survey_id: @survey.id}).average(:contrast_rating), precision: 2
+            %td= number_with_precision Comment.joins(:survey_response).where(survey_responses: {survey_id: @survey.id}).average(:cultural_rating), precision: 2
+            %td

@@ -1,0 +1,75 @@
+:ruby
+  title @post.title
+  description @post.description
+
+  set_meta_tags({
+    site: 'Global Symbols News',
+    article: {
+      published_time: @post.publish_date,
+      modified_time: @post.updated_at,
+      publisher: 'https://globalsymbols.com'
+    },
+    twitter: {
+      creator: '@globalsymbols',
+    },
+    og: {
+      url: news_url(slug_for @post),
+      type: 'article',
+    }
+  })
+
+  # Schema.org NewsArticle and BlogPosting have the same fields. Here is the base template.
+  rich_data_base = {
+      mainEntityOfPage: {
+          '@type':   'WebPage',
+          '@id': news_url(slug_for @post)
+      },
+      headline:      @post.title,
+      datePublished: @post.publish_date,
+      dateModified:  @post.updated_at,
+      author: {
+        '@type': 'Person',
+        name:    @post.author.try(:name),
+      },
+      publisher: {
+          '@type': 'Organization',
+          name:    'GlobalSymbols',
+          url:     'https://globalsymbols.com',
+          logo: {
+              '@type':  'ImageObject',
+              url:      image_url('logo-square-512.png'),
+              width: 512,
+              height: 512
+          }
+      }
+  }
+
+  # If there's an image...
+  if @post.hero_image and @png_heroimage_url
+    # Add the image, to the JSON+LD
+    rich_data_base[:image] = @png_heroimage_url
+
+    # Add the image to OG an other <meta>data
+    set_meta_tags({
+      image_src: @png_heroimage_url,
+      twitter: { image: @png_heroimage_url }
+    })
+  end
+
+= render partial: 'topbar', cache: true
+
+%main.container-lg.mt-0
+  %section.row.justify-content-center
+    .col-md-8
+      %article.news_article
+        - if @post.hero_image
+          %img.img-fluid{src: @post.hero_image.url, alt: @post.hero_image.description}
+        %header.row.my-4
+          .col-sm-4.text-right.text-muted
+            %time.h1{datetime: @publish_date.strftime('%Y-%m-%d'), pubdate: true}= l(@publish_date.to_date, format: :long)
+            %p.mt-2.font-weight-light= @post.author.try(:name)
+          .col
+            %h1= @post.title
+            = redcarpet(NewsArticleRenderer).render(@post.body).html_safe
+= render 'rich_data', data: rich_data_base.merge({'@type': 'NewsArticle'}), cache: true
+= render 'rich_data', data: rich_data_base.merge({'@type': 'BlogPosting'}), cache: true

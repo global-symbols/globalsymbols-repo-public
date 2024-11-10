@@ -1,0 +1,33 @@
+:ruby
+  title t('views.articles.index.title')
+  description t('views.articles.index.description')
+
+  set_meta_tags og: {
+    url: symbolsets_url,
+    type: 'object'
+  }
+= render partial: 'topbar', cache: true
+
+%main.container-xl
+  %section.row.justify-content-md-center
+    .col-md-8
+      - @posts.each do |post|
+        %article.row.mb-5
+          .col.order-sm-last
+            %h2= link_to post.title, news_path(slug_for post)
+            = post.description
+          .col-sm-3.text-right.mt-1.font-weight-light.text-muted
+            %a.text-dark{href: news_path(slug_for post)}
+              %time{datetime: post.publish_date.strftime('%Y-%m-%d'), pubdate: true}= l(post.publish_date.to_date, format: :long)
+            %br.d-none.d-sm-inline
+            %span.d-sm-none ·
+            %span.mt-1= post.author.name
+
+      - if @page == 1
+        .row
+          .col.offset-3.text-center
+            %a.btn.btn-primary{href: page_news_index_path(2)}
+              = t('views.articles.index.more_button')
+              %i.fas.fa-chevron-right.ml-1
+      - else
+        = paginate_articles @posts, @pagination_params

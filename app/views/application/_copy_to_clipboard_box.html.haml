@@ -1,0 +1,9 @@
+- id = "copy-#{Digest::MD5.hexdigest(content)}"
+.card.p-3.bg-light.mb-3
+  .row.align-items-center
+    .col
+      %code{id: id}= content
+    .col-sm-auto
+      %a.btn.btn-primary.btn-sm.text-white.clipboard-btn{'data-toggle': 'tooltip', title: t('views.application._copy_to_clipboard.button_title'), 'data-clipboard-action': :copy, 'data-clipboard-target': "##{id}"}
+        %i.far.fa-copy.pr-2
+        = t('views.application._copy_to_clipboard.button')

@@ -1,0 +1,979 @@
+sr_Latn:
+  devise:
+    failure:
+      locked: Vaš nalog je zaključan.
+      already_authenticated: Već ste prijavljeni.
+      inactive: Vaš nalog još nije aktiviran.
+      invalid: Nevažeći %{authentication_keys} ili lozinka.
+      last_attempt: Imate još jedan pokušaj da se vaš nalog zaključa.
+      not_found_in_database: Nevažeći %{authentication_keys} ili lozinka.
+      timeout: Sesija je istekla. Prijavite se ponovo da biste nastavili.
+      unauthenticated: Potrebno je da se prijavite ili da se prijavite pre nego što
+        nastavite.
+      unconfirmed: Morate potvrditi svoju e-adresu pre nego što nastavite.
+    confirmations:
+      confirmed: Vaša e-adresa je uspešno potvrđena.
+      send_instructions: Dobićete e-poruku sa instrukcijama o tome kako da potvrdite
+        e-adresu za nekoliko minuta.
+      send_paranoid_instructions: Ako vaša e-adresa postoji u našoj bazi podataka,
+        dobićete e-poruku sa instrukcijama o tome kako da potvrdite e-adresu za nekoliko
+        minuta.
+    mailer:
+      confirmation_instructions:
+        subject: Instrukcije za potvrdu
+      reset_password_instructions:
+        subject: Ponovo postavi instrukcije za lozinku
+      unlock_instructions:
+        subject: Uputstva za otključavanje
+      email_changed:
+        subject: Promenjena e-pošta
+      password_change:
+        subject: Promenjena lozinka
+    omniauth_callbacks:
+      failure: Nije bilo moguće potvrditi verodostojnost od %{kind} jer "%{reason}".
+      success: Uspešno je potvrđena sa %{kind} naloga.
+    passwords:
+      no_token: Ne možete da pristupite ovoj stranici, a da ne dolazite iz e-poruke
+        za poništavanje lozinke. Ako ste došli iz e-poruke za poništavanje lozinke,
+        uverite se da ste koristili punu URL adresu.
+      send_instructions: Poslali smo vam e-poruku za poništavanje lozinke.
+      send_paranoid_instructions: Ako vaša e-adresa postoji u našoj bazi podataka,
+        dobićete vezu za oporavak lozinke na e-adresi za nekoliko minuta.
+      updated: Vaša lozinka je uspešno promenjena. Sada ste prijavljeni.
+      updated_not_active: Vaša lozinka je uspešno promenjena.
+    registrations:
+      destroyed: ćao! Vaš nalog je uspešno otkazan. Nadamo se da ćemo se uskoro videti.
+      signed_up: Dobrodoљli! Uspešno ste se prijavili.
+      signed_up_but_inactive: Uspešno ste se prijavili. Međutim, nismo mogli da vas
+        prijavljujemo jer vaš nalog još uvek nije aktiviran.
+      signed_up_but_locked: Uspešno ste se prijavili. Međutim, nismo mogli da vas
+        prijavljujemo jer je vaš nalog zaključan.
+      signed_up_but_unconfirmed: Poruka sa vezom za potvrdu je poslata na vašu e-adresu.
+        Sledite vezu da biste aktivirali nalog.
+      update_needs_confirmation: Uspešno ste ažurirali svoj nalog, ali treba da verifikujete
+        novu e-adresu. Proverite e-poštu i pratite vezu "potvrda" da biste potvrdili
+        novu e-adresu.
+      updated: Vaš nalog je uspešno ažuriran.
+    sessions:
+      signed_in: dobrodošao nazad!
+      signed_out: Ste se prijavili.
+      already_signed_out: Ste se prijavili.
+    unlocks:
+      send_instructions: Dobićete e-poruku sa instrukcijama o tome kako da otključate
+        nalog za nekoliko minuta.
+      send_paranoid_instructions: Ako vaš nalog postoji, dobićete e-poruku sa instrukcijama
+        o tome kako da je otključate za nekoliko minuta.
+      unlocked: Vaš nalog je uspešno otključan. Prijavite se da biste nastavili.
+    views:
+      registrations:
+        new:
+          page_title: Kreiraj nalog
+          heading: Kreiraj nalog
+          sign_up_button: Kreiraj nalog
+        _form:
+          language_helper: Simboli će biti prikazani na željenom jeziku tamo gde je
+            to moguće.
+          password_helper: '%{var} znakova minimum'
+          confirm_password: Potvrda lozinke
+          please_fix_errors: Ispravite ove greške.
+          new_password: Nova lozinka
+          new_password_confirmation: Potvrdite novu lozinku
+          current_password_helper: Potrebna nam je vaša trenutna lozinka da biste
+            potvrdili promene.
+          new_password_helper: '%{var} znakova minimum. Ostavite prazno ako ne želite
+            da ga promenite.'
+          button_save_changes: Sačuvate promene
+          cancel_account_header: Otkaži moj nalog
+          cancel_account_text: Ako želite da zatvorite nalog Global Symbols…
+          cancel_account_confirm: Jesi siguran? Vaš nalog Global Symbols će biti trajno
+            izbrisan.
+          cancel_account_button: Izbriši moj nalog
+          button_change_password: Promeni lozinku
+        _shared:
+          _links:
+            sign_in: upiši se
+            sign_up: prijavi se
+            forgotten_password: Zaboravili ste lozinku?
+            new_confirmation: Nije primila instrukcije za potvrdu?
+            new_unlock: Nije primila instrukcije za otključavanje?
+        edit:
+          heading: Upravljaj nalogom
+          page_title: Upravljaj nalogom
+          awaiting_confirmation: Trenutno čeka potvrdu za:%{unconfirmed_email}
+        account_saved:
+          heading: Nalog je ažuriran
+          return_to_gs_button: Povratak na Global Symbols
+        change_password:
+          heading: Promeni lozinku
+          manage_account: Upravljaj nalogom
+          submit: Promeni lozinku
+          account_indicator: Prijavljeno kao %{email}
+      passwords:
+        new:
+          heading: Poništavanje lozinke
+          email_helper: E-adresa koju ste koristili za prijavljivanje na Global Symbols
+          button: Uspostavi početnu vrednost veze e-pošte
+          page_title: Upravljaj nalogom
+        instructions: Unesite e-adresu naloga i poslaćemo link za poništavanje vaše
+          lozinke.
+        edit:
+          heading: Promena lozinke
+          new_password_label: Nova lozinka
+          new_password_helper: "%{var} znakova minimum"
+          confirm_password_label: Potvrdite novu lozinku
+          button: Promeni lozinku
+      sessions:
+        new:
+          page_title: upiši se
+          sign_in_button: upiši se
+        errors:
+          messages:
+            already_confirmed: je već potvrđen, pokušajte da se prijavite
+            confirmation_period_expired: Mora biti potvrđeno u roku od %{period},
+              zatražite novi
+            expired: istekla, molim vas zatražite novi
+            not_found: Nije pronađeno
+            not_locked: Nije bila zaključana
+            not_saved:
+              one: '1 greška zabranjeno je da ovaj %{resource} bude sačuvan:'
+              other: '%{count} greške su zabranile čuvanje ovog %{resource}:'
+      _shared:
+        _links:
+          new_confirmation: Niste dobili instrukcije za potvrdu?
+          sign_in: upiši se
+          sign_up: Kreiraj nalog
+          forgotten_password: Zaboravili ste lozinku?
+          new_unlock: Niste dobili uputstva za otključavanje?
+  unauthorized:
+    manage:
+      all: Ne možete %{action} ovo %{subject}.
+      picto: Možete da upravljate samo skupovima simbolima kojima ste saradnik.
+    update:
+      project: Nije dozvoljeno ažuriranje ovog projekta.
+  views:
+    survey_editor:
+      _form:
+        language_label: Prikaži oznake simbola u
+        name_helper: Obezbedite ime koje će učesnicima pomoći da identifikuju ovu
+          anketu.
+        introduction_helper: Opcionalno. Ovo se prikazuje učesnicima prilikom pokretanja
+          ankete.
+        close_at_helper: Opcionalno. Postavite krajnji rok za učesnike koji će odgovarati.
+        language_helper: Prilikom preuzimanja ove ankete učesnici će prikazivati oznake
+          simbola na izabranom jeziku.
+        language_blank_option: Sve dostupne jezike
+        show_symbol_descriptions_label: Prikaži opise simbola
+        show_symbol_descriptions_helper: Prikazuje opise simbola učesnicima.
+        save_button: Sačuvaj anketu
+        create_button: Kreiraj anketu
+      _add_picto_to_survey:
+        button: Dodaj u anketu
+        option: '%{survey_name} u %{symbolset_name}'
+      _picto:
+        no_label_for_language: Ne postoji %{language_name} oznaka
+        remove_confirm: Želite li zaista da uklonite ovaj simbol iz ankete?
+      _sidebar:
+        heading: Faze
+        stages:
+          plan: Plan
+          collect_feedback: Prikupi povratnu informaciju
+          analyse: Analiziraj rezultate
+          archive: Arhiviranje ili brisanje
+          plan_description: Izbor simbola koji treba uključiti u anketu
+          collect_feedback_description: Neka učesnici završe anketu
+          analyse_results_description: Pregled rezultata ankete
+      export_xlsx:
+        header_participant_number: Brojo učesnika
+        header_participant_name: Ime učesnika
+        header_symbol_id: ID simbola
+        header_label: Oznaku
+        header_overall_rating: Ocena
+        header_representation_rating: Zastupljenost
+        header_contrast_rating: Kontrast
+        header_cultural_rating: Kulturni
+        header_comment: Komentar
+        comment_participant_name: Učesnici nisu obavezni da obezbede njihova imena,
+          tako da neke ćelije mogu biti prazne.
+        sheet_name: Komentare
+      destroy:
+        notice: Izbrisali smo anketu %{name}.
+      edit:
+        _title: Uređivanje %{survey_name} u %{symbolset_name}
+        heading: Uredi anketu
+      index:
+        _title: Ankete u %{symbolset_name}
+        button_new_survey: Kreiraj anketu
+        no_surveys_at_stage: Nema anketa u fazi %{stage}.
+        get_help: Istražite %{link} za ankete
+        get_help_link: Pomoć i obuka
+      new:
+        button_create: Kreiraj anketu
+      show:
+        symbols_heading: Simboli u ovoj anketi
+        symbols_text: Dodajte simbole u ovu anketu tako što ćete ih potražiti u Global
+          Symbols i odabrati opciju "Dodaj u anketu".
+        symbols_search_helper: Potražite simbole koje treba dodati u ovu anketu
+        collect_feedback:
+          heading: Prikupi povratnu informaciju
+          text_1: Kada počnete da prikupljate povratne informacije, Daćemo vam URL
+            adresu na kojoj ljudi mogu da učestvuju u anketi.
+          text_2: Nećete moći da promenite izbore simbola dok anketa prikuplja povratne
+            informacije.
+          close_at_label: Prihvati odgovore do
+          close_at_helper: Opcionalno. Postavite krajnji rok za odgovore na anketu.
+          button_begin_collecting: Počni sa prikupljanjem povratnih informacija
+          invite_at_this_url: Pozovite ljude da preuzmu anketu na ovoj URL adresi.
+          invite_deadline: Učesnici imaju rok do %{close_at} da daju odgovore (%{link}).
+          responses_count:
+            one: Vaša anketa ima %{count} odgovor.
+            other: Vaša anketa ima %{count} odgovora.
+          confirm_stop: To će zaustaviti ljude koji reaguju na istraživanje. Jesi
+            siguran?
+          stop_button: Okončali anketu
+          paper_heading: Istraživanja papira
+          paper_intro: Neki učesnici možda preferiraju obrasce za istraživanje papira.
+            Koristite ove alatke kako biste prikupili povratne informacije i uskladištili
+            ih ovde.
+          paper_customisation_invitation: Da biste prilagodite i štampali obrasce
+            za anketu za učesnike…
+          paper_print_button: Štampanje obrazaca ankete
+          paper_to_include_results: Da biste u rezultate ankete uključili rezultate
+            iz obrazaca za istraživanje papira…
+          paper_add_paper_feedback_button: Dodaj povratnu informaciju o papiru
+          survey_ended: Prikupljanje odziva za ovu anketu je završeno.
+          survey_ended_add_paper: I dalje možete ručno dodati povratnu informaciju
+            iz obrazaca za istraživanje papira.
+        analyse_results:
+          heading: Analiziraj rezultate
+          results_appear_here: Rezultati će se pojaviti ovde kada ljudi počnu da reaguju
+            na vaše istraživanje.
+          responses_count:
+            one: '%{count} osoba je reagovala na vašu anketu.'
+            other: '%{count} osobe su odgovorile na vašu anketu.'
+          button_individual_responses: Pojedinačne odgovore
+          button_stats: Statistika simbola
+          export:
+            heading: Izvezi rezultate u Excel
+            text_1: Koristite ovu alatku da biste preuzeli sve podatke ankete, uključujući
+              ocene i komentare.
+            text_2: Ovo olakšava izvršavanje sopstvene analize u programu Excel. Predlažemo
+              da koristite izvedene tabele da biste izračunali i obračunali prosečne
+              rezultate za svaki simbol.
+            text_3: Svaki red u Excel datoteci predstavlja pregled jednog učesnika
+              u anketi.
+        archive:
+          heading: Arhiviranje ili brisanje
+          survey_is_archived: Ova anketa je arhivirana. Još uvek možete da analizirate
+            sve rezultate.
+          archive_description: Arhivirati ovu anketu kada završite sa njom. I dalje
+            ćete moći da analizirate sve rezultate u ovoj anketi.
+          archive_confirm: To će zaustaviti ljude koji reaguju na istraživanje. Jesi
+            siguran?
+          archive_button: Arhiviraj anketu
+          delete_description: Brisanje ove ankete će trajno izbrisati sve rezultate
+            koje ste prikupili. Simboli neće biti izbrisani.
+          delete_confirm: Želite li zaista da izbrišete ovu anketu i sve odgovore?
+          delete_button: Brisanje ankete
+      add_symbol:
+        notice_success: Dodali smo simbol vašem istraživanju. %{add_another_link}
+        notice_success_add_another: Dodajte još jedan?
+        alert_failure: Ovaj simbol je već u %{survey_link}
+    survey_response_analysis:
+      new:
+        heading: Dodaj povratnu informaciju o papiru
+        label_contrast_rating: Kontrast boja
+        use_this_form_to: Koristite ovaj obrazac da biste sačuvali pojedinačno istraživanje
+          papira u Global Symbols. Tada će se računati na vašu statistiku ankete.
+        match_numbers: Brojevi prikazani u gornjem desnom uglu svakog okvira za simbol
+          trebalo bi da odgovaraju onima koji su prikazani na papirnim obrascima,
+          kako biste bili sigurni da ste uneli ispravne ocene za svaki simbol.
+        label_overall_rating: Osećanja u vezi sa simbolom
+        label_representation_rating: Predstavlja reč
+        label_cultural_rating: Kulturna osetljivost
+        cancel_confirm: Jesi siguran? Do sada ćete izgubiti rezultate.
+        save_button: Čuvanje odgovora
+      _sidebar:
+        heading: Odgovore
+        participant_number: Učesnik %{number}
+      index:
+        crumb_name: Pojedinačne odgovore
+        heading: Pojedinačne odgovore
+      create:
+        notice_success: Ovaj odgovor na papir je sačuvan.
+    survey_picto_analysis:
+      index:
+        column_heading_cultural_rating_description: Kulturne podobnosti
+        crumb_name: Statistika simbola
+        heading: Statistika simbola
+        intro: Ova tabela prikazuje prosečne odgovore za svaki simbol u anketi, na
+          osnovu ukupno %{count} Primljeno.
+        column_heading_overall_average: Ukupni prosek
+        row_heading_averages: Prosečne vrednosti
+        column_heading_rating_description: Osećanja prema simbolu u celini
+        column_heading_representation_rating_description: Predstavlja reč ili frazu
+        column_heading_contrast_rating_description: Kontrast boja
+    pages:
+      home:
+        for_creators: Za kreatorima
+        for_creators_text: Upravljanje i objavljivanje skupova simbola
+        for_communicators: Za komunikatore
+        for_communicators_text: Razmeni slike za kreiranje razgovora
+        for_everyone: Za svakoga
+        for_everyone_text: Otkrivanje, mešanje, podudaranje i kreiranje simbola korišćenje
+          ličnog
+        explore_heading: Istraživanje skupova simbola
+        explore_button: Istražite više skupova simbola…
+        board_builder:
+          subheading: Komunikacione table na lakši način
+          heading: Global Symbols Board Builder
+          create: Napravite table za pomoć u komunikaciji koristeći hiljade besplatnih
+            slika iz naše biblioteke, pa čak i vaše.
+          storage: Sve je bezbedno uskladišteno u vašem nalogu Global Symbols.
+          button_featured: Skupovi istaknutih tabli
+          button_try: Isprobajte Board Builder
+          design: Dizajnirajte, gradite, čuvajte i štampajte komunikacione table na
+            mreži.
+      search:
+        symbolset_dropdown_any_symbol_set: Bilo koji skup simbola
+        search: Pretrage
+        search_for: Potražili
+        _title: Pretrage
+        no_results: Nismo mogli da pronađemo nijedan odgovarajući simbol. Isprobajte
+          širu pretragu.
+      contact:
+        heading: Ući u kontakt
+        lead_text: Veoma smo srećni što primamo upite, sugestije i informacije o relevantnim
+          resursima.
+        _description: Kontaktirajte nas sa opštim pitanjima ili da biste objavili
+          svoj skup simbola.
+        email_us: Pošaljite nam e-mail
+    surveys:
+      _shared:
+        number_of_symbols:
+          one: Ova anketa ima %{count} simbol koji treba da redigujete.
+          other: Ova anketa ima %{count} simbola koji treba da redigujete.
+        thank_you: Hvala vam što ste okončali anketu!
+        questions:
+          feelings_rating: Osećanja prema simbolu u celini
+          representation_rating: Predstavlja reč ili frazu
+          contrast_rating: Kontrast boja
+          cultural_rating: Kulturna osetljivost
+          comments: Dodatni komentari
+      show:
+        close_at_message: Možete da učestvujete do %{date}.
+        begin_button: Započnite anketu
+        provide_details: Obezbeđivanje vaših detalja je opcionalno i može da pomogne
+          organizatorima ankete.
+        provide_details_2: Vaši detalji biće prikazani organizatorima ankete u vezi
+          sa vašim povratnim informacijama i nikada ih ne koriste Global Symbols u
+          bilo koje druge svrhe.
+        closed_header: Ova anketa trenutno ne prihvata povratne informacije.
+        closed_text: Obratite se organizatorovom istraživanju ako očekujete da ćete
+          moći da učestvujete.
+        offline_participants: Za učesnike koji rade van mreže…
+        offline_participants_button: Štampanje obrazaca povratnih informacija o štampanju
+      print:
+        heading: Postavke štampanja
+        collect_names: Prikupite imena učesnika
+        show_intro: Prikaži uvod u anketu
+        show_intro_helper: Promenite uvod uređivanjem ankete.
+        show_instructions: Prikaži uputstva
+        show_instructions_helper: Promenite uputstva klikom na njih.
+        show_example: Prikazivanje primera
+        show_example_helper: Dodaje primer pitanja koja prikazuje uzorak odgovora.
+        symbol_label_language: Prikaži oznake simbola u
+        symbol_label_language_all: Sve dostupne jezike
+        symbol_label_language_helper: Za najbolje rezultate Štampajte u boji koristeći
+          moderan pregledač i onemogućite zaglavlja i podnožja.
+        print_button: Štampanje ankete
+        name_field: Moje ime je
+        introduction: Uvod
+        instructions_heading: Uputstva
+        instructions_1: Ova anketa će vas pitati da ocenite četiri aspekta svakog
+          simbola i date neke komentare.
+        instructions_2: Ocenite svaki simbol na skali gde je 1 potpuno neprihvatljiv,
+          a 5 je ' potpuno prihvatljivo ', postavljanjem potvrdnog znaka u odgovarajuće
+          polje.
+      thank_you:
+        feedback_is_saved: Sačuvali smo sve vaše povratne informacije.
+        button_go_to_homepage: Nastavi do Global Symbols
+        button_restart_survey: Ponovo pokrenite anketu
+      _print_question:
+        example_heading: Primer pitanja
+        example_text: Ovo pokazuje kako možete odgovoriti na pitanja
+        symbol_counter: Simbol %{number}
+        example_comment: Ovo drvo izgleda kao kula.
+    symbolsets:
+      show:
+        no_symbols_for_collaborator: Dodavanje simbola za početak izgradnje skupa
+          simbola
+        _description: Istražite skup simbola %{symbolset_name} u Global Symbols. Nabavite
+          besplatne slike i simbole za komunikaciju.
+      _topbar:
+        download: Preuzimanje
+        button_add_symbol: Dodaj simbol
+        button_edit: Uređivanje
+        button_review: Pregledajte
+        button_archive: Arhivirani simboli
+        button_translate: Prevesti
+      _form:
+        description_helper: Ovaj opis će se pojaviti pored skupa simbola.
+        published_helper: Objavljeni skupovi simbola su vidljivi svima. Nacrti skupova
+          simbola su vidljivi administratorima i simbolima koji su postavljeni.
+        publisher_helper: Ime osobe ili organizacije koja objavljuje skup simbola.
+        publisher_url_helper: Adresa Veb lokacije izdavača.
+        logo_helper: Ovaj logotip će se pojaviti na stranici "Simbolskupove". Ovo
+          bi trebalo da bude slika, idealno od SVG ili PNG-a, 300x200 piksela sa prozirnom
+          pozadinom.
+        logo_label: Logo
+        publisher_url_label: URL adresa izdavača
+        publisher_placeholder: Na primer, ljudi iz Ljudice
+        publisher_url_placeholder: npr. https://peoplesymbols.com
+        licence_prompt: Izaberite dozvolu
+        create_button: Kreiraj skup simbola
+        save_button: Sačuvaj skup simbola
+      _review_row:
+        remove_confirmation: Da li ćemo ukloniti %{subject} iz ovog simbola?
+      _symbolset_card:
+        image:
+          alt: Logotip %{symbolset_name}
+      edit:
+        _title: Uređivanje %{symbolset_name}
+      import:
+        _title: Uvezi u %{symbolset_name}
+        heading: Uvezi simbole
+        introduction: Otpremite postojeće simbole u Global Symbols.
+      index:
+        _title: Istraživanje skupova simbola
+        heading: Istraživanje skupova simbola
+        create_symbol_set_button: Kreiraj skup simbola
+        _description: Pregledajte hiljade simbola slobodne komunikacije u Global Symbols.
+      new:
+        _title: Kreiranje skupa simbola
+        heading: Kreiranje skupa simbola
+        introduction: Novi skup simbola će biti kreiran u nacrtu stanja. Ona će biti
+          vidljiva samo vama i saradnicima koje dodajete, što vam omogućava da dodate
+          simbole i pripremite skup simbola.
+        guidance: Predlažemo vam da redigujete smernice za
+        guidance_link: Dobijanje skupa simbola objavljenih na Global Symbols
+      _shared:
+        none_found: Ovde nismo mogli da pronađemo nijednu simbole!
+      review:
+        heading: Pregledajte
+        filter_all_symbols: Svi simboli
+        filter_without_a_concept: Bez koncepta
+      archive:
+        description: Arhivirani simboli nisu prikazani u skupu simbola, rezultatima
+          pretrage ili aplikacijama
+        heading: Arhivirani simboli
+        none_found: Nema arhiviranih simbola u ovom skupu simbola
+      translate:
+        description: Automatski prevedi oznake simbola na nove jezike. Ova alatka
+          se prevodi u grupama simbola %{symbols_limit} istovremeno.
+        heading: Prevođenje nalepnica
+        button_find_untranslated: Pronađi simbole koji nisu predviđeni
+        form:
+          target_lang_prompt: Izbor ciljnog jezika
+          target_lang_label: Da
+          source_lang_label: Prevedi sa
+          source_lang_option: '%{language_name} (%{labels_count} simboli, %{coverage_percentage}
+            pokrivenost)'
+        title: Prevedi %{symbolset_name}
+    pictos:
+      _comment_form:
+        save_button: Sačuvaj komentar
+      _form:
+        image_helper: Otpremite SVG (preferirani) ili PNG format.
+        label_helper: Oznaka opisuje Vaš simbol tako da ga ljudi mogu pronaći. Kada
+          kreirate simbol, možete dodati oznake na dodatnim jezicima.
+        language_helper: Jezik oznake.
+        label_label: Tekst oznake
+        diacritised_label_helper: Samo za arapske jezike. Ovo skladišti dodatne izgovor
+          detalja.
+        description_helper: Ukratko Opišite simbol da pomogne u razumevanju.
+        save_button: Sačuvaj simbol
+        create_button: Dodaj simbol
+        to_download_symbols: da biste preuzeli simbole
+      _topbar:
+        download_button: Preuzmite %{file_type}
+        not_publicly_visible: Nije javno vidljivo
+      edit:
+        _title: Uređivanje %{picto_label} u %{symbolset_name}
+        heading: Uredi simbol
+      new:
+        _title: Dodaj simbol u %{symbolset_name}
+        heading: Dodaj simbol
+      show:
+        _title: '%{picto_label} u %{symbolset_name}'
+        concept_defined_in: Definisano u %{coding_framework_name}
+        no_concepts: Ovaj simbol nema koncepata da ga definiše.
+        add_concept_button: Dodavanje koncepta
+        alternative_symbols_heading: Alternativni simboli
+        _description: Simbol '%{picto_label}', deo skupa simbola %{symbolset_name}.
+          Pronađite hiljade besplatnih simbola za komunikaciju.
+        archived_notice:
+          heading: Arhivirani simbol
+          text: Ovaj simbol nije prikazan u skupu simbola, rezultatima pretrage ili
+            aplikacijama
+    picto_labels:
+      _form:
+        label_label: Tekst oznake
+        language_helper: Jezik oznake.
+        diacritised_label_label: Oznaka dijakritizovanih znakova
+        diacritised_label_helper: Samo za arapske jezike. Ovo skladišti dodatne izgovor
+          detalja.
+        description_helper: Ukratko Opišite simbol da pomogne u razumevanju.
+        button_save: Sačuvaj oznaku
+        button_add: Dodaj oznaku
+      _picto_labels:
+        heading: '%{label_type} nalepnice'
+        remove_label_aria_label: Ukloni oznaku
+        remove_label_confirm: Da li ćemo ukloniti %{text} iz ovog simbola?
+        no_labels_found: Oznake nisu pronađene
+      edit:
+        page_title: Oznake za %{symbol}
+        heading: Uredi oznaku
+        intro: Oznake pomažu drugim osobama da razumeju vaše simbole. Oni nam pomažu
+          da razumemo značenje vašeg simbola, tako da se uverite da su tačni i specifični.
+      index:
+        page_title: Oznake za %{symbol}
+        intro: Oznake pomažu drugim osobama da razumeju vaše simbole. Oni nam pomažu
+          da razumemo značenje vašeg simbola, tako da se uverite da su tačni i specifični.
+        instructions: Simboli moraju imati najmanje jednu nalepnicu. Ako želite, možete
+          da dodate oznaku za više jezika.
+        heading_add_label: Dodavanje oznake
+        status_published: Objavio
+        status_suggested: Predloћio
+      create:
+        notice_success: Dodali smo oznaku %{label} ovom simbolu.
+        alert_failure: Morate da se obraćamo nekim problemima pre nego što dodate
+          ovu oznaku.
+      destroy:
+        notice_success: Uklonili smo oznaku %{label} iz ovog simbola.
+        alert_failure: Nije bilo moguće ukloniti oznaku %{label} iz ovog simbola.
+      publish_translation:
+        notice_success: Objavio je oznaku %{language_name}.
+    survey_questions:
+      _form:
+        please_fix_errors: Ispravite greške ispod.
+        comments_helper: Opcionalno. Dodajte komentare koji će nam pomoći da poboljšamo
+          ovaj simbol.
+        button_previous_question: Prethodno pitanje
+        button_save_answer: Sačuvaj odgovor
+      show:
+        please_rate: Ocenite ovaj simbol na skali gde je 1 potpuno neprihvatljiv,
+          a 5 je 'potpuno prihvatljivo'.
+      _controller:
+        timed_out: Izvini-vaše istraživanje je isteklo zbog neaktivnosti. Ponovo započnite
+          anketu.
+    collaborators:
+      index:
+        page_title: Saradnici za %{name}
+        add_heading: Dodavanje Saradioca
+        add_text: Da biste dozvolili nekom drugom da uređuje ovaj skup simbola, unesite
+          e-adresu koju su koristili za prijavljivanje na Global Symbols.
+        add_button: Dodaj Saradioca
+        existing_heading: Postojeći saradnici
+        existing_text: Ovim osobama je dozvoljeno da uređuju ovaj skup simbola.
+        existing_none_found: Korisnicima nije dozvoljeno da uređuju ovaj skup simbola.
+        added_at: Dodato %{date}
+        remove_confirm: Da li ćemo ukloniti %{email} iz ovog skupa simbola?
+        remove_aria_label: Ukloni Saradioca
+      create:
+        notice_success: Dodali smo %{email_address} kao saradioca.
+        alert_no_gs_account: '%{email_address} još uvek ne postoji račun Global Symbols.'
+      destroy:
+        notice_success: Uklonili smo %{email_address} kao saradilac.
+    concepts:
+      show:
+        page_title: '%{subject} u %{coding_framework}'
+        defined_in: Koncept definisan u
+    picto_concepts:
+      index:
+        intro: Koncepti pomažu računarima da razumeju simbole, tako da se uverite
+          da su tačni i specifični.
+        add_concept_invitation: Možemo dodati bilo koji koncept koji možete pronaći
+          na ConceptNet.
+        add_concept:
+          heading: Dodavanje koncepta
+          instruction: Da biste dodali koncept ovom simbolu, unesite reč. Dodaćemo
+            koncept ako možemo da ga pronađemo.
+          button: Dodaj koncept
+          add: dodati
+        existing_concepts:
+          heading: Postojeće koncepte
+          added_at: Dodato %{date}
+          none_found: Ovaj simbol nema koncepte
+          remove_confirm: Da li ćemo ukloniti %{subject} iz ovog simbola?
+          remove_aria_label: Ukloni koncept
+        page_title: Koncepti za %{symbol}
+      create:
+        notice_success: Dodali smo koncept %{concept} ovom simbolu.
+        alert_failure: Nismo mogli da pronađemo koncept po imenu %{concept}. Isprobajte
+          neku drugu reč.
+        alert_already_exists: '%{concept} je već koncept ovog simbola.'
+      destroy:
+        notice_success: Uklonili smo koncept %{concept} iz ovog simbola.
+        alert_failure: Nismo mogli da uklonimo koncept %{concept} iz ovog simbola.
+    application:
+      _copy_to_clipboard:
+        button_title: Kopiraj u ostavu
+        button: Kopirate
+    pagination:
+      next: Sledeći
+      last: Poslednji
+      first: Prvi
+      previous: Prev
+    errors:
+      not_found:
+        description: Nismo mogli ništa da nađemo na ovoj adresi
+    translations:
+      _translation_form:
+        translation_complete_heading: Prevod je dovršen
+        button_translate: Prevedi simbole
+        button_translate_working: Prevođenje simbola…
+        publish_button: Objavi sve %{language_name} prevode
+        publish_button_working: Objavljivanje svih prevoda…
+        translation_complete_text: Svi simboli su prevedeni na %{language_name}.
+      _translations_published:
+        heading: Objavljeni prevodi
+        next_steps: Pronađite još simbola za prevođenje ili odaberite drugi jezik.
+        labels_saved: Novi prevodi su sačuvani.
+        labels_are_visible: Novi prevodi su sada vidljivi na Global Symbols i u aplikacijama.
+      _symbols_table:
+        heading_source_language: Izvor %{language_name}
+        heading_destination_language: Prevod %{language_name}
+        button_get_translation: Nabavi prevod
+        button_get_translation_working: Prevodi…
+        heading_type: Tip
+      _suggestion_form:
+        button_publish: Objavite
+        button_publish_working: Objavljivanje…
+        label: Prevod
+    articles:
+      _topbar:
+        header_news: Vesti o globalnim simbolima
+      index:
+        title: Vesti
+        description: Blog globalnih simbola - ispravke, ideje i inspiracija koji će
+          vam pomoći da komunicirate sa simbolima.
+        more_button: Još članaka
+  activerecord:
+    models:
+      category: Kategorija
+      coding_framework: Okvir za kodiranje
+      comment: Komentar
+      concept: Koncept
+      image: Slika
+      label: Oznaku
+      language: Jezik
+      licence: Dozvolu
+      picto: Simbol
+      picto_concept: Pikto koncepcija
+      survey: Ankete
+      survey_picto: Ispitivanje Picto
+      survey_response: Odgovor na anketu
+      symbolset: Skup simbola
+      symbolset_user: Saradnik
+      user: Korisnika
+    attributes:
+      category:
+        name: Ime
+      coding_framework:
+        name: Ime
+        structure: Struktura
+        api_uri_base: API URI baza
+        www_uri_base: WWW URI baza
+      comment:
+        rating: Ocena
+        representation_rating: Rejting predstavljanja
+        representation_rating_short: Zastupljenost
+        contrast_rating: Ocena kontrasta
+        contrast_rating_short: Kontrast
+        cultural_rating: Kulturna ocena
+        cultural_rating_short: Kulturni
+        comment: Komentar
+        read: Proиitao
+        resolved: Rešen
+      concept:
+        subject: Tema
+      label:
+        text: Oznaku
+        text_diacritised: Oznaka dijakritizovanih znakova
+        description: Opis
+      language:
+        active: Aktivni
+        name: Ime
+        scope: Opseg
+        category: Kategorija
+      licence:
+        name: Ime
+        url: Url adresa
+        version: Verzija
+        properties: Svojstva
+        logo: Logo
+      picto:
+        part_of_speech: Deo govora
+        publisher_ref: Referenca izdavača
+        image: Slika
+        part_of_speech_options:
+          noun: Imenica
+          verb: Glagol
+          adverb: Prilog
+          preposition: Predlog
+          interjection: Interjekcija
+          article: Članak
+          adjective: Pridev
+          pronoun: Zamenica
+          conjunction: Veznik
+          modifier: Modifikator
+        visibility: Vidljivo po
+        visibility_options:
+          everybody: Svi
+          collaborators: Saradnici grupe simbola
+      survey:
+        name: Ime
+        introduction: Uvod
+        status: Status
+        close_at: Blizu
+        show_symbol_descriptions: Prikaži opise simbola
+      survey_response:
+        name: Ime
+        organisation: Organizacija
+        role: Ulogu
+      symbolset:
+        name: Ime
+        description: Opis
+        publisher: Izdavača
+        publisher_url: URL adresa izdavača
+        logo: Logo
+        status: Status
+        statuses:
+          published: Objavio
+          draft: Nacrt
+          ingesting: Konzumiranja
+      user:
+        email: E-adresa
+        prename: Ime
+        surname: Prezime
+        company: Kompanija
+        location: Lokaciju
+        language_id: Željeni jezik
+        current_password: Trenutna lozinka
+        remember_me: Sjećaš me se
+        password: Lozinku
+  dictionary:
+    collaborator:
+      one: Saradnik
+      other: Saradnici
+    concept:
+      one: Koncept
+      other: Koncepti
+    settings: Postavke
+    label:
+      one: Oznaku
+      other: Oznake
+    symbolset:
+      one: Skup simbola
+      other: Skupovi simbola
+    symbol:
+      one: Simbol
+      other: Simboli
+    response:
+      one: Odgovor
+      other: Odgovori
+    survey:
+      one: Anketa
+      other: Ankete
+    unauthorised: Neovlašćenu
+    go_back: vrati se
+    global_symbols: Global Symbols
+    numbers:
+      '1': '1'
+      '2': '2'
+      '3': '3'
+      '4': '4'
+      '5': '5'
+    back: Nazad
+    by: Po
+    import: Uvoz
+    edit: Uređivanje
+    sign_in: upiši se
+    view: Prikaz
+    remove: Uklonite
+    search: Pretrage
+    change: Promenite
+    download: Preuzimanje
+    page_not_found: Stranica nije pronađena
+    archive: Arhive
+    un-archive: Otkači arhiviranje
+    publish: Objavite
+  languages:
+    en: engleski
+    fr: francuski
+    de: nemački
+    hr: hrvatski
+    sr: srpski
+    sr_Cyrl: Srpski (ćirilica)
+    sr_Latn: Srpski (latinica)
+    ro: Rumunski
+    el: Grčki
+    hy: Jermenski
+    tr: Turski
+    ca: Katalonski
+    nl: Holandski
+    es: Španski
+    sq: Albanski
+    bg: Bugarski
+    cnr: Crnogorski
+    sh: srpsko-hrvatski
+    ru: Ruski
+    pt: Portugalski
+    mr: Marati
+    mk: Makedonski
+    it: Italijanski
+    hi: Hindu
+    da: Danski
+    zh: Kineski
+    ar: Arapski
+    an: Aragonese
+    br: Breton
+    et: Estonski
+    eu: Baskijski
+    fa: Persijski
+    gl: Galicijski
+    he: Hebrejski
+    hu: Mađarski
+    pl: Poljski
+    sk: Slovački
+    sv: Švedski
+    val: Vehes
+    ur: Urdu
+  layouts:
+    application:
+      menu:
+        news: Vesti
+        sign_out: Odjavljivanje
+        my_account: Moj nalog
+        resources: Resurse
+        training: Trening
+        sign_in: upiši se
+        sign_up: Kreiraj nalog
+        search_placeholder: Pretraživanje %{var}
+        board_builder: Board Builder
+        facebook: Global Symbols na Facebook
+        twitter: Global Symbols na Twitter
+      footer:
+        privacy_policy: Politika privatnosti
+        terms: Uslove
+        accessibility: Pristupačnosti
+        about: O
+        contact: Kontakt
+        language_label: Jezik
+      skip_to_main_content: Pređi na glavni sadržaj
+  doorkeeper:
+    scopes:
+      public: Pristup javnim podacima
+      identity:read:user: Čitanje podataka na korisničkom nalogu
+      boardset:read: Pročitajte skupove tabli
+      boardset:write: Pišite svojim tabli
+  errors:
+    messages:
+      size_too_small: je premali (minimum je %{file_size})
+      wrong_size: je pogrešne veličine (trebalo bi da bude %{file_size})
+      size_too_big: je prevelik (maksimum je %{file_size})
+      already_confirmed: je već potvrđen, pokušajte da se prijavite
+      confirmation_period_expired: Mora biti potvrđeno u roku od %{period}, zatražite
+        novi
+      expired: istekla, molim vas zatražite novi
+      not_found: Nije pronađeno
+      not_locked: Nije bila zaključana
+      not_saved:
+        one: '1 greška zabranjeno je da ovaj %{resource} bude sačuvan:'
+        other: '%{count} grešaka je zabranilo čuvanje ovog %{resource}:'
+      even: mora biti ravnomerno
+      odd: mora biti čudno
+      other_than: mora biti drugo osim %{count}
+      less_than_or_equal_to: mora biti manji ili jednak %{count}
+      less_than: mora biti manje od %{count}
+      equal_to: mora biti jednako %{count}
+      greater_than_or_equal_to: mora biti veći ili jednak %{count}
+      greater_than: mora biti veći od %{count}
+      not_an_integer: mora biti ceo broj
+      not_a_number: nije broj
+      wrong_length:
+        one: je pogrešne dužine (treba da bude 1 znak)
+        other: je pogrešna dužina (trebalo bi da bude %{count} znakova)
+      too_short:
+        one: je prekratko (minimum je 1 znak)
+        other: je prekratak (minimum je %{count} znakova)
+      too_long:
+        one: je predugo (maksimum je 1 znak)
+        other: je predugo (maksimum je %{count} znakova)
+      present: mora biti prazno
+      blank: ne može biti prazno
+      empty: ne može biti prazno
+      accepted: mora biti prihvaćeno
+      confirmation: ne podudara se sa %{atributom}
+      invalid: je nevažeći
+      exclusion: je rezervisano
+      inclusion: nije uključena u listu
+      model_invalid: 'Provera valjanosti nije uspela: %{errors}'
+  date:
+    formats:
+      default: '%e %b %Y'
+      short: '%d %b'
+      long: '%d %B %Y'
+    day_names:
+    - Subota
+    - Ponedeljak
+    - Utorak
+    - Sreda
+    - Četvrtak
+    - Petak
+    - Subota
+    abbr_month_names:
+    - Dec
+    - Jan
+    - Feb
+    - Mar
+    - Apr
+    - maj
+    - Dћun
+    - Jul
+    - Aug
+    - Sep
+    - Oct
+    - Nov
+    order:
+    - Godine
+    - Meseca
+    - Dan
+    abbr_day_names:
+    - Sunce
+    - Mon
+    - Uto
+    - Wed
+    - Thu
+    - Fri
+    - Sedeo
+    month_names:
+    - januar
+    - februar
+    - mart
+    - april
+    - maj
+    - jun
+    - Jul
+    - avgust
+    - septembar
+    - oktobar
+    - novembar
+    - decembar
+  time:
+    formats:
+      default: '%a, %d %d %Y %H:%M:%S %z'
+      short: '%d %b %H:%M'
+      long: '%b %d, %Y %H:%M'
+    am: Sam
+    pm: Premijer

@@ -1,0 +1,15 @@
+:ruby
+  errors = {
+    empty: {
+      alt: 'Desert'
+    },
+    not_found: {
+      alt: 'Compass'
+    },
+    unauthorised: {
+      alt: 'Key'
+    }
+  }
+.text-center
+  %img.img-fluid.status-image{src: asset_path("statuses/#{status}.svg"), alt: errors[status][:alt]}
+  %p.mt-2.lead.font-weight-bold= text

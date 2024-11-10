@@ -1,0 +1,7 @@
+part_of_speech,label,filename,diacritised_label,category,description,publisher_ref
+,,,,,,
+verb,carrot,carrot.png,,vegetables,A food,8226
+,carrot,carrot.png,,vegetables,A food,8226
+verb,,carrot.png,,vegetables,A food,8226
+verb,carrot,,,vegetables,A food,8226
+verb,carrot,carrot.png,,vegetables,A food,8226

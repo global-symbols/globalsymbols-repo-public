@@ -1,0 +1,10 @@
+- title t('views.picto_labels.edit.page_title', symbol: @symbol.best_label_for(locale).text)
+- content_for(:topbar, render('pictos/topbar', picto: @symbol))
+%main.container-xl
+  .row
+    .col-md-6.offset-md-3
+      %h1.text-center= t('views.picto_labels.edit.heading')
+      %p= t('views.picto_labels.edit.intro')
+      =render 'form', label: @picto_label, picto: @symbol
+    .col-md-3
+      = render 'pictos/right_preview', picto: @symbol

@@ -1,0 +1,6 @@
+- if surveys.planning.any?
+  .btn-group.mt-2.mt-sm-0
+    %button.btn.btn-sm.btn-primary.dropdown-toggle{data: {toggle: :dropdown}}= t('views.survey_editor._add_picto_to_survey.button')
+    .dropdown-menu
+      - surveys.planning.each do |survey|
+        = link_to t('views.survey_editor._add_picto_to_survey.option', survey_name: survey.name, symbolset_name: survey.symbolset.name), add_symbol_symbolset_survey_path(survey.symbolset, survey, symbol_id: picto), method: :post, class: 'dropdown-item'

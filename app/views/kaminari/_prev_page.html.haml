@@ -1,0 +1,5 @@
+%li.page-item.d-none.d-sm-inline
+  - unless current_page.first?
+    %a.page-link{href: url, rel: :prev, remote: remote}
+      %i.fas.fa-chevron-left.mr-1
+      = raw t 'views.pagination.previous'

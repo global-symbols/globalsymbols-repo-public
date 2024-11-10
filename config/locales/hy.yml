@@ -1,0 +1,987 @@
+hy:
+  activerecord:
+    models:
+      concept: Կոնցեպտ
+      survey: Հարցում
+      category: Կատեգորիա
+      comment: Մեկնաբանություն
+      label: Պիտակ
+      language: Լեզու
+      licence: Լիցե
+      picto: Զինանշան
+      picto_concept: Պիկտո կոնցեպցիա
+      survey_response: Survey արձագանք
+      coding_framework: Կոդավորման շրջանակ
+      image: Պատկեր
+      symbolset: Խորհրդանիշի սեթ
+      symbolset_user: Համահեղինակ
+      survey_picto: Հարցում Picto
+      user: Օգտվող
+    attributes:
+      survey:
+        name: Անուն
+        introduction: Ներածություն
+        status: Կարգավիճակ
+        close_at: Փակել At
+        show_symbol_descriptions: Ցույց տալ սիմվոլիկ բնութագրերը
+      language:
+        category: Կատեգորիա
+        scope: Ծավալ
+        active: Ակտիվ
+        name: Անուն
+      licence:
+        logo: Լոգո
+        name: Անուն
+        url: URL
+        version: Արեւմտահայերէն տարբերակ
+        properties: Հատկությունները
+      user:
+        email: Էլ. փոստի հասցե
+        location: Տեղակայում
+        prename: Առաջին անուն
+        surname: Ազգանուն
+        company: Ընկերություն
+        language_id: Նախընտրելի լեզու
+        current_password: Ընթացիկ ծածկագիրը
+        password: Անձնագիր
+        remember_me: Հիշիր ինձ
+      symbolset:
+        statuses:
+          draft: Նախագիծ
+          published: Հրապարակված է
+          ingesting: Ինգեստինգ
+        description: Նկարագրություն
+        publisher: Հրատարակիչ
+        publisher_url: Հրատարակիչ URL
+        logo: Լոգո
+        status: Կարգավիճակ
+        name: Անուն
+      coding_framework:
+        structure: Կառուցվածք
+        api_uri_base: ԱՊԻ URI բազա
+        name: Անուն
+        www_uri_base: WWW URI բազա
+      comment:
+        rating: Ռեյտինգ
+        representation_rating: Ներկայացուցչության վարկանիշ
+        representation_rating_short: Ներկայացուցչություն
+        contrast_rating: Կոնտրաստ վարկանիշ
+        contrast_rating_short: Կոնտրաստ
+        cultural_rating: Մշակութային վարկանիշ
+        cultural_rating_short: Մշակութային
+        comment: Մեկնաբանություն
+        read: Կարդալ
+        resolved: Լուծարվել է
+      concept:
+        subject: Ենթակայություն
+      picto:
+        part_of_speech_options:
+          noun: Նոուն
+          adjective: Ածական
+          pronoun: Դերանուն
+          preposition: Նախապատմություն
+          conjunction: Կոնյունկցիա
+          interjection: Ինտերյեր
+          article: Հոդված
+          modifier: Մոդիֆիկատոր
+          verb: Վերբ
+          adverb: Ադվերբ
+        publisher_ref: Հրատարակիչ հղում
+        visibility: Տեսանելի է ըստ
+        visibility_options:
+          collaborators: Հոմանիշների գործակիցներ
+          everybody: Բոլորը
+        part_of_speech: Խոսքի մաս
+        image: Պատկեր
+      survey_response:
+        name: Անուն
+        organisation: Կազմակերպություն
+        role: Դեր
+      category:
+        name: Անուն
+      label:
+        text: Պիտակ
+        text_diacritised: Diacritised պիտակ
+        description: Նկարագրություն
+  devise:
+    views:
+      registrations:
+        new:
+          sign_up_button: Ստեղծել հաշիվ
+          page_title: Ստեղծել հաշիվ
+          heading: Ստեղծել հաշիվ
+        change_password:
+          account_indicator: Ստորագրված է որպես %{email}
+          heading: Փոխել գաղտնաբառը
+          manage_account: Կառավարել հաշիվը
+          submit: Փոխել գաղտնաբառը
+        account_saved:
+          heading: Հաշիվը թարմացվում է
+          return_to_gs_button: Վերադառնալ Global Symbols
+        _form:
+          language_helper: 'Խորհրդանիշները հնարավորության դեպքում կցուցադրվեն ձեր
+            նախընտրած լեզվով:'
+          button_change_password: Փոխել գաղտնաբառը
+          cancel_account_text: Եթե ցանկանում եք փակել Ձեր Global Symbols հաշիվը…
+          current_password_helper: 'Ձեր փոփոխությունները հաստատելու համար մեզ անհրաժեշտ
+            է Ձեր ընթացիկ ծածկագիրը:'
+          password_helper: '%{var} տառեր նվազագույնը'
+          confirm_password: Հաստատել գաղտնաբառը
+          please_fix_errors: 'Խնդրում ենք շտկել այս սխալները:'
+          new_password: Նոր գաղտնաբառ
+          new_password_confirmation: Հաստատել նոր գաղտնաբառը
+          new_password_helper: '%{var} տառերը նվազագույնը: Բաց թողեք, եթե չեք ցանկանում
+            փոխել այն:'
+          button_save_changes: Պահպանել փոփոխությունները
+          cancel_account_header: Չեղարկել հաշիվս
+          cancel_account_button: Ջնջել իմ հաշիվը
+          cancel_account_confirm: 'Վստահ ես? Ձեր Global Symbols հաշիվը մեկընդմիշտ
+            կջնջվի:'
+        edit:
+          heading: Կառավարել հաշիվը
+          page_title: Կառավարել հաշիվը
+          awaiting_confirmation: 'Ներկայումս սպասում է հաստատմանը: %{unconfirmed_email}'
+      _shared:
+        _links:
+          new_unlock: 'Չստացավ բացվող հրահանգները:'
+          new_confirmation: 'Չստացավ հաստատման հրահանգը:'
+          sign_in: Գրանցել
+          sign_up: Ստեղծել հաշիվ
+          forgotten_password: Մոռացել եք Ձեր գաղտնաբառը?
+      passwords:
+        edit:
+          confirm_password_label: Հաստատել նոր գաղտնաբառը
+          new_password_helper: '%{var} տառեր նվազագույնը'
+          heading: Փոխեք ձեր գաղտնաբառը
+          new_password_label: Նոր գաղտնաբառ
+          button: Փոխել գաղտնաբառը
+        new:
+          button: Email Reset Link
+          heading: Reset ծածկագիրը
+          email_helper: Էլեկտրոնային փոստի հասցեն, որով դուք գրանցվում էիք Global
+            Symbols-ում
+          page_title: Կառավարել հաշիվը
+        instructions: 'Մուտքագրեք Ձեր հաշվի էլփոստի հասցեն եւ մենք կուղարկենք հղում
+          Ձեր գաղտնաբառը վերստուգելու համար:'
+      sessions:
+        errors:
+          messages:
+            expired: լրացել է, խնդրում ենք հայցել նոր
+            not_locked: փակված չէր
+            already_confirmed: արդեն հաստատված էր, խնդրում ենք փորձել ստորագրել
+            confirmation_period_expired: անհրաժեշտ է հաստատել %{ժամանակաշրջան}-ի սահմաններում,
+              խնդրում ենք պահանջել նոր
+            not_found: չգտնուած
+            not_saved:
+              one: '1 սխալն արգելել է այս %{ռեսուրսը} փրկվել:'
+              other: '%{count} սխալներն արգելում էին այս %{ռեսուրսը} պահպանել:'
+        new:
+          sign_in_button: Գրանցել
+          page_title: Գրանցել
+    mailer:
+      password_change:
+        subject: Գաղտնաբառը փոխված է
+      confirmation_instructions:
+        subject: Հաստատության հրահանգները
+      reset_password_instructions:
+        subject: Reset գաղտնաբառի հրահանգները
+      unlock_instructions:
+        subject: Բացել հրահանգները
+      email_changed:
+        subject: Էլ. փոստը փոխվել է
+    passwords:
+      send_instructions: 'Մենք ձեզ ուղարկել ենք գաղտնաբառի վերստուգիչ էլփոստ:'
+      no_token: 'Դուք չեք կարող մուտք գործել այս էջը առանց գաղտնաբառի վերստուգման
+        էլփոստից գալու: Եթե դուք գալիս եք գաղտնաբառի վերստուգման էլեկտրոնային փոստից,
+        խնդրում ենք համոզվեք, որ դուք օգտագործել եք URL-ի լիարժեք տրամադրումը:'
+      send_paranoid_instructions: 'Եթե ձեր էլփոստի հասցեն առկա է մեր տվյալների բազայում,
+        ապա մի քանի րոպեից Դուք կստանաք գաղտնաբառի վերականգնման հղում Ձեր էլփոստի
+        հասցեով:'
+      updated: 'Ձեր գաղտնաբառը փոփոխվել է հաջողությամբ: Դուք հիմա ստորագրվում եք:'
+      updated_not_active: 'Ձեր գաղտնաբառը փոփոխվել է հաջողությամբ:'
+    sessions:
+      signed_out: 'Դուք ստորագրել եք:'
+      signed_in: Բարի վերադարձ!
+      already_signed_out: 'Դուք ստորագրել եք:'
+    confirmations:
+      confirmed: 'Ձեր էլփոստի հասցեն հաջողությամբ հաստատվել է:'
+      send_instructions: 'Դուք կստանաք էլեկտրոնային նամակ հրահանգներով, թե ինչպես
+        մի քանի րոպեում հաստատել ձեր էլփոստի հասցեն:'
+      send_paranoid_instructions: 'Եթե ձեր էլփոստի հասցեն առկա է մեր տվյալների բազայում,
+        դուք կստանաք էլեկտրոնային նամակ հրահանգներով, թե ինչպես մի քանի րոպեում հաստատել
+        ձեր էլփոստի հասցեն:'
+    failure:
+      already_authenticated: 'Դուք արդեն ստորագրված եք:'
+      inactive: 'Ձեր հաշիվը դեռ չի ակտիվանում:'
+      invalid: 'Invalid %{authentication_keys} կամ գաղտնաբառ:'
+      locked: 'Ձեր հաշիվը կողպված է:'
+      last_attempt: 'Դուք եւս մեկ փորձ ունեք, նախքան ձեր հաշիվը կփակվի:'
+      not_found_in_database: 'Invalid %{authentication_keys} կամ գաղտնաբառ:'
+      timeout: 'Ձեր նիստի ժամկետը լրացավ: Խնդրում եմ ստորագրել նորից շարունակելու
+        համար:'
+      unauthenticated: 'Դուք պետք է ստորագրեք կամ գրանցվեք նախքան շարունակելը:'
+      unconfirmed: 'Դուք պետք է հաստատեք ձեր էլփոստի հասցեն նախքան շարունակելը:'
+    omniauth_callbacks:
+      failure: Հնարավոր չէ վավերացնել ձեզ %{kind}-ից, քանի որ "%{պատճառ}".
+      success: 'Հաջողությամբ վավերացված է %{kind} հաշվից:'
+    registrations:
+      destroyed: 'Ցտեսություն! Ձեր հաշիվը հաջողությամբ չեղյալ է համարվել: Հուսով ենք,
+        որ շուտով կրկին կտեսնենք ձեզ։'
+      signed_up: 'Բարի գալուստ! Դուք հաջողությամբ եք գրանցվել:'
+      signed_up_but_inactive: 'Դուք հաջողությամբ եք գրանցվել: Սակայն մենք չէինք կարող
+        ստորագրել ձեզ, քանի որ ձեր հաշիվը դեռ ակտիվացված չէ։'
+      signed_up_but_locked: 'Դուք հաջողությամբ եք գրանցվել: Սակայն մենք չկարողացանք
+        ստորագրել ձեզ, քանի որ ձեր հաշիվը կողպված է։'
+      signed_up_but_unconfirmed: 'Ձեր էլփոստի հասցեին ուղարկվել է հաստատման հղումով
+        հաղորդագրություն: Խնդրում ենք հետեւել հղմանը՝ ձեր հաշիվն ակտիվացնելու համար:'
+      update_needs_confirmation: 'Դուք հաջողությամբ թարմացրել եք Ձեր հաշիվը, սակայն
+        մենք պետք է ճշտենք Ձեր նոր էլփոստի հասցեն: Խնդրում ենք ստուգել ձեր էլփոստը
+        եւ հետեւել հաստատման հղմանը՝ հաստատելու ձեր նոր էլփոստի հասցեն:'
+      updated: 'Ձեր հաշիվը հաջողությամբ թարմացվել է:'
+    unlocks:
+      send_instructions: 'Դուք կստանաք էլեկտրոնային նամակ հրահանգներով, թե ինչպես
+        բացել ձեր հաշիվը մի քանի րոպեում:'
+      send_paranoid_instructions: 'Եթե ձեր հաշիվը գոյություն ունի, դուք կստանաք էլեկտրոնային
+        նամակ հրահանգներով, թե ինչպես բացել այն մի քանի րոպեում:'
+      unlocked: 'Ձեր հաշիվը հաջողությամբ բացվել է: Խնդրում եմ ստորագրել շարունակել:'
+  dictionary:
+    by: By
+    sign_in: Գրանցել
+    remove: Հեռացնել
+    collaborator:
+      one: Համահեղինակ
+      other: Համագործակիցներ
+    survey:
+      one: Հարցում
+      other: Հարցումներ
+    concept:
+      one: Կոնցեպտ
+      other: Հասկացություններ
+    label:
+      one: Պիտակ
+      other: Պիտակները
+    numbers:
+      '5': '5'
+      '1': '1'
+      '2': '2'
+      '3': '3'
+      '4': '4'
+    edit: Խմբագրել
+    settings: Պարամետրեր
+    symbolset:
+      one: Խորհրդանիշի սեթ
+      other: Սիմվոլների հավաքածուներ
+    response:
+      one: Արձագանք
+      other: Պատասխաններ
+    go_back: Հետ գնա
+    back: Հետույք
+    search: Որոնում
+    change: փոփոխութիւն
+    download: Ներբեռնել
+    page_not_found: Էջը չի գտնվել
+    archive: Արխիվ
+    un-archive: Ան-արխիվ
+    publish: Հրատարակչություն
+    global_symbols: Global Symbols
+    unauthorised: Անթույլատրելի է
+    import: Ներմուծում
+    view: Դիտել
+    symbol:
+      one: Զինանշան
+      other: Խորհրդանիշներ
+  languages:
+    tr: Թուրքերեն
+    sq: Ալբաներեն
+    bg: Բուլղարերեն
+    ca: Կատալաներեն
+    sr_Latn: Սերբերեն (լատիշ)
+    nl: Հոլանդերեն
+    en: Անգլերեն
+    fr: Ֆրանսերեն
+    de: Գերմաներեն
+    sr: Սերբերեն
+    sr_Cyrl: Սերովբե (կիրիլիցա)
+    ro: Ռումիներեն
+    el: Հունարեն
+    hy: Հայերեն
+    es: Իսպաներեն
+    ar: Արաբերեն
+    zh: Չինարեն
+    da: Դանիերեն
+    hi: Հնդկերեն
+    it: Իտալերեն
+    mk: Մակեդոներեն
+    mr: Մարաթի
+    pt: Պորտուգալերեն
+    ru: Ռուսերեն
+    sh: Սերբո-խորվաթական
+    cnr: Մնացականյան
+    hr: Խորվաթերեն
+    an: Արագոնեզե
+    pl: Լեհերեն
+    sv: Շվեդերեն
+    he: Եբրայերեն
+    hu: Հունգարերեն
+    ur: Ուրդու
+    val: Վեհիս
+    et: Էստոներեն
+    eu: Բասկերեն
+    fa: Պարսկերեն
+    gl: Գալիսերեն
+    sk: Սլովակերեն
+    br: Բրետոն
+    ps: Պաշտո
+  views:
+    surveys:
+      _print_question:
+        example_heading: Օրինակելի հարց
+        example_text: Սա ցույց է տալիս, թե ինչպես կարող եք պատասխանել հարցերին
+        symbol_counter: Հոմանիշ %{թիվ}
+        example_comment: 'Այս ծառը նման է բրոկոլիի:'
+      print:
+        name_field: Իմ անունն է
+        heading: Տպել պարամետրերը
+        show_intro: Ցույց տալ Survey-ի ներածությունը
+        show_instructions_helper: 'Փոխեք հրահանգները սեղմելով դրանց վրա:'
+        show_example: Ցույց տալ օրինակ
+        show_example_helper: 'Ավելացնում է օրինակելի հարց, որը ցույց է տալիս նմուշի
+          պատասխանները:'
+        symbol_label_language_helper: 'Լավագույն արդյունքների համար տպեք գույներով՝
+          օգտագործելով ժամանակակից բրաուզեր եւ անջատել գլխաշորերն ու ոտնակները:'
+        print_button: Պրինտ survey
+        instructions_heading: Ցուցումներ
+        instructions_1: 'Այս հարցումը կխնդրի ձեզ գնահատել յուրաքանչյուր խորհրդանիշի
+          չորս կողմերը եւ ներկայացնել որոշ մեկնաբանություններ:'
+        collect_names: Հավաքել մասնակիցների անունները
+        show_intro_helper: 'Ներածությունը փոխել՝ խմբագրելով հարցումը:'
+        show_instructions: Ցույց տալ հրահանգները
+        symbol_label_language: Ցույց տալ սիմվոլիկ պիտակներ in
+        symbol_label_language_all: Բոլոր առկա լեզուները
+        introduction: Ներածություն
+        instructions_2: "Գնահատեք յուրաքանչյուր սիմվոլը այն սանդղակով, որտեղ 1-ը «լիովին\
+          \ անընդունելի» է, իսկ 5-ը 'լիովին ընդունելի'' ճիշտ վանդակում չեկ դնելով:"
+      _shared:
+        thank_you: Շնորհակալություն հարցման ավարտի համար!
+        questions:
+          feelings_rating: Զգացմունքներ խորհրդանիշի մասին որպես ամբողջություն
+          representation_rating: Ներկայացնում է բառը կամ արտահայտությունը
+          contrast_rating: Գույների հակադրություն
+          cultural_rating: Մշակութային զգայունություն
+          comments: Լրացուցիչ մեկնաբանություններ
+        number_of_symbols:
+          one: 'Այս հարցումը ունի %{count} սիմվոլը, որը պետք է վերանայեք:'
+          other: 'Այս հետազոտության մեջ կան %{count} Նշաններ, որոնք դուք պետք է վերանայեք:'
+      show:
+        close_at_message: 'Դուք կարող եք մասնակցել մինչեւ %{date}:'
+        begin_button: Սկսեք հարցումը
+        provide_details: Ձեր մանրամասները ներկայացնելը կամընտիր է, եւ կարող է օգնել
+          հարցման կազմակերպիչներին։
+        provide_details_2: 'Ձեր մանրամասները կցուցադրվեն հարցման կազմակերպիչներին
+          ձեր արձագանքի կապակցությամբ եւ երբեք չեն օգտագործվի Global Symbols-ի կողմից
+          որեւէ այլ նպատակի համար:'
+        closed_header: 'Այս հարցումն այս պահին արձագանք չի ընդունում:'
+        closed_text: Եթե ակնկալում եք, որ կկարողանաք մասնակցել հարցման կազմակերպչի
+          հետ, կապ հաստատեք հարցման կազմակերպչի հետ։
+        offline_participants: Օֆլայն աշխատող մասնակիցների համար…
+        offline_participants_button: Պրինտ Survey Feedback Կաղապարներ
+      thank_you:
+        button_restart_survey: Վերսկսեք հարցումը
+        feedback_is_saved: 'Մենք փրկել ենք ձեր բոլոր արձագանքները:'
+        button_go_to_homepage: Գնացեք Գլոբալ Global Symbols
+    symbolsets:
+      _topbar:
+        button_translate: Թարգմանիր
+        button_add_symbol: Ավելացնել սիմվոլը
+        button_edit: Խմբագրել
+        button_review: Վերանայում
+        button_archive: Archived Հոմանիշներ
+        download: Ներբեռնել
+      review:
+        filter_without_a_concept: Առանց հայեցակարգի
+        heading: Վերանայում
+        filter_all_symbols: Բոլոր սիմվոլները
+      _form:
+        publisher_url_helper: 'Թողարկողի կայքի հասցեն:'
+        description_helper: 'Այս նկարագրությունը կհայտնվի Խորհրդանիշի հավաքածուի կողքին:'
+        published_helper: 'Հրապարակված սիմվոլիկ հավաքածուները տեսանելի են բոլորի համար:
+          Draft Symbol Sets-ը տեսանելի է Admins եւ Սիմվոլների Set Collaborators-ին:'
+        publisher_helper: 'Խորհրդանիշը հրապարակող անձի կամ կազմակերպության անվանումը:'
+        logo_helper: 'Այս լոգոն կհայտնվի Symbolsets էջում: Սա պետք է լինի պատկեր,
+          իդեալական SVG կամ PNG, 300x200 պիքսելներ, որոնք ունեն թափանցիկ ֆոն:'
+        logo_label: Լոգո
+        publisher_url_label: Հրատարակիչ URL
+        publisher_placeholder: e.g. PeopleSymbols հիմնադրամը
+        publisher_url_placeholder: ե. https://peoplesymbols.com
+        licence_prompt: Ընտրեք արտոնագիրը
+        create_button: Ստեղծեք սիմվոլների հավաքածու
+        save_button: Save սիմվոլի սեթ
+      show:
+        no_symbols_for_collaborator: Ավելացրեք սիմվոլը, որպեսզի սկսեք կառուցել ձեր
+          Սիմվոլը Set
+        _description: 'Հետազոտեք Global Symbols-ում տեղադրված %{symbolset_name} նշանը:
+          Ստանալ ազատ պատկերներ եւ սիմվոլներ շփման համար:'
+      import:
+        introduction: 'Վերբեռնեք ձեր գոյություն ունեցող սիմվոլները Global Symbols-
+          ում:'
+        _title: Ներմուծումը մինչեւ %{symbolset_name}
+        heading: Ներմուծման սիմվոլներ
+      index:
+        _title: Հետազոտել սիմվոլիկ սեթերը
+        heading: Հետազոտել սիմվոլիկ սեթերը
+        create_symbol_set_button: Ստեղծեք սիմվոլների հավաքածու
+        _description: 'Աչքի անցկացնել ազատ հաղորդակցության հազարավոր սիմվոլներ Global
+          Symbols-ում:'
+      new:
+        _title: Ստեղծել սիմվոլիկ կոմպետեն
+        guidance: Առաջարկում ենք ձեզ վերանայել ուղեցույցները
+        heading: Ստեղծել սիմվոլիկ կոմպետեն
+        guidance_link: ստանալ Ձեր Սիմվոլի Սեթը, որը հրատարակվել է Global Symbols-ի
+        introduction: 'Ձեր նոր խորհրդանիշի հավաքածուն կստեղծվի պետության նախագծմամբ:
+          Այն տեսանելի կլինի միայն ձեզ եւ ձեր կողմից ավելացրած գործընկերներին՝ թույլ
+          տալով ավելացնել սիմվոլներ եւ պատրաստել նշանային հավաքածուն:'
+      _shared:
+        none_found: Մենք այստեղ ոչ մի խորհրդանիշ չկարողացանք գտնել!
+      translate:
+        description: 'Ինքնաշխատ կերպով թարգմանեք սիմվոլիկ պիտակները նոր լեզուներով:
+          Այս գործիքը ժամանակ առ ժամանակ թարգմանվում է %{symbols_limit} սիմվոլների
+          բատչերում:'
+        title: Թարգմանել %{symbolset_name}
+        heading: Թարգմանել պիտակներ
+        button_find_untranslated: Գտնել չթարգմանված սիմվոլներ
+        form:
+          target_lang_prompt: Ընտրեք թիրախային լեզուն
+          target_lang_label: to
+          source_lang_label: Թարգմանիր
+          source_lang_option: '%{language_name} (%{labels_count} սիմվոլներ, %{coverage_percentage}
+            ծածկույթ)'
+      edit:
+        _title: '%{symbolset_name} Խմբագրել'
+      archive:
+        heading: Archived Հոմանիշներ
+        none_found: Այս խորհրդանիշի հավաքածուում չկան արխիվացված խորհրդանիշներ
+        description: Արխիվային սիմվոլները չեն ցուցադրվում նշանային հավաքածուում, որոնման
+          արդյունքներում կամ հավելվածներում
+      _symbolset_card:
+        image:
+          alt: '%{symbolset_name} լոգո'
+      _review_row:
+        remove_confirmation: 'Այս սիմվոլից պետք է հանել %{subject}:'
+    pages:
+      home:
+        explore_button: Հետազոտեք ավելի շատ սիմվոլիկ սեթեր…
+        for_creators: Ստեղծողների համար
+        for_communicators: Հաղորդավարների համար
+        for_communicators_text: Փոխանակեք նկարներ, որպեսզի ստեղծեք զրույցներ
+        for_everyone: Բոլորի համար
+        for_everyone_text: Բացահայտեք, խառնեք, համապատասխանեցեք եւ դարձեք խորհրդանիշը
+          անձնական օգտագործման
+        explore_heading: Հետազոտել սիմվոլիկ սեթերը
+        board_builder:
+          subheading: Հաղորդակցման տախտակներ հեշտ ճանապարհով
+          create: "Ստեղծեք տախտակներ, որոնք կօգնեն հաղորդակցմանը' օգտագործելով հազարավոր\
+            \ անվճար պատկերներ մեր գրադարանից եւ նույնիսկ ձեր սեփականը:"
+          design: 'Օնլայն կապի տախտակների նախագծում, կառուցում, խնայում եւ տպում:'
+          storage: 'Ամեն ինչ ապահով պահվում է ձեր Global Symbols հաշվի մեջ:'
+          button_featured: Featured Board Սեթեր
+          button_try: Փորձեք Board Builder
+          heading: Global Symbols Board Builder
+        for_creators_text: Կառավարել եւ թողարկել սիմվոլիկ սեթեր
+      search:
+        symbolset_dropdown_any_symbol_set: Ցանկացած սիմվոլի սեթ
+        search: Որոնում
+        search_for: Փնտրել
+        _title: Որոնում
+        no_results: 'Մենք չէինք կարողանում գտնել համապատասխան խորհրդանիշներ: Փորձիր
+          ավելի լայն որոնում կատարել:'
+      contact:
+        heading: Դիպչեք
+        lead_text: 'Մենք շատ ուրախ ենք ստանալ համապատասխան ռեսուրսների վերաբերյալ
+          հարցումներ, առաջարկություններ եւ տեղեկություններ:'
+        _description: 'Կապ հաստատեք մեզ հետ ընդհանուր հարցումների հետ, կամ ձեր խորհրդանիշի
+          հավաքածուն հրատարակեք:'
+        email_us: Էլ. փոստով մեզ
+    survey_editor:
+      _form:
+        save_button: Պահպանեք հարցումը
+        show_symbol_descriptions_label: Ցույց տալ սիմվոլի նկարագրությունները
+        show_symbol_descriptions_helper: 'Ցուցադրում է խորհրդանիշի նկարագրություններ
+          մասնակիցներին:'
+        introduction_helper: 'Ընտրանքային: Սա ցույց է տրվում մասնակիցներին, երբ նրանք
+          սկսում են հարցումը:'
+        close_at_helper: 'Ընտրանքային: Սահմանել մասնակիցների արձագանքման վերջնաժամկետը:'
+        language_label: Ցուցանմշային պիտակներ in
+        language_helper: 'Այս հարցումը կատարելիս մասնակիցներին ցույց են տրվում ընտրված
+          լեզվով սիմվոլիկ պիտակներ:'
+        create_button: Ստեղծել Survey
+        name_helper: 'Ներկայացրեք մի անուն, որն օգնում է մասնակիցներին բացահայտել
+          այս հարցումը:'
+        language_blank_option: Բոլոր առկա լեզուները
+      _add_picto_to_survey:
+        option: '%{survey_name}-ում %{symbolset_name}'
+        button: Ավելացնել հարցմանը
+      _picto:
+        no_label_for_language: No %{language_name} պիտակ
+        remove_confirm: 'Համոզվա՞ծ եք, որ ցանկանում եք հեռացնել այս Սիմվոլը Survey-ից:'
+      _sidebar:
+        heading: Փուլեր
+        stages:
+          plan: Պլան
+          collect_feedback: Հավաքել հետադարձ կապ
+          analyse: Վերլուծության արդյունքները
+          archive: Արխիվացնել կամ ջնջել
+          collect_feedback_description: Թող մասնակիցներն ավարտեն Survey-ը
+          analyse_results_description: Վերանայեք հարցման արդյունքները
+          plan_description: Ընտրեք սիմվոլներ, որոնք պետք է ներառվեն Survey-ում
+      export_xlsx:
+        header_participant_number: Մասնակից Numbero
+        header_participant_name: Մասնակցի անուն
+        header_symbol_id: Խորհրդանիշի ID
+        header_overall_rating: Ռեյտինգ
+        header_representation_rating: Ներկայացուցչություն
+        header_contrast_rating: Կոնտրաստ
+        header_comment: Մեկնաբանություն
+        sheet_name: Մեկնաբանություններ
+        header_label: Պիտակ
+        header_cultural_rating: Մշակութային
+        comment_participant_name: Մասնակիցներից չի պահանջվում տալ իրենց անունները,
+          ուստի որոշ բջիջներ կարող են դատարկ լինել։
+      destroy:
+        notice: 'Ջնջեցինք Ձեր Survey %{name}- ը:'
+      edit:
+        _title: Խմբագրել %{survey_name}-ում %{symbolset_name}
+        heading: ՀետազոտությունԽմբագրել
+      index:
+        _title: Հարցումներ %{symbolset_name}
+        button_new_survey: Ստեղծել Survey
+        get_help: Հետազոտել %{link} հետազոտությունների համար
+        get_help_link: Օգնություն եւ ուսուցում
+        no_surveys_at_stage: 'Չեն կատարվում Հարցումներ %{stage} փուլում:'
+      new:
+        button_create: Ստեղծել Survey
+      show:
+        symbols_heading: Սույն հետազոտության հոմանիշները
+        symbols_text: "Ավելացրեք սիմվոլներ այս Survey- ում' փնտրելով դրանք Global\
+          \ Symbols- ում եւ ընտրելով 'Add to Survey':"
+        symbols_search_helper: Որոնել սիմվոլներ, որպեսզի ավելացնենք այս Survey
+        collect_feedback:
+          heading: Հավաքել հետադարձ կապ
+          close_at_label: Ընդունել պատասխանները մինչեւ
+          invite_at_this_url: 'Հրավիրեք մարդկանց վերցնել ձեր հարցումը այս URL-ում:'
+          invite_deadline: 'Մասնակիցներն ունեն մինչեւ %{close_at}} պատասխանները տրամադրելու
+            համար (%{link}):'
+          confirm_stop: Դա կդադարեցնի մարդկանց արձագանքը հարցմանը։ Վստահ ես?
+          paper_intro: 'Որոշ մասնակիցներ նախընտրում են թղթե հարցման ձեւերը։ Օգտագործեք
+            այս գործիքները հավաքեք իրենց արձագանքը եւ պահեք այստեղ:'
+          paper_customisation_invitation: Ձեր մասնակիցների համար հարցման ձեւերը հարմարեցնելու
+            եւ տպելու համար…
+          paper_print_button: Պրինտ Survey կաղապարներ
+          paper_to_include_results: Ձեր հարցման արդյունքներում թղթային հարցման ձեւաթղթերի
+            արդյունքները ներառելու համար…
+          paper_add_paper_feedback_button: Ավելացնել թղթային հետադարձ կապ
+          survey_ended: Այս հարցման պատասխանների հավաքածուն ավարտվել է։
+          survey_ended_add_paper: 'Դուք դեռ կարող եք ձեռքով ավելացնել հետադարձ կապ
+            թղթային հարցման ձեւաթղթերից:'
+          button_begin_collecting: Սկսեք հավաքել հետադարձ կապ
+          text_1: 'Երբ սկսեք հավաքել հետադարձ կապ, մենք ձեզ կտանք URL, որտեղ մարդիկ
+            կարող են մասնակցել հարցմանը:'
+          text_2: 'Դուք չեք կարողանա փոխել ձեր խորհրդանիշների ընտրությունները, մինչ
+            հարցումը հավաքում է հետադարձ կապ:'
+          close_at_helper: 'Ընտրանքային: Սահմանել հարցման պատասխանների վերջնաժամկետը:'
+          stop_button: Ավարտեք հարցումը
+          paper_heading: Թղթե հետազոտություններ
+          responses_count:
+            one: 'Ձեր հարցումն ունի %{count} պատասխան:'
+            other: 'Ձեր հարցումն ունի %{count} պատասխան:'
+        analyse_results:
+          heading: Վերլուծության արդյունքները
+          results_appear_here: 'Արդյունքները կհայտնվեն այստեղ, երբ մարդիկ սկսեն պատասխանել
+            ձեր Հարցմանը:'
+          button_individual_responses: Անհատական արձագանքներ
+          button_stats: Սիմվոլների վիճակագրություն
+          export:
+            text_1: 'Օգտագործեք այս գործիքը, որպեսզի ներբեռնեք հարցման բոլոր տվյալները,
+              ներառյալ գնահատականները եւ մեկնաբանությունները:'
+            text_2: 'Սա հեշտացնում է ձեր սեփական վերլուծությունը Excel- ում: Առաջարկում
+              ենք օգտագործել Pivot Tables- ը յուրաքանչյուր Սիմվոլի համար միջին արդյունքները
+              հաշվարկելու եւ աղյուսակի համար:'
+            text_3: 'Excel ֆայլի յուրաքանչյուր շարքը ներկայացնում է մեկ մասնակցի կողմից
+              դիտարկման ժամանակ ներկայացված հայտանիշի վերանայումը:'
+            heading: Արտահանման արդյունքները Excel-ում
+          responses_count:
+            one: '%{count} անձը պատասխանել է Ձեր հարցմանը:'
+            other: '%{count} մարդ պատասխանել է ձեր հարցմանը:'
+        archive:
+          survey_is_archived: 'Այս հարցումը Արխիվացված է: Դուք դեռ կարող եք վերլուծել
+            ցանկացած արդյունք:'
+          archive_description: 'Արխիվ այս Հարցումը, երբ դուք ավարտել եք այն: Դուք
+            դեռ կկարողանաք վերլուծել ցանկացած արդյունք այս Survey-ում:'
+          archive_confirm: Դա կդադարեցնի մարդկանց արձագանքը հարցմանը։ Վստահ ես?
+          archive_button: Արխիվ the Survey
+          delete_description: 'Ջնջել այս Survey-ը մեկընդմիշտ ջնջելու է ձեր հավաքած
+            ցանկացած արդյունք: Ոչ մի հոմանիշ չի ջնջվի.'
+          delete_button: Ջնջեք հարցումը
+          heading: Արխիվացնել կամ ջնջել
+          delete_confirm: 'Համոզվա՞ծ եք, որ ցանկանում եք ջնջել այս Հարցումը եւ որեւէ
+            արձագանք:'
+      add_symbol:
+        notice_success_add_another: Ավելացրու ուրիշին?
+        alert_failure: Այս սիմվոլն արդեն գտնվում է %{survey_link}-ում
+        notice_success: 'Մենք ավելացրեցինք խորհրդանիշը ձեր Survey- ում: %{add_another_link}'
+    pictos:
+      _form:
+        label_helper: 'Պիտակը նկարագրում է ձեր խորհրդանիշը, որպեսզի մարդիկ կարողանան
+          գտնել այն: Նշանը ստեղծելուց հետո կարող եք ավելացնել պիտակներ լրացուցիչ լեզուներով:'
+        language_helper: 'Պիտակի լեզուն:'
+        label_label: Պիտակային տեքստ
+        diacritised_label_helper: 'Միայն արաբական լեզուների համար: Սա պահպանում է
+          արտասանության լրացուցիչ մանրամասներ:'
+        description_helper: Հակիրճ նկարագրիր խորհրդանիշը, որպեսզի օգնի հասկանալու
+          այն։
+        save_button: Պահպանել սիմվոլը
+        create_button: Ավելացնել սիմվոլը
+        to_download_symbols: սիմվոլներ ներբեռնելու համար
+        image_helper: 'Վերբեռնեք SVG (նախընտրելի) կամ PNG ֆորմատով պատկեր:'
+      _topbar:
+        download_button: Ներբեռնել %{file_type}
+        not_publicly_visible: Հրապարակավ տեսանելի չէ
+      edit:
+        _title: Խմբագրել %{picto_label}-ում %{symbolset_name}
+        heading: ԶինանշանԽմբագրել
+      new:
+        _title: Ավելացնել սիմվոլը %{symbolset_name} -ում
+        heading: Ավելացնել սիմվոլը
+      show:
+        _title: '%{picto_label}-ում %{symbolset_name}'
+        concept_defined_in: Սահմանված է %{coding_framework_name}
+        no_concepts: 'Այս սիմվոլը չունի հասկացություններ այն սահմանելու համար:'
+        add_concept_button: Ավելացնել հասկացությունը
+        alternative_symbols_heading: Այլընտրանքային սիմվոլներ
+        _description: "'%{picto_label}' սիմվոլի, %{symbolset_name} սիմվոլների մի մասը:\
+          \ Գտնել հաղորդակցման հազարավոր ազատ սիմվոլներ:"
+        archived_notice:
+          text: Այս սիմվոլը չի ցուցադրվում նշանային հավաքածուում, որոնման արդյունքներում
+            կամ հավելվածներում
+          heading: Archived Սիմվոլ
+      _comment_form:
+        save_button: Save Մեկնաբանություն
+    pagination:
+      last: Վերջին
+      first: Առաջին
+      next: Հաջորդը
+      previous: Պրեվ
+    survey_picto_analysis:
+      index:
+        heading: Սիմվոլների վիճակագրություն
+        intro: 'Այս աղյուսակը ցույց է տալիս հարցման յուրաքանչյուր սիմվոլի միջին պատասխանները՝
+          հիմնված ստացված %{count}-ի ընդհանուր թվի վրա:'
+        row_heading_averages: Հհ դրամներ
+        column_heading_rating_description: Զգացմունքներ խորհրդանիշի մասին որպես ամբողջություն
+        column_heading_representation_rating_description: Ներկայացնում է բառը կամ
+          արտահայտությունը
+        column_heading_contrast_rating_description: Գույների հակադրություն
+        crumb_name: Սիմվոլների վիճակագրություն
+        column_heading_overall_average: Ընդհանուր ՀՀ
+        column_heading_cultural_rating_description: Մշակութային հարմարություն
+    survey_response_analysis:
+      _sidebar:
+        heading: Արձագանքներ
+        participant_number: Մասնակից %{number}
+      index:
+        crumb_name: Անհատական արձագանքներ
+        heading: Անհատական արձագանքներ
+      new:
+        heading: Ավելացնել թղթային հետադարձ կապ
+        use_this_form_to: 'Օգտագործեք այս ձեւը, որպեսզի պահեք մեկ թղթե հարցում Global
+          Symbols- ում: Այնուհետեւ այն կհամընթանա ձեր հարցման վիճակագրության վրա:'
+        match_numbers: 'Յուրաքանչյուր նշանային արկղի վերեւի աջ մասում ցույց տրված
+          թվերը պետք է համապատասխանեն թղթային ձեւերի վրա ցուցադրված թվերին, որպեսզի
+          դուք մուտքագրեք յուրաքանչյուր սիմվոլի համար ճիշտ գնահատականներ:'
+        label_representation_rating: Ներկայացնում է խոսքը
+        label_overall_rating: Զգացմունքներ խորհրդանիշի մասին
+        label_contrast_rating: Գույների հակադրություն
+        label_cultural_rating: Մշակութային զգայունություն
+        cancel_confirm: 'Վստահ ես? Մինչեւ հիմա դուք կկորցնեք ցանկացած արդյունք:'
+        save_button: Պահպանեք պատասխանները
+      create:
+        notice_success: Այս թղթի պատասխանը փրկվեց։
+    survey_questions:
+      _form:
+        please_fix_errors: 'Խնդրում ենք շտկել ստորեւ բերված սխալները:'
+        comments_helper: 'Ընտրանքային: Խնդրում ենք ավելացնել ցանկացած մեկնաբանություն,
+          որը կօգնի մեզ բարելավել այս սիմվոլը:'
+        button_previous_question: ՆախորդըՀարցում
+        button_save_answer: Պահպանել պատասխանը
+      show:
+        please_rate: "Խնդրում ենք գնահատել այս սիմվոլը այն սանդղակով, որտեղ 1-ը «լիովին\
+          \ անընդունելի» է, իսկ 5-ը' «լիովին ընդունելի»:"
+      _controller:
+        timed_out: 'Ներեցեք - ձեր հարցումը ժամանակին կատարվել է անգործության պատճառով:
+          Խնդրում ենք նորից սկսել հարցումը:'
+    collaborators:
+      index:
+        page_title: Գործակիցներ %{անվանման համար}
+        add_heading: Ավելացնել գործակից
+        add_text: 'Որպեսզի մեկ ուրիշը կարողանա խմբագրել այս սիմվոլիկ հավաքածուն, մուտքագրեք
+          այն էլփոստի հասցեն, որով նրանք մուտքագրվում էին Global Symbols- ում:'
+        add_button: Ավելացնել համահեղինակ
+        existing_heading: Առկա գործակիցներ
+        existing_text: 'Այս մարդկանց թույլատրվում է խմբագրել այս սիմվոլիկ հավաքածուն:'
+        existing_none_found: 'Ոչ մի օգտագործողի թույլ չի տրվում խմբագրել այս սիմվոլիկ
+          հավաքածուն:'
+        added_at: Ավելացվել է %{date}
+        remove_aria_label: Հեռացրեք համահեղինակին
+        remove_confirm: '%{email} այս խորհրդանիշի կոմպլետետից հանե՞նք:'
+      create:
+        notice_success: 'Մենք ավելացրեցինք %{email_address} որպես համահեղինակ:'
+        alert_no_gs_account: '%{email_address}-ը դեռեւս չունի Global Symbols հաշիվ:'
+      destroy:
+        notice_success: 'Մենք հեռացրեցինք %{email_address} որպես համահեղինակ:'
+    concepts:
+      show:
+        page_title: '%{{subject}-ը%{coding_framework}-ում'
+        defined_in: Հասկացություն, որը սահմանված է
+    picto_concepts:
+      index:
+        intro: 'Կոնցեպտները օգնում են համակարգիչներին հասկանալ ձեր սիմվոլները, ուստի
+          հավաստիացեք, որ դրանք ճշգրիտ են եւ կոնկրետ:'
+        add_concept_invitation: 'Մենք կարող ենք ավելացնել ցանկացած հասկացություն,
+          որը կարող եք գտնել ConceptNet-ում:'
+        add_concept:
+          heading: Ավելացնել հասկացությունը
+          instruction: 'Այս նշանին հայեցակարգ ավելացնելու համար մուտքագրեք որեւէ բառ:
+            Մենք կավելացնենք հայեցակարգը, եթե կարողանանք գտնել այն:'
+          button: Ավելացնել հասկացությունը
+          add: Ավելացնել
+        existing_concepts:
+          heading: Գոյություն ունեցող հասկացություններ
+          added_at: Ավելացվել է %{date}
+          none_found: Այս սիմվոլը հասկացություններ չունի
+          remove_confirm: Այս սիմվոլից պետք է հանել %{subject} ?
+          remove_aria_label: Հեռացնել հասկացությունը
+        page_title: Հասկացություններ %{սիմվոլի համար}
+      create:
+        notice_success: 'Այս սիմվոլի վրա ավելացրեցինք %{concept} հասկացությունը:'
+        alert_failure: 'Մենք չկարողացանք գտնել մի հասկացություն, որը կոչվում էր %{concept}:
+          Ուրիշ բառ էլ փորձիր:'
+        alert_already_exists: '%{concept}-ն արդեն այս սիմվոլի վրա հասկացություն է:'
+      destroy:
+        notice_success: 'Այս սիմվոլից հանել ենք %{concept} հասկացությունը:'
+        alert_failure: 'Մենք չէինք կարող այս սիմվոլից հանել %{concept} հասկացությունը:'
+    picto_labels:
+      _form:
+        language_helper: 'Պիտակի լեզուն:'
+        label_label: Պիտակի տեքստ
+        diacritised_label_label: Diacritised պիտակ
+        diacritised_label_helper: 'Միայն արաբական լեզուների համար: Սա պահպանում է
+          արտասանության լրացուցիչ մանրամասներ:'
+        description_helper: Հակիրճ նկարագրիր խորհրդանիշը, որպեսզի օգնի հասկանալու
+          այն։
+        button_save: Փրկել պիտակը
+        button_add: Ավելացնել պիտակը
+      _picto_labels:
+        heading: '%{label_type} Պիտակներ'
+        remove_label_aria_label: Հեռացնել պիտակը
+        remove_label_confirm: Այս սիմվոլից պետք է հանել %{text} ?
+        no_labels_found: Պիտակներ չեն հայտնաբերվել
+      edit:
+        page_title: Պիտակներ %{սիմվոլի համար}
+        heading: ՊիտակԽմբագրել
+        intro: 'Պիտակները օգնում են այլ մարդկանց հասկանալ ձեր սիմվոլները: Դրանք օգնում
+          են մեզ հասկանալ ձեր խորհրդանիշի իմաստը, ուստի հավաստիացեք, որ դրանք ճշգրիտ
+          են եւ կոնկրետ:'
+      publish_translation:
+        notice_success: 'Հրապարակվել է %{language_name} պիտակը:'
+      index:
+        page_title: Պիտակներ %{սիմվոլի համար}
+        intro: 'Պիտակները օգնում են այլ մարդկանց հասկանալ ձեր սիմվոլները: Դրանք օգնում
+          են մեզ հասկանալ ձեր խորհրդանիշի իմաստը, ուստի հավաստիացեք, որ դրանք ճշգրիտ
+          են եւ կոնկրետ:'
+        instructions: 'Հոմանիշները պետք է ունենան առնվազն մեկ պիտակ: Ցանկության դեպքում
+          կարող եք ավելացնել մեկից ավելի լեզուների համար նախատեսված պիտակ:'
+        heading_add_label: Ավելացնել պիտակը
+        status_published: Հրապարակված է
+        status_suggested: Առաջարկված
+      create:
+        notice_success: 'Այս նշանին ավելացրեցինք %{պիտակ} մակնիշը:'
+        alert_failure: 'Դուք պետք է որոշ խնդիրներ լուծեք, նախքան մենք կկարողանանք
+          ավելացնել այս պիտակը:'
+      destroy:
+        notice_success: 'Այս սիմվոլից հանել ենք %{պիտակ} պիտակը:'
+        alert_failure: 'Մենք չէինք կարող այս սիմվոլից հանել %{պիտակ} պիտակը:'
+    translations:
+      _translation_form:
+        publish_button: Հրատարակեք բոլոր %{language_name} թարգմանությունները
+        button_translate: Թարգմանել Հոմանիշներ
+        button_translate_working: Հոմանիշների թարգմանում…
+        publish_button_working: Հրատարակում եմ բոլոր թարգմանությունները…
+        translation_complete_heading: Թարգմանությունը՝ ամբողջական
+        translation_complete_text: 'Բոլոր սիմվոլները թարգմանվել են %{language_name}:'
+      _symbols_table:
+        heading_source_language: '%{language_name} Աղբյուր'
+        heading_destination_language: '%{language_name} Թարգմանություն'
+        button_get_translation: Ստացեք թարգմանություն
+        button_get_translation_working: Թարգմանում է…
+        heading_type: Տեսակը
+      _suggestion_form:
+        button_publish: Հրատարակչություն
+        button_publish_working: Հրապարակում…
+        label: Թարգմանություն
+      _translations_published:
+        heading: Հրատարակվում են թարգմանություններ
+        labels_are_visible: 'Նոր թարգմանություններն այժմ տեսանելի են Global Symbols-ում
+          եւ հավելվածներում:'
+        next_steps: 'Գտեք ավելի շատ սիմվոլներ թարգմանելու համար, կամ ընտրեք մեկ այլ
+          լեզու:'
+        labels_saved: Նոր թարգմանությունները փրկվեցին։
+    application:
+      _copy_to_clipboard:
+        button_title: Պատճենել clipboard
+        button: Պատճենել
+    errors:
+      not_found:
+        description: Այս հասցեում ոչինչ չկարողացանք գտնել
+    articles:
+      _topbar:
+        header_news: Գլոբալ հոմանիշներ Նորություններ
+      index:
+        title: Նորություններ
+        description: 'Global Symbols Blog - Թարմացումներ, գաղափարներ եւ ոգեշնչում,
+          որոնք կօգնեն ձեզ հաղորդակցվել սիմվոլների հետ:'
+        more_button: Ավելի շատ հոդվածներ
+  errors:
+    messages:
+      wrong_size: սխալ մեծություն է (պետք է լինի %{file_size})
+      not_a_number: թիվ չէ
+      confirmation_period_expired: անհրաժեշտ է հաստատել %{ժամանակաշրջան}-ի սահմաններում,
+        խնդրում ենք պահանջել նոր
+      expired: լրացել է, խնդրում ենք հայցել նոր
+      not_found: չգտնուած
+      not_locked: փակված չէր
+      size_too_small: չափազանց փոքր է (նվազագույնը %{file_size})
+      not_an_integer: պետք է լինի ներզատիչ
+      greater_than: պետք է ավելի մեծ լինի,քան %{count}
+      greater_than_or_equal_to: պետք է լինի ավելի մեծ, քան կամ հավասար է %{count}
+      equal_to: պետք է հավասար լինի %{count}
+      less_than: պետք է լինի %{count} -ից պակաս
+      less_than_or_equal_to: պետք է լինի ավելի քիչ, քան կամ հավասար է %{count}
+      other_than: պետք է լինի այլ, քան %{count}
+      odd: պետք է տարօրինակ լինի
+      even: պետք է լինի նույնիսկ
+      wrong_length:
+        one: սխալ երկարություն է (պետք է լինի 1 կերպար)
+        other: սխալ երկարությունն է (պետք է լինի %{count} նիշ)
+      size_too_big: չափազանց մեծ է (առավելագույնը ՝%{file_size})
+      model_invalid: Վավերացումը ձախողվեց. %{սխալներ}
+      inclusion: ցուցակում ներառված չէ
+      exclusion: վերապահված է
+      invalid: անվավեր է
+      confirmation: չի համապատասխանում %{ատրիբուտ}
+      accepted: պետք է ընդունվի
+      empty: դատարկ լինել չի կարող
+      blank: չի կարող լինել դատարկ
+      present: պետք է լինի դատարկ
+      already_confirmed: արդեն հաստատված էր, խնդրում ենք փորձել ստորագրել
+      too_long:
+        one: չափազանց երկար է (առավելագույնը 1 կերպար)
+        other: չափազանց երկար է (առավելագույնը %{count} նիշ է)
+      too_short:
+        one: չափազանց կարճ է (նվազագույնը 1 կերպար)
+        other: չափազանց կարճ է (նվազագույնը %{count} նիշ է)
+      not_saved:
+        one: '1 սխալն արգելել է այս %{ռեսուրսը} փրկվել:'
+        other: '%{count} սխալներն արգելում էին այս %{ռեսուրսը} պահպանել:'
+  layouts:
+    application:
+      footer:
+        contact: Կապ
+        privacy_policy: Գաղտնիության քաղաքականություն
+        terms: Պայմաններ
+        accessibility: Մատչելիություն
+        about: Մասին
+        language_label: Լեզու
+      menu:
+        sign_in: Գրանցել
+        sign_up: Ստեղծել հաշիվ
+        resources: Ռեսուրսներ
+        board_builder: Board Շինարար
+        training: Թրեյնինգ
+        news: Նորություններ
+        sign_out: Նշեք դուրս
+        my_account: Իմ հաշիվը
+        search_placeholder: Որոնում %{var}
+        facebook: Global Symbols- ը Facebook
+        twitter: Global Symbols- ը Twitter- ում
+      skip_to_main_content: Skip դեպի հիմնական բովանդակությունը
+  doorkeeper:
+    scopes:
+      public: Մուտք գործեք ձեր հանրային տվյալները
+      boardset:read: Կարդացեք ձեր Board Սեթերը
+      boardset:write: Գրեք ձեր Board Sets-ին
+      identity:read:user: Կարդացե՛ք տվյալներ Ձեր օգտահաշիվում
+  unauthorized:
+    manage:
+      all: Դուք չեք կարող %{action} այս %{subject}.
+      picto: 'Դուք կարող եք կառավարել միայն Symbolsets, որոնց վրա դուք գործընկեր եք:'
+    update:
+      project: 'Թույլ չի տրվում թարմացնել այս նախագիծը:'
+  date:
+    day_names:
+    - Կիրակի
+    - Երկուշաբթի
+    - Չորեքշաբթի
+    - Հինգշաբթի
+    - Շաբաթ
+    - Ուրբաթ
+    - Շաբաթ
+    month_names:
+    - Ապրիլ
+    - Հունվար
+    - Փետրվար
+    - Մարտ
+    - Հուլիս
+    - Մայիս
+    - Սեպտեմբեր
+    - Հոկտեմբեր
+    - Նոյեմբեր
+    - Դեկտեմբեր
+    - Հոկտեմբեր
+    - Նոյեմբեր
+    - Դեկտեմբեր
+    abbr_day_names:
+    - Արեւ
+    - Մոն
+    - Տուե
+    - Թյու
+    - Ֆրի
+    - Սաթ
+    - Սաթ
+    order:
+    - տարի
+    - օր
+    - օր
+    formats:
+      default: '%e %b %Y'
+      short: '%d %b'
+      long: '%d %B %Y'
+    abbr_month_names:
+    - Յան
+    - Ֆեբ
+    - Մար
+    - Ապր
+    - Մայիս
+    - Ջուն
+    - Ջուլ
+    - Աուգուստ
+    - Սեպ
+    - Հոկտեմբեր
+    - Նով
+    - Դեկտ
+    - Դեկտ
+  time:
+    formats:
+      default: '%a, %d %b %Y %H:%M:%S %z'
+      short: '%d %b %H:%%M'
+      long: '%B %d, %Y %H:%M'
+    am: ամ
+    pm: pm

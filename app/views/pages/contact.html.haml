@@ -1,0 +1,18 @@
+:ruby
+  title t('views.pages.contact.heading')
+  description t('views.pages.contact._description')
+
+  set_meta_tags og: {
+    url: contact_url
+  }
+
+%main.mt-0
+  %article
+    = render 'topbar' do
+      = t('views.pages.contact.heading')
+    .container-xl.mt-4
+      .row.mt-5
+        .col.text-center
+          %p.lead= t('views.pages.contact.lead_text')
+          %a.h1{href:'mailto:hello@globalsymbols.com'} hello@globalsymbols.com
+          %img.status-image{src: asset_path('pages/contact.svg'), alt: 'Email'}

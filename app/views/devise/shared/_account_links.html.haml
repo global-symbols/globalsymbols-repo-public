@@ -1,0 +1,8 @@
+.d-flex.justify-content-around.align-items-center.mt-5
+  - if controller_name == 'registrations'
+    - if action_name == 'edit' or action_name == 'update'
+      %a.btn.btn-link.btn-sm{href: users_change_password_path}= t('devise.views.registrations._form.button_change_password')
+      %a.btn.btn-link.btn-sm{href: registration_path(resource_name), data:{ method: :delete, confirm: t('devise.views.registrations._form.cancel_account_confirm') }}= t('devise.views.registrations._form.cancel_account_button')
+
+    - if action_name == 'change_password' or action_name == 'update_password'
+      %a.btn.btn-link.btn-sm{href: edit_user_registration_path}= t('devise.views.registrations.change_password.manage_account')

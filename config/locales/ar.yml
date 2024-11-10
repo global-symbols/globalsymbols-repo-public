@@ -1,0 +1,999 @@
+ar:
+  unauthorized:
+    manage:
+      picto: يمكنك فقط إدارة Symbolsets التي كنت متعاونا عليها.
+      all: لا يمكنك ٪{إجراء} هذا ٪{subject}.
+    update:
+      project: غير مسموح بتحديث هذا المشروع.
+  views:
+    survey_editor:
+      edit:
+        heading: تحرير الاستطلاع
+        _title: تحرير ٪{survey_name} في ٪{symbolset_name}
+      destroy:
+        notice: لقد حذفنا الاستطلاع ٪{name}.
+      export_xlsx:
+        sheet_name: التعليقات
+        comment_participant_name: لا يطلب من المشاركين تقديم أسمائهم، لذلك قد تكون
+          بعض الخلايا فارغة.
+        header_comment: التعليق
+        header_cultural_rating: ثقافي
+        header_contrast_rating: تباين
+        header_representation_rating: التمثيل
+        header_overall_rating: تقييم الموقع
+        header_label: تسميه
+        header_symbol_id: معرف الرمز
+        header_participant_name: اسم المشارك
+        header_participant_number: رقم المشارك
+      _sidebar:
+        stages:
+          analyse_results_description: مراجعة نتائج المسح
+          collect_feedback_description: السماح للمشاركين بإكمال المسح
+          plan_description: اختيار الرموز لتضمينها في الاستطلاع
+          archive: أرشفة أو حذف
+          analyse: تحليل النتائج
+          collect_feedback: جمع الملاحظات
+          plan: خطة
+        heading: المراحل
+      _picto:
+        remove_confirm: هل تريد بالتأكيد إزالة هذا الرمز من الاستطلاع؟
+        no_label_for_language: لا يوجد تسمية ٪{language_name}
+      _form:
+        create_button: إنشاء استطلاع
+        save_button: حفظ الاستطلاع
+        show_symbol_descriptions_helper: يعرض وصف الرمز للمشاركين.
+        show_symbol_descriptions_label: إظهار أوصاف الرموز
+        language_blank_option: جميع اللغات المتاحة
+        language_helper: عند إجراء هذا الاستطلاع، يتم عرض تسميات رموز للمشاركين باللغة
+          المحددة.
+        language_label: إظهار تسميات الرموز في
+        close_at_helper: اختياري. حدد موعدا نهائيا للمشاركين للرد.
+        introduction_helper: اختياري. يظهر هذا للمشاركين عند بدء الاستطلاع.
+        name_helper: قم بتوفير اسم يساعد المشاركين على تحديد هذا الاستطلاع.
+      _add_picto_to_survey:
+        option: ٪{survey_name} في ٪{symbolset_name}
+        button: إضافة إلى الاستطلاع
+      show:
+        collect_feedback:
+          heading: جمع الملاحظات
+          text_1: عندما تبدأ في جمع الملاحظات، سنعطيك عنوان URL حيث يمكن للأشخاص المشاركة
+            في الاستطلاع.
+          paper_add_paper_feedback_button: إضافة ملاحظات ورقية
+          text_2: لن تتمكن من تغيير اختيارات الرموز أثناء جمع الاستطلاع للملاحظات.
+          close_at_helper: اختياري. حدد موعدا نهائيا للرد على الاستطلاع.
+          button_begin_collecting: البدء في جمع الملاحظات
+          invite_at_this_url: دعوة الأشخاص إلى إجراء استطلاع الرأي في عنوان URL هذا.
+          stop_button: إنهاء الاستطلاع
+          paper_heading: استطلاعات الرأي الورقية
+          paper_customisation_invitation: لتخصيص نماذج الاستطلاع وطباعتها للمشاركين…
+          paper_to_include_results: لتضمين نتائج نماذج المسح الورقي في نتائج الاستطلاع…
+          survey_ended: انتهت مجموعة الردود لهذا الاستطلاع.
+          survey_ended_add_paper: لا يزال بإمكانك إضافة ملاحظات يدويا من نماذج الاستطلاع
+            الورقي.
+          invite_deadline: لدى المشاركين حتى ٪{close_at} لتقديم الاستجابات (٪{link}).
+          confirm_stop: وهذا من شأنه أن يمنع الناس من الرد على الاستطلاع. هل أنت متأكد؟
+          paper_intro: قد يفضل بعض المشاركين نماذج المسح الورقي. استخدم هذه الأدوات
+            لجمع ملاحظاتهم وتخزينها هنا.
+          close_at_label: قبول الردود حتى
+          responses_count:
+            zero: يحتوي الاستطلاع على استجابة ٪{count}.
+            one: يحتوي الاستطلاع على استجابة ٪{count}.
+            two: يحتوي الاستطلاع على ٪{count} ردود.
+            few: يحتوي الاستطلاع على ٪{count} ردود.
+            many: يحتوي الاستطلاع على ٪{count} ردود.
+            other: يحتوي الاستطلاع على ٪{count} ردود.
+          paper_print_button: طباعة نماذج الاستطلاع
+        symbols_search_helper: البحث عن رموز لإضافتها إلى هذا الاستطلاع
+        symbols_text: أضف رموزا إلى هذا الاستطلاع من خلال البحث عنها في Global Symbols
+          واختيار "إضافة إلى الاستطلاع".
+        symbols_heading: رموز في هذا الاستطلاع
+        analyse_results:
+          responses_count:
+            zero: استجاب ٪{count} للشخص إلى الاستطلاع.
+            one: استجاب ٪{count} للشخص إلى الاستطلاع.
+            two: استجاب ٪{count} شخصًا لاستطلاعك.
+            few: استجاب ٪{count} شخصًا لاستطلاعك.
+            many: استجاب ٪{count} شخصًا لاستطلاعك.
+            other: استجاب ٪{count} شخصًا لاستطلاعك.
+          heading: تحليل النتائج
+          results_appear_here: ستظهر النتائج هنا عندما يبدأ الأشخاص في الرد على الاستطلاع.
+          button_individual_responses: ردود فردية
+          button_stats: إحصائيات الرموز
+          export:
+            text_1: استخدم هذه الأداة لتنزيل جميع بيانات الاستطلاع، بما في ذلك التقييمات
+              والتعليقات.
+            text_2: وهذا يجعل من السهل إجراء التحليل الخاص بك في إكسيل. نقترح عليك
+              استخدام Pivot Tables لحساب متوسط النتائج لكل رمز ورسمها.
+            heading: تصدير النتائج إلى Excel
+            text_3: يمثل كل صف في ملف Excel مراجعة مشارك واحد لرمز في الاستطلاع.
+        archive:
+          archive_description: ارشيف هذا الاستطلاع عند الانتهاء منه. سيظل بإمكانك
+            تحليل أي نتائج في هذا الاستطلاع.
+          archive_confirm: وهذا من شأنه أن يمنع الناس من الرد على الاستطلاع. هل أنت
+            متأكد؟
+          archive_button: ارشيف الاستطلاع
+          delete_description: سيؤدي حذف هذا الاستطلاع إلى حذف أي نتائج جمعتها نهائيا.
+            لن يتم حذف أي رموز.
+          delete_confirm: هل تريد بالتأكيد حذف هذا الاستطلاع وأي ردود؟
+          delete_button: حذف الاستطلاع
+          heading: أرشفة أو حذف
+          survey_is_archived: تم أرشفة هذا الاستطلاع. لا يزال بإمكانك تحليل أي نتائج.
+      new:
+        button_create: إنشاء استطلاع
+      index:
+        get_help_link: المساعدة والتدريب
+        get_help: استكشاف ٪{link} للاستطلاعات
+        no_surveys_at_stage: لا توجد استطلاعات في مرحلة ٪{stage}.
+        button_new_survey: إنشاء استطلاع
+        _title: استطلاعات الرأي في ٪{symbolset_name}
+      add_symbol:
+        alert_failure: هذا الرمز موجود بالفعل في ٪{survey_link}
+        notice_success: أضفنا الرمز إلى الاستطلاع الخاص بك. ٪{add_another_link}
+        notice_success_add_another: إضافة آخر؟
+    pictos:
+      show:
+        archived_notice:
+          text: لا يظهر هذا الرمز في مجموعة الرموز أو نتائج البحث أو التطبيقات
+          heading: رمز مؤرشفة
+        _description: رمز '٪{picto_label}'، وهو جزء من مجموعة رموز ٪{symbolset_name}.
+          العثور على الآلاف من الرموز مجانا للاتصال.
+        alternative_symbols_heading: رموز بديلة
+        add_concept_button: إضافة مفهوم
+        no_concepts: هذا الرمز لا يوجد لديه مفاهيم لتعريفه.
+        concept_defined_in: تم تعريفه في ٪{coding_framework_name}
+        _title: ٪{picto_label} في ٪{symbolset_name}
+      new:
+        heading: إضافة رمز
+        _title: إضافة رمز في ٪{symbolset_name}
+      edit:
+        heading: تحرير الرمز
+        _title: تحرير ٪{picto_label} في ٪{symbolset_name}
+      _topbar:
+        not_publicly_visible: غير مرئية للجمهور
+        download_button: تنزيل ٪{file_type}
+      _form:
+        to_download_symbols: لتحميل الرموز
+        create_button: إضافة رمز
+        save_button: حفظ الرمز
+        description_helper: وصف موجز للرمز للمساعدة في فهم.
+        diacritised_label_helper: للغات العربية فقط. هذا يخزن تفاصيل النطق إضافية.
+        label_label: نص التسمية
+        language_helper: لغة التسمية.
+        label_helper: تصف التسمية الرمز الخاص بك حتى يتمكن الأشخاص من العثور عليه.
+          يمكنك إضافة تسميات بلغات إضافية بعد إنشاء الرمز.
+        image_helper: تحميل صورة بتنسيق SVG (مفضل) أو PNG.
+      _comment_form:
+        save_button: حفظ التعليق
+    symbolsets:
+      translate:
+        title: ترجمة ٪{symbolset_name}
+        form:
+          source_lang_option: ٪{language_name} (٪{labels_count} الرموز، ٪{coverage_percentage}
+            التغطية)
+          source_lang_label: ترجمة من
+          target_lang_label: ل
+          target_lang_prompt: تحديد اللغة المستهدفة
+        button_find_untranslated: البحث عن رموز غير مترجمة
+        description: ترجمة تسميات الرموز تلقائيا إلى لغات جديدة. تترجم هذه الأداة
+          على دفعات من رموز ٪{symbols_limit} في كل مرة.
+        heading: ترجمة التسميات
+      archive:
+        description: لا تظهر الرموز المؤرشفة في مجموعة الرموز أو نتائج البحث أو التطبيقات
+        none_found: لا توجد رموز مؤرشفة في مجموعة الرموز هذه
+        heading: الرموز المؤرشفة
+      review:
+        filter_without_a_concept: بدون مفهوم
+        filter_all_symbols: جميع الرموز
+        heading: استعراض
+      _shared:
+        none_found: لم نستطع العثور على أي رموز هنا!
+      new:
+        guidance_link: نشر مجموعة الرموز على Global Symbols
+        guidance: نقترح عليك مراجعة الإرشادات الخاصة ب
+        introduction: سيتم إنشاء مجموعة الرموز الجديدة في حالة مسودة. وسوف تكون مرئية
+          فقط لك والمتعاونين قمت بإضافة، مما يسمح لك لإضافة الرموز وإعداد مجموعة الرموز.
+        heading: إنشاء مجموعة رموز
+        _title: إنشاء مجموعة رموز
+      index:
+        _description: تصفح آلاف رموز الاتصال المجاني في Global Symbols.
+        create_symbol_set_button: إنشاء مجموعة رموز
+        heading: استكشاف مجموعات الرموز
+        _title: استكشاف مجموعات الرموز
+      import:
+        introduction: تحميل الرموز الموجودة في Global Symbols.
+        heading: استيراد الرموز
+        _title: الاستيراد إلى ٪{symbolset_name}
+      edit:
+        _title: تحرير ٪{symbolset_name}
+      _symbolset_card:
+        image:
+          alt: شعار ٪{symbolset_name}
+      _review_row:
+        remove_confirmation: هل نزيل ٪{subject} من هذا الرمز؟
+      _form:
+        save_button: حفظ مجموعة الرموز
+        create_button: إنشاء مجموعة رموز
+        licence_prompt: اختر ترخيصا
+        publisher_url_placeholder: على سبيل المثال https://peoplesymbols.com
+        publisher_placeholder: على سبيل المثال مؤسسة بيبول سيمبولز
+        publisher_url_label: عنوان URL للناشر
+        logo_label: شعار
+        logo_helper: سيظهر هذا الشعار في صفحة Symbolsets. يجب أن تكون هذه صورة ، من
+          الناحية المثالية SVG أو PNG ، 300x200 بكسل مع خلفية شفافة.
+        publisher_url_helper: عنوان موقع الناشر على الويب.
+        publisher_helper: اسم الشخص أو المؤسسة التي تنشر مجموعة الرموز.
+        published_helper: مجموعات الرموز المنشورة مرئية للجميع. مجموعات رموز المسودة
+          مرئية للمسؤولين والمتعاونين في مجموعة الرموز.
+        description_helper: سيظهر هذا الوصف إلى جانب مجموعة الرموز.
+      _topbar:
+        button_translate: ترجمة
+        button_archive: الرموز المؤرشفة
+        button_review: استعراض
+        button_edit: حرر
+        button_add_symbol: إضافة رمز
+        download: تحميل
+      show:
+        _description: استكشاف الرمز ٪{symbolset_name} الذي تم تعيينه في Global Symbols.
+          احصل على صور ورموز مجانية للاتصال.
+        no_symbols_for_collaborator: إضافة رمز لبدء إنشاء مجموعة الرموز
+    surveys:
+      _print_question:
+        example_comment: هذه الشجرة تبدو مثل القرنبيط.
+        symbol_counter: الرمز ٪{number}
+        example_text: هذا يوضح كيف يمكنك الإجابة على الأسئلة
+        example_heading: مثال سؤال
+      thank_you:
+        button_restart_survey: إعادة تشغيل الاستطلاع
+        button_go_to_homepage: المتابعة إلى Global Symbols
+        feedback_is_saved: لقد حفظنا كل ملاحظاتك.
+      print:
+        instructions_2: قم بتقييم كل رمز على مقياس يكون فيه 1 "غير مقبول تماما" و
+          5 "مقبولا تماما"، عن طريق وضع شيك في المربع الصحيح.
+        instructions_1: سيطلب منك هذا الاستطلاع تقييم أربعة جوانب لكل رمز ، وتقديم
+          بعض التعليقات.
+        instructions_heading: تعليمات
+        introduction: مقدمة
+        name_field: اسمي هو
+        print_button: مسح الطباعة
+        symbol_label_language_helper: للحصول على أفضل النتائج، اطبع بالألوان باستخدام
+          متصفح حديث وعطل الرؤوس والتذييلات.
+        symbol_label_language_all: جميع اللغات المتاحة
+        symbol_label_language: إظهار تسميات الرموز في
+        show_example_helper: إضافة سؤال مثال يعرض إجابات نموذجية.
+        show_example: إظهار مثال
+        show_instructions_helper: تغيير التعليمات عن طريق النقر عليها.
+        show_instructions: إظهار التعليمات
+        show_intro_helper: تغيير المقدمة عن طريق تحرير الاستطلاع.
+        show_intro: إظهار مقدمة الاستطلاع
+        collect_names: جمع أسماء المشاركين
+        heading: إعدادات الطباعة
+      show:
+        offline_participants_button: طباعة نماذج ملاحظات الاستطلاع
+        offline_participants: للمشاركين الذين يعملون دون اتصال…
+        closed_text: اتصل بمنظم الاستطلاع إذا كنت تتوقع أن تتمكن من المشاركة.
+        closed_header: لا يقبل هذا الاستطلاع التعليقات في الوقت الحالي.
+        provide_details_2: سيتم عرض التفاصيل الخاصة بك لمنظمي الاستطلاع فيما يتعلق
+          بتعليقاتك ، ولن تستخدمها شركة Global Symbols مطلقًا لأي غرض آخر.
+        provide_details: تقديم التفاصيل الخاصة بك هو اختياري، وقد يساعد منظمي الاستطلاع.
+        begin_button: بدء المسح
+        close_at_message: يمكنك المشاركة حتى ٪{date}.
+      _shared:
+        questions:
+          comments: تعليقات إضافية
+          cultural_rating: الحساسية الثقافية
+          contrast_rating: تباين اللون
+          representation_rating: يمثل الكلمة أو العبارة
+          feelings_rating: مشاعر حول الرمز ككل
+        thank_you: شكرا لاستكمال المسح!
+        number_of_symbols:
+          zero: يحتوي هذا الاستطلاع على رمز ٪{count} لتراجعه.
+          one: يحتوي هذا الاستطلاع على ٪{count} من الرموز لتراجعها.
+          two: يحتوي هذا الاستطلاع على ٪{count} من الرموز لتراجعها.
+          few: يحتوي هذا الاستطلاع على ٪{count} من الرموز لتراجعها.
+          many: يحتوي هذا الاستطلاع على ٪{count} من الرموز لتراجعها.
+          other: يحتوي هذا الاستطلاع على ٪{count} من الرموز لتراجعها.
+    pages:
+      contact:
+        _description: اتصل بنا مع الاستفسارات العامة، أو للحصول على مجموعة الرموز
+          الخاصة بك نشرها.
+        email_us: مراسلتنا عبر البريد الإلكتروني
+        lead_text: نحن سعداء جدا لتلقي الاستفسارات والاقتراحات والمعلومات حول الموارد
+          ذات الصلة.
+        heading: الحصول على اتصال
+      search:
+        no_results: لم نتمكن من العثور على أي رموز مطابقة. جرب بحثا أوسع.
+        _title: بحث
+        search_for: بحث
+        search: بحث
+        symbolset_dropdown_any_symbol_set: أي مجموعة رموز
+      home:
+        board_builder:
+          button_try: جرب Board Builder
+          button_featured: مجموعات اللوحة المميزة
+          storage: يتم تخزين كل شيء بأمان في حساب Global Symbols الخاص بك.
+          design: تصميم وبناء وحفظ وطباعة لوحات الاتصالات عبر الإنترنت.
+          create: إنشاء لوحات للمساعدة في الاتصالات باستخدام الآلاف من الصور المجانية
+            من مكتبتنا، وحتى الخاصة بك.
+          subheading: لوحات الاتصالات بالطريقة السهلة
+          heading: Global Symbols Board Builder
+        explore_button: استكشاف المزيد من مجموعات الرموز…
+        explore_heading: استكشاف مجموعات الرموز
+        for_everyone_text: اكتشاف، خلط، مطابقة وجعل استخدام الرمز الشخصي
+        for_everyone: للجميع
+        for_communicators_text: تبادل الصور لإنشاء محادثات
+        for_communicators: للتواصل
+        for_creators_text: إدارة ونشر مجموعات الرموز
+        for_creators: للمبدعين
+    picto_labels:
+      index:
+        heading_add_label: إضافة تسمية
+        status_published: نشر
+        page_title: تسميات ٪{رمز}
+        intro: تساعد التسميات الأشخاص الآخرين على فهم رموزك. أنها تساعدنا على فهم
+          معنى الرمز الخاص بك، لذلك تأكد من أنها دقيقة ومحددة.
+        instructions: يجب أن تحتوي الرموز على تسمية واحدة على الأقل. إذا كنت ترغب
+          في ذلك، يمكنك إضافة تسمية لأكثر من لغة واحدة.
+        status_suggested: اقترح
+      _form:
+        button_add: إضافة تسمية
+        language_helper: لغة التسمية.
+        label_label: نص التسمية
+        diacritised_label_label: تسمية شيطانية
+        diacritised_label_helper: للغات العربية فقط. هذا يخزن تفاصيل النطق إضافية.
+        description_helper: وصف موجز للرمز للمساعدة في فهم.
+        button_save: حفظ التسمية
+      _picto_labels:
+        no_labels_found: لم يتم العثور على تسميات
+        heading: تسميات ٪{label_type}
+        remove_label_aria_label: إزالة التسمية
+        remove_label_confirm: هل نزيل ٪{text} من هذا الرمز؟
+      edit:
+        page_title: تسميات ٪{رمز}
+        heading: تحرير التسمية
+        intro: تساعد التسميات الأشخاص الآخرين على فهم رموزك. أنها تساعدنا على فهم
+          معنى الرمز الخاص بك، لذلك تأكد من أنها دقيقة ومحددة.
+      create:
+        notice_success: أضفنا تسمية ٪{label} إلى هذا الرمز.
+        alert_failure: يجب معالجة بعض المشاكل قبل أن نتمكن من إضافة هذه التسمية.
+      destroy:
+        notice_success: لقد أزلنا التسمية ٪{label} من هذا الرمز.
+        alert_failure: تعذر علينا إزالة التسمية ٪{label} من هذا الرمز.
+      publish_translation:
+        notice_success: نشر التسمية ٪{language_name}.
+    pagination:
+      last: آخر
+      next: مقبل
+      first: أولا
+      previous: السابق
+    collaborators:
+      index:
+        add_heading: إضافة متعاون
+        page_title: المتعاونون مع ٪{name}
+        add_text: للسماح لشخص آخر بتحرير مجموعة الرموز هذه، أدخل عنوان البريد الإلكتروني
+          الذي استخدمه للتسجيل في Global Symbols.
+        add_button: إضافة متعاون
+        existing_heading: المتعاونون الحاليون
+        existing_text: يسمح لهؤلاء الأشخاص بتحرير مجموعة الرموز هذه.
+        added_at: تمت الإضافة ٪{date}
+        remove_confirm: هل نزيل ٪{email} من مجموعة الرموز هذه؟
+        remove_aria_label: إزالة المتعاون
+        existing_none_found: لا يسمح للمستخدمين بتحرير مجموعة الرموز هذه.
+      create:
+        notice_success: أضفنا ٪{email_address} كمتعاون.
+        alert_no_gs_account: ٪{email_address} ليس لديه حساب Global Symbols حتى الآن.
+      destroy:
+        notice_success: لقد أزلنا ٪{email_address} كمتعاون.
+    survey_picto_analysis:
+      index:
+        heading: إحصائيات الرموز
+        intro: يعرض هذا الجدول متوسط الردود لكل رمز في الاستطلاع، استنادا إلى إجمالي
+          ٪{count} الذي تم تلقيه.
+        column_heading_overall_average: المتوسط العام
+        column_heading_rating_description: مشاعر حول الرمز ككل
+        column_heading_representation_rating_description: يمثل الكلمة أو العبارة
+        column_heading_contrast_rating_description: تباين اللون
+        column_heading_cultural_rating_description: الملاءمة الثقافية
+        crumb_name: إحصائيات الرموز
+        row_heading_averages: المتوسطات
+    survey_response_analysis:
+      _sidebar:
+        heading: الاستجابات
+        participant_number: المشارك ٪{number}
+      index:
+        crumb_name: ردود فردية
+        heading: ردود فردية
+      new:
+        match_numbers: يجب أن تتطابق الأرقام الموضحة في أعلى يمين كل مربع رموز مع
+          الأرقام الموضحة في النماذج الورقية، لضمان إدخال التقييمات الصحيحة لكل رمز.
+        label_overall_rating: مشاعر حول الرمز
+        label_representation_rating: يمثل الكلمة
+        cancel_confirm: هل أنت متأكد؟ سوف تفقد أي نتائج حتى الآن.
+        save_button: حفظ الاستجابات
+        heading: إضافة ملاحظات ورقية
+        use_this_form_to: استخدم هذا النموذج لحفظ استطلاع ورقة واحدة إلى Global Symbols.
+          ثم سيتم احتسابها في إحصاءات الاستطلاع.
+        label_contrast_rating: تباين اللون
+        label_cultural_rating: الحساسية الثقافية
+      create:
+        notice_success: تم حفظ استجابة الورق هذه.
+    survey_questions:
+      _form:
+        please_fix_errors: الرجاء إصلاح الأخطاء أدناه.
+        comments_helper: اختياري. يرجى إضافة أي تعليقات لمساعدتنا على تحسين هذا الرمز.
+        button_previous_question: السؤال السابق
+        button_save_answer: حفظ الإجابة
+      show:
+        please_rate: يرجى تقييم هذا الرمز على مقياس حيث 1 هو "غير مقبول تماما" و 5
+          هو "مقبول تماما".
+      _controller:
+        timed_out: عذرا - مهلة الاستطلاع الخاص بك بسبب الخمول. يرجى بدء المسح مرة
+          أخرى.
+    concepts:
+      show:
+        defined_in: مفهوم معرف في
+        page_title: ٪{الموضوع} في ٪{coding_framework}
+    picto_concepts:
+      index:
+        intro: تساعد المفاهيم أجهزة الكمبيوتر على فهم الرموز الخاصة بك، لذا تأكد من
+          دقتها ودقتها.
+        add_concept_invitation: يمكننا إضافة أي مفهوم يمكنك العثور على ConceptNet.
+        add_concept:
+          instruction: لإضافة مفهوم إلى هذا الرمز، أدخل كلمة. سنضيف المفهوم إذا استطعنا
+            العثور عليه.
+          button: إضافة مفهوم
+          heading: إضافة مفهوم
+          add: جمع
+        existing_concepts:
+          heading: المفاهيم الموجودة
+          added_at: تمت الإضافة ٪{date}
+          none_found: هذا الرمز لا يحتوي على مفاهيم
+          remove_confirm: هل نزيل ٪{subject} من هذا الرمز؟
+          remove_aria_label: إزالة المفهوم
+        page_title: مفاهيم ٪{رمز}
+      create:
+        notice_success: أضفنا مفهوم ٪{concept} إلى هذا الرمز.
+        alert_failure: تعذر العثور على مفهوم يسمى ٪{concept}. جرب كلمة أخرى.
+        alert_already_exists: ٪{concept} هو بالفعل مفهوم على هذا الرمز.
+      destroy:
+        notice_success: لقد أزلنا مفهوم ٪{concept} من هذا الرمز.
+        alert_failure: تعذر علينا إزالة مفهوم ٪{concept} من هذا الرمز.
+    translations:
+      _translations_published:
+        next_steps: ابحث عن المزيد من الرموز لترجمتها، أو اختر لغة أخرى.
+        heading: الترجمات المنشورة
+        labels_are_visible: الترجمات الجديدة مرئية الآن على Global Symbols وفي التطبيقات.
+        labels_saved: تم حفظ الترجمات الجديدة.
+      _translation_form:
+        button_translate: ترجمة الرموز
+        button_translate_working: ترجمة الرموز…
+        publish_button: نشر كافة الترجمات ٪{language_name}
+        publish_button_working: نشر جميع الترجمات…
+        translation_complete_heading: اكتمال الترجمة
+        translation_complete_text: تمت ترجمة كافة الرموز إلى ٪{language_name}.
+      _symbols_table:
+        heading_source_language: ٪{language_name} المصدر
+        heading_destination_language: الترجمة ٪{language_name}
+        button_get_translation_working: تتم الآن الترجمة…
+        button_get_translation: احصل على الترجمة
+        heading_type: نوع
+      _suggestion_form:
+        button_publish_working: نشر…
+        button_publish: نشر
+        label: ترجمة
+    application:
+      _copy_to_clipboard:
+        button_title: نسخ إلى الحافظة
+        button: نسخ
+    errors:
+      not_found:
+        description: لم نتمكن من العثور على أي شيء في هذا العنوان
+    articles:
+      index:
+        more_button: المزيد من المقالات
+        title: خبر
+        description: مدونة الرموز العالمية - التحديثات والأفكار والإلهام لمساعدتك
+          على التواصل مع الرموز.
+      _topbar:
+        header_news: أخبار الرموز العالمية
+  languages:
+    cnr: الجبل الاسود
+    sh: الصربية الكرواتية
+    ru: الروسية
+    pt: البرتغالية
+    mr: الماراثية
+    mk: مقدوني
+    it: الإيطالية
+    hi: الهندية
+    da: الدانماركية
+    zh: الصينية
+    ar: العربية
+    es: الإسبانية
+    nl: الهولندية
+    ca: الكتالانية
+    bg: البلغارية
+    sq: الألبانية
+    tr: التركية
+    hy: الأرمينية
+    el: اليونانية
+    ro: الرومانية
+    sr_Latn: الصربية (اللاتينية)
+    sr_Cyrl: الصربية (السيريلية)
+    sr: الصربية
+    hr: الكرواتية
+    de: الألمانية
+    fr: الفرنسية
+    en: الإنكليزية
+    et: الإستونية
+    sk: السلوفاكية
+    an: أراغونيز
+    br: بريتونية
+    eu: الباسكية
+    fa: فارسي
+    gl: الغاليشية
+    he: العبرية
+    hu: المجرية
+    pl: البولندية
+    sv: السويدية
+    val: فيس
+    ur: الأوردية
+  dictionary:
+    publish: نشر
+    un-archive: الأمم المتحدة الأرشيف
+    archive: أرشيف
+    page_not_found: لم يتم العثور على الصفحة
+    download: تحميل
+    change: تغيير
+    search: بحث
+    remove: أبعد
+    view: منظر
+    sign_in: تسجيل الدخول
+    edit: حرر
+    import: استورد
+    by: ب
+    back: ظهر
+    numbers:
+      '5': '5'
+      '4': '4'
+      '3': '3'
+      '2': '2'
+      '1': '1'
+    global_symbols: Global Symbols
+    go_back: الرجوع للخلف
+    unauthorised: غير المصرح به
+    survey:
+      zero: مسح
+      one: مسح
+      two: الدراسات الاستقصائية
+      few: الدراسات الاستقصائية
+      many: الدراسات الاستقصائية
+      other: الدراسات الاستقصائية
+    response:
+      zero: استجابه
+      one: استجابه
+      two: استجابات
+      few: استجابات
+      many: استجابات
+      other: استجابات
+    symbol:
+      zero: رمز
+      one: رمز
+      two: الرموز
+      few: الرموز
+      many: الرموز
+      other: الرموز
+    label:
+      zero: تسميه
+      one: تسميه
+      two: ملصقات
+      few: ملصقات
+      many: ملصقات
+      other: ملصقات
+    symbolset:
+      zero: مجموعة الرموز
+      one: مجموعة الرموز
+      two: مجموعات الرموز
+      few: مجموعات الرموز
+      many: مجموعات الرموز
+      other: مجموعات الرموز
+    settings: اعدادات
+    concept:
+      zero: مفهوم
+      one: مفهوم
+      two: المفاهيم
+      few: المفاهيم
+      many: المفاهيم
+      other: المفاهيم
+    collaborator:
+      zero: المتعاون
+      one: المتعاون
+      two: المتعاونون
+      few: المتعاونون
+      many: المتعاونون
+      other: المتعاونون
+  errors:
+    messages:
+      even: يجب أن يكون حتى
+      odd: يجب أن يكون غريبا
+      other_than: يجب أن يكون غير ٪{العد}
+      less_than_or_equal_to: يجب أن يكون أقل من ٪{count أو مساويا له}
+      less_than: يجب أن يكون أقل من ٪{count}
+      equal_to: يجب أن يساوي ٪{العد}
+      greater_than_or_equal_to: يجب أن يكون أكبر من ٪{count أو مساويا له}
+      greater_than: يجب أن يكون أكبر من ٪{count}
+      not_an_integer: يجب أن يكون عدد صحيح
+      not_a_number: ليس رقما
+      wrong_length:
+        zero: هو طول خاطئ (يجب أن يكون 1 حرف)
+        one: هو طول خاطئ (يجب أن يكون 1 حرف)
+        two: هو الطول الخطأ (يجب أن يكون ٪{count} حرف)
+        few: هو الطول الخطأ (يجب أن يكون ٪{count} حرف)
+        many: هو الطول الخطأ (يجب أن يكون ٪{count} حرف)
+        other: هو الطول الخطأ (يجب أن يكون ٪{count} حرف)
+      too_short:
+        zero: قصير جدا (الحد الأدنى هو حرف واحد)
+        one: قصير جدا (الحد الأدنى هو حرف واحد)
+        two: قصير جدًا (الحد الأدنى هو ٪{count} حرفًا)
+        few: قصير جدًا (الحد الأدنى هو ٪{count} حرفًا)
+        many: قصير جدًا (الحد الأدنى هو ٪{count} حرفًا)
+        other: قصير جدًا (الحد الأدنى هو ٪{count} حرفًا)
+      too_long:
+        zero: طويل جدا (الحد الأقصى هو حرف واحد)
+        one: طويل جدا (الحد الأقصى هو حرف واحد)
+        two: طويل جدًا (الحد الأقصى هو ٪{count} حرفًا)
+        few: طويل جدًا (الحد الأقصى هو ٪{count} حرفًا)
+        many: طويل جدًا (الحد الأقصى هو ٪{count} حرفًا)
+        other: طويل جدًا (الحد الأقصى هو ٪{count} حرفًا)
+      present: يجب أن تكون فارغة
+      blank: لا يمكن أن تكون فارغة
+      empty: لا يمكن أن تكون فارغة
+      accepted: يجب أن تكون مقبولة
+      confirmation: لا يتطابق مع ٪{السمة}
+      invalid: غير صالح
+      exclusion: محجوز
+      inclusion: غير مدرج في القائمة
+      model_invalid: 'فشل التحقق من الصحة: ٪{أخطاء}'
+      not_saved:
+        zero: 'خطأ واحد منع حفظ هذا ٪{resource}:'
+        one: 'خطأ واحد منع حفظ هذا ٪{resource}:'
+        two: '٪{count} خطأ منعت من حفظ ٪{resource} هذا:'
+        few: '٪{count} خطأ منعت من حفظ ٪{resource} هذا:'
+        many: '٪{count} خطأ منعت من حفظ ٪{resource} هذا:'
+        other: '٪{count} خطأ منعت من حفظ ٪{resource} هذا:'
+      not_locked: لم يتم تأمين
+      not_found: لم يتم العثور على
+      expired: انتهت صلاحيتها، يرجى طلب واحدة جديدة
+      confirmation_period_expired: يجب أن يتم تأكيدها في غضون ٪{period}، يرجى طلب
+        واحدة جديدة
+      already_confirmed: تم تأكيد ذلك بالفعل، يرجى محاولة تسجيل الدخول
+      size_too_big: كبير جدا (الحد الأقصى هو ٪{file_size})
+      size_too_small: صغير جدا (الحد الأدنى هو ٪{file_size})
+      wrong_size: هو الحجم الخطأ (يجب أن يكون ٪{file_size})
+  activerecord:
+    attributes:
+      user:
+        remember_me: تذكرني
+        current_password: كلمة المرور الحالية
+        password: شعار
+        language_id: اللغة المفضلة
+        location: مكان
+        company: شركة
+        surname: اللقب
+        prename: الاسم الأول
+        email: عنوان البريد الإلكتروني
+      symbolset:
+        statuses:
+          ingesting: تناول
+          draft: مسودة
+          published: نشر
+        status: حالة
+        logo: شعار
+        publisher_url: عنوان URL للناشر
+        publisher: ناشر
+        description: وصف
+        name: اسم
+      survey_response:
+        role: دور
+        organisation: منظمه
+        name: اسم
+      survey:
+        show_symbol_descriptions: إظهار وصف الرمز
+        close_at: إغلاق عند
+        status: حالة
+        introduction: مقدمة
+        name: اسم
+      picto:
+        visibility_options:
+          collaborators: المتعاونون في مجموعة الرموز
+          everybody: الجميع
+        visibility: مرئية من قبل
+        image: صورة
+        publisher_ref: مرجع الناشر
+        part_of_speech_options:
+          modifier: معدل
+          article: مقالة
+          interjection: المداخله
+          conjunction: حرف عطف
+          preposition: الجر
+          pronoun: ضمير
+          adverb: ظرف
+          adjective: نعت
+          verb: فعل
+          noun: اسم
+        part_of_speech: جزء من الكلام
+      licence:
+        logo: شعار
+        properties: خصائص
+        version: الإصدار
+        url: عنوان URL
+        name: اسم
+      language:
+        category: باب
+        scope: نطاق
+        name: اسم
+        active: نشط
+      label:
+        description: وصف
+        text_diacritised: تسمية شيطانية
+        text: تسميه
+      concept:
+        subject: موضوع
+      comment:
+        resolved: حل
+        read: قرأ
+        comment: التعليق
+        cultural_rating_short: ثقافي
+        cultural_rating: التصنيف الثقافي
+        contrast_rating_short: تباين
+        contrast_rating: تصنيف التباين
+        representation_rating_short: التمثيل
+        representation_rating: تقييم التمثيل
+        rating: تقييم الموقع
+      coding_framework:
+        www_uri_base: قاعدة أوري WWW
+        api_uri_base: قاعدة API URI
+        structure: هيكل
+        name: اسم
+      category:
+        name: اسم
+    models:
+      user: مستخدم
+      symbolset_user: المتعاون
+      symbolset: مجموعة الرموز
+      survey_response: استجابة الاستطلاع
+      survey_picto: مسح بيكو
+      survey: مسح
+      picto_concept: مفهوم بيكو
+      picto: رمز
+      licence: ترخيص
+      language: اللغة
+      label: تسميه
+      image: صورة
+      concept: مفهوم
+      comment: التعليق
+      coding_framework: إطار الترميز
+      category: باب
+  doorkeeper:
+    scopes:
+      boardset:write: الكتابة إلى مجموعات المجلس
+      boardset:read: قراءة مجموعات المجلس
+      identity:read:user: قراءة البيانات في حساب المستخدم
+      public: الوصول إلى بياناتك العامة
+  devise:
+    views:
+      sessions:
+        errors:
+          messages:
+            not_saved:
+              zero: 'خطأ واحد منع حفظ هذا ٪{resource}:'
+              one: 'خطأ واحد منع حفظ هذا ٪{resource}:'
+              two: '٪{count} خطأ منعت من حفظ ٪{resource} هذا:'
+              few: '٪{count} خطأ منعت من حفظ ٪{resource} هذا:'
+              many: '٪{count} خطأ منعت من حفظ ٪{resource} هذا:'
+              other: '٪{count} خطأ منعت من حفظ ٪{resource} هذا:'
+            not_locked: لم يتم تأمين
+            not_found: لم يتم العثور على
+            expired: انتهت صلاحيتها، يرجى طلب واحدة جديدة
+            confirmation_period_expired: يجب أن يتم تأكيدها في غضون ٪{period}، يرجى
+              طلب واحدة جديدة
+            already_confirmed: تم تأكيد ذلك بالفعل، يرجى محاولة تسجيل الدخول
+        new:
+          sign_in_button: تسجيل الدخول
+          page_title: تسجيل الدخول
+      _shared:
+        _links:
+          new_unlock: ألم تتلق تعليمات إلغاء القفل؟
+          new_confirmation: ألم تتلق تعليمات تأكيد؟
+          forgotten_password: نسيت كلمة المرور الخاصة بك؟
+          sign_up: إنشاء حساب
+          sign_in: تسجيل الدخول
+      passwords:
+        edit:
+          button: تغيير كلمة المرور
+          confirm_password_label: تأكيد كلمة المرور الجديدة
+          new_password_helper: الحد الأدنى لأحرف ٪{var}
+          new_password_label: كلمة مرور جديدة
+          heading: تغيير كلمة المرور
+        instructions: أدخل عنوان البريد الإلكتروني لحسابك وسنرسل رابطا لإعادة تعيين
+          كلمة المرور.
+        new:
+          page_title: إدارة الحساب
+          button: رابط إعادة تعيين البريد الإلكتروني
+          email_helper: عنوان البريد الإلكتروني الذي استخدمته للتسجيل في Global Symbols
+          heading: إعادة تعيين كلمة المرور
+      registrations:
+        account_saved:
+          return_to_gs_button: العودة إلى Global Symbols
+          heading: تحديث الحساب
+        change_password:
+          account_indicator: تم تسجيل الدخول على أنه ٪{email}
+          submit: تغيير كلمة المرور
+          manage_account: إدارة الحساب
+          heading: تغيير كلمة المرور
+        edit:
+          awaiting_confirmation: 'في انتظار التأكيد حاليا: ٪{unconfirmed_email}'
+          page_title: إدارة الحساب
+          heading: إدارة الحساب
+        _form:
+          button_change_password: تغيير كلمة المرور
+          cancel_account_button: حذف حسابي
+          cancel_account_confirm: هل أنت واثق؟ سيتم حذف حساب Global Symbols الخاص
+            بك نهائيًا.
+          cancel_account_text: إذا كنت ترغب في إغلاق حساب Global Symbols الخاص بك
+            …
+          cancel_account_header: إلغاء حسابي
+          button_save_changes: حفظ التغييرات
+          new_password_helper: ٪{var} أحرف الحد الأدنى. اتركه فارغا إذا كنت لا تريد
+            تغييره.
+          current_password_helper: نحتاج إلى كلمة المرور الحالية لتأكيد التغييرات
+            التي أجريتها.
+          new_password_confirmation: تأكيد كلمة المرور الجديدة
+          new_password: كلمة مرور جديدة
+          please_fix_errors: الرجاء إصلاح هذه الأخطاء.
+          confirm_password: تأكيد كلمة المرور
+          password_helper: الحد الأدنى لأحرف ٪{var}
+          language_helper: ستظهر الرموز بلغتك المفضلة حيثما أمكن ذلك.
+        new:
+          sign_up_button: إنشاء حساب
+          heading: إنشاء حساب
+          page_title: إنشاء حساب
+    unlocks:
+      unlocked: تم إلغاء قفل حسابك بنجاح. يرجى تسجيل الدخول للمتابعة.
+      send_paranoid_instructions: إذا كان حسابك موجودا، ستتلقى رسالة إلكترونية مع
+        إرشادات حول كيفية إلغاء قفله في غضون دقائق قليلة.
+      send_instructions: ستتلقى رسالة إلكترونية مع تعليمات حول كيفية فتح حسابك في
+        غضون دقائق قليلة.
+    sessions:
+      already_signed_out: لقد قمت بتسجيل الخروج.
+      signed_out: لقد قمت بتسجيل الخروج.
+      signed_in: مرحباً بك مرة أخرى!
+    registrations:
+      updated: تم تحديث حسابك بنجاح.
+      update_needs_confirmation: لقد قمت بتحديث حسابك بنجاح، ولكننا بحاجة إلى التحقق
+        من عنوان بريدك الإلكتروني الجديد. يرجى التحقق من بريدك الإلكتروني واتبع رابط
+        التأكيد لتأكيد عنوان بريدك الإلكتروني الجديد.
+      signed_up_but_unconfirmed: تم إرسال رسالة تحتوي على رابط تأكيد إلى عنوان بريدك
+        الإلكتروني. يرجى اتباع الرابط لتفعيل حسابك.
+      signed_up_but_locked: لقد قمت بالتسجيل بنجاح. ومع ذلك، لم نتمكن من تسجيل دخولك
+        لأن حسابك مقفل.
+      signed_up_but_inactive: لقد قمت بالتسجيل بنجاح. ومع ذلك، لم نتمكن من تسجيل دخولك
+        لأن حسابك لم يتم تنشيطه بعد.
+      signed_up: أهلًا وسهلًا! لقد قمت بالتسجيل بنجاح.
+      destroyed: وداعًا! تم إلغاء حسابك بنجاح. نأمل أن نراكم مرة أخرى قريبا.
+    passwords:
+      updated_not_active: تم تغيير كلمة المرور بنجاح.
+      updated: تم تغيير كلمة المرور بنجاح. لقد قمت بتسجيل الدخول الآن.
+      send_paranoid_instructions: إذا كان عنوان بريدك الإلكتروني موجودا في قاعدة بياناتنا،
+        فسوف تتلقى رابط استرداد كلمة المرور على عنوان بريدك الإلكتروني في غضون دقائق
+        قليلة.
+      send_instructions: لقد أرسلنا لك رسالة بريد إلكتروني لإعادة تعيين كلمة المرور.
+      no_token: لا يمكنك الوصول إلى هذه الصفحة دون أن تأتي من رسالة بريد إلكتروني
+        لإعادة تعيين كلمة المرور. إذا كنت لا تأتي من البريد الإلكتروني إعادة تعيين
+        كلمة السر، يرجى التأكد من استخدام عنوان URL الكامل المقدمة.
+    omniauth_callbacks:
+      success: تمت المصادقة بنجاح من حساب ٪{kind}.
+      failure: تعذر مصادقتك من ٪{kind} لأن "٪{reason}".
+    mailer:
+      password_change:
+        subject: تم تغيير كلمة المرور
+      email_changed:
+        subject: تم تغيير البريد الإلكتروني
+      unlock_instructions:
+        subject: إلغاء تأمين التعليمات
+      reset_password_instructions:
+        subject: إعادة تعيين إرشادات كلمة المرور
+      confirmation_instructions:
+        subject: تعليمات التأكيد
+    failure:
+      unconfirmed: يجب عليك تأكيد عنوان بريدك الإلكتروني قبل المتابعة.
+      unauthenticated: تحتاج إلى تسجيل الدخول أو التسجيل قبل المتابعة.
+      timeout: انتهت مدة صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى للمتابعة.
+      not_found_in_database: ٪{authentication_keys} أو كلمة مرور غير صالحة.
+      last_attempt: لديك محاولة أخرى قبل تأمين حسابك.
+      locked: حسابك مقفل.
+      invalid: ٪{authentication_keys} أو كلمة مرور غير صالحة.
+      inactive: لم يتم تنشيط حسابك بعد.
+      already_authenticated: لقد قمت بتسجيل الدخول بالفعل.
+    confirmations:
+      send_paranoid_instructions: إذا كان عنوان بريدك الإلكتروني موجودا في قاعدة بياناتنا،
+        فسوف تتلقى رسالة إلكترونية مع تعليمات حول كيفية تأكيد عنوان بريدك الإلكتروني
+        في غضون دقائق قليلة.
+      send_instructions: ستتلقى رسالة إلكترونية مع تعليمات حول كيفية تأكيد عنوان بريدك
+        الإلكتروني في غضون دقائق قليلة.
+      confirmed: تم تأكيد عنوان بريدك الإلكتروني بنجاح.
+  layouts:
+    application:
+      menu:
+        my_account: حسابي
+        sign_in: تسجيل الدخول
+        facebook: Global Symbols على Facebook
+        resources: موارد
+        board_builder: Board Builder
+        training: تدريب
+        news: خبر
+        sign_out: تسجيل الخروج
+        sign_up: إنشاء حساب
+        search_placeholder: البحث ٪{فار}
+        twitter: ‎Global Symbols على Twitter
+      footer:
+        about: عن
+        privacy_policy: سياسة الخصوصية
+        terms: حيث
+        accessibility: امكانيه الوصول
+        contact: الاتصال
+        language_label: اللغة
+      skip_to_main_content: الانتقال إلى المحتوى الرئيسي
+  date:
+    formats:
+      default: ٪e ٪b ٪Y
+      short: ٪d ٪b
+      long: ٪d ٪B ٪Y
+    abbr_day_names:
+    - شمس
+    - الاثنين
+    - الخميس
+    - الجمعه
+    - جلس
+    month_names:
+    - يناير
+    - فبراير
+    - مارس
+    - أبريل
+    - مايو
+    - يونيو
+    - يوليو
+    - أغسطس
+    - سبتمبر
+    - أكتوبر
+    - نوفمبر
+    - ديسمبر
+    order:
+    - سنة
+    - شهر
+    day_names:
+    - الأحد
+    - الاثنين
+    - الثلاثاء
+    - الأربعاء
+    - الخميس
+    - الجمعة
+    - السبت
+    abbr_month_names:
+    - يناير
+    - فبراير
+    - مارس
+    - ابريل
+    - مايو
+    - يونيو
+    - يوليو
+    - اغسطس
+    - سبتمبر
+    - اكتوبر
+    - نوفمبر
+    - ديسمبر
+  time:
+    formats:
+      default: ٪a, ٪d ٪b ٪Y٪H:٪M:٪S ٪z
+      short: ٪d ٪b ٪H:٪M
+      long: ٪B ٪d, ٪Y ٪H:٪M
+    am: ص
+    pm: بعد الظهر

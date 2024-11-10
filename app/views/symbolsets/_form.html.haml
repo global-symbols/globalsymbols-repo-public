@@ -1,0 +1,19 @@
+= bootstrap_form_with model: @symbolset, layout: :horizontal, label_col: 'col-sm-3', control_col: 'col-sm-9', id: :symbolset_form do |f|
+  = f.text_field :name
+  = f.text_field :description, help: t('views.symbolsets._form.description_helper')
+  = f.select :licence_id, Licence.all.collect {|l| [l.name, l.id]}, {include_blank: t('views.symbolsets._form.licence_prompt')}
+  = f.text_field :publisher, wrapper: {class: 'mt-5'}, placeholder: t('views.symbolsets._form.publisher_placeholder'), help: t('views.symbolsets._form.publisher_helper')
+  = f.text_field :publisher_url, label: t('views.symbolsets._form.publisher_url_label'), placeholder: t('views.symbolsets._form.publisher_url_placeholder'), help: t('views.symbolsets._form.publisher_url_helper')
+  = f.file_field :logo, label: t('views.symbolsets._form.logo_label'), help: t('views.symbolsets._form.logo_helper')
+  - if current_user.admin?
+    .card.bg-light
+      .card-header Settings for Administrators
+      .card-body
+        = f.number_field :featured_level, help: 'Set a number here to show the Symbolset earlier in lists and on the homepage. Lower numbers will be shown earlier.'
+        = f.select :status, Symbolset.statuses.map {|k, v| [k.humanize.capitalize, k]}, help: t('views.symbolsets._form.published_helper')
+  .row.mt-5
+    .col
+      - btn_path = @symbolset.persisted? ? symbolset_path(@symbolset) : symbolsets_path
+      %a.btn.btn-outline-secondary{href: btn_path}= t('dictionary.back')
+    .col.text-right
+      = f.primary (@symbolset.persisted? ? t('views.symbolsets._form.save_button') : t('views.symbolsets._form.create_button')), data: { turbolinks: false, disable: true }

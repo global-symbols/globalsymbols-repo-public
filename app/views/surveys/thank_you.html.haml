@@ -1,0 +1,20 @@
+- title @survey.name
+- content_for(:topbar, render('topbar'))
+
+%main.container-xl
+  .row.justify-content-center
+    .col-lg-6.col-md-8.col-sm-10.text-center
+      .card.mb-5
+        .card-body
+          %h3= t('views.surveys._shared.thank_you')
+          %p.lead= t('views.surveys.thank_you.feedback_is_saved')
+
+          %p
+            %a.btn.btn-primary.mt-3.mb-5{href: '/'}
+              = t('views.surveys.thank_you.button_go_to_homepage')
+              %i.fas.fa-chevron-right.pl-2
+
+          %p
+            %a.btn.btn-outline-secondary.btn-sm{href: survey_path}
+              = t('views.surveys.thank_you.button_restart_survey')
+              %i.fas.fa-chevron-right.pl-1

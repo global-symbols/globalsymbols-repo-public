@@ -1,0 +1,29 @@
+!!!
+%html.h-100.w-100.d-table
+  %head
+    %meta{content: 'text/html; charset=UTF-8', 'http-equiv' => 'Content-Type'}/
+    %title= t('doorkeeper.layouts.application.title')
+    = render 'application/favicon'
+    %meta{charset: 'utf-8'}/
+    %meta{content: 'IE=edge', 'http-equiv' => 'X-UA-Compatible'}/
+    %meta{content: 'width=device-width, initial-scale=1.0', name: 'viewport'}/
+
+    -# Deferred loaders for CDN stylesheets.
+    %link{rel: :preload, href: 'https://fonts.googleapis.com/css?family=Lato:300,400&display=swap', as: :style, onload: "this.onload=null;this.rel='stylesheet'"}
+
+    -# If no JS is available, load the CDN stylesheets directly.
+    %noscript
+      %link{rel: :stylesheet, href: 'https://fonts.googleapis.com/css?family=Lato:300,400&display=swap'}
+
+    = stylesheet_link_tag 'application'
+    = javascript_include_tag 'application'
+    = csrf_meta_tags
+  %body.bg-light-1.py-3.mh-100.d-table-cell.align-middle.auth-layout
+    .container-sm{style: 'max-width: 570px'}
+      .card.shadow-lg.border-0
+        .card-img-top.bg-primary.text-center
+          %img{src: asset_path('doorkeeper/authorisation-banner.svg'), alt: 'Global Symbols'}
+        - if flash[:notice].present?
+          .alert.alert-info.rounded-0.border-0.mb-0
+            = flash[:notice]
+        = yield

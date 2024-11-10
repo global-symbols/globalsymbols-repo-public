@@ -1,0 +1,6 @@
+%li.page-item
+  - unless current_page.first?
+    %a.page-link.text-nowrap{href: url, remote: remote}
+      %i.fas.fa-chevron-left>
+      %i.fas.fa-chevron-left.ml-n1
+      %span.ml-1.d-none.d-sm-inline= raw t 'views.pagination.first'

@@ -1,0 +1,29 @@
+:ruby
+  title 'Knowledge Base'
+
+%main.mt-0
+  %article
+    = render 'pages/topbar' do
+      Knowledge Base
+    .container-xl.mt-4
+      .row.justify-content-center
+        .col-md-3.bg-light.pb-2
+          %h2.h4.mt-2 Content
+          = render 'sidenav', articles: @articles#, current_article: nil
+
+        .col-md-8.text-center{role: :main}
+
+          .d-flex.justify-content-center.bg-light.py-5
+            = bootstrap_form_with url: search_knowledge_base_index_path, local: true, method: :get, layout: :horizontal, label_col: 'col', control_col: 'col-sm-12', class: 'form-inline col-8' do |f|
+              = f.text_field :query, input_group_class: 'input-group-lg', class: 'is-search', wrapper: { class: 'mb-0 input-group-lg w-100'}, label_as_placeholder: true, label: t('views.knowledge_base.index.search_input_placeholder'), required: true, minlength: 2
+
+          %h2.my-4 Explore by Section
+
+          .card-deck.kb-sections
+            - @articles.each do |article|
+              .card
+                %a.card-body.btn.btn-light{href: knowledge_base_path(article.id)}
+                  - if article.icon
+                    %img.img-fluid.mb-3{src: article.icon.url, alt: article.icon.description}
+
+                  = article.title

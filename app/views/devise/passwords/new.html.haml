@@ -1,0 +1,12 @@
+- title t('devise.views.passwords.new.page_title')
+%main.container-xl
+  .justify-content-md-center
+    %h1.mb-4= t('devise.views.passwords.new.heading')
+    %p= t('devise.views.passwords.instructions')
+    = bootstrap_form_for(resource, as: resource_name, url: password_path(resource_name), layout: :vertical, label_col: 'col-sm-3', control_col: 'col-sm-7', html: { method: :post }) do |f|
+      -# = devise_error_messages!
+      = f.email_field :email, autofocus: true, autocomplete: 'email', help: t('devise.views.passwords.new.email_helper')
+      .row.mt-4
+        .col.text-center
+          = f.primary t('devise.views.passwords.new.button')
+    = render 'devise/shared/links', cache: true

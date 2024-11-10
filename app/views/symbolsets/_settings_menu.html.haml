@@ -1,0 +1,4 @@
+.list-group
+  %a.list-group-item.list-group-item-action{class: ("active" if request.path == edit_symbolset_path(symbolset)), href: edit_symbolset_path(symbolset)}= t('dictionary.settings')
+  %a.list-group-item.list-group-item-action{class: ("active" if request.path == symbolset_collaborators_path(symbolset)), href: symbolset_collaborators_path(symbolset)}= t('dictionary.collaborator.other')
+  -#%a.list-group-item.list-group-item-action{class: ("active" if request.path == import_symbolset_path(symbolset)), href: import_symbolset_path(symbolset)} Import

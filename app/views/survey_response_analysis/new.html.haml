@@ -1,0 +1,38 @@
+- title "#{@survey.name}"
+- content_for(:topbar, render('survey_editor/topbar', survey: @survey))
+%main.container-xl
+  .row
+    .col
+      %h3= t('views.survey_response_analysis.new.heading')
+      %p= t('views.survey_response_analysis.new.use_this_form_to')
+      %p= t('views.survey_response_analysis.new.match_numbers')
+      -url = @response.persisted? ? symbolset_survey_response_path(@survey.symbolset, @survey, @response) : symbolset_survey_responses_path(symbolset: @survey.symbolset, survey: @survey)
+      = bootstrap_form_with url: url, model: @response, scope: 'response', label_col: 'col-sm-4', control_col: 'col-sm-8', id: :survey_response_form, class: 'alert-if-modified' do |f|
+        = f.fields_for :comments do |comment_fields|
+          - comment = comment_fields.object
+          = comment_fields.hidden_field :picto_id
+          .card.mb-3
+            .card-header.d-flex.justify-content-between
+              %span
+                = t('dictionary.symbol.one')
+                #{comment_fields.options[:child_index] + 1}
+              %small.text-muted #{comment.picto.id}
+            .card-body
+              .row
+                .col-2
+                  %img.img-fluid{src: comment.picto.images.last.imagefile.url, alt: comment.picto.best_label_for(locale).text}
+                .col
+                  .form-row
+                    .col= comment_fields.number_field :rating, label: t('views.survey_response_analysis.new.label_overall_rating'), in: 1..5, required: true
+                    .col= comment_fields.number_field :representation_rating, label: t('views.survey_response_analysis.new.label_representation_rating'), in: 1..5, required: true
+                    .col= comment_fields.number_field :contrast_rating, label: t('views.survey_response_analysis.new.label_contrast_rating'), in: 1..5, required: true
+                    .col= comment_fields.number_field :cultural_rating, label: t('views.survey_response_analysis.new.label_cultural_rating'), in: 1..5, required: true
+                  .form-row
+                    .col= comment_fields.text_field :comment, maxlength: 255
+        .row.mt-5
+          .col
+            = link_to t('dictionary.back'), symbolset_survey_path(id: @survey.id), class: 'btn btn-outline-secondary', data: { confirm: t('views.survey_response_analysis.new.cancel_confirm')}
+          .col.text-right
+            = f.primary do
+              = t('views.survey_response_analysis.new.save_button')
+              %i.fas.fa-chevron-right.pl-2

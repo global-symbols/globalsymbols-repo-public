@@ -1,0 +1,11 @@
+- title t('views.symbolsets.new._title')
+%main.container-xl
+  .row.justify-content-md-center
+    .col-md-6
+      %h1.text-center.mb-4= t('views.symbolsets.new.heading')
+      %p= t('views.symbolsets.new.introduction')
+      %p.mb-4
+        = t('views.symbolsets.new.guidance')
+        %a{href: help_path(article: :publishing_a_symbolset)}= t('views.symbolsets.new.guidance_link')
+        ='.'
+      = render 'form'

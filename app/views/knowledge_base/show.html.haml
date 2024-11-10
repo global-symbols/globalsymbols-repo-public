@@ -1,0 +1,43 @@
+:ruby
+  title @article.title
+
+%main.mt-0
+  %article
+    = render 'pages/topbar' do
+      = t('layouts.application.menu.knowledge_base')
+    .container-xl.mt-4
+      .row.justify-content-center
+        .col-md-3.bg-light.pb-2.d-print-none
+
+          %h2.h4.mt-2= t('views.knowledge_base.sidebar.content_heading')
+
+          = bootstrap_form_with url: search_knowledge_base_index_path, local: true, method: :get, layout: :horizontal, control_col: 'col' do |f|
+            = f.text_field :query, input_group_class: 'input-group-sm', class: 'is-search', wrapper: { class: 'input-group-sm'}, label_as_placeholder: true, label: t('views.knowledge_base.index.search_input_placeholder'), required: true, minlength: 2
+
+          = render 'sidenav', articles: @articles, current_article_id: @article.id
+
+        %article.kb-article.col-md-8{role: :main}
+
+          %h2= @article.title
+
+          %p.mt-2.text-muted
+            %small
+              = t('views.knowledge_base.sidebar.updated')
+              %time{datetime: @article.publish_date.strftime('%H:%M %Y-%m-%d'), pubdate: true}= l(@article.publish_date.to_date, format: :long)
+              - if @article.author.try(:name)
+                = t('views.knowledge_base.sidebar.by')
+                = @article.author.try(:name)
+
+          - if @article.hero_image
+            .text-center
+              %img.img-fluid.hero-image{src: @article.hero_image.url, alt: @article.hero_image.description}
+
+          = redcarpet(KnowledgeBaseArticleRenderer).render(@article.body).html_safe
+
+          - if @article.try(:child_articles)
+            %h3.h4.mt-4= t('views.knowledge_base.sidebar.see_also_heading')
+            %small
+              %ul.list-unstyled.ml-4
+                - @article.child_articles.each do |article|
+                  %li
+                    %a{href: knowledge_base_path(article.id)}= article.title

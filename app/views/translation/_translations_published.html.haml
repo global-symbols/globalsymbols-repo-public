@@ -1,0 +1,12 @@
+.text-center.mt-5
+  .h2.font-weight-normal= t('views.translations._translations_published.heading')
+
+  .my-5
+    %i.fas.fa-check-circle.display-4.text-success
+
+  - if symbolset.published?
+    %p= t('views.translations._translations_published.labels_are_visible')
+  - else
+    %p= t('views.translations._translations_published.labels_saved')
+
+  %p= t('views.translations._translations_published.next_steps')

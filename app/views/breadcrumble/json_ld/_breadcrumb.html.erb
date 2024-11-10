@@ -1,0 +1,17 @@
+<%
+  return unless breadcrumbs.any?
+
+  data = {
+      '@type':           "BreadcrumbList",
+      'itemListElement': []
+  }
+
+  breadcrumbs.each_with_index do |crumb,i|
+    data[:itemListElement] << {
+        '@type':    "ListItem",
+        'position': i,
+        'name':     crumb[:name],
+        'item':     crumb[:url]
+    }
+  end
+%><%= render 'rich_data', data: data %>

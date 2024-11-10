@@ -1,0 +1,23 @@
+-url = @picto.persisted? ? symbolset_symbol_path(@picto.symbolset) : symbolset_symbols_path
+= bootstrap_form_with url: url, model: @picto, layout: :horizontal, label_col: 'col-sm-4', control_col: 'col-sm-8', id: :picto_form do |f|
+  = f.hidden_field :symbolset_id
+  = f.select :part_of_speech, Picto.part_of_speeches.keys.collect { |pos| [Picto.human_enum_name(:part_of_speech, pos), pos]}.sort, label: t('activerecord.attributes.picto.part_of_speech')
+
+  = f.select :visibility, Picto.visibilities.keys.collect { |visibility| [Picto.human_enum_name(:visibility, visibility), visibility]}, label: t('activerecord.attributes.picto.visibility')
+  - if @picto.new_record?
+    = f.fields_for :images do |images_form|
+      = images_form.file_field :imagefile, label: t('activerecord.models.image'), help: t('views.pictos._form.image_helper'), accept: 'image/png,image/jpeg,image/svg+xml', required: true
+
+    %h2.text-center= t('dictionary.label.one')
+    %p= t('views.pictos._form.label_helper')
+    = f.fields_for :labels do |labels_form|
+      = labels_form.collection_select :language_id, Language.where(active: true), :id, :name, {help: t('views.pictos._form.language_helper')}, class: 'gs-language-picker'
+      = labels_form.text_field :text, label: t('views.pictos._form.label_label'), required: true
+      = labels_form.text_field :text_diacritised, label: t('activerecord.attributes.label.text_diacritised'), help: t('views.pictos._form.diacritised_label_helper'), wrapper: {class: 'd-none'}
+      = labels_form.text_field :description, help: t('views.pictos._form.description_helper')
+  .row.mt-5
+    .col
+      - btn_path = @picto.persisted? ? symbolset_symbol_path(@picto.symbolset, @picto) : symbolset_path(@picto.symbolset)
+      %a.btn.btn-outline-secondary{href: btn_path}= t('dictionary.back')
+    .col.text-right
+      = f.primary @picto.persisted? ? t('views.pictos._form.save_button') : t('views.pictos._form.create_button')

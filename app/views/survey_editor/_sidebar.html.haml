@@ -1,0 +1,35 @@
+%h1= t('views.survey_editor._sidebar.heading')
+.list-group
+  %a.list-group-item.list-group-item-action{href: "#list-symbols", role: :tab, 'data-toggle': :list, class: (:active if @survey.status == 'planning')}
+    .d-flex.justify-content-between.align-items-center
+      = t('dictionary.numbers.1') + '.'
+      = t('views.survey_editor._sidebar.stages.plan')
+      - if @survey.status.in? ['collecting_feedback', 'analysing_results', 'archived']
+        %i.far.fa-check-circle
+      - if @survey.status == 'planning'
+        %i.far.fa-dot-circle
+    %small= t 'views.survey_editor._sidebar.stages.plan_description'
+  %a.list-group-item.list-group-item-action{href: "#list-collect", role: :tab, 'data-toggle': :list, class: (:active if @survey.status == 'collecting_feedback')}
+    .d-flex.justify-content-between.align-items-center
+      = t('dictionary.numbers.2') + '.'
+      = t('views.survey_editor._sidebar.stages.collect_feedback')
+      - if @survey.status.in? ['analysing_results', 'archived']
+        %i.far.fa-check-circle
+      - if @survey.status == 'collecting_feedback'
+        %i.far.fa-dot-circle
+    %small= t 'views.survey_editor._sidebar.stages.collect_feedback_description'
+  %a.list-group-item.list-group-item-action{href: "#list-analyse", role: :tab, 'data-toggle': :list, class: (:active if @survey.status == 'analysing_results')}
+    .d-flex.justify-content-between.align-items-center
+      = t('dictionary.numbers.4') + '.'
+      = t('views.survey_editor._sidebar.stages.analyse')
+      - if @survey.status.in? ['archived']
+        %i.far.fa-check-circle
+      - if @survey.status == 'analysing_results'
+        %i.far.fa-dot-circle
+    %small= t 'views.survey_editor._sidebar.stages.analyse_results_description'
+  %a.list-group-item.list-group-item-action{href: "#list-archive", role: :tab, 'data-toggle': :list, class: (:active if @survey.status == 'archived')}
+    .d-flex.justify-content-between.align-items-center
+      = t('dictionary.numbers.4') + '.'
+      = t('views.survey_editor._sidebar.stages.archive')
+      - if @survey.status == 'archived'
+        %i.far.fa-check-circle

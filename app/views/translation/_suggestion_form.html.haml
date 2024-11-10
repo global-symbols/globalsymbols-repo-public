@@ -1,0 +1,3 @@
+= bootstrap_form_for suggestion, url: translation_path(suggestion.picto.id), layout: :horizontal, label_col: 'col', control_col: 'col-sm-12', method: :patch, remote: true do |f|
+  = f.hidden_field :label_id, value: suggestion.id
+  = f.text_field :text, append: f.primary(t('views.translations._suggestion_form.button_publish'), data: {disable_with: t('views.translations._suggestion_form.button_publish_working')}), wrapper: { class: 'mb-0'}, label: t('views.translations._suggestion_form.label'), label_class: 'sr-only', required: true

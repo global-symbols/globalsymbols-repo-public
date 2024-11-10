@@ -1,0 +1,2 @@
+class CsvLanguageNotFoundException < Exception
+end

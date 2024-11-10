@@ -1,0 +1,977 @@
+ur:
+  dictionary:
+    remove: ہٹانا
+    settings: سیٹنگیں
+    label:
+      one: لیبل
+      other: لیبل
+    go_back: واپس جاؤ
+    numbers:
+      '1': '1'
+      '3': '3'
+      '4': '4'
+      '2': '2'
+      '5': '5'
+    global_symbols: Global Symbols
+    back: واپس
+    edit: تدوین
+    search: تلاش
+    page_not_found: صفحہ نہیں ملا
+    archive: محفوظہ
+    un-archive: غیر محفوظہ
+    unauthorised: غیر مجاز
+    import: درآمد
+    view: منظر
+    by: سے
+    collaborator:
+      one: معاون
+      other: معاون
+    symbolset:
+      one: سمبل سیٹ
+      other: سمبل سیٹ
+    response:
+      one: جواب
+      other: جوابات
+    survey:
+      one: سروے
+      other: سروے
+    sign_in: سائن ان کریں
+    change: انقلاب
+    download: ڈاؤن لوڈ
+    publish: شائع کرنا
+    symbol:
+      one: علامت
+      other: علامتیں
+    concept:
+      one: تصور
+      other: تصورات
+  devise:
+    views:
+      registrations:
+        new:
+          sign_up_button: اکاؤنٹ بنائیں
+          heading: اکاؤنٹ بنائیں
+          page_title: اکاؤنٹ بنائیں
+        change_password:
+          heading: پاس ورڈ تبدیل کریں
+          manage_account: اکاؤنٹ کا انتظام کریں
+          submit: پاس ورڈ تبدیل کریں
+          account_indicator: بطور %{email} دستخط شدہ
+        _form:
+          button_change_password: پاس ورڈ تبدیل کریں
+          password_helper: 'کریکٹر کم از کم %{var}'
+          confirm_password: پاس ورڈ کی تصدیق کریں
+          new_password: نیا پاس ورڈ
+          new_password_confirmation: نیا پاس ورڈ تصدیق کریں
+          button_save_changes: تبدیلیاں محفوظ کریں
+          cancel_account_button: میرا اکاؤنٹ حذف کریں
+          language_helper: جہاں ممکن ہو آپ کی ترجیحی زبان میں علامات دکھائی جائیں
+            گی۔
+          current_password_helper: آپ کی تبدیلیوں کی تصدیق کے لیے ہمیں آپ کے حالیہ
+            پاس ورڈ کی ضرورت ہے۔
+          please_fix_errors: براہ کرم ان غلطیوں کو ٹھیک کریں۔
+          cancel_account_header: میرا اکاؤنٹ منسوخ کریں
+          cancel_account_confirm: تمھيں يقين ہے? آپ کا Global Symbols اکاؤنٹ مستقل
+            طور پر حذف کر دیا جائے گا۔
+          new_password_helper: '%{var} کریکٹر کم سے کم. اگر آپ اسے تبدیل نہیں کرنا
+            چاہتے تو خالی چھوڑ دیں۔'
+          cancel_account_text: اگر آپ اپنا Global Symbols اکاؤنٹ بند کرنا چاہتے ہیں…
+        edit:
+          page_title: اکاؤنٹ کا انتظام کریں
+          awaiting_confirmation: 'فی الحال تصدیق کا انتظار کر رہا ہے برائے: {unconfirmed_email}%'
+          heading: اکاؤنٹ کا انتظام کریں
+        account_saved:
+          heading: اکاؤنٹ تازہ کاری
+          return_to_gs_button: Global Symbols کی طرف لوٹیں
+      passwords:
+        edit:
+          confirm_password_label: نیا پاس ورڈ تصدیق کریں
+          new_password_helper: '%{var} کریکٹر کم از کم'
+          heading: اپنا پاس ورڈ تبدیل کریں
+          new_password_label: نیا پاس ورڈ
+          button: پاس ورڈ تبدیل کریں
+        new:
+          email_helper: وہ ای میل پتہ جو آپ Global Symbols پر سائن اپ کرتے تھے
+          button: ای میل پھر سیٹ لنک
+          page_title: اکاؤنٹ کا انتظام کریں
+          heading: پاس ورڈ پھر سیٹ کریں
+        instructions: اپنا اکاؤنٹ ای میل پتہ درج کریں اور ہم آپ کا پاس ورڈ ری سیٹ
+          کرنے کے لیے لنک بھیجیں گے۔
+      sessions:
+        errors:
+          messages:
+            not_locked: بند نہیں تھا
+            not_found: نہ ملا
+            expired: ختم ہو چکی ہے، براہ کرم ایک نئے کی درخواست کریں
+            already_confirmed: پہلے ہی تصدیق ہو چکی تھی، براہ کرم دستخط کرنے کی کوشش
+              کریں
+            confirmation_period_expired: '%{period} کے اندر تصدیق کی ضرورت ہے، براہ
+              کرم ایک نئے کی درخواست کریں'
+            not_saved:
+              one: '1 غلطی نے اس {resource}% کو محفوظ ہونے سے منع کیا:'
+              other: '%{count} غلطیوں نے اس %{resource} کو محفوظ ہونے سے منع کیا ہے:'
+        new:
+          page_title: سائن ان کریں
+          sign_in_button: سائن ان کریں
+      _shared:
+        _links:
+          sign_in: سائن ان کریں
+          sign_up: اکاؤنٹ بنائیں
+          forgotten_password: اپنا پاس ورڈ بھول گئے؟
+          new_unlock: کیا ان لاک ہدایات موصول نہیں ہوئی؟
+          new_confirmation: کیا تصدیقی ہدایات موصول نہیں ہوئی؟
+    passwords:
+      send_instructions: ہم نے آپ کو پاس ورڈ ری سیٹ ای میل بھیجا ہے۔
+      updated: آپ کا پاس ورڈ کامیابی سے تبدیل کر دیا گیا ہے۔ اب آپ پر دستخط ہو چکے
+        ہیں۔
+      no_token: آپ پاس ورڈ ری سیٹ ای میل سے آئے بغیر اس صفحے تک رسائی حاصل نہیں کر
+        سکتے۔ اگر آپ پاس ورڈ ری سیٹ ای میل سے آتے ہیں، تو براہ کرم اس بات کو یقینی
+        بنائیں کہ آپ نے فراہم کردہ مکمل یو آر ایل استعمال کیا ہے۔
+      send_paranoid_instructions: اگر آپ کا ای میل پتہ ہمارے ڈیٹا بیس میں موجود ہے،
+        تو آپ کو چند منٹوں میں اپنے ای میل ایڈریس پر پاس ورڈ ریکوری لنک موصول ہوگا۔
+      updated_not_active: آپ کا پاس ورڈ کامیابی سے تبدیل کر دیا گیا ہے۔
+    confirmations:
+      confirmed: آپ کے ای میل ایڈریس کی کامیابی سے تصدیق ہو چکی ہے۔
+      send_paranoid_instructions: اگر آپ کا ای میل پتہ ہمارے ڈیٹا بیس میں موجود ہے،
+        تو آپ کو ہدایات کے ساتھ ایک ای میل موصول ہوگا کہ چند منٹوں میں اپنے ای میل
+        ایڈریس کی تصدیق کیسے کی جائے۔
+      send_instructions: آپ کو چند منٹوں میں اپنے ای میل ایڈریس کی تصدیق کرنے کے لئے
+        ہدایات کے ساتھ ایک ای میل موصول ہوگا۔
+    failure:
+      inactive: آپ کا اکاؤنٹ ابھی فعال نہیں ہوا ہے۔
+      invalid: ناجائز %{authentication_keys} یا پاس ورڈ۔
+      locked: آپ کا اکاؤنٹ لاک ہے۔
+      last_attempt: آپ کا اکاؤنٹ لاک ہونے سے پہلے آپ کے پاس ایک اور کوشش ہے۔
+      timeout: آپ کا سیشن ختم ہو گیا۔ جاری رکھنے کے لیے دوبارہ سائن ان کریں۔
+      unconfirmed: جاری رکھنے سے پہلے آپ کو اپنے ای میل ایڈریس کی تصدیق کرنی ہوگی۔
+      already_authenticated: آپ پہلے ہی دستخط شدہ ہیں۔
+      not_found_in_database: ناجائز %{authentication_keys} یا پاس ورڈ۔
+      unauthenticated: جاری رکھنے سے پہلے آپ کو سائن ان یا سائن اپ کرنے کی ضرورت ہے۔
+    mailer:
+      reset_password_instructions:
+        subject: پاس ورڈ ہدایات پھر سیٹ کریں
+      email_changed:
+        subject: ای میل تبدیل
+      password_change:
+        subject: پاس ورڈ تبدیل
+      confirmation_instructions:
+        subject: توثیق ہدایات
+      unlock_instructions:
+        subject: ہدایات ان لاک کریں
+    omniauth_callbacks:
+      failure: '%{kind} سے آپ کی توثیق نہیں کر سکا کیونکہ "%{reason}".'
+      success: '%{kind} اکاؤنٹ سے کامیابی سے تصدیق شدہ.'
+    registrations:
+      signed_up: خوش آمدید! آپ نے کامیابی سے سائن اپ کیا ہے۔
+      updated: آپ کے اکاؤنٹ کو کامیابی سے اپ ڈیٹ کیا گیا ہے۔
+      destroyed: خدا حافظ! آپ کا اکاؤنٹ کامیابی سے منسوخ کر دیا گیا ہے۔ ہم جلد ہی
+        آپ سے دوبارہ ملنے کی امید کرتے ہیں۔
+      signed_up_but_inactive: آپ نے کامیابی سے سائن اپ کیا ہے۔ تاہم، ہم آپ کو سائن
+        ان نہیں کر سکے کیونکہ آپ کا اکاؤنٹ ابھی فعال نہیں ہوا ہے۔
+      signed_up_but_locked: آپ نے کامیابی سے سائن اپ کیا ہے۔ تاہم، ہم آپ کو سائن ان
+        نہیں کر سکے کیونکہ آپ کا اکاؤنٹ لاک ہے۔
+      signed_up_but_unconfirmed: آپ کے ای میل ایڈریس پر تصدیقی لنک کے ساتھ پیغام بھیجا
+        گیا ہے۔ براہ کرم اپنا اکاؤنٹ فعال کرنے کے لیے لنک پر عمل کریں۔
+      update_needs_confirmation: آپ نے اپنے اکاؤنٹ کو کامیابی سے اپ ڈیٹ کیا ہے، لیکن
+        ہمیں آپ کے نئے ای میل ایڈریس کی تصدیق کرنے کی ضرورت ہے۔ براہ کرم اپنا ای میل
+        چیک کریں اور اپنے نئے ای میل ایڈریس کی تصدیق کے لئے تصدیق شدہ لنک پر عمل کریں۔
+    sessions:
+      signed_in: خوش آمديد!
+      signed_out: آپ نے دستخط کر دیئے ہیں۔
+      already_signed_out: آپ نے دستخط کر دیئے ہیں۔
+    unlocks:
+      send_instructions: آپ کو چند منٹوں میں اپنے اکاؤنٹ کو ان لاک کرنے کے لئے ہدایات
+        کے ساتھ ایک ای میل موصول ہوگا۔
+      send_paranoid_instructions: اگر آپ کا اکاؤنٹ موجود ہے، تو آپ کو ایک ای میل موصول
+        ہوگی جس میں ہدایات ہوں گی کہ اسے چند منٹوں میں ان لاک کیسے کیا جائے۔
+      unlocked: آپ کا اکاؤنٹ کامیابی سے ان لاک کر دیا گیا ہے۔ جاری رکھنے کے لیے سائن
+        ان کریں۔
+  activerecord:
+    attributes:
+      user:
+        current_password: حالیہ پاس ورڈ
+        surname: کنیت
+        company: کمپنی
+        language_id: ترجیحی زبان
+        password: پاسورڈ
+        remember_me: مجھے یاد رکھیں
+        email: ای میل پتہ
+        prename: پہلا نام
+        location: جگہ
+      coding_framework:
+        structure: ساخت
+        api_uri_base: اے پی آئی یو آر آئی بیس
+        name: نام
+        www_uri_base: WWW یو آر آئی بیس
+      comment:
+        representation_rating: نمائندگی درجہ بندی
+        representation_rating_short: نمائندگی
+        contrast_rating: تضاد درجہ بندی
+        contrast_rating_short: برعکس
+        cultural_rating: ثقافتی درجہ بندی
+        cultural_rating_short: ثقافتی
+        comment: تبصرہ
+        read: پڑھنا
+        resolved: حل
+        rating: درجہ بندی
+      concept:
+        subject: موضوع
+      language:
+        scope: اسکوپ
+        category: زمرہ
+        active: سرگرم
+        name: نام
+      licence:
+        version: ورژن
+        properties: خواص
+        logo: طغرہ
+        name: نام
+        url: یو آر ایل
+      picto:
+        part_of_speech_options:
+          noun: اسم
+          pronoun: ضمیر
+          preposition: حرف جار
+          conjunction: ملانا
+          article: چیز
+          modifier: ترمیم کار
+          verb: فعل
+          adverb: فعل
+          adjective: صفت
+          interjection: مداخلت
+        publisher_ref: ناشر حوالہ
+        visibility: نظر آتا ہے از
+        image: روپ
+        visibility_options:
+          everybody: سب
+          collaborators: علامت سیٹ معاونین
+        part_of_speech: تقریر کا حصہ
+      survey:
+        name: نام
+        introduction: تعارف
+        status: پایہ
+        show_symbol_descriptions: علامت تصریحات نمایش کریں
+        close_at: بند کریں
+      survey_response:
+        name: نام
+        organisation: ادارہ
+        role: کردار
+      symbolset:
+        description: بیان
+        logo: طغرہ
+        status: پایہ
+        statuses:
+          draft: مسودہ
+          ingesting: انجیسنگ
+          published: شائع
+        name: نام
+        publisher: ناشر
+        publisher_url: ناشر یو آر ایل
+      label:
+        text: لیبل
+        text_diacritised: ڈائکرائٹائزڈ لیبل
+        description: بیان
+      category:
+        name: نام
+    models:
+      category: زمرہ
+      concept: تصور
+      label: لیبل
+      language: زبان
+      licence: لائسنس
+      picto: علامت
+      survey: سروے
+      survey_response: سروے جواب
+      coding_framework: کوڈنگ فریم ورک
+      image: روپ
+      survey_picto: سروے پکٹو
+      symbolset: علامت سیٹ
+      symbolset_user: معاون
+      user: صارف
+      comment: تبصرہ
+      picto_concept: تصور تصویر
+  doorkeeper:
+    scopes:
+      public: اپنے عوامی ڈیٹا تک رسائی حاصل کریں
+      boardset:write: اپنے بورڈ سیٹ پر لکھیں
+      identity:read:user: اپنے صارف اکاؤنٹ میں کوائف پڑھیں
+      boardset:read: اپنے بورڈ سیٹ پڑھیں
+  errors:
+    messages:
+      expired: ختم ہو چکی ہے، براہ کرم ایک نئے کی درخواست کریں
+      not_locked: بند نہیں تھا
+      inclusion: فہرست میں شامل نہیں
+      exclusion: محفوظ ہے
+      confirmation: '%{attribute} سے میل نہیں کھاتا'
+      size_too_small: بہت چھوٹا ہے (کم سے کم %{file_size})
+      not_an_integer: ایک انٹیگر ہونا ضروری ہے
+      greater_than_or_equal_to: '%{count} سے بڑا یا مساوی ہونا ضروری ہے'
+      equal_to: '%{count} کے برابر ہونا ضروری ہے'
+      odd: عجیب ہونا چاہئے
+      even: برابر ہونا چاہئے
+      other_than: '%{count} کے علاوہ دیگر ہونا ضروری ہے'
+      already_confirmed: پہلے ہی تصدیق ہو چکی تھی، براہ کرم دستخط کرنے کی کوشش کریں
+      wrong_size: غلط سائز ہے (%{file_size})
+      size_too_big: بہت بڑا ہے (زیادہ سے زیادہ %{file_size})
+      not_a_number: نمبر نہیں ہے
+      not_found: نہ ملا
+      invalid: ناجائز ہے
+      accepted: قبول کرنا ضروری ہے
+      empty: خالی نہیں ہو سکتا
+      blank: خالی نہیں ہو سکتا
+      present: خالی ہونا چاہیے
+      too_long:
+        one: بہت لمبا ہے (زیادہ سے زیادہ 1 کریکٹر ہے)
+        other: بہت لمبا ہے (زیادہ سے زیادہ %{count} حروف)
+      confirmation_period_expired: '%{period}کے اندر تصدیق کی ضرورت ہے، براہ کرم ایک
+        نئے کی درخواست کریں'
+      model_invalid: 'توثیق ناکام: %{errors}'
+      greater_than: '%{count} سے بڑا ہونا ضروری ہے'
+      less_than: '%{count} سے کم ہونا ضروری ہے'
+      less_than_or_equal_to: '%{count} سے کم یا مساوی ہونا ضروری ہے'
+      not_saved:
+        one: '1 نقص نے اس %{count} کو محفوظ ہونے سے منع کیا:'
+        other: '%{count} غلطیوں نے اس %{resource} کو محفوظ ہونے سے منع کیا ہے:'
+      too_short:
+        one: بہت مختصر ہے (کم از کم 1 کریکٹر ہے)
+        other: بہت چھوٹا ہے (کم از کم %{count} حروف ہے)
+      wrong_length:
+        one: غلط لمبائی ہے (1 کریکٹر ہونا چاہئے)
+        other: غلط لمبائی ہے %{count} حروف ہونا چاہئے)
+  unauthorized:
+    manage:
+      all: آپ %{action} یہ %{subject}نہیں کر سکتے۔
+      picto: آپ صرف علامتی سیٹوں کا انتظام کرسکتے ہیں جن پر آپ معاون ہیں۔
+    update:
+      project: اس منصوبے کو اپ ڈیٹ کرنے کی اجازت نہیں ہے۔
+  languages:
+    de: جرمن
+    sr_Cyrl: سربيئن - کرلک
+    el: يونانی
+    hy: ارمنين
+    tr: ترکش
+    sq: البينيئن
+    bg: بلگيرين
+    ca: کٹالن
+    nl: ڈچ
+    es: سپينش
+    ar: عربی
+    zh: چائنيز
+    da: ڈينش
+    hi: ہندی
+    it: اطالوی
+    mk: مقدونیائی
+    mr: مراٹھی
+    pt: پرتگال
+    ru: رشئن
+    sh: سربو کروشیائی
+    cnr: مونٹینیگرین
+    en: انگريزی
+    fr: فرنچ
+    sr: سربيئن
+    sr_Latn: سربیا (لاطینی)
+    ro: رومانيئن
+    hr: کروٹيئن
+    an: آراگونسے
+    br: بریٹن
+    et: اسٹونين
+    eu: باسيق
+    fa: فارسی
+    gl: گالاکيئن
+    he: اسرائيلی
+    hu: ہنگرين
+    pl: پولش
+    sk: سلووک
+    sv: سؤڈش
+    val: ویش
+    ur: اردو
+  views:
+    pages:
+      home:
+        for_creators: تخلیق کاروں کے لئے
+        for_communicators: مواصلات کرنے والوں کے لیے
+        for_communicators_text: گفتگو بنانے کے لیے تصاویر کا تبادلہ کریں
+        for_everyone_text: دریافت کریں، مکس کریں، مشابہ کریں اور علامت کا استعمال
+          ذاتی بنائیں
+        explore_button: مزید علامت سیٹ دریافت کریں…
+        board_builder:
+          subheading: مواصلات بورڈ آسان طریقہ
+          design: مواصلاتی بورڈز کو آن لائن ڈیزائن، تعمیر، محفوظ اور پرنٹ کریں۔
+          storage: ہر چیز آپ کے Global Symbols اکاؤنٹ میں محفوظ طریقے سے ذخیرہ کی
+            جاتی ہے۔
+          create: ہماری لائبریری سے ہزاروں مفت تصاویر کا استعمال کرتے ہوئے مواصلات
+            میں مدد کے لئے بورڈ بنائیں، اور یہاں تک کہ اپنے.
+          button_featured: فیچرڈ بورڈ سیٹ
+          heading: Global Symbols Board Builder
+          button_try: Board Builder آزمائیں
+        for_creators_text: علامت سیٹ کا انتظام اور اشاعت کریں
+        for_everyone: ہر ایک کے لئے
+        explore_heading: علامت سیٹ دریافت کریں
+      search:
+        symbolset_dropdown_any_symbol_set: کوئی علامت سیٹ
+        search_for: تلاش کریں
+        _title: تلاش
+        search: تلاش
+        no_results: ہمیں کوئی مماثل علامتیں نہیں مل سکیں۔ وسیع تر تلاش کی کوشش کریں۔
+      contact:
+        heading: رابطہ کریں
+        lead_text: ہمیں متعلقہ وسائل کے بارے میں سوالات، تجاویز اور معلومات موصول
+          کرکے بہت خوشی ہو رہی ہے۔
+        email_us: ہمیں ای میل کریں
+        _description: عام پوچھ گچھ کے ساتھ ہم سے رابطہ کریں، یا اپنی علامت سیٹ شائع
+          کروانے کے لئے۔
+    surveys:
+      _shared:
+        thank_you: سروے مکمل کرنے کے لئے آپ کا شکریہ!
+        questions:
+          representation_rating: لفظ یا محاورے کی نمائندگی کرتا ہے
+          contrast_rating: رنگ تضاد
+          cultural_rating: ثقافتی حساسیت
+          comments: اضافی تبصرے
+          feelings_rating: مجموعی طور پر علامت کے بارے میں احساسات
+        number_of_symbols:
+          one: اس سروے میں %{count} علامت ہے جس کا آپ جائزہ لیں۔
+          other: اس سروے میں آپ کے جائزے کے ل %{count} علامتیں ہیں۔
+      show:
+        close_at_message: آپ %{date}تک حصہ لے سکتے ہیں۔
+        begin_button: سروے شروع کریں
+        closed_header: یہ سروے اس وقت رائے قبول نہیں کر رہا ہے۔
+        closed_text: اگر آپ کو شرکت کرنے کے قابل ہونے کی توقع ہے تو سروے منتظم سے
+          رابطہ کریں۔
+        offline_participants: آف لائن کام کرنے والے شرکاء کے لیے…
+        provide_details: آپ کی تفصیلات فراہم کرنا اختیاری ہے، اور سروے منتظمین کی
+          مدد کر سکتا ہے۔
+        provide_details_2: آپ کی تفصیلات آپ کی رائے کے سلسلے میں سروے کے منتظمین کو
+          دکھائی جائیں گی، اور کبھی بھی Global Symbols کے ذریعہ کسی اور مقصد کے لئے
+          استعمال نہیں کی جائیں گی۔
+        offline_participants_button: سروے فیڈ بیک فارم چھاپیں
+      print:
+        show_intro: سروے تعارف دکھائیں
+        show_example: مثال دکھائیں
+        show_example_helper: نمونہ جوابات دکھاتے ہوئے ایک مثال سوال شامل کرتا ہے۔
+        print_button: پرنٹ سروے
+        instructions_1: یہ سروے آپ سے ہر علامت کے چار پہلوؤں کی درجہ بندی کرنے اور
+          کچھ تبصرے فراہم کرنے کے لئے کہے گا۔
+        show_intro_helper: سروے میں ترمیم کرکے تعارف تبدیل کریں۔
+        show_instructions: ہدایات دکھائیں
+        introduction: تعارف
+        show_instructions_helper: ہدایات پر کلک کرکے تبدیل کریں۔
+        heading: سیٹنگیں چھاپیں
+        symbol_label_language_helper: بہترین نتائج کے لیے جدید براؤزر کا استعمال کرتے
+          ہوئے رنگ میں پرنٹ کریں اور ہیڈر ز اور فٹرز کو غیر فعال کریں۔
+        name_field: میرا نام ہے
+        instructions_heading: ہدایات
+        collect_names: شرکاء کے نام جمع کریں
+        symbol_label_language: علامت لیبل نمایش کریں
+        symbol_label_language_all: تمام دستیاب زبانیں
+        instructions_2: ہر علامت کو اس پیمانے پر درجہ دیں جہاں 1 'مکمل طور پر ناقابل
+          قبول' ہو اور 5 صحیح باکس میں چیک رکھ کر 'مکمل طور پر قابل قبول' ہو۔
+      thank_you:
+        button_go_to_homepage: Global Symbols کی طرف بڑھیں
+        button_restart_survey: سروے پھر شروع کریں
+        feedback_is_saved: ہم نے آپ کی تمام رائے محفوظ کر لی ہے۔
+      _print_question:
+        symbol_counter: علامت %{number}
+        example_comment: یہ درخت بروکولی کی طرح لگتا ہے۔
+        example_heading: مثال سوال
+        example_text: اس سے پتہ چلتا ہے کہ آپ سوالات کا جواب کیسے کرسکتے ہیں
+    symbolsets:
+      show:
+        no_symbols_for_collaborator: اپنی علامت سیٹ بنانے کے لیے ایک علامت شامل کریں
+        _description: Global Symbols پر سیٹ کردہ %{symbolset_name} علامت دریافت کریں۔
+          مواصلات کے لئے مفت تصاویر اور علامات حاصل کریں۔
+      _topbar:
+        button_edit: تدوین
+        button_review: جائزہ
+        download: ڈاؤن لوڈ
+        button_add_symbol: علامت اضافہ کریں
+        button_archive: آرکائیو شدہ علامات
+        button_translate: ترجمہ کرنا
+      index:
+        _title: علامت سیٹ دریافت کریں
+        heading: علامت سیٹ دریافت کریں
+        create_symbol_set_button: علامت سیٹ بنائیں
+        _description: Global Symbols پر ہزاروں مفت مواصلاتی علامات براؤز کریں۔
+      new:
+        _title: علامت سیٹ بنائیں
+        heading: علامت سیٹ بنائیں
+        guidance_link: Global Symbols پر اپنی علامت سیٹ شائع کرنا
+        guidance: ہمارا مشورہ ہے کہ آپ کے لئے رہنما خطوط کا جائزہ لیں
+        introduction: آپ کی نئی علامت سیٹ ایک مسودہ ریاست میں بنائی جائے گی۔ یہ صرف
+          آپ کو اور آپ کے شامل کردہ معاونین کو نظر آئے گا، جس سے آپ علامتیں شامل کر
+          سکتے ہیں اور علامت سیٹ تیار کر سکتے ہیں۔
+      _shared:
+        none_found: ہمیں یہاں کوئی علامت نہیں مل سکی!
+      review:
+        heading: جائزہ
+        filter_all_symbols: تمام علامات
+        filter_without_a_concept: ایک تصور کے بغیر
+      _form:
+        publisher_url_helper: ناشر کی ویب سائٹ کا پتہ۔
+        logo_helper: یہ لوگو علامتسیٹ سپیج پر ظاہر ہوگا۔ یہ ایک تصویر ہونی چاہئے،
+          مثالی طور پر ایک ایس وی جی یا پی این جی، شفاف پس منظر کے ساتھ 300ایکس 200
+          پکسلز.
+        publisher_url_label: ناشر یو آر ایل
+        publisher_placeholder: جیسے عوامی علامتوں کی فاؤنڈیشن
+        licence_prompt: لائسنس منتخب کریں
+        create_button: علامت سیٹ بنائیں
+        logo_label: طغرہ
+        description_helper: یہ تصریح علامت سیٹ کے ساتھ ظاہر ہوگی۔
+        published_helper: شائع شدہ علامت سیٹ ہر ایک کو نظر آتے ہیں۔ مسودہ علامت سیٹ
+          ایڈمن ز اور علامت سیٹ معاونین کو نظر آتے ہیں۔
+        publisher_helper: اس شخص یا تنظیم کا نام جو علامت سیٹ شائع کرتا ہے۔
+        publisher_url_placeholder: جیسے https://peoplesymbols.com
+        save_button: علامت سیٹ محفوظ کریں
+      translate:
+        title: ترجمہ %{symbolset_name}
+        button_find_untranslated: غیر ترجمہ شدہ علامات تلاش کریں
+        form:
+          target_lang_prompt: ہدف زبان منتخب کریں
+          target_lang_label: کو
+          source_lang_label: ترجمہ از
+          source_lang_option: '%{language_name} (%{labels_count} علامات، %{coverage_percentage}
+            کوریج)'
+        description: علامتی لیبل وں کا نئی زبانوں میں خود بخود ترجمہ کریں۔ یہ ٹول
+          ایک وقت میں %{symbols_limit} علامتوں کے بیچوں میں ترجمہ کرتا ہے۔
+        heading: لیبل ترجمہ کریں
+      _review_row:
+        remove_confirmation: کیا ہم اس علامت سے %{subject} ہٹا دیں؟
+      edit:
+        _title: تدوین %{symbolset_name}
+      import:
+        _title: درآمد کریں بطرف %{symbolset_name}
+        heading: علامتیں درآمد کریں
+        introduction: اپنی موجودہ علامات کو Global Symbols میں اپ لوڈ کریں۔
+      archive:
+        heading: آرکائیو شدہ علامات
+        none_found: اس علامت سیٹ میں کوئی آرکائیو شدہ علامتیں نہیں ہیں
+        description: آرکائیو شدہ علامات علامت سیٹ، تلاش کے نتائج یا ایپس میں نہیں
+          دکھائی جاتی ہیں
+      _symbolset_card:
+        image:
+          alt: '%{symbolset_name} لوگو'
+    pictos:
+      _form:
+        language_helper: لیبل کی زبان.
+        label_label: لیبل متن
+        description_helper: تفہیم میں مدد کے لئے علامت کو مختصر طور پر بیان کریں۔
+        save_button: علامت محفوظ کریں
+        to_download_symbols: علامتیں ڈاؤن لوڈ کرنے کے لئے
+        image_helper: ایس وی جی (ترجیحی) یا پی این جی فارمیٹ کی تصویر اپ لوڈ کریں۔
+        label_helper: لیبل آپ کی علامت کو بیان کرتا ہے تاکہ لوگ اسے تلاش کر سکیں۔
+          علامت بنانے کے بعد آپ اضافی زبانوں میں لیبل شامل کرسکتے ہیں۔
+        diacritised_label_helper: صرف عربی زبانوں کے لیے۔ اس میں اضافی تلفظ کی تفصیل
+          ذخیرہ کی گئی ہے۔
+        create_button: علامت اضافہ کریں
+      _topbar:
+        download_button: ڈاؤن لوڈ کریں %{file_type}
+        not_publicly_visible: عوامی طور پر نظر نہیں آتا
+      edit:
+        heading: علامت تدوین کریں
+        _title: '%{symbolset_name} میں %{picto_label} کی تدوین کریں'
+      show:
+        concept_defined_in: وضاحت %{coding_framework_name} میں کی گئی ہے
+        add_concept_button: ایک تصور شامل کریں
+        alternative_symbols_heading: متبادل علامات
+        archived_notice:
+          heading: آرکائیو شدہ علامت
+          text: یہ علامت سیٹ، تلاش کے نتائج یا ایپس میں نہیں دکھائی گئی
+        _title: '%{picto_label} میں %{symbolset_name}'
+        no_concepts: اس علامت کی وضاحت کے لیے کوئی تصور نہیں ہے۔
+        _description: "'%{picto_label}' علامت، %{symbolset_name} علامت سیٹ کا حصہ.\
+          \ مواصلات کے لئے ہزاروں مفت علامات تلاش کریں۔"
+      _comment_form:
+        save_button: تبصرہ محفوظ کریں
+      new:
+        _title: '%{symbolset_name} میں علامت کا اضافہ کریں'
+        heading: علامت اضافہ کریں
+    survey_editor:
+      _form:
+        show_symbol_descriptions_label: علامت تصریحات نمایش کریں
+        show_symbol_descriptions_helper: شرکاء کو علامتی تصریحات دکھاتا ہے۔
+        language_helper: یہ سروے لیتے وقت شرکاء کو منتخب زبان میں علامتی لیبل دکھائے
+          جاتے ہیں۔
+        save_button: سروے محفوظ کریں
+        create_button: سروے بنائیں
+        introduction_helper: اختیاری. یہ شرکاء کو اس وقت دکھایا جاتا ہے جب وہ سروے
+          شروع کرتے ہیں۔
+        close_at_helper: اختیاری. شرکاء کے جواب کے لئے آخری تاریخ مقرر کریں۔
+        language_label: علامت لیبل نمایش کریں
+        name_helper: ایک نام فراہم کریں جو شرکاء کو اس سروے کی شناخت کرنے میں مدد
+          کرتا ہے۔
+        language_blank_option: تمام دستیاب زبانیں
+      _picto:
+        no_label_for_language: کوئی %{language_name} لیبل نہیں
+        remove_confirm: کیا آپ کو یقین ہے کہ آپ اس علامت کو سروے سے ہٹانا چاہتے ہیں؟
+      _sidebar:
+        heading: مراحل
+        stages:
+          plan: منصوبہ
+          collect_feedback: رائے اکٹھا کریں
+          analyse: نتائج کا تجزیہ کریں
+          archive: آرکائیو یا حذف کریں
+          collect_feedback_description: شرکاء کو سروے مکمل کرنے دیں
+          analyse_results_description: سروے کے نتائج کا جائزہ لیں
+          plan_description: سروے میں شامل کرنے کے لئے علامتیں چنیں
+      export_xlsx:
+        header_participant_number: شریک نمبرو
+        header_symbol_id: علامت شناختی نشان
+        header_overall_rating: درجہ بندی
+        header_representation_rating: نمائندگی
+        header_contrast_rating: برعکس
+        header_comment: تبصرہ
+        sheet_name: تبصرے
+        header_label: لیبل
+        header_cultural_rating: ثقافتی
+        header_participant_name: نام شریک
+        comment_participant_name: شرکاء کو اپنے نام فراہم کرنے کی ضرورت نہیں ہے، لہذا
+          کچھ خلیات خالی ہو سکتے ہیں۔
+      edit:
+        _title: '%{symbolset_name} میں %{survey_name} کی تدوین کریں'
+        heading: سروے میں ترمیم کریں
+      index:
+        _title: '%{symbolset_name} میں سروے'
+        button_new_survey: سروے بنائیں
+        get_help: سروے کے لیے %{link} دریافت کریں
+        no_surveys_at_stage: '%{stage} مرحلہ پر کوئی سروے نہیں ہے۔'
+        get_help_link: مدد اور تربیت
+      new:
+        button_create: سروے بنائیں
+      show:
+        symbols_heading: اس سروے میں علامات
+        symbols_text: Global Symbols میں ان کی تلاش اور 'سروے میں اضافہ' کا انتخاب
+          کرکے اس سروے میں علامتیں شامل کریں۔
+        collect_feedback:
+          close_at_label: جوابات قبول کریں جب تک
+          invite_deadline: شرکاء کے پاس جوابات فراہم کرنے کے لیے %{close_at} تک کا
+            وقت ہوتا ہے (%{link})۔
+          responses_count:
+            one: آپ کے سروے میں %{count} کا جواب ہے۔
+            other: آپ کے سروے میں%{count} جوابات ہیں۔
+          confirm_stop: اس سے لوگ سروے کا جواب دینے سے رک جائیں گے۔ تمھيں يقين ہے?
+          paper_add_paper_feedback_button: کاغذی رائے شامل کریں
+          survey_ended_add_paper: آپ اب بھی کاغذی سروے فارموں سے دستی طور پر رائے
+            شامل کرسکتے ہیں۔
+          button_begin_collecting: رائے اکٹھا کرنا شروع کریں
+          close_at_helper: اختیاری. سروے کے جوابات کے لئے ایک آخری تاریخ مقرر کریں۔
+          paper_heading: کاغذی سروے
+          heading: رائے اکٹھا کریں
+          invite_at_this_url: لوگوں کو اس یو آر ایل پر اپنا سروے لینے کی دعوت دیں۔
+          paper_intro: کچھ شرکاء کاغذی سروے فارم کو ترجیح دے سکتے ہیں۔ ان ٹولز کا
+            استعمال ان کی رائے اکٹھا کریں اور اسے یہاں ذخیرہ کریں۔
+          paper_customisation_invitation: اپنے شرکاء کے لئے سروے فارم کو اپنی مرضی
+            کے مطابق اور پرنٹ کرنے کے لئے…
+          paper_print_button: سروے فارم چھاپیں
+          paper_to_include_results: اپنے سروے کے نتائج میں کاغذی سروے فارموں کے نتائج
+            شامل کرنے کے لئے…
+          survey_ended: اس سروے کے لئے جوابی مجموعہ ختم ہو چکا ہے۔
+          text_1: جب آپ رائے اکٹھا کرنا شروع کریں گے تو ہم آپ کو ایک یو آر ایل دیں
+            گے جہاں لوگ سروے میں حصہ لے سکیں گے۔
+          text_2: جب سروے رائے اکٹھا کر رہا ہو تو آپ اپنی علامت کے انتخاب کو تبدیل
+            نہیں کر سکیں گے۔
+          stop_button: سروے ختم کریں
+        analyse_results:
+          button_stats: علامت شماریات
+          button_individual_responses: انفرادی جوابات
+          export:
+            text_3: ایکسل فائل میں ہر قطار سروے میں ایک علامت کے واحد شرکا کے جائزے
+              کی نمائندگی کرتی ہے۔
+            text_1: تمام سروے ڈیٹا ڈاؤن لوڈ کرنے کے لیے اس ٹول کا استعمال کریں، بشمول
+              ریٹنگ اور تبصرے۔
+            text_2: اس سے ایکسل میں اپنا تجزیہ کرنا آسان ہو جاتا ہے۔ ہمارا مشورہ ہے
+              کہ آپ ہر علامت کے اوسط نتائج کا حساب لگانے اور چارٹ کرنے کے لیے Pat
+              جدول استعمال کریں۔
+            heading: برآمدی نتائج بطرف ایکسل
+          responses_count:
+            one: '%{count} شخص نے آپ کے سروے کا جواب دیا۔'
+            other: آپ کے سروے میں %{count} جوابات ہیں۔
+          heading: نتائج کا تجزیہ کریں
+          results_appear_here: نتائج یہاں ظاہر ہوں گے جب لوگ آپ کے سروے کا جواب دینا
+            شروع کریں گے۔
+        archive:
+          survey_is_archived: یہ سروے آرکائیو شدہ ہے۔ آپ اب بھی کسی بھی نتائج کا تجزیہ
+            کر سکتے ہیں۔
+          archive_button: سروے آرکائیو کریں
+          delete_button: سروے حذف کریں
+          heading: آرکائیو یا حذف کریں
+          archive_description: جب آپ اس کے ساتھ ختم کر لیں تو اس سروے کو محفوظ کریں۔
+            آپ اب بھی اس سروے میں کسی بھی نتائج کا تجزیہ کر سکیں گے۔
+          archive_confirm: اس سے لوگ سروے کا جواب دینے سے رک جائیں گے۔ تمھيں يقين
+            ہے?
+          delete_description: اس سروے کو حذف کرنے سے آپ کے جمع کردہ نتائج مستقل طور
+            پر حذف ہو جائیں گے۔ کوئی علامت حذف نہیں کی جائے گی۔
+          delete_confirm: کیا آپ اس سروے اور کسی بھی جواب کو حذف کرنا چاہتے ہیں؟
+        symbols_search_helper: اس سروے میں اضافہ کرنے کے لیے علامتیں تلاش کریں
+      _add_picto_to_survey:
+        button: سروے میں اضافہ کریں
+        option: '%{survey_name} میں %{symbolset_name}'
+      add_symbol:
+        notice_success_add_another: ایک اور اضافہ کریں؟
+        notice_success: ہم نے آپ کے سروے میں علامت شامل کی۔ %{add_another_link}
+        alert_failure: یہ علامت پہلے ہی %{survey_link} میں ہے
+      destroy:
+        notice: ہم نے آپ کا سروے %{name}حذف کر دیا۔
+    survey_picto_analysis:
+      index:
+        row_heading_averages: اوسط
+        column_heading_rating_description: مجموعی طور پر علامت کے بارے میں احساسات
+        column_heading_representation_rating_description: لفظ یا محاورے کی نمائندگی
+          کرتا ہے
+        column_heading_overall_average: مجموعی اوسط
+        column_heading_cultural_rating_description: ثقافتی مناسبت
+        heading: علامت شماریات
+        column_heading_contrast_rating_description: رنگ تضاد
+        crumb_name: علامت شماریات
+        intro: یہ جدول سروے میں موصول ہونے والے کل %{count} کی بنیاد پر ہر علامت کے
+          اوسط جوابات دکھاتا ہے۔
+    survey_response_analysis:
+      _sidebar:
+        heading: جوابات
+        participant_number: شریک %{number}
+      index:
+        crumb_name: انفرادی جوابات
+        heading: انفرادی جوابات
+      new:
+        heading: کاغذی رائے شامل کریں
+        label_overall_rating: علامت کے بارے میں احساسات
+        label_contrast_rating: رنگ تضاد
+        label_cultural_rating: ثقافتی حساسیت
+        save_button: جوابات محفوظ کریں
+        match_numbers: ہر علامت خانہ کے اوپر دائیں طرف دکھائے گئے نمبر کاغذی شکلوں
+          پر دکھائے گئے نمبروں سے مشابہ ہونے چاہئیں، تاکہ یہ یقینی بنایا جا سکے کہ
+          آپ ہر علامت کے لیے صحیح درجہ بندی درج کریں۔
+        label_representation_rating: لفظ کی نمائندگی کرتا ہے
+        cancel_confirm: تمھيں يقين ہے? آپ اب تک کوئی نتیجہ کھو دیں گے۔
+        use_this_form_to: کسی ایک کاغذی سروے کو Global Symbols میں محفوظ کرنے کے لئے
+          اس فارم کا استعمال کریں۔ اس کے بعد آپ کے سروے کے اعدادوشمار کا حساب لگائیں
+          گے۔
+      create:
+        notice_success: یہ کاغذی جواب محفوظ کر لیا گیا تھا۔
+    survey_questions:
+      _form:
+        button_previous_question: پچھلا سوال
+        button_save_answer: جواب محفوظ کریں
+        please_fix_errors: براہ کرم نیچے دی گئی غلطیوں کو ٹھیک کریں۔
+        comments_helper: اختیاری. براہ کرم اس علامت کو بہتر بنانے میں ہماری مدد کے
+          لئے کوئی تبصرہ شامل کریں۔
+      show:
+        please_rate: براہ کرم اس علامت کو اس پیمانے پر درجہ دیں جہاں 1 'مکمل طور پر
+          ناقابل قبول' ہے اور 5 'مکمل طور پر قابل قبول' ہے۔
+      _controller:
+        timed_out: معذرت - غیر فعالیت کی وجہ سے آپ کا سروے وقت پر آگیا۔ براہ کرم دوبارہ
+          سروے شروع کریں۔
+    collaborators:
+      index:
+        page_title: معاونین برائے %{name}
+        add_heading: معاون کا اضافہ کریں
+        add_button: معاون اضافہ کریں
+        existing_heading: موجودہ معاونین
+        existing_none_found: کسی بھی صارف کو اس علامت سیٹ میں ترمیم کرنے کی اجازت
+          نہیں ہے۔
+        added_at: اضافہ شدہ %{date}
+        existing_text: ان لوگوں کو اس علامت سیٹ میں ترمیم کرنے کی اجازت ہے۔
+        remove_aria_label: معاون ہٹائیں
+        remove_confirm: کیا ہم اس علامت سیٹ سے %{email} ہٹا دیں؟
+        add_text: کسی اور کو بھی اس علامت سیٹ میں ترمیم کرنے کی اجازت دینے کے لئے
+          ، وہ ای میل پتہ درج کریں جس کے ذریعے وہ Global Symbols پر سائن اپ کرتے تھے۔
+      destroy:
+        notice_success: ہم نے بطور معاون %{email_address} ہٹا دیا۔
+      create:
+        notice_success: ہم نے بطور معاون %{email_address} کا اضافہ کیا۔
+        alert_no_gs_account: '%{email_address} کا ابھی تک Global Symbols اکاؤنٹ نہیں
+          ہے۔'
+    picto_concepts:
+      index:
+        add_concept:
+          heading: ایک تصور شامل کریں
+          instruction: اس علامت میں ایک تصور شامل کرنے کے لیے ایک لفظ درج کریں۔ اگر
+            ہم اسے تلاش کر سکیں تو ہم اس تصور کو شامل کریں گے۔
+          button: تصور اضافہ کریں
+          add: اضافہ کرنا
+        existing_concepts:
+          none_found: اس علامت کا کوئی تصور نہیں ہے
+          remove_confirm: کیا ہم اس علامت سے %{subject} ہٹا دیں؟
+          remove_aria_label: تصور ہٹائیں
+          heading: موجودہ تصورات
+          added_at: اضافہ شدہ %{date}
+        intro: تصورات کمپیوٹرکو آپ کی علامتوں کو سمجھنے میں مدد دیتے ہیں، لہذا اس
+          بات کو یقینی بنائیں کہ وہ درست اور مخصوص ہیں۔
+        add_concept_invitation: ہم کوئی بھی تصور شامل کر سکتے ہیں جو آپ تصور نیٹ پر
+          تلاش کر سکتے ہیں۔
+        page_title: تصورات برائے %{symbol}
+      create:
+        notice_success: ہم نے اس علامت میں %{concept} تصور شامل کیا۔
+        alert_already_exists: '%{concept} پہلے ہی اس علامت پر ایک تصور ہے۔'
+        alert_failure: ہمیں %{concept}نامی تصور نہیں مل سکا۔ ایک اور لفظ آزمائیں۔
+      destroy:
+        alert_failure: ہم اس علامت سے %{concept} تصور کو نہیں ہٹا سکے۔
+        notice_success: ہم نے اس علامت سے %{concept} تصور ہٹا دیا۔
+    picto_labels:
+      _form:
+        language_helper: لیبل کی زبان.
+        description_helper: تفہیم میں مدد کے لئے علامت کو مختصر طور پر بیان کریں۔
+        button_save: لیبل محفوظ کریں
+        button_add: لیبل اضافہ کریں
+        label_label: لیبل متن
+        diacritised_label_label: ڈائکرائٹائزڈ لیبل
+        diacritised_label_helper: صرف عربی زبانوں کے لیے۔ اس میں اضافی تلفظ کی تفصیل
+          ذخیرہ کی گئی ہے۔
+      _picto_labels:
+        heading: '%{label_type} لیبل'
+        remove_label_confirm: کیا ہم اس علامت سے %{text} ہٹا دیں؟
+        remove_label_aria_label: لیبل ہٹائیں
+        no_labels_found: کوئی لیبل نہیں ملا
+      edit:
+        page_title: لیبل برائے %{symbol}
+        intro: لیبل دوسرے لوگوں کو آپ کی علامتوں کو سمجھنے میں مدد کرتے ہیں۔ وہ ہمیں
+          آپ کی علامت کے معنی کو سمجھنے میں مدد کرتے ہیں، لہذا اس بات کو یقینی بنائیں
+          کہ وہ درست اور مخصوص ہیں۔
+        heading: لیبل تدوین کریں
+      index:
+        page_title: لیبل برائے %{symbol}
+        instructions: علامتوں میں کم از کم ایک لیبل ہونا ضروری ہے۔ اگر آپ چاہیں تو
+          ایک سے زیادہ زبانوں کے لیے لیبل شامل کر سکتے ہیں۔
+        heading_add_label: لیبل شامل کریں
+        status_published: شائع
+        intro: لیبل دوسرے لوگوں کو آپ کی علامتوں کو سمجھنے میں مدد کرتے ہیں۔ وہ ہمیں
+          آپ کی علامت کے معنی کو سمجھنے میں مدد کرتے ہیں، لہذا اس بات کو یقینی بنائیں
+          کہ وہ درست اور مخصوص ہیں۔
+        status_suggested: تجویز
+      create:
+        notice_success: ہم نے اس علامت میں %{label} لیبل شامل کیا۔
+        alert_failure: اس لیبل کو شامل کرنے سے پہلے آپ کو کچھ مسائل کا ازالہ کرنا
+          ہوگا۔
+      destroy:
+        alert_failure: ہم اس علامت سے %{label} لیبل نہیں ہٹا سکے۔
+        notice_success: ہم نے اس علامت سے %{label} لیبل ہٹا دیا۔
+      publish_translation:
+        notice_success: '%{language_name} لیبل شائع کیا۔'
+    application:
+      _copy_to_clipboard:
+        button: نقل
+        button_title: تختہ تراشہ پر نقل کریں
+    pagination:
+      next: اگلا
+      previous: پریف
+      first: پہلا
+      last: آخری
+    errors:
+      not_found:
+        description: ہمیں اس پتے پر کچھ نہیں ملا
+    translations:
+      _translation_form:
+        button_translate: علامات کا ترجمہ کریں
+        publish_button_working: تمام ترجموں کی اشاعت…
+        translation_complete_heading: ترجمہ مکمل
+        button_translate_working: علامات کا ترجمہ کر رہا ہے…
+        publish_button: تمام %{language_name} ترجمے شائع کریں
+        translation_complete_text: تمام علامتوں کا ترجمہ %{language_name} میں کیا
+          گیا ہے۔
+      _symbols_table:
+        heading_source_language: '%{language_name} ماخذ'
+        heading_destination_language: '%{language_name} ترجمہ'
+        button_get_translation: ترجمہ حاصل کریں
+        heading_type: قسم
+        button_get_translation_working: ترجمہ کر رہا ہے…
+      _suggestion_form:
+        button_publish: شائع کرنا
+        button_publish_working: اشاعت…
+        label: ترجمہ
+      _translations_published:
+        heading: شائع شدہ ترجمے
+        next_steps: ترجمہ کرنے کے لیے مزید علامات تلاش کریں، یا کسی اور زبان کا انتخاب
+          کریں۔
+        labels_saved: نئے ترجمے محفوظ کر لیے گئے ہیں۔
+        labels_are_visible: نئے ترجمے اب Global Symbols اور ایپس میں نظر آرہے ہیں۔
+    concepts:
+      show:
+        defined_in: ایک تصور جس کی وضاحت کی گئی ہے
+        page_title: '%{subject} میں %{coding_framework}'
+    articles:
+      _topbar:
+        header_news: عالمی علامات خبریں
+      index:
+        title: خبر
+        description: عالمی علامات بلاگ - اپ ڈیٹس، خیالات، اور تحریک آپ کو علامتوں
+          کے ساتھ بات چیت کرنے میں مدد کرنے کے لئے.
+        more_button: مزید مضامین
+  layouts:
+    application:
+      menu:
+        sign_in: سائن ان کریں
+        sign_up: اکاؤنٹ بنائیں
+        resources: وسائل
+        board_builder: Board Builder
+        training: تربیت
+        news: خبر
+        twitter: ٹوئٹر پر Global Symbols
+        sign_out: سائن آؤٹ کریں
+        my_account: میرا اکاؤنٹ
+        search_placeholder: تلاش کریں %{var}
+        facebook: فیس بک پر Global Symbols
+      footer:
+        privacy_policy: رازداری کی پالیسی
+        terms: شرائط
+        accessibility: رسائی
+        contact: رابطہ
+        about: تقریباً
+        language_label: زبان
+      skip_to_main_content: مرکزی مشمول پر چھوڑیں
+  date:
+    formats:
+      default: ٪ای ٪ب ٪ی
+      short: ٪د ٪ب
+      long: ٪د ٪ب ٪ی
+    day_names:
+    - اتوار
+    - پیر
+    - منگل
+    - بدھ
+    - جمعرات
+    - جمعہ
+    - ہفتہ
+    abbr_day_names:
+    - سورج
+    - سوم
+    - منگل
+    - شادی
+    - تھو
+    - جمعہ
+    - ہفتہ
+    month_names:
+    - جنوری
+    - فروری
+    - مارچ
+    - اپریل
+    - مئی
+    - جون
+    - جولائی
+    - اگست
+    - ستمبر
+    - اکتوبر
+    - نومبر
+    - دسمبر
+    abbr_month_names:
+    - جان
+    - فروری
+    - مار
+    - اپریل
+    - مئی
+    - جون
+    - جول
+    - اگست
+    - ستمبر
+    - اکتوبر
+    - نومبر
+    - دسمبر
+    order:
+    - سال
+    - مہینہ
+    - دن
+  time:
+    formats:
+      default: ٪A, ٪٪ب ٪ی ٪a٪M:٪ایس ٪زیڈ
+      short: ٪د ٪ب ٪ایچ:٪M
+      long: ٪ب ٪د، ٪وائی ٪ایچ:٪M
+    am: پر
+    pm: پی ایم

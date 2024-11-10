@@ -1,0 +1,1 @@
+$("#edit_label_<%= @label.id %>").replaceWith('<%= escape_javascript render('label_link', label: @label) %>')

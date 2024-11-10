@@ -1,0 +1,969 @@
+nl:
+  layouts:
+    application:
+      footer:
+        contact: Contact
+        about: Over
+        accessibility: Toegankelijkheid
+        terms: Voorwaarden
+        privacy_policy: Privacybeleid
+        language_label: Taal
+      menu:
+        twitter: Global Symbols op Twitter
+        facebook: Global Symbols op Facebook
+        search_placeholder: Zoeken %{var}
+        sign_in: Aanmelden
+        my_account: Mijn account
+        sign_out: Afmelden
+        news: Nieuws
+        training: Opleiding
+        board_builder: Board Builder
+        resources: Middelen
+        sign_up: Account aanmaken
+      skip_to_main_content: Ga naar de hoofdinhoud
+  views:
+    application:
+      _copy_to_clipboard:
+        button: Kopiëren
+        button_title: Naar klembord kopiëren
+    picto_labels:
+      destroy:
+        alert_failure: We konden het label %{label} niet uit dit symbool verwijderen.
+        notice_success: We hebben het label %{label} uit dit symbool verwijderd.
+      create:
+        alert_failure: U moet enkele problemen oplossen voordat we dit label kunnen
+          toevoegen.
+        notice_success: We hebben het label %{label} aan dit symbool toegevoegd.
+      index:
+        heading_add_label: Een label toevoegen
+        instructions: Symbolen moeten ten minste één label hebben. Als u wilt, u een
+          label voor meer dan één taal toevoegen.
+        intro: Labels helpen andere mensen uw symbolen te begrijpen. Ze helpen ons
+          de betekenis van uw symbool te begrijpen, dus zorg ervoor dat ze nauwkeurig
+          en specifiek zijn.
+        page_title: Labels voor %{symbol}
+        status_published: Gepubliceerd
+        status_suggested: Voorgesteld
+      edit:
+        intro: Labels helpen andere mensen uw symbolen te begrijpen. Ze helpen ons
+          de betekenis van uw symbool te begrijpen, dus zorg ervoor dat ze nauwkeurig
+          en specifiek zijn.
+        heading: Label bewerken
+        page_title: Labels voor %{symbol}
+      _picto_labels:
+        no_labels_found: Er zijn geen labels gevonden
+        remove_label_confirm: Zullen we %{text} uit dit symbool verwijderen?
+        remove_label_aria_label: Label verwijderen
+        heading: '%{label_type} labels'
+      _form:
+        button_add: Label toevoegen
+        button_save: Label opslaan
+        description_helper: Beschrijf kort het symbool om begrip te bevorderen.
+        diacritised_label_helper: Alleen voor Arabische talen. Dit slaat extra uitspraakdetails
+          op.
+        diacritised_label_label: Gediacritiseerd etiket
+        label_label: Labeltekst
+        language_helper: De taal van het label.
+      publish_translation:
+        notice_success: Het label %{language_name} gepubliceerd.
+    picto_concepts:
+      destroy:
+        alert_failure: We konden het concept %{concept} niet uit dit symbool verwijderen.
+        notice_success: We hebben het concept %{concept} uit dit symbool verwijderd.
+      create:
+        alert_already_exists: '%{concept} is al een concept op dit symbool.'
+        alert_failure: We konden geen concept vinden met de naam %{concept}. Probeer
+          nog een woord.
+        notice_success: We hebben het concept %{concept} aan dit symbool toegevoegd.
+      index:
+        page_title: Concepten voor %{symbol}
+        existing_concepts:
+          remove_aria_label: Concept verwijderen
+          remove_confirm: Zullen we %{subject} uit dit symbool verwijderen?
+          none_found: Dit symbool heeft geen concepten
+          added_at: '%{date} toegevoegd'
+          heading: Bestaande concepten
+        add_concept:
+          button: Concept toevoegen
+          instruction: Als u een concept aan dit symbool wilt toevoegen, voert u een
+            woord in. We voegen het concept toe als we het kunnen vinden.
+          heading: Een concept toevoegen
+          add: toevoegen
+        add_concept_invitation: We kunnen elk concept toevoegen dat u op ConceptNet
+          vinden.
+        intro: Concepten helpen computers uw symbolen te begrijpen, dus zorg ervoor
+          dat ze nauwkeurig en specifiek zijn.
+    concepts:
+      show:
+        defined_in: Een concept gedefinieerd in
+        page_title: '%{subject} in %{coding_framework}'
+    collaborators:
+      destroy:
+        notice_success: Als medewerker hebben we %{email_address} verwijderd.
+      create:
+        alert_no_gs_account: '%{email_address} heeft nog geen Global Symbols account.'
+        notice_success: We hebben %{email_address} toegevoegd als medewerker.
+      index:
+        remove_aria_label: Medewerker verwijderen
+        remove_confirm: Zullen we %{email} uit deze symboolset verwijderen?
+        added_at: '%{date} toegevoegd'
+        existing_none_found: Gebruikers mogen deze symboolset niet bewerken.
+        existing_text: Deze mensen mogen deze symboolset bewerken.
+        existing_heading: Bestaande medewerkers
+        add_button: Medewerker toevoegen
+        add_text: Als u iemand anders wilt toestaan deze symboolset te bewerken, voert
+          u het e-mailadres in dat ze hebben gebruikt om zich aan te melden bij Global
+          Symbols.
+        add_heading: Een medewerker toevoegen
+        page_title: Medewerkers voor %{name}
+    survey_questions:
+      _controller:
+        timed_out: Sorry - er is een time-out op uw enquête opgekomen vanwege inactiviteit.
+          Begin opnieuw met de enquête.
+      show:
+        please_rate: Beoordeel dit symbool op een schaal waarbij 1 'volstrekt onaanvaardbaar'
+          is en 5 'volledig acceptabel'.
+      _form:
+        button_save_answer: Antwoord opslaan
+        button_previous_question: Vorige vraag
+        comments_helper: Optionele. Voeg eventuele opmerkingen toe om ons te helpen
+          dit symbool te verbeteren.
+        please_fix_errors: Los de onderstaande fouten op.
+    survey_response_analysis:
+      create:
+        notice_success: Deze papieren reactie is opgeslagen.
+      new:
+        save_button: Reacties opslaan
+        cancel_confirm: Weet je het zeker? U zult tot nu toe resultaten verliezen.
+        label_cultural_rating: Culturele sensitiviteit
+        label_contrast_rating: Kleurcontrast
+        label_representation_rating: Vertegenwoordigt het woord
+        label_overall_rating: Gevoelens over het symbool
+        match_numbers: De nummers rechtsboven in elk symboolvak moeten overeenkomen
+          met de nummers die op de papieren formulieren worden weergegeven, om ervoor
+          te zorgen dat u de juiste beoordelingen voor elk symbool invoert.
+        use_this_form_to: Gebruik dit formulier om één papieren enquête op te slaan
+          in Global Symbols. Het telt dan mee voor uw enquêtestatistieken.
+        heading: Papierfeedback toevoegen
+      index:
+        heading: Individuele reacties
+        crumb_name: Individuele reacties
+      _sidebar:
+        participant_number: Deelnemer %{number}
+        heading: Reacties
+    survey_picto_analysis:
+      index:
+        column_heading_cultural_rating_description: Culturele geschiktheid
+        column_heading_contrast_rating_description: Kleurcontrast
+        column_heading_representation_rating_description: Vertegenwoordigt het woord
+          of de woordgroep
+        column_heading_rating_description: Gevoelens over het symbool als geheel
+        row_heading_averages: Gemiddelden
+        column_heading_overall_average: Totaal gemiddelde
+        intro: Deze tabel toont de gemiddelde antwoorden voor elk symbool in de enquête,
+          op basis van een totaal ontvangen %{count}.
+        heading: Symboolstatistieken
+        crumb_name: Symboolstatistieken
+    survey_editor:
+      add_symbol:
+        alert_failure: Dit symbool bevindt zich al in %{survey_link}
+        notice_success_add_another: Nog een toevoegen?
+        notice_success: We hebben het symbool aan uw enquête toegevoegd. %{add_another_link}
+      show:
+        archive:
+          delete_button: De enquête verwijderen
+          delete_confirm: Weet u zeker dat u deze enquête en eventuele antwoorden
+            wilt verwijderen?
+          delete_description: Als u deze enquête verwijdert, worden alle resultaten
+            die u hebt verzameld permanent verwijderd. Er worden geen symbolen verwijderd.
+          archive_button: Archiveer de enquête
+          archive_confirm: Dit voorkomt dat mensen reageren op de enquête. Weet je
+            het zeker?
+          archive_description: Archiveer deze enquête wanneer u klaar bent met deze
+            enquête. U nog steeds alle resultaten in deze enquête analyseren.
+          survey_is_archived: Deze enquête is gearchiveerd. U nog steeds alle resultaten
+            analyseren.
+          heading: Archiveren of verwijderen
+        analyse_results:
+          export:
+            text_3: Elke rij in het Excel-bestand vertegenwoordigt de beoordeling
+              door één deelnemer van een symbool in de enquête.
+            text_2: Dit maakt het eenvoudig om uw eigen analyse uit te voeren in Excel.
+              We raden u aan draaitabellen te gebruiken om de gemiddelde resultaten
+              voor elk symbool te berekenen en in kaart te brengen.
+            text_1: Gebruik deze tool om alle enquêtegegevens te downloaden, inclusief
+              beoordelingen en opmerkingen.
+            heading: Resultaten exporteren naar Excel
+          button_stats: Symboolstatistieken
+          button_individual_responses: Individuele reacties
+          results_appear_here: De resultaten worden hier weergegeven wanneer mensen
+            beginnen te reageren op uw enquête.
+          heading: Resultaten analyseren
+          responses_count:
+            one: '%{count} persoon heeft op uw enquête gereageerd.'
+            other: '%{count} mensen hebben op uw enquête gereageerd.'
+        collect_feedback:
+          survey_ended_add_paper: U nog steeds handmatig feedback toevoegen van papieren
+            enquêteformulieren.
+          survey_ended: De responsverzameling voor deze enquête is beëindigd.
+          paper_add_paper_feedback_button: Papierfeedback toevoegen
+          paper_to_include_results: Resultaten van papieren enquêteformulieren opnemen
+            in uw enquêteresultaten…
+          paper_print_button: Enquêteformulieren afdrukken
+          paper_customisation_invitation: Enquêteformulieren voor uw deelnemers aanpassen
+            en afdrukken…
+          paper_intro: Sommige deelnemers geven de voorkeur aan papieren enquêteformulieren.
+            Gebruik deze tools verzamelen hun feedback en slaan het hier op.
+          responses_count:
+            one: Uw enquête heeft %{count} reactie.
+            other: Uw enquête heeft %{count} reacties.
+          invite_deadline: Deelnemers hebben tot %{close_at} om antwoorden te geven
+            (%{link}).
+          invite_at_this_url: Nodig mensen uit om uw enquête op deze URL in te vullen.
+          button_begin_collecting: Begin met het verzamelen van feedback
+          close_at_helper: Optionele. Stel een deadline in voor enquêtereacties.
+          close_at_label: Reacties accepteren tot
+          text_2: U uw symboolselecties niet wijzigen terwijl de enquête feedback
+            verzamelt.
+          text_1: Wanneer u begint met het verzamelen van feedback, geven we u een
+            URL waar mensen kunnen deelnemen aan de enquête.
+          heading: Feedback verzamelen
+          stop_button: De enquête beëindigen
+          paper_heading: Papieren enquêtes
+          confirm_stop: Dit voorkomt dat mensen reageren op de enquête. Weet je het
+            zeker?
+        symbols_search_helper: Zoeken naar symbolen om aan deze enquête toe te voegen
+        symbols_text: Voeg symbolen toe aan deze enquête door ernaar te zoeken in
+          Global Symbols en 'Toevoegen aan enquête' te kiezen.
+        symbols_heading: Symbolen in deze enquête
+      new:
+        button_create: Enquête maken
+      index:
+        get_help_link: Hulp en training
+        get_help: '%{link} verkennen voor enquêtes'
+        no_surveys_at_stage: Er zijn geen enquêtes in de fase %{stage}.
+        button_new_survey: Enquête maken
+        _title: Enquêtes in %{symbolset_name}
+      edit:
+        heading: Enquête bewerken
+        _title: '%{survey_name} bewerken in %{symbolset_name}'
+      destroy:
+        notice: We hebben uw enquête %{name} verwijderd.
+      export_xlsx:
+        sheet_name: Opmerkingen
+        comment_participant_name: Deelnemers hoeven hun naam niet op te geven, dus
+          sommige cellen kunnen leeg zijn.
+        header_comment: Commentaar
+        header_cultural_rating: Culturele
+        header_contrast_rating: Contrast
+        header_representation_rating: Vertegenwoordiging
+        header_overall_rating: Rating
+        header_label: Label
+        header_symbol_id: Symbool-ID
+        header_participant_name: Naam deelnemer
+        header_participant_number: Deelnemer Numbero
+      _sidebar:
+        stages:
+          analyse_results_description: Bekijk de resultaten van de enquête
+          collect_feedback_description: Laat deelnemers de enquête invullen
+          plan_description: Symbolen kiezen die u in de enquête wilt opnemen
+          archive: Archiveren of verwijderen
+          analyse: Resultaten analyseren
+          collect_feedback: Feedback verzamelen
+          plan: Plan
+        heading: Stadia
+      _picto:
+        remove_confirm: Weet u zeker dat u dit symbool uit de enquête wilt verwijderen?
+        no_label_for_language: Geen label %{language_name}
+      _form:
+        create_button: Enquête maken
+        save_button: Enquête opslaan
+        show_symbol_descriptions_helper: Geeft symboolbeschrijvingen weer aan deelnemers.
+        show_symbol_descriptions_label: Symboolbeschrijvingen weergeven
+        language_blank_option: Alle beschikbare talen
+        language_helper: Bij het invullen van deze enquête krijgen deelnemers symboollabels
+          in de geselecteerde taal te zien.
+        language_label: Symboollabels weergeven in
+        close_at_helper: Optionele. Stel een deadline in voor deelnemers om te reageren.
+        introduction_helper: Optionele. Dit wordt aan deelnemers getoond wanneer ze
+          de enquête starten.
+        name_helper: Geef een naam op waarmee deelnemers deze enquête kunnen identificeren.
+      _add_picto_to_survey:
+        option: '%{survey_name} in %{symbolset_name}'
+        button: Toevoegen aan enquête
+    pictos:
+      show:
+        _description: "'%{picto_label}'-symbool, onderdeel van de symbolenset %{symbolset_name}.\
+          \ Vind duizenden gratis symbolen voor communicatie."
+        alternative_symbols_heading: Alternatieve symbolen
+        add_concept_button: Een concept toevoegen
+        no_concepts: Dit symbool heeft geen concepten om het te definiëren.
+        concept_defined_in: Gedefinieerd in %{coding_framework_name}
+        _title: '%{picto_label} in %{symbolset_name}'
+        archived_notice:
+          heading: Gearchiveerd symbool
+          text: Dit symbool wordt niet weergegeven in de symbolenset, zoekresultaten
+            of apps
+      new:
+        heading: Symbool toevoegen
+        _title: Symbool toevoegen in %{symbolset_name}
+      edit:
+        heading: Symbool bewerken
+        _title: '%{picto_label} bewerken in %{symbolset_name}'
+      _topbar:
+        not_publicly_visible: Niet openbaar zichtbaar
+        download_button: Download %{file_type}
+      _form:
+        to_download_symbols: symbolen downloaden
+        create_button: Symbool toevoegen
+        save_button: Symbool opslaan
+        description_helper: Beschrijf kort het symbool om begrip te bevorderen.
+        diacritised_label_helper: Alleen voor Arabische talen. Dit slaat extra uitspraakdetails
+          op.
+        label_label: Labeltekst
+        language_helper: De taal van het label.
+        label_helper: Het label beschrijft uw symbool, zodat mensen het kunnen vinden.
+          U labels in extra talen toevoegen nadat u het symbool hebt gemaakt.
+        image_helper: Upload een SVG-afbeelding (voorkeur) of PNG-indeling.
+      _comment_form:
+        save_button: Opmerking opslaan
+    symbolsets:
+      review:
+        filter_without_a_concept: Zonder concept
+        filter_all_symbols: Alle symbolen
+        heading: Review
+      _shared:
+        none_found: We konden hier geen symbolen vinden!
+      new:
+        guidance_link: uw symboolset gepubliceerd krijgen op Global Symbols
+        guidance: We raden u aan de richtlijnen voor
+        introduction: Uw nieuwe symboolset wordt gemaakt in een conceptstatus. Het
+          is alleen zichtbaar voor u en medewerkers die u toevoegt, zodat u symbolen
+          toevoegen en de symboolset voorbereiden.
+        heading: Een symboolset maken
+        _title: Een symboolset maken
+      index:
+        _description: Blader door duizenden gratis communicatiesymbolen bij Global
+          Symbols.
+        create_symbol_set_button: Symboolset maken
+        heading: Symboolsets verkennen
+        _title: Symboolsets verkennen
+      import:
+        introduction: Upload uw bestaande symbolen naar Global Symbols.
+        heading: Symbolen importeren
+        _title: Importeren naar %{symbolset_name}
+      edit:
+        _title: '%{symbolset_name} bewerken'
+      _symbolset_card:
+        image:
+          alt: '%{symbolset_name} logo'
+      _form:
+        save_button: Symboolset opslaan
+        create_button: Symboolset maken
+        licence_prompt: Selecteer een licentie
+        publisher_url_placeholder: bijv. https://peoplesymbols.com
+        publisher_placeholder: b.v. Stichting PeopleSymbols
+        publisher_url_label: Uitgever-URL
+        logo_label: Logo
+        logo_helper: Dit logo verschijnt op de pagina Symbolsets. Dit moet een afbeelding
+          zijn, idealiter een SVG of PNG, 300x200 pixels met een transparante achtergrond.
+        publisher_url_helper: Het adres van de website van de uitgever.
+        publisher_helper: De naam van de persoon of organisatie die de symboolset
+          publiceert.
+        published_helper: Gepubliceerde symboolsets zijn voor iedereen zichtbaar.
+          Conceptsymboolsets zijn zichtbaar voor beheerders en medewerkers van symboolsets.
+        description_helper: Deze beschrijving wordt weergegeven naast de symboolset.
+      _review_row:
+        remove_confirmation: Zullen we %{subject} uit dit symbool verwijderen?
+      _topbar:
+        button_review: Review
+        button_edit: Bewerken
+        button_add_symbol: Symbool toevoegen
+        download: Downloaden
+        button_archive: Gearchiveerde symbolen
+        button_translate: Vertalen
+      show:
+        _description: Verken het symbool %{symbolset_name} dat is ingesteld op Global
+          Symbols. Ontvang gratis afbeeldingen en symbolen voor communicatie.
+        no_symbols_for_collaborator: Een symbool toevoegen om te beginnen met het
+          bouwen van uw symboolset
+      archive:
+        description: Gearchiveerde symbolen worden niet weergegeven in de symbolenset,
+          zoekresultaten of apps
+        heading: Gearchiveerde symbolen
+        none_found: Er zijn geen gearchiveerde symbolen in deze symbolenset
+      translate:
+        form:
+          target_lang_prompt: Doeltaal selecteren
+          target_lang_label: aan
+          source_lang_label: Vertalen van
+          source_lang_option: '%{language_name} (%{labels_count} symbolen, %{coverage_percentage}
+            dekking)'
+        heading: Labels vertalen
+        description: Vertaal symboollabels automatisch naar nieuwe talen. Deze tool
+          vertaalt in batches van %{symbols_limit} symbolen tegelijk.
+        button_find_untranslated: Onvertaalde symbolen zoeken
+        title: '%{symbolset_name} vertalen'
+    pagination:
+      first: Eerste
+      previous: Vorige
+      last: Laatste
+      next: Volgende
+    surveys:
+      _print_question:
+        example_comment: Deze boom ziet eruit als een broccoli.
+        symbol_counter: Symbool %{number}
+        example_text: Dit laat zien hoe je vragen beantwoorden
+        example_heading: Voorbeeldvraag
+      thank_you:
+        button_restart_survey: De enquête opnieuw starten
+        button_go_to_homepage: Ga verder met Global Symbols
+        feedback_is_saved: We hebben al je feedback opgeslagen.
+      print:
+        instructions_2: Beoordeel elk symbool op een schaal waarbij 1 'volstrekt onaanvaardbaar'
+          is en 5 'volledig acceptabel', door een vinkje in het juiste vakje te plaatsen.
+        instructions_1: Deze enquête zal u vragen om vier aspecten van elk symbool
+          te beoordelen en enkele opmerkingen te geven.
+        instructions_heading: Instructies
+        introduction: Introductie
+        name_field: Mijn naam is
+        print_button: Enquête afdrukken
+        symbol_label_language_helper: Voor het beste resultaat u in kleur afdrukken
+          met een moderne browser en kopteksten en voetteksten uitschakelen.
+        symbol_label_language_all: Alle beschikbare talen
+        symbol_label_language: Symboollabels weergeven in
+        show_example_helper: Voegt een voorbeeldvraag toe met voorbeeldantwoorden.
+        show_example: Een voorbeeld weergeven
+        show_instructions_helper: Wijzig de instructies door erop te klikken.
+        show_instructions: De instructies weergeven
+        show_intro_helper: Wijzig de inleiding door de enquête te bewerken.
+        show_intro: De enquêteintroductie weergeven
+        collect_names: Namen van deelnemers verzamelen
+        heading: Afdrukinstellingen
+      show:
+        offline_participants_button: Feedbackformulieren voor enquêtes afdrukken
+        offline_participants: Voor deelnemers die offline werken…
+        closed_text: Neem contact op met de enquêteorganisator als u verwacht deel
+          te kunnen nemen.
+        closed_header: Deze enquête accepteert momenteel geen feedback.
+        provide_details_2: Uw gegevens worden getoond aan de organisatoren van de
+          enquête in verband met uw feedback en nooit gebruikt door Global Symbols
+          voor andere doeleinden.
+        provide_details: Het verstrekken van uw gegevens is optioneel en kan de organisatoren
+          van de enquête helpen.
+        begin_button: Start de enquête
+        close_at_message: U deelnemen tot %{date}.
+      _shared:
+        questions:
+          comments: Aanvullende opmerkingen
+          cultural_rating: Culturele sensitiviteit
+          contrast_rating: Kleurcontrast
+          representation_rating: Vertegenwoordigt het woord of de woordgroep
+          feelings_rating: Gevoelens over het symbool als geheel
+        thank_you: Bedankt voor het invullen van de enquête!
+        number_of_symbols:
+          one: Deze enquête heeft %{count} symbool dat u kunt beoordelen.
+          other: Deze enquête heeft %{count} symbolen die u kunt beoordelen.
+    pages:
+      contact:
+        email_us: E-mail ons
+        _description: Neem contact met ons op met algemene vragen, of om uw symboolset
+          gepubliceerd te krijgen.
+        lead_text: We ontvangen graag vragen, suggesties en informatie over relevante
+          bronnen.
+        heading: Neem contact met ons op
+      search:
+        no_results: We konden geen overeenkomende symbolen vinden. Probeer een bredere
+          zoekopdracht.
+        _title: Zoek
+        search_for: Zoeken naar
+        search: Zoek
+        symbolset_dropdown_any_symbol_set: Elke symboolset
+      home:
+        explore_button: Ontdek meer symboolsets…
+        for_everyone: Voor iedereen
+        for_communicators_text: Afbeeldingen uitwisselen om gesprekken te maken
+        for_communicators: Voor communicatoren
+        for_creators_text: Symboolsets beheren en publiceren
+        for_creators: Voor makers
+        explore_heading: Symboolsets verkennen
+        for_everyone_text: Ontdek, mix, match en maak symboolgebruik persoonlijk
+        board_builder:
+          subheading: Communicatieborden op de eenvoudige manier
+          heading: Global Symbols Board Builder
+          create: Maak borden om de communicatie te helpen met behulp van duizenden
+            gratis afbeeldingen uit onze bibliotheek, en zelfs die van uzelf.
+          design: Ontwerp, bouw, bewaar en print communicatieborden online.
+          storage: Alles wordt veilig opgeslagen in uw Global Symbols account.
+          button_featured: Uitgelichte bordsets
+          button_try: Board Builder proberen
+    errors:
+      not_found:
+        description: We konden niets vinden op dit adres
+    translations:
+      _translation_form:
+        button_translate: Symbolen vertalen
+        button_translate_working: Symbolen vertalen…
+        publish_button: Publiceer alle %{language_name} Vertalingen
+        publish_button_working: Alle vertalingen publiceren…
+        translation_complete_heading: Vertaling voltooid
+        translation_complete_text: Alle symbolen zijn vertaald naar %{language_name}.
+      _translations_published:
+        heading: Vertalingen gepubliceerd
+        labels_are_visible: De nieuwe vertalingen zijn nu zichtbaar op Global Symbols
+          en in apps.
+        next_steps: Zoek meer symbolen om te vertalen of kies een andere taal.
+        labels_saved: De nieuwe vertalingen zijn opgeslagen.
+      _suggestion_form:
+        button_publish: Publiceren
+        button_publish_working: Publiceren…
+        label: Vertaling
+      _symbols_table:
+        heading_source_language: '%{language_name} Bron'
+        heading_destination_language: '%{language_name} Vertaling'
+        button_get_translation: Vertaling kregen
+        button_get_translation_working: Vertalen…
+        heading_type: Type
+    articles:
+      index:
+        description: The Global Symbols Blog - Updates, ideeën en inspiratie om u
+          te helpen communiceren met symbolen.
+        title: Nieuws
+        more_button: Meer artikelen
+      _topbar:
+        header_news: Global Symbols Nieuws
+  languages:
+    sr_Latn: Servisch (Latijn)
+    sr_Cyrl: Servisch (Cyrillisch)
+    sr: Servisch
+    hr: Kroatisch
+    de: Duits
+    fr: Frans
+    en: Engels
+    ro: Roemeens
+    el: Grieks
+    hy: Armeens
+    tr: Turks
+    sq: Albanees
+    bg: Bulgaars
+    ca: Catalaans
+    nl: Nederlands
+    es: Spaans
+    cnr: Montenegrijns
+    sh: Servo-Kroatisch
+    ru: Russisch
+    pt: Portugees
+    mr: Marathi
+    mk: Macedonisch
+    it: Italiaans
+    hi: Hindi
+    da: Deens
+    zh: Chinees
+    ar: Arabisch
+    an: Aragonees
+    he: Hebreeuws
+    br: Bretons
+    et: Estisch
+    eu: Baskisch
+    fa: Perzisch
+    gl: Galicisch
+    hu: Hongaars
+    pl: Pools
+    sk: Slowaaks
+    sv: Zweeds
+    val: Vehes
+    ur: Urdu
+  dictionary:
+    page_not_found: Pagina niet gevonden
+    download: Downloaden
+    change: Wijzigen
+    search: Zoek
+    remove: Verwijderen
+    view: Bekijken
+    sign_in: Aanmelden
+    edit: Bewerken
+    import: Importeren
+    by: Door
+    back: Terug
+    numbers:
+      '5': '5'
+      '4': '4'
+      '3': '3'
+      '2': '2'
+      '1': '1'
+    global_symbols: Global Symbols
+    go_back: Terug
+    unauthorised: Onbevoegde
+    settings: Instellingen
+    survey:
+      one: Enquête
+      other: Enquêtes
+    response:
+      one: Reactie
+      other: Reacties
+    symbol:
+      one: Symbool
+      other: Symbolen
+    symbolset:
+      one: Symboolreeks
+      other: Symbolensets
+    label:
+      one: Etiket
+      other: Etiketten
+    collaborator:
+      one: Medewerker
+      other: Medewerkers
+    concept:
+      one: Concept
+      other: Concepten
+    archive: Archief
+    un-archive: Niet-archiveren
+    publish: Publiceren
+  activerecord:
+    attributes:
+      user:
+        language_id: Voorkeurstaal
+        location: Locatie
+        company: Bedrijf
+        surname: Achternaam
+        prename: Voornaam
+        email: E-mailadres
+        current_password: Huidig wachtwoord
+        remember_me: Denk aan mij
+        password: wachtwoord
+      symbolset:
+        statuses:
+          ingesting: Inname
+          draft: Ontwerp
+          published: Gepubliceerd
+        status: Status
+        logo: Logo
+        publisher_url: Uitgever-URL
+        publisher: Publisher
+        description: Beschrijving
+        name: Naam
+      survey_response:
+        role: Role
+        organisation: Organisatie
+        name: Naam
+      survey:
+        show_symbol_descriptions: Symboolbeschrijvingen weergeven
+        close_at: Sluiten bij
+        status: Status
+        introduction: Introductie
+        name: Naam
+      picto:
+        visibility_options:
+          collaborators: Medewerkers van Symbolset
+          everybody: Iedereen
+        visibility: Zichtbaar door
+        image: Afbeelding
+        publisher_ref: Referentie uitgever
+        part_of_speech_options:
+          modifier: Modifier
+          article: Artikel
+          interjection: Interruptie
+          conjunction: Samen
+          preposition: Voorzetsel
+          pronoun: Voornaamwoord
+          adverb: Adverb
+          adjective: Adjectief
+          verb: Werkwoord
+          noun: Zelfstandig naamwoord
+        part_of_speech: Onderdeel van Speech
+      licence:
+        logo: Logo
+        properties: Eigenschappen
+        version: Versie
+        url: Url
+        name: Naam
+      language:
+        category: Categorie
+        scope: Scope
+        name: Naam
+        active: Actieve
+      label:
+        description: Beschrijving
+        text_diacritised: Gediacritiseerd etiket
+        text: Label
+      concept:
+        subject: Onderwerp
+      comment:
+        resolved: Opgelost
+        read: Lezen
+        comment: Commentaar
+        cultural_rating_short: Culturele
+        cultural_rating: Culturele beoordeling
+        contrast_rating_short: Contrast
+        contrast_rating: Contrastbeoordeling
+        representation_rating_short: Vertegenwoordiging
+        representation_rating: Vertegenwoordigingsbeoordeling
+        rating: Rating
+      coding_framework:
+        www_uri_base: WWW URI-basis
+        api_uri_base: API URI-basis
+        structure: Structuur
+        name: Naam
+      category:
+        name: Naam
+    models:
+      user: Gebruiker
+      symbolset_user: Medewerker
+      symbolset: Symboolreeks
+      survey_response: Enquêterespons
+      survey_picto: Enquête Picto
+      survey: Enquête
+      picto_concept: Picto Concept
+      picto: Symbool
+      licence: Licentie
+      language: Taal
+      label: Label
+      image: Afbeelding
+      concept: Concept
+      comment: Commentaar
+      coding_framework: Coderingskader
+      category: Categorie
+  errors:
+    messages:
+      size_too_big: is te groot (maximum is %{file_size})
+      size_too_small: is te klein (minimum is %{file_size})
+      wrong_size: is de verkeerde grootte (moet %{file_size} zijn)
+      already_confirmed: was al bevestigd, probeer dan in te loggen
+      confirmation_period_expired: moet worden bevestigd binnen %{period}, vraag een
+        nieuwe aan
+      expired: is verlopen, vraag dan een nieuwe aan
+      not_found: niet gevonden
+      not_saved:
+        one: 'Door 1 fout kon deze %{resource} niet worden opgeslagen:'
+        other: '%{count} fouten verhinderden dat deze %{resource} werd opgeslagen:'
+      not_locked: was niet vergrendeld
+      even: moet gelijk zijn
+      odd: moet vreemd zijn
+      other_than: moet anders zijn dan %{count}
+      less_than_or_equal_to: moet kleiner zijn dan of gelijk zijn aan %{count}
+      less_than: moet kleiner zijn dan %{count}
+      equal_to: moet gelijk zijn aan %{count}
+      greater_than_or_equal_to: moet groter zijn dan of gelijk zijn aan %{count}
+      greater_than: moet groter zijn dan %{count}
+      not_an_integer: moet een geheel getal zijn
+      not_a_number: is geen getal
+      wrong_length:
+        one: is de verkeerde lengte (moet 1 teken zijn)
+        other: is de verkeerde lengte (moet %{count} tekens zijn)
+      too_short:
+        one: is te kort (minimaal 1 teken)
+        other: is te kort (minimum is %{count} tekens)
+      too_long:
+        one: is te lang (maximaal 1 teken)
+        other: is te lang (maximum is %{count} tekens)
+      present: moet leeg zijn
+      blank: kan niet leeg zijn
+      empty: kan niet leeg zijn
+      accepted: moet worden geaccepteerd
+      confirmation: komt niet overeen met %{attribuut}
+      invalid: is ongeldig
+      exclusion: is gereserveerd
+      inclusion: is niet opgenomen in de lijst
+      model_invalid: 'Validatie mislukt: %{errors}'
+  doorkeeper:
+    scopes:
+      boardset:write: Schrijf naar je boardsets
+      boardset:read: Lees uw boardsets
+      identity:read:user: Gegevens lezen in uw gebruikersaccount
+      public: Toegang tot uw openbare gegevens
+  devise:
+    views:
+      sessions:
+        errors:
+          messages:
+            not_locked: was niet vergrendeld
+            not_found: niet gevonden
+            expired: is verlopen, vraag dan een nieuwe aan
+            confirmation_period_expired: moet worden bevestigd binnen %{period}, vraag
+              een nieuwe aan
+            already_confirmed: was al bevestigd, probeer dan in te loggen
+            not_saved:
+              one: 'Door 1 fout kon deze %{resource} niet worden opgeslagen:'
+              other: 'Door %{count} fouten kon deze %{resource} niet worden opgeslagen:'
+        new:
+          sign_in_button: Aanmelden
+          page_title: Aanmelden
+      registrations:
+        edit:
+          awaiting_confirmation: 'Momenteel in afwachting van bevestiging voor: %{unconfirmed_email}'
+          page_title: Account beheren
+          heading: Account beheren
+        _form:
+          cancel_account_button: Mijn account verwijderen
+          cancel_account_confirm: Weet je het zeker? Uw Global Symbols account wordt
+            permanent verwijderd.
+          cancel_account_text: Als u uw Global Symbols-account wilt sluiten…
+          cancel_account_header: Mijn account opzeggen
+          button_save_changes: Wijzigingen opslaan
+          new_password_helper: Minimaal %{var}-tekens. Laat leeg als u het niet wilt
+            wijzigen.
+          current_password_helper: We hebben uw huidige wachtwoord nodig om uw wijzigingen
+            te bevestigen.
+          new_password_confirmation: Nieuw wachtwoord bevestigen
+          new_password: Nieuw wachtwoord
+          please_fix_errors: Los deze fouten op.
+          confirm_password: Wachtwoord bevestigen
+          password_helper: Minimaal %{var}-tekens
+          language_helper: Symbolen worden waar mogelijk in uw voorkeurstaal weergegeven.
+          button_change_password: Wachtwoord wijzigen
+        new:
+          sign_up_button: Account aanmaken
+          heading: Account aanmaken
+          page_title: Account aanmaken
+        change_password:
+          heading: Wachtwoord wijzigen
+          manage_account: Account beheren
+          submit: Wachtwoord wijzigen
+          account_indicator: Aangemeld als %{email}
+        account_saved:
+          heading: Account bijgewerkt
+          return_to_gs_button: Terug naar Global Symbols
+      passwords:
+        edit:
+          heading: Uw wachtwoord wijzigen
+          button: Wachtwoord wijzigen
+          confirm_password_label: Nieuw wachtwoord bevestigen
+          new_password_helper: minimaal %{var} tekens
+          new_password_label: Nieuw wachtwoord
+        instructions: Voer het e-mailadres van uw account in en we sturen een link
+          om uw wachtwoord opnieuw in te stellen.
+        new:
+          page_title: Account beheren
+          button: Koppeling voor het opnieuw instellen van e-mail
+          email_helper: Het e-mailadres dat u hebt gebruikt om u aan te melden bij
+            Global Symbols
+          heading: Wachtwoord opnieuw instellen
+      _shared:
+        _links:
+          sign_up: Account aanmaken
+          new_unlock: Heb je geen ontgrendelingsinstructies ontvangen?
+          new_confirmation: Geen bevestigingsinstructies ontvangen?
+          forgotten_password: Wachtwoord vergeten?
+          sign_in: Aanmelden
+    unlocks:
+      unlocked: Uw account is ontgrendeld. Log in om door te gaan.
+      send_paranoid_instructions: Als uw account bestaat, ontvangt u een e-mail met
+        instructies voor het ontgrendelen ervan in een paar minuten.
+      send_instructions: U ontvangt binnen enkele minuten een e-mail met instructies
+        voor het ontgrendelen van uw account.
+    sessions:
+      already_signed_out: Je hebt je afgemeld.
+      signed_out: Je hebt je afgemeld.
+      signed_in: Setup voortzetten!
+    registrations:
+      updated: Uw account is bijgewerkt.
+      update_needs_confirmation: U hebt uw account met succes bijgewerkt, maar we
+        moeten uw nieuwe e-mailadres verifiëren. Controleer uw e-mail en volg de bevestigingslink
+        om uw nieuwe e-mailadres te bevestigen.
+      signed_up_but_unconfirmed: Er is een bericht met een bevestigingslink naar uw
+        e-mailadres verzonden. Volg de link om uw account te activeren.
+      signed_up_but_locked: Je hebt je met succes aangemeld. We konden u echter niet
+        aanmelden omdat uw account is vergrendeld.
+      signed_up_but_inactive: Je hebt je met succes aangemeld. We konden u echter
+        niet aanmelden omdat uw account nog niet is geactiveerd.
+      signed_up: Welkom! Je hebt je met succes aangemeld.
+      destroyed: Bye! Uw account is geannuleerd. We hopen je snel weer te zien.
+    passwords:
+      updated_not_active: Uw wachtwoord is gewijzigd.
+      updated: Uw wachtwoord is gewijzigd. Je bent nu ingelogd.
+      send_paranoid_instructions: Als uw e-mailadres in onze database aanwezig is,
+        ontvangt u binnen enkele minuten een link naar wachtwoordherstel op uw e-mailadres.
+      send_instructions: We hebben je een e-mail gestuurd om het wachtwoord opnieuw
+        in te stellen.
+      no_token: U hebt geen toegang tot deze pagina zonder afkomstig te zijn van een
+        e-mail voor het opnieuw instellen van het wachtwoord. Als u afkomstig bent
+        van een e-mail voor het opnieuw instellen van het wachtwoord, zorg er dan
+        voor dat u de volledige opgegeven URL hebt gebruikt.
+    omniauth_callbacks:
+      success: Geverifieerd vanaf %{kind} account.
+      failure: Kan u niet verifiëren van %{kind} omdat "%{reason}".
+    mailer:
+      password_change:
+        subject: Wachtwoord gewijzigd
+      email_changed:
+        subject: E-mail gewijzigd
+      unlock_instructions:
+        subject: Instructies ontgrendelen
+      reset_password_instructions:
+        subject: Wachtwoordinstructies opnieuw instellen
+      confirmation_instructions:
+        subject: Bevestigingsinstructies
+    failure:
+      unconfirmed: U moet uw e-mailadres bevestigen voordat u doorgaat.
+      unauthenticated: U moet zich aanmelden of aanmelden voordat u doorgaat.
+      timeout: Je sessie is verlopen. Meld u opnieuw aan om door te gaan.
+      not_found_in_database: Ongeldig %{authentication_keys} of wachtwoord.
+      last_attempt: U hebt nog één poging voordat uw account is vergrendeld.
+      locked: Je account is vergrendeld.
+      invalid: Ongeldig %{authentication_keys} of wachtwoord.
+      inactive: Uw account is nog niet geactiveerd.
+      already_authenticated: Je bent al ingelogd.
+    confirmations:
+      send_paranoid_instructions: Als uw e-mailadres in onze database aanwezig is,
+        ontvangt u binnen enkele minuten een e-mail met instructies voor het bevestigen
+        van uw e-mailadres.
+      send_instructions: U ontvangt binnen enkele minuten een e-mail met instructies
+        voor het bevestigen van uw e-mailadres.
+      confirmed: Uw e-mailadres is bevestigd.
+  unauthorized:
+    update:
+      project: Het is niet toegestaan om dit project bij te werken.
+    manage:
+      picto: U alleen symbolsets beheren waarop u een medewerker bent.
+      all: U dit %{subject} niet %{action}.
+  date:
+    day_names:
+    - Zondag
+    - Maandag
+    - Dinsdag
+    - Woensdag
+    - Donderdag
+    abbr_day_names:
+    - zon
+    - Ma
+    - Di
+    - trouwen
+    - Do
+    - Vr
+    - zaterdag
+    month_names:
+    - Januari
+    - Februari
+    - Maart
+    - April
+    - Mei
+    - Juni
+    - Juli
+    - Augustus
+    - September
+    - Oktober
+    - November
+    - December
+    abbr_month_names:
+    - Jun
+    - Jan
+    - Februari
+    - Mar
+    - Apr
+    - Mei
+    - dec
+    order:
+    - jaar
+    - maand
+    - dag
+    formats:
+      default: '%e %b %Y'
+      short: '%d %b'
+      long: '%d %B %Y'
+  time:
+    formats:
+      default: '%a, %d %b %Y %H:%M:%S %z'
+      short: '%d %b %H:%M'
+      long: '%B %d, %Y %H:%M'
+    am: ben
+    pm: Pm

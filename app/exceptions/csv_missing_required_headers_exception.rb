@@ -1,0 +1,2 @@
+class CsvMissingRequiredHeadersException < Exception
+end

@@ -1,0 +1,19 @@
+- title t('views.symbolsets.translate.title', symbolset_name: @symbolset.name)
+- content_for(:topbar, render('topbar', symbolset: @symbolset))
+.container-xl.bg-light#symbol-topbar
+  .row.py-1
+    .col.text-center
+      %h1.my-4= t('views.symbolsets.translate.heading')
+      %p= t('views.symbolsets.translate.description', symbols_limit: @limit)
+  .row
+    .col
+      = bootstrap_form_with url: translate_symbolset_path(@symbolset), layout: :inline, method: :get, html: {class: 'justify-content-center'} do |f|
+        = f.collection_select :source_language, @source_languages, :iso639_3, Proc.new {|l| t('views.symbolsets.translate.form.source_lang_option', language_name: l.name, labels_count: l.labels_count, coverage_percentage: number_to_percentage((l.labels_count.to_f/@total_symbols)*100, precision: 0)) }, {label: t('views.symbolsets.translate.form.source_lang_label'), selected: @source_language.iso639_3}, class: 'mr-2'
+        = f.collection_select :dest_language, @destination_languages, :iso639_3, :name, {label: t('views.symbolsets.translate.form.target_lang_label'), selected: @destination_language.try(:iso639_3), prompt: t('views.symbolsets.translate.form.target_lang_prompt')}, required: true, class: 'mr-2'
+        = f.primary t('views.symbolsets.translate.button_find_untranslated')
+
+.container-xl
+  .row
+    .col
+      = render 'translation/translation_form', { symbolset: @symbolset, pictos: @pictos, source_language: @source_language, destination_language: @destination_language}
+

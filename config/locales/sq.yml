@@ -1,0 +1,974 @@
+sq:
+  unauthorized:
+    manage:
+      picto: Ju mund të menaxhoni vetëm Symbolset që ju jeni një bashkëpunëtor në.
+      all: Nuk mund të %{action} këtë %{subject}.
+    update:
+      project: Nuk lejohet të përditësojë këtë projekt.
+  devise:
+    confirmations:
+      send_instructions: Ju do të merrni një email me udhëzime se si të konfirmoni
+        adresën tuaj të e-mail në disa minuta.
+      confirmed: Adresa juaj e email-it është konfirmuar me sukses.
+      send_paranoid_instructions: Nëse adresa juaj e e-mail ekziston në bazën tonë
+        të të dhënave, ju do të merrni një email me udhëzime se si të konfirmoni adresën
+        tuaj të e-mail në pak minuta.
+    failure:
+      already_authenticated: Ju jeni të nënshkruar tashmë.
+      inactive: Llogaria juaj nuk është aktivizuar ende.
+      invalid: E pavlefshme %{authentication_keys} ose fjalëkalimi.
+      locked: Llogaria jote është e mbyllur.
+      last_attempt: Ju keni edhe një përpjekje para se llogaria juaj të jetë e kyçur.
+      not_found_in_database: E pavlefshme %{authentication_keys} ose fjalëkalimi.
+      timeout: Seanca juaj skadoi. Ju lutem, firmosni përsëri për të vazhduar.
+      unauthenticated: Duhet të regjistrohesh ose të regjistrohesh para se të vazhdosh.
+      unconfirmed: Duhet të konfirmoni adresën tuaj të emailit para se të vazhdoni.
+    mailer:
+      confirmation_instructions:
+        subject: Udhëzimet e konfirmimit
+      reset_password_instructions:
+        subject: Rivendos udhëzimet e fjalëkalimeve
+      unlock_instructions:
+        subject: Zhblloko udhëzimet
+      email_changed:
+        subject: Ndryshuar emaili
+      password_change:
+        subject: Ndrysho fjalëkalimin
+    omniauth_callbacks:
+      failure: I pamundur autentifikimi nga %{kind} sepse "%{reason}".
+      success: U autentifikuar me sukses nga llogaria %{kind}.
+    passwords:
+      send_instructions: Ju kemi dërguar një email për rivendosjen e fjalëkalimit.
+      send_paranoid_instructions: Nëse adresa juaj e e-mail ekziston në bazën tonë
+        të të dhënave, ju do të merrni një lidhje për rimëkëmbjen e fjalëkalimeve
+        në adresën tuaj të email-it për pak minuta.
+      updated: Fjalëkalimi juaj është ndryshuar me sukses. Tani je i nënshkruar.
+      updated_not_active: Fjalëkalimi juaj është ndryshuar me sukses.
+      no_token: Ju nuk mund të aksesoni këtë faqe pa ardhur nga një email reset password.
+        Nëse ju vini nga një email reset password, ju lutem sigurohuni që keni përdorur
+        URL-në e plotë të dhënë.
+    registrations:
+      destroyed: Mirupafshim! Llogaria juaj është anuluar me sukses. Ne shpresojmë
+        të të shohim përsëri së shpejti.
+      signed_up: Mirë se erdhe! Ju keni nënshkruar me sukses.
+      signed_up_but_locked: Ju keni nënshkruar me sukses. Megjithatë, nuk mund të
+        të firmosim, sepse llogaria jote është e mbyllur.
+      update_needs_confirmation: Ju përditësuat me sukses llogarinë tuaj, por ne duhet
+        të verifikojmë adresën tuaj të re të emailit. Ju lutem kontrolloni emailin
+        tuaj dhe ndiqni linkun e konfirmimit për të konfirmuar adresën tuaj të re
+        të emailit.
+      updated: Llogaria juaj është përditësuar me sukses.
+      signed_up_but_inactive: Ju keni nënshkruar me sukses. Megjithatë, nuk mund t'ju
+        firmosim, sepse llogaria juaj nuk është aktivizuar ende.
+      signed_up_but_unconfirmed: Një mesazh me një lidhje konfirmimi është dërguar
+        në adresën tuaj të emailit. Ju lutem ndiqni linkun për të aktivizuar llogarinë
+        tuaj.
+    sessions:
+      signed_in: Mirë se u ktheve!
+      signed_out: Ju keni nënshkruar jashtë.
+      already_signed_out: Ju keni nënshkruar jashtë.
+    unlocks:
+      send_instructions: Ju do të merrni një email me udhëzime se si të zhbllokuar
+        llogarinë tuaj në disa minuta.
+      send_paranoid_instructions: Nëse llogaria juaj ekziston, ju do të merrni një
+        email me udhëzime se si ta zhbllokoni atë në disa minuta.
+      unlocked: Llogaria juaj është hapur me sukses. Ju lutem, firmosni për të vazhduar.
+    views:
+      registrations:
+        new:
+          page_title: Krijo llogari
+          heading: Krijo llogarinë
+          sign_up_button: Krijo llogari
+        _form:
+          language_helper: Simbolet do të tregohen në gjuhën tuaj të preferuar aty
+            ku është e mundur.
+          password_helper: '%{var} minimumi i karaktereve'
+          confirm_password: Konfirmo fjalëkalimin
+          please_fix_errors: Të lutem rregulloji këto gabime.
+          new_password: Fjalëkalim i ri
+          new_password_confirmation: Konfirmo fjalëkalimin e ri
+          current_password_helper: Ne kemi nevojë për fjalëkalimin tuaj aktual për
+            të konfirmuar ndryshimet tuaja.
+          button_save_changes: Ruaj ndryshimet
+          cancel_account_header: Anullo llogarinë time
+          cancel_account_text: Nëse do të doje të mbyllje llogarinë tënde të Simboleve
+            Globale…
+          cancel_account_confirm: A je i sigurt? Llogaria juaj Global Symbols do të
+            eleminohet përgjithmonë.
+          cancel_account_button: Elemino llogarinë time
+          button_change_password: Ndrysho fjalëkalimin
+          new_password_helper: '%{var} karakteret minimale. Lëre bosh nëse nuk do
+            ta ndryshosh.'
+        edit:
+          heading: Menaxho llogarinë
+          page_title: Menaxho llogarinë
+          awaiting_confirmation: 'Aktualisht në pritje të konfirmimit për: %{unconfirmed_email}'
+        change_password:
+          heading: Ndrysho fjalëkalimin
+          manage_account: Menaxho llogarinë
+          submit: Ndrysho fjalëkalimin
+          account_indicator: E firmosur si %{email}
+        account_saved:
+          heading: Llogaria e përditësuar
+          return_to_gs_button: Kthimi te Global Symbols
+      passwords:
+        new:
+          heading: Rivendos fjalëkalimin
+          email_helper: Adresa e emailit që përdore për t'u nënshkruar me Global Symbols
+          button: Email Reset Link
+          page_title: Menaxho llogarinë
+        instructions: Hyni në adresën e emailit të llogarisë tuaj dhe ne do të dërgojmë
+          një link për të rivendosur fjalëkalimin tuaj.
+        edit:
+          heading: Ndrysho fjalëkalimin tënd
+          new_password_label: Fjalëkalim i ri
+          new_password_helper: '%{var} minimumi i karaktereve'
+          confirm_password_label: Konfirmo fjalëkalimin e ri
+          button: Ndrysho fjalëkalimin
+      _shared:
+        _links:
+          sign_in: Hyr
+          sign_up: Krijo llogari
+          forgotten_password: Harrove fjalëkalimin tënd?
+          new_unlock: Nuk i ke marrë udhëzimet e zhbllokuara?
+          new_confirmation: Nuk i ke marrë udhëzimet e konfirmimit?
+      sessions:
+        new:
+          page_title: Hyr
+          sign_in_button: Hyr
+        errors:
+          messages:
+            already_confirmed: u konfirmua tashmë, ju lutem provoni të nënshkruani
+              në
+            confirmation_period_expired: duhet të konfirmohet brenda %{period}, ju
+              lutemi kërkoni një të ri
+            expired: ka skaduar, ju lutem kërkoni një të re
+            not_found: nuk u gjet
+            not_locked: nuk ishte i kyçur
+            not_saved:
+              one: '1 gabim ndalohet që ky %{resource} të ruhet:'
+              other: '%{count} gabime ndaluan që ky %{resource} të ruhet:'
+  doorkeeper:
+    scopes:
+      public: Akseso të dhënat e tua publike
+      identity:read:user: Lexo të dhëna në llogarinë tënde të përdoruesit
+      boardset:read: Lexo Setet e Bordit
+      boardset:write: Shkruaji vendoseve të bordit
+  activerecord:
+    models:
+      category: Kategori
+      coding_framework: Kuadri i kodifikimit
+      comment: Koment
+      concept: Koncepti
+      image: Figura
+      label: Etiketa
+      language: Gjuha
+      licence: Licensa
+      picto: Simboli
+      survey: Sondazh
+      survey_response: Përgjigje për anketën
+      symbolset: Set simboli
+      symbolset_user: Bashkëpunëtor
+      user: Përdorues
+      picto_concept: Koncepti Picto
+      survey_picto: Pikato e anketës
+    attributes:
+      category:
+        name: Emri
+      coding_framework:
+        name: Emri
+        structure: Struktura
+        www_uri_base: WWW URI Base
+        api_uri_base: API URI Base
+      comment:
+        rating: Vlerësimi
+        representation_rating: Vlerësimi i përfaqësimit
+        representation_rating_short: Përfaqësimi
+        contrast_rating: Vlerësimi i kontrastit
+        contrast_rating_short: Kontrasti
+        cultural_rating: Vlerësimi kulturor
+        cultural_rating_short: Kulturore
+        comment: Koment
+        read: Lexo
+        resolved: E zgjidhur
+      concept:
+        subject: Subjekti
+      label:
+        text: Etiketa
+        text_diacritised: Etiketë e diakritizuar
+        description: Përshkrimi
+      language:
+        active: Aktiv
+        name: Emri
+        scope: Fushë
+        category: Kategori
+      licence:
+        name: Emri
+        url: URL
+        version: Versioni
+        properties: Pronësitë
+        logo: Logo
+      picto:
+        part_of_speech: Pjesë e të folurit
+        part_of_speech_options:
+          verb: Folja
+          adjective: Mbiemër
+          pronoun: Shqiptimi
+          preposition: Prepozicioni
+          conjunction: Koniunksion
+          interjection: Ndërjeksion
+          article: Artikulli
+          modifier: Modifikuesi
+          noun: Emër
+          adverb: Ndajfolje
+        publisher_ref: Referenca e botuesit
+        image: Figura
+        visibility: E dukshme nga
+        visibility_options:
+          collaborators: Bashkëpuntorët e simbolit
+          everybody: Të gjithë
+      survey:
+        name: Emri
+        introduction: Hyrje
+        status: Gjendja
+        close_at: Mbylle në
+        show_symbol_descriptions: Shfaq përshkrimet e simboleve
+      survey_response:
+        name: Emri
+        organisation: Organizata
+        role: Roli
+      symbolset:
+        name: Emri
+        description: Përshkrimi
+        publisher: Botues
+        publisher_url: URL e botuesit
+        logo: Logo
+        status: Gjendja
+        statuses:
+          published: Botuar
+          draft: Harto
+          ingesting: Gëlltitja
+      user:
+        email: Adresa e emailit
+        prename: Emri i parë
+        company: Kompania
+        location: Vendndodhja
+        surname: Mbiemri
+        language_id: Gjuha e preferuar
+        current_password: Fjalëkalimi aktual
+        remember_me: Më kujto mua
+        password: Fjalëkalimi
+  errors:
+    messages:
+      wrong_size: është madhësia e gabuar (duhet të jetë %{file_size})
+      size_too_small: është shumë e vogël (minimumi është %{file_size})
+      already_confirmed: u konfirmua tashmë, ju lutem provoni të nënshkruani në
+      confirmation_period_expired: duhet të konfirmohet brenda %{period}, ju lutemi
+        kërkoni një të ri
+      expired: ka skaduar, ju lutem kërkoni një të re
+      not_found: nuk u gjet
+      size_too_big: është shumë e madhe (maksimumi është %{file_size})
+      not_locked: nuk ishte i kyçur
+      not_saved:
+        one: '1 gabim ndalohet që ky %{resource} të ruhet:'
+        other: '%{count} gabime ndaluan që ky %{resource} të ruhet:'
+      even: duhet të jetë edhe
+      odd: duhet të jetë e çuditshme
+      other_than: duhet të jetë ndryshe nga %{count}
+      less_than_or_equal_to: duhet të jetë më pak se ose e barabartë me %{count}
+      less_than: duhet të jetë më pak se %{count}
+      equal_to: duhet të jetë e barabartë me %{count}
+      greater_than_or_equal_to: duhet të jetë më e madhe se ose e barabartë me %{count}
+      greater_than: duhet të jetë më e madhe se %{count}
+      not_an_integer: duhet te jete nje integer
+      not_a_number: nuk është një numër
+      wrong_length:
+        one: është gjatësia e gabuar (duhet të jetë 1 karakter)
+        other: është gjatësia e gabuar (duhet të jetë %{count} karaktere)
+      too_short:
+        one: është shumë e shkurtër (minimumi është 1 karakter)
+        other: është shumë e shkurtër (minimumi është %{count} karaktere)
+      too_long:
+        one: është shumë e gjatë (maksimumi është 1 karakter)
+        other: është shumë e gjatë (maksimumi është %{count} karaktere)
+      present: duhet të jetë e bardhë
+      blank: nuk mund të jetë e bardhë
+      empty: nuk mund të jetë bosh
+      accepted: duhet pranuar
+      confirmation: nuk përputhet me %{atributin}
+      invalid: është i pavlefshëm
+      exclusion: është e rezervuar
+      inclusion: nuk përfshihet në listë
+      model_invalid: 'Dështoi validation: %{errors}'
+  dictionary:
+    collaborator:
+      one: Bashkëpunëtor
+      other: Bashkëpunëtorë
+    settings: Rregullimet
+    concept:
+      one: Koncepti
+      other: Konceptet
+    label:
+      one: Etiketa
+      other: Etiketat
+    symbol:
+      one: Simboli
+      other: Simbolet
+    response:
+      one: Përgjigja
+      other: Përgjigjet
+    unauthorised: Pa leje
+    survey:
+      one: Sondazh
+      other: Sondazhet
+    go_back: Kthehu mbrapa
+    global_symbols: Global Symbols
+    numbers:
+      '1': '1'
+      '2': '2'
+      '3': '3'
+      '4': '4'
+      '5': '5'
+    back: Mbrapa
+    by: Nga
+    import: Importo
+    edit: Ndrysho
+    sign_in: Hyr
+    view: Shfaq
+    remove: Hiq
+    search: Kërko
+    change: ndrysho
+    download: Shkarko
+    archive: Arkivi
+    publish: Publiko
+    symbolset:
+      one: Set simboli
+      other: Setet e simboleve
+    page_not_found: Faqe e pa gjetur
+    un-archive: Pa arkiv
+  languages:
+    en: Anglisht
+    fr: Frëngjisht
+    de: Gjermanisht
+    hr: Kroatisht
+    sr: Serbisht
+    sr_Cyrl: Serbisht (cirilik)
+    sr_Latn: Serbisht (latinisht)
+    ro: Rumanisht
+    el: Greqisht
+    hy: Armenisht
+    tr: Turqisht
+    sq: Shqip
+    bg: Bullgarisht
+    ca: Katalonisht
+    nl: Holandisht
+    es: Spanjisht
+    cnr: Malazez
+    sh: Serbo-kroatisht
+    ru: Rusisht
+    pt: Portugalisht
+    mr: Maratisht
+    mk: Maqedonisht
+    it: Italisht
+    hi: Indisht
+    da: Danisht
+    zh: Kinezisht
+    ar: Arabisht
+    an: Aragonase
+    et: Estonisht
+    ur: Urduisht
+    br: Bretonisht
+    eu: Baskisht
+    fa: Persisht
+    gl: Galicianisht
+    he: Hebraisht
+    hu: Hungarisht
+    pl: Polonisht
+    sk: Sllovakisht
+    sv: Suedisht
+    val: Vehes
+  views:
+    pages:
+      home:
+        for_creators: Për krijuesit
+        for_creators_text: Menaxho dhe publiko Grupet e Simboleve
+        for_communicators: Për komunikostët
+        for_everyone_text: Zbuloni, përzjejni, përputhni dhe bëni përdorimin personal
+          të simbolit
+        explore_heading: Eksploro grupet e simboleve
+        explore_button: Eksploroni më shumë grupe simbolesh…
+        board_builder:
+          heading: Global Symbols Board Builder
+          create: Krijoni borde për të ndihmuar komunikimin duke përdorur mijëra imazhe
+            falas nga biblioteka jonë, madje edhe tuajën.
+          storage: Çdo gjë ruhet në mënyrë të sigurt në llogarinë tuaj Global Symbols.
+          button_featured: Grupet e bordit të shfaqur
+          button_try: Provo Board Builder
+          subheading: Bordet e komunikimit në mënyrën e lehtë
+          design: Dizajno, ndërto, ruaj dhe printo në internet tabelën e komunikimit.
+        for_communicators_text: Shkëmben fotografi për të krijuar biseda
+        for_everyone: Për të gjithë
+      search:
+        symbolset_dropdown_any_symbol_set: Çdo set simboli
+        search: Kërko
+        search_for: Kërko për
+        _title: Kërko
+        no_results: Nuk mund të gjenim simbole të përputhshme. Provo një kërkim më
+          të gjerë.
+      contact:
+        heading: Futu në kontakt
+        email_us: Na dërgo email
+        _description: Na kontaktoni me pyetje të përgjithshme, ose për të marrë seten
+          e simbolit tuaj të publikuar.
+        lead_text: Jemi shumë të lumtur të marrim përgjigje, sugjerime dhe informacione
+          rreth burimeve përkatëse.
+    surveys:
+      _shared:
+        thank_you: Faleminderit që e përfundove anketën!
+        questions:
+          representation_rating: Përfaqëson fjalën ose frazën
+          contrast_rating: Kontrast ngjyrash
+          comments: Komente të tjera
+          feelings_rating: Ndjenja për simbolin në tërësi
+          cultural_rating: Ndjeshmëri kulturore
+        number_of_symbols:
+          one: Ky sondazh ka %{count} Simboli për ju për të shqyrtuar.
+          other: Kjo sondazh ka %{count} Simbole për tu shqyrtuar.
+      show:
+        close_at_message: Ju mund të merrni pjesë deri në %{date}.
+        begin_button: Fillo anketën
+        provide_details_2: Detajet tuaja do t'u tregohen organizatorëve të sondazhit
+          në lidhje me feedback-in tuaj, dhe nuk do të përdoren kurrë nga Global Symbols
+          për ndonjë qëllim tjetër.
+        closed_header: Ky sondazh nuk po pranon reagime për momentin.
+        offline_participants: Për pjesëmarrësit që punojnë jashtë linje…
+        offline_participants_button: Printo format e feedback-ut të anketës
+        provide_details: Dhënia e detajeve tuaja është opsional dhe mund të ndihmojë
+          organizatorët e sondazhit.
+        closed_text: Kontakto organizatorin e sondazhit nëse pritet të jesh në gjendje
+          të marrësh pjesë.
+      print:
+        heading: Printo Rregullimet
+        collect_names: Mblidh emrat e pjesmarrësve
+        show_intro: Trego hyrjen e anketës
+        show_intro_helper: Ndrysho hyrjen duke edituar sondazhin.
+        show_instructions: Shfaq udhëzimet
+        show_instructions_helper: Ndrysho udhëzimet duke klikuar mbi to.
+        show_example: Shfaq një shembull
+        symbol_label_language: Shfaq etiketat e simboleve në
+        symbol_label_language_all: Të gjitha gjuhët që janë në dispozicion
+        print_button: Printo Anketën
+        name_field: Emri im është
+        introduction: Hyrje
+        show_example_helper: Shton një pyetje shembull që tregon përgjigjet e shembujve.
+        symbol_label_language_helper: Për rezultate më të mira, printoni me ngjyra
+          duke përdorur një shfletues modern dhe çaktivizoni headers dhe footers.
+        instructions_heading: Udhëzime
+        instructions_1: Ky sondazh do të të kërkojë të dallosh katër aspekte të çdo
+          simboli dhe të bësh disa komente.
+        instructions_2: Renditni çdo simbol në një shkallë ku 1 është 'krejtësisht
+          e papranueshme' dhe 5 është 'plotësisht e pranueshme', duke vendosur një
+          çek në kutinë e saktë.
+      thank_you:
+        feedback_is_saved: I kemi ruajtur të gjitha feedback-ut tuaj.
+        button_restart_survey: Rinis sondazhin
+        button_go_to_homepage: Vazhdoni drejt Global Symbols
+      _print_question:
+        example_heading: Pyetje shembull
+        example_text: Kjo tregon se si mund t'u përgjigjesh pyetjeve
+        symbol_counter: Simboli %{number}
+        example_comment: Kjo pemë duket si brokoli.
+    symbolsets:
+      show:
+        _description: Eksploro simbolin %{symbolset_name} të vendosur në Global Symbols.
+          Merrni imazhe dhe simbole falas për komunikim.
+        no_symbols_for_collaborator: Shto një simbol për të filluar ndërtimin e setit
+          tënd të simboleve
+      _topbar:
+        download: Shkarko
+        button_add_symbol: Shto simbolin
+        button_edit: Ndrysho
+        button_review: Rishqyrtimin
+        button_archive: Simbole të arkivuar
+        button_translate: Përkthe
+      _form:
+        publisher_helper: Emri i personit ose organizatës që boton setin e simboleve.
+        publisher_url_helper: Adresa e faqes së internetit të botuesit.
+        logo_helper: Kjo logo do të shfaqet në faqen Symbolsets. Ky duhet të jetë
+          një imazh, idealisht një SVG ose PNG, 300x200 pixels me një sfond transparent.
+        logo_label: Logo
+        publisher_url_label: URL e botuesit
+        publisher_placeholder: p.sh. Fondacioni PeopleSymbols
+        publisher_url_placeholder: p.sh. https://peoplesymbols.com
+        licence_prompt: Zgjidh një liçensë
+        create_button: Krijo setin e simboleve
+        description_helper: Ky përshkrim do të shfaqet së bashku me Setin e Simboleve.
+        published_helper: Grupet e simboleve të botuara janë të dukshme për të gjithë.
+          Draft Symbol Sets janë të dukshme për Admins dhe Symbol Set Collaborators.
+        save_button: Ruaj setin e simboleve
+      _review_row:
+        remove_confirmation: Duhet të heqim %{subject} nga ky simbol?
+      _symbolset_card:
+        image:
+          alt: Logo %{symbolset_name}
+      edit:
+        _title: Ndrysho %{symbolset_name}
+      import:
+        _title: Importo në %{symbolset_name}
+        heading: Importo simbolet
+        introduction: Ngarko simbolet e tua ekzistuese në Global Symbols.
+      index:
+        _title: Eksploro grupet e simboleve
+        heading: Eksploro grupet e simboleve
+        create_symbol_set_button: Krijo setin e simboleve
+        _description: Shfletoni mijëra simbole të komunikimit falas në Global Symbols.
+      new:
+        _title: Krijo një set simboli
+        heading: Krijo një set simboli
+        guidance: Ju sugjerojmë të rishikoni udhëzimet për
+        guidance_link: duke marrë Setin e Simboleve tuaja të botuara në Global Symbols
+        introduction: Simboli yt i ri do të krijohet në një projekt-shtet. Do të jetë
+          e dukshme vetëm për ju dhe bashkëpunëtorët që shtoni, duke ju lejuar të
+          shtoni simbole dhe të përgatisni setin e simboleve.
+      _shared:
+        none_found: Ne nuk mund të gjenim asnjë simbol këtu!
+      review:
+        heading: Rishqyrtimin
+        filter_all_symbols: Të gjitha simbolet
+        filter_without_a_concept: Pa koncept
+      archive:
+        heading: Simbole të arkivuar
+        none_found: Nuk ka simbole të arkivuar në këtë set simbolesh
+        description: Simbolet e arkivuar nuk janë paraqitur në setin e simboleve,
+          rezultatet e kërkimit apo aplikacionet
+      translate:
+        heading: Përkthe etiketat
+        form:
+          target_lang_label: të
+          source_lang_label: Përkthe nga
+          target_lang_prompt: Zgjidh gjuhën e synuar
+          source_lang_option: '%{language_name} (%{labels_count} simbolet, %{coverage_percentage}
+            mbulimi)'
+        description: Përktheni automatikisht etiketat e simboleve në gjuhë të reja.
+          Ky mjet përkthehet në grumbull të simboleve %{symbols_limit} në një kohë.
+        button_find_untranslated: Gjej simbole të patransmetuar
+        title: Përktheu %{symbolset_name}
+    pictos:
+      _form:
+        language_helper: Gjuha e etiketës.
+        label_label: Teksti i etiketës
+        diacritised_label_helper: Vetëm për gjuhët arabe. Kjo ruan detaje të tjera
+          shqiptimi.
+        description_helper: Përshkruaj shkurtimisht simbolin për të ndihmuar kuptueshmërinë.
+        save_button: Ruaj simbolin
+        create_button: Shto simbolin
+        image_helper: Vendosni një imazh të formatit SVG (të preferuar) ose PNG.
+        to_download_symbols: për të shkarkuar simbolet
+        label_helper: Etiketa përshkruan simbolin tuaj në mënyrë që njerëzit ta gjejnë
+          atë. Ju mund të shtoni etiketa në gjuhë shtesë pas krijimit të simbolit.
+      _topbar:
+        download_button: Shkarko %{file_type}
+        not_publicly_visible: Nuk është e dukshme publikisht
+      edit:
+        _title: Ndrysho %{picto_label} në %{symbolset_name}
+        heading: Ndrysho simbolin
+      new:
+        _title: Shto simbolin në %{symbolset_name}
+        heading: Shto simbolin
+      show:
+        concept_defined_in: E përcaktuar në %{coding_framework_name}
+        no_concepts: Ky simbol nuk ka koncepte për ta përcaktuar atë.
+        add_concept_button: Shto një koncept
+        alternative_symbols_heading: Simbole alternative
+        archived_notice:
+          heading: Simboli i arkivuar
+          text: Ky simbol nuk është paraqitur në setin simbol, rezultatet e kërkimit
+            apo apps
+        _title: '%{picto_label} në %{symbolset_name}'
+        _description: Simboli '%{picto_label}', pjesë e simbolit %{symbolset_name}
+          . Gjej mijëra simbole falas për komunikim.
+      _comment_form:
+        save_button: Ruaj komentin
+    survey_editor:
+      _add_picto_to_survey:
+        button: Shtoji anketës
+        option: '%{survey_name} në %{symbolset_name}'
+      _form:
+        name_helper: Jep një emër që i ndihmon pjesëmarrësit të identifikojnë këtë
+          sondazh.
+        close_at_helper: Opsional. Vendos një afat përfundimtar për pjesëmarrësit
+          për t'u përgjigjur.
+        language_label: Shfaq etiketat e simboleve në
+        language_helper: Kur marrin këtë sondazh, pjesëmarrësve u tregohet etiketa
+          simbol në gjuhën e zgjedhur.
+        language_blank_option: Të gjitha gjuhët në dispozicion
+        show_symbol_descriptions_label: Shfaq përshkrimet e simboleve
+        show_symbol_descriptions_helper: Shfaq përshkrimet e simboleve për pjesëmarrësit.
+        save_button: Ruaj sondazhin
+        create_button: Krijo anketën
+        introduction_helper: Opsional. Kjo është treguar për pjesëmarrësit kur ata
+          fillojnë sondazhin.
+      _picto:
+        no_label_for_language: Nuk ka etiketë %{language_name}
+        remove_confirm: A jeni i sigurt që doni ta hiqni këtë Simbol nga Sondazhi?
+      _sidebar:
+        heading: Skenat
+        stages:
+          plan: Plani
+          collect_feedback: Mblidh feedback
+          analyse: Analizo rezultatet
+          archive: Arkivo ose fshije
+          collect_feedback_description: Le të përfundojnë anketën pjesëmarrësit
+          analyse_results_description: Rishiko rezultatet e Anketës
+          plan_description: Zgjidh simbolet që do të përfshihen në sondazh
+      export_xlsx:
+        header_participant_number: Numri i pjesmarrësve
+        header_participant_name: Emri i pjesëmarrësit
+        header_symbol_id: Simboli ID
+        header_label: Etiketa
+        header_overall_rating: Vlerësimi
+        header_representation_rating: Përfaqësimi
+        header_contrast_rating: Kontrasti
+        header_cultural_rating: Kulturore
+        header_comment: Koment
+        comment_participant_name: Pjesëmarrësit nuk janë të detyruar të japin emrat
+          e tyre, kështu që disa qeliza mund të jenë bosh.
+        sheet_name: Komentet
+      destroy:
+        notice: E fshimë Sondazhin tuaj %{name}.
+      edit:
+        _title: Ndrysho %{survey_name} në %{symbolset_name}
+        heading: Ndrysho sondazhin
+      index:
+        _title: Vëzhgimet në %{symbolset_name}
+        button_new_survey: Krijo anketën
+        no_surveys_at_stage: Nuk ka Vëzhgime në fazën %{stage}.
+        get_help: Eksploro %{link} për vëzhgimet
+        get_help_link: Ndihmë dhe stërvitje
+      new:
+        button_create: Krijo anketën
+      show:
+        symbols_heading: Simbolet në këtë sondazh
+        symbols_text: Shto Simbolet në këtë Sondazh duke i kërkuar ato në Simbolet
+          Globale dhe duke zgjedhur 'Add to Survey'.
+        symbols_search_helper: Kërko për simbolet për të shtuar në këtë Sondazh
+        collect_feedback:
+          heading: Mblidh feedback
+          text_1: Kur të filloni mbledhjen e feedback-ut, ne do t'ju japim një URL
+            ku njerëzit mund të marrin pjesë në sondazh.
+          close_at_label: Pranoji përgjigje deri në
+          close_at_helper: Opsional. Vendos një afat përfundimtar për përgjigjen e
+            sondazhit.
+          button_begin_collecting: Fillo mbledhjen e feedback-ut
+          invite_at_this_url: Ftoni njerëzit të marrin sondazhin tuaj në këtë URL.
+          confirm_stop: Kjo do t'i ndalojë njerëzit që t'i përgjigjen sondazhit. A
+            je i sigurt?
+          stop_button: T'i japim fund anketës
+          paper_heading: Vëzhgime nga letra
+          paper_customisation_invitation: Për të personalizuar dhe shtypur formularët
+            e sondazhit për pjesëmarrësit tuaj…
+          paper_print_button: Printo format e anketës
+          paper_add_paper_feedback_button: Shto feedback-un e letrës
+          survey_ended: Ka përfunduar grumbullimi i përgjigjeve për këtë sondazh.
+          survey_ended_add_paper: Ju ende mund të shtoni manualisht feedback nga formularët
+            e sondazhit të letrës.
+          text_2: Ju nuk do të jeni në gjendje të ndryshoni përzgjedhjet e simboleve
+            tuaja ndërsa sondazhi është duke mbledhur feedback.
+          invite_deadline: Pjesëmarrësit kanë deri në %{close_at} për të dhënë përgjigje
+            (%{link}).
+          responses_count:
+            one: Sondazhi juaj ka përgjigjen %{count}.
+            other: Sondazhi juaj ka %{count} përgjigje.
+          paper_intro: Disa pjesëmarrës mund të preferojnë formularët e sondazhit
+            në letër. Përdorni këto mjete për të mbledhur feedback-un e tyre dhe ruajini
+            këtu.
+          paper_to_include_results: Për të përfshirë rezultatet nga formularët e sondazhit
+            të letrës në rezultatet e sondazhit tuaj…
+        analyse_results:
+          heading: Analizo rezultatet
+          results_appear_here: Rezultatet do të shfaqen këtu kur njerëzit të fillojnë
+            t'i përgjigjen Sondazhit tuaj.
+          button_individual_responses: Përgjigje individuale
+          button_stats: Statistikat e simboleve
+          export:
+            heading: Eksporto rezultatet në Excel
+            text_3: Çdo rresht në dosjen Excel përfaqëson një shqyrtim të një pjesëmarrësi
+              të vetëm të një simboli në sondazh.
+            text_1: Përdorni këtë mjet për të shkarkuar të gjitha të dhënat e sondazhit,
+              duke përfshirë vlerësimet dhe komentet.
+            text_2: Kjo e bën të lehtë të kryeni analizën tuaj në Excel. Ne ju sugjerojmë
+              të përdorni Pivot Tables për të llogaritur dhe për të hartuar rezultatet
+              mesatare për çdo Simbol.
+          responses_count:
+            one: '%{count} personi iu përgjigj sondazhit tuaj.'
+            other: '%{count} persona iu përgjigjën sondazhit tuaj.'
+        archive:
+          heading: Arkivo ose fshije
+          survey_is_archived: Ky sondazh është arkivuar. Mund të analizosh akoma çdo
+            rezultat.
+          archive_confirm: Kjo do t'i ndalojë njerëzit që t'i përgjigjen sondazhit.
+            A je i sigurt?
+          archive_button: Arkivo anketën
+          delete_description: Fshirja e këtij Sondazhi do të fshijë përgjithmonë çdo
+            rezultat që keni mbledhur. Asnjë simbol nuk do të fshihet.
+          delete_confirm: A jeni i sigurt që doni të fshini këtë Sondazh dhe ndonjë
+            përgjigje?
+          delete_button: Elemino sondazhin
+          archive_description: Archive this Survey when you have finished with it.
+            Ju ende do të jetë në gjendje për të analizuar çdo rezultat në këtë Sondazh.
+      add_symbol:
+        notice_success: Ne e shtuam simbolin në Sondazhin tuaj. %{add_another_link}
+        notice_success_add_another: Shto një tjetër?
+        alert_failure: Ky simbol është tashmë në %{survey_link}
+    survey_picto_analysis:
+      index:
+        crumb_name: Statistikat e simboleve
+        heading: Statistikat e simboleve
+        column_heading_overall_average: Mesatarja e përgjithshme
+        row_heading_averages: Mesatarja
+        column_heading_rating_description: Ndjenja për simbolin në tërësi
+        column_heading_representation_rating_description: Përfaqëson fjalën ose frazën
+        column_heading_contrast_rating_description: Kontrast ngjyrash
+        intro: Kjo tabelë tregon përgjigjen mesatare për çdo simbol në sondazh, bazuar
+          në një total prej %{count} marrë.
+        column_heading_cultural_rating_description: Aftësia kulturore
+    survey_response_analysis:
+      _sidebar:
+        heading: Përgjigje
+        participant_number: Pjesëmarrës %{number}
+      index:
+        crumb_name: Përgjigje individuale
+        heading: Përgjigje individuale
+      new:
+        heading: Shto feedback-un e letrës
+        match_numbers: Numrat e treguar në të djathtën e sipërme të çdo kutie simbol
+          duhet të përputhen me ato të treguara në formularët e letrës, për t'ju siguruar
+          që të hyni në vlerësimet e sakta për çdo simbol.
+        label_representation_rating: Përfaqëson fjalën
+        label_contrast_rating: Kontrast ngjyrash
+        label_cultural_rating: Ndjeshmëri kulturore
+        save_button: Ruaj përgjigje
+        use_this_form_to: Përdor këtë formë për të ruajtur një sondazh të vetëm në
+          letër tek Global Symbols. Ajo pastaj do të llogaritet në statistikat tuaja
+          të sondazhit.
+        label_overall_rating: Ndjenja për simbolin
+        cancel_confirm: A je i sigurt? Do të humbasësh çdo rezultat deri tani.
+      create:
+        notice_success: Kjo përgjigje në letër u shpëtua.
+    survey_questions:
+      _form:
+        please_fix_errors: Ju lutem rregulloni gabimet më poshtë.
+        comments_helper: Opsional. Ju lutemi shtoni ndonjë koment për të na ndihmuar
+          të përmirësojmë këtë simbol.
+        button_previous_question: Pyetja e mëparshme
+        button_save_answer: Ruaj përgjigjen
+      _controller:
+        timed_out: Më vjen keq - sondazhi juaj u skadua për shkak të pasivitet. Ju
+          lutem filloni sondazhin përsëri.
+      show:
+        please_rate: Ju lutemi, 1 e ka normë këtë simbol në një shkallë ku 1 është
+          'krejtësisht e papranueshme' dhe 5 është 'krejtësisht e pranueshme'.
+    collaborators:
+      index:
+        page_title: Bashkëpunëtorët për %{name}
+        add_heading: Shto një bashkëpunëtor
+        add_text: Për të lejuar dikë tjetër të redaktojë këtë set simboli, hyni në
+          adresën elektronike që ata përdornin për t'u nënshkruar me Global Symbols.
+        add_button: Shto Bashkëpunëtor
+        existing_heading: Bashkëpunëtorët ekzistues
+        existing_text: Këtyre njerëzve u lejohet të redaktojn këtë grup simbolesh.
+        added_at: Shtuar %{date}
+        remove_confirm: A duhet të heqim %{email} nga ky set simboli?
+        remove_aria_label: Hiq bashkëpunëtorin
+        existing_none_found: Asnjë përdorues nuk lejohet të redaktoj këtë set simboli.
+      create:
+        notice_success: Ne shtuam %{email_address} si një bashkëpunëtor.
+        alert_no_gs_account: '%{email_address} nuk ka ende një llogari Global Symbols.'
+      destroy:
+        notice_success: Hoqëm %{email_address} si bashkëpunëtor.
+    concepts:
+      show:
+        page_title: '%{subject} në %{coding_framework}'
+        defined_in: Një koncept i përcaktuar në
+    picto_concepts:
+      index:
+        add_concept_invitation: Ne mund të shtojmë çdo koncept që mund të gjeni në
+          ConceptNet.
+        add_concept:
+          heading: Shto një koncept
+          instruction: Për të shtuar një koncept në këtë simbol, hyni në një fjalë.
+            Ne do të shtojmë konceptin nëse mund ta gjejmë atë.
+          button: Shto Koncept
+          add: Shto
+        existing_concepts:
+          heading: Konceptet ekzistuese
+          added_at: Shtuar %{date}
+          none_found: Ky simbol nuk ka koncepte
+          remove_confirm: Duhet të heqim %{subject} nga ky simbol?
+          remove_aria_label: Hiq konceptin
+        page_title: Konceptet për %{simbolin}
+        intro: Konceptet ndihmojnë kompjuterat të kuptojnë simbolet tuaja, kështu
+          që siguroni se ato janë të sakta dhe specifike.
+      create:
+        notice_success: Ne shtuam konceptin %{concept} në këtë simbol.
+        alert_failure: Ne nuk mund të gjenim një koncept të quajtur %{concept}. Provo
+          një fjalë tjetër.
+        alert_already_exists: '%{concept} është tashmë një koncept në këtë simbol.'
+      destroy:
+        notice_success: Hoqëm konceptin %{concept} nga ky simbol.
+        alert_failure: Nuk mundëm të hiqnim konceptin %{concept} nga ky simbol.
+    picto_labels:
+      _form:
+        language_helper: Gjuha e etiketës.
+        label_label: Teksti i etiketës
+        description_helper: Përshkruaj shkurtimisht simbolin për të ndihmuar kuptueshmërinë.
+        button_save: Ruaj etiketën
+        button_add: Shto etiketën
+        diacritised_label_label: Etiketë e diakritizuar
+        diacritised_label_helper: Vetëm për gjuhët arabe. Kjo ruan detaje të tjera
+          shqiptimi.
+      _picto_labels:
+        heading: Etiketat %{label_type}
+        remove_label_aria_label: Hiq etiketën
+        remove_label_confirm: Duhet të heqim %{text} nga ky simbol?
+        no_labels_found: Nuk u gjetën etiketa
+      edit:
+        page_title: Etiketat për %{simbolin}
+        heading: Ndrysho etiketën
+        intro: Etiketat ndihmojnë njerëzit e tjerë të kuptojnë simbolet tuaja. Ata
+          na ndihmojnë të kuptojmë domethënien e simbolit tuaj, kështu që siguroni
+          se janë të saktë dhe specifikë.
+      index:
+        page_title: Etiketat për %{simbolin}
+        heading_add_label: Shto një etiketë
+        status_suggested: Sugjeroi
+        intro: Etiketat ndihmojnë njerëzit e tjerë të kuptojnë simbolet tuaja. Ata
+          na ndihmojnë të kuptojmë domethënien e simbolit tuaj, kështu që siguroni
+          se janë të saktë dhe specifikë.
+        instructions: Simbolet duhet të kenë të paktën një etiketë. Nëse dëshiron,
+          mund të shtosh një etiketë për më shumë se një gjuhë.
+        status_published: Botuar
+      create:
+        notice_success: Ne shtuam etiketën %{etiketë në këtë simbol.
+        alert_failure: Duhet të adresosh disa probleme para se të shtojmë këtë etiketë.
+      destroy:
+        alert_failure: Nuk mundëm të hiqnim etiketën %{etiketë nga ky simbol.
+        notice_success: Hoqëm etiketën %{etiketë nga ky simbol.
+      publish_translation:
+        notice_success: Publikuar etiketa %{language_name} .
+    application:
+      _copy_to_clipboard:
+        button_title: Kopjo në Dërmues
+        button: Kopjo
+    pagination:
+      next: Në vazhdim
+      last: E fundit
+      first: E para
+      previous: E mëparshme
+    errors:
+      not_found:
+        description: Ne nuk mund të gjenim asgjë në këtë adresë
+    translations:
+      _translation_form:
+        button_translate: Përktheu simbolet
+        button_translate_working: Duke përkthyer simbole…
+        publish_button: Publiko të gjitha përkthimet %{language_name}
+        publish_button_working: Duke botuar të gjitha përkthimet…
+        translation_complete_heading: Përkthimi i plotë
+        translation_complete_text: Të gjitha simbolet janë përkthyer në %{language_name}.
+      _symbols_table:
+        heading_source_language: '%{language_name} Burimi'
+        heading_destination_language: '%{language_name} Përkthimi'
+        button_get_translation: Gjej përkthimin
+        button_get_translation_working: Duke përkthyer…
+        heading_type: Lloji
+      _suggestion_form:
+        button_publish: Publiko
+        button_publish_working: Botimi…
+        label: Përkthimi
+      _translations_published:
+        heading: Përkthime të botuara
+        next_steps: Gjej më shumë simbole për të përkthyer, ose për të zgjedhur një
+          gjuhë tjetër.
+        labels_saved: Përkthimet e reja janë shpëtuar.
+        labels_are_visible: Përkthimet e reja tani janë të dukshme në Global Symbols
+          dhe në apps.
+    articles:
+      _topbar:
+        header_news: Lajmet e simboleve globale
+      index:
+        title: Lajme
+        more_button: Artikuj të tjerë
+        description: Blog i Global Symbols - Përditësime, ide dhe frymëzim për t'ju
+          ndihmuar të komunikoni me simbolet.
+  layouts:
+    application:
+      menu:
+        board_builder: Board Builder
+        training: Stërvitje
+        news: Lajme
+        sign_out: Firmos
+        my_account: Llogaria ime
+        sign_in: Hyr
+        sign_up: Krijo llogari
+        search_placeholder: Kërko %{var}
+        facebook: Global Symbols në Facebook
+        twitter: Global Symbols në Twitter
+        resources: Burimet
+      footer:
+        privacy_policy: Politika e privatësisë
+        terms: Kushtet
+        accessibility: Açesibiliteti
+        about: Rreth
+        contact: Kontakt
+        language_label: Gjuha
+      skip_to_main_content: Kaloni tek përmbajtja kryesore
+  date:
+    formats:
+      default: '%e %b %Y'
+      short: '%d %b'
+      long: '%d %B %Y'
+    day_names:
+    - E diel
+    - E hënë
+    - E martë
+    - E mërkurë
+    - E premte
+    - E shtunë
+    - E shtunë
+    abbr_day_names:
+    - Dielli
+    - Mon
+    - Tue
+    - Med
+    - Thu
+    - Fri
+    - Sat
+    month_names:
+    - Maj
+    - Janar
+    - Shkurt
+    - Mars
+    - Prill
+    - Tetor
+    - Nëntor
+    - Dhjetor
+    abbr_month_names:
+    - Jan
+    - Jul
+    - Feb
+    - Mar
+    - Apr
+    - Maj
+    - Jun
+    order:
+    - vit
+    - muaj
+    - dita
+  time:
+    formats:
+      default: '%a, %d %b %Y %H:%M:%S %z'
+      short: '%d %b %H:%M'
+      long: '%B %d, %Y %H:%M'
+    am: am
+    pm: pm

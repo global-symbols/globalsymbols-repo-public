@@ -1,0 +1,19 @@
+:ruby
+  title t('views.symbolsets.index._title')
+  description t('views.symbolsets.index._description')
+
+  set_meta_tags og: {
+    url: symbolsets_url,
+    type: 'object'
+  }
+
+%main.container-xl
+  .row
+    .col
+      %h1= t('views.symbolsets.index.heading')
+    .col-md-auto
+      %a.btn.btn-primary{href: new_symbolset_path}= t('views.symbolsets.index.create_symbol_set_button')
+  .row.mt-4
+    .col
+      .card-deck.gs-deck-4.symbolsets-card-deck
+        = render partial: 'symbolset_card', collection: @symbolsets, locals: { show_description: true}, cached: -> record { [I18n.locale, record] }

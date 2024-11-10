@@ -1,0 +1,110 @@
+- title @survey.name
+- content_for(:topbar, render('topbar', survey: @survey, show_edit: true))
+- responses_count = @survey.responses.count
+%main.container-xl
+  .row
+    .col-md-3
+      = render 'sidebar'
+
+    .col
+      .tab-content
+        .tab-pane.fade#list-symbols{role: :tabpanel, class: ('active show' if @survey.status == 'planning') }
+          %h1= t('views.survey_editor.show.symbols_heading')
+          - if @survey.status == 'planning'
+            %p= t('views.survey_editor.show.symbols_text')
+            = bootstrap_form_with url: search_path, local: true, method: :get, layout: :horizontal, label_col: 'col', control_col: 'col-sm-12', class: 'mt-3 mb-4' do |f|
+              = f.hidden_field :locale, value: I18n.locale
+              -#= f.hidden_field :symbolset, value: current_symbolset_id, id: :navbar_search_symbolset
+              = f.text_field :query, append: f.primary(t('dictionary.search')), wrapper: { class: 'mb-0'}, label_as_placeholder: true, label: t('views.survey_editor.show.symbols_search_helper'), id: :not_navbar_search_query, required: true
+          .card-deck.gs-deck-5.text-center
+            - @survey.survey_pictos.each do |sp|
+              = render 'survey_editor/picto', survey_picto: sp
+        .tab-pane.fade#list-collect{role: :tabpanel, class: ('active show' if @survey.status == 'collecting_feedback') }
+          %h1= t('views.survey_editor.show.collect_feedback.heading')
+          - if @survey.status == 'planning'
+            %p= t('views.survey_editor.show.collect_feedback.text_1')
+            %p= t('views.survey_editor.show.collect_feedback.text_2')
+            .row
+              .col
+                = bootstrap_form_with url: symbolset_survey_path(@survey.symbolset), model: @survey, layout: :horizontal, label_col: 'col-sm-6', control_col: 'col-sm-6', id: :survey_form do |f|
+                  .row
+                    .col-md-6
+                      = f.date_field :close_at, label: t('views.survey_editor.show.collect_feedback.close_at_label'), help: t('views.survey_editor.show.collect_feedback.close_at_helper')
+                      = f.hidden_field :status, value: 'collecting_feedback'
+                    .col
+                      = f.primary do
+                        = t('views.survey_editor.show.collect_feedback.button_begin_collecting')
+                        %i.fas.fa-chevron-right.pl-2
+          - elsif @survey.status == 'collecting_feedback'
+            %p
+              = t('views.survey_editor.show.collect_feedback.invite_at_this_url')
+            = render 'application/copy_to_clipboard_box', content: survey_url(@survey)
+            - if @survey.close_at.present?
+              %p
+                = t('views.survey_editor.show.collect_feedback.invite_deadline', close_at: @survey.close_at.to_date.to_formatted_s(:long), link: link_to(t('dictionary.change'), edit_symbolset_survey_path(@survey.symbolset, @survey))).html_safe
+            = bootstrap_form_with url: symbolset_survey_path(@survey.symbolset), model: @survey, id: :survey_form do |f|
+              = f.hidden_field :status, value: 'analysing_results'
+              .d-flex.justify-content-between
+                = t('views.survey_editor.show.collect_feedback.responses_count', count: responses_count)
+                = f.primary nil, data: { confirm: t('views.survey_editor.show.collect_feedback.confirm_stop') } do
+                  = t('views.survey_editor.show.collect_feedback.stop_button')
+                  %i.fas.fa-chevron-right.pl-2
+
+            %h2.mt-3= t('views.survey_editor.show.collect_feedback.paper_heading')
+            %p= t('views.survey_editor.show.collect_feedback.paper_intro')
+            .d-flex.justify-content-between.align-items-center.mb-3
+              = t('views.survey_editor.show.collect_feedback.paper_customisation_invitation')
+              %a.btn.btn-sm.btn-secondary{href: print_survey_path, target: :blank}
+                = t('views.survey_editor.show.collect_feedback.paper_print_button')
+                %i.fas.fa-chevron-right.pl-2
+            .d-flex.justify-content-between.align-items-center
+              = t('views.survey_editor.show.collect_feedback.paper_to_include_results')
+              %a.btn.btn-sm.btn-secondary.ml-2{href: new_symbolset_survey_response_path(@symbolset, @survey.id)}
+                = t('views.survey_editor.show.collect_feedback.paper_add_paper_feedback_button')
+                %i.fas.fa-chevron-right.pl-2
+          - else
+            %p= t('views.survey_editor.show.collect_feedback.survey_ended')
+            %p= t('views.survey_editor.show.collect_feedback.survey_ended_add_paper')
+            %a.btn.btn-primary{href: new_symbolset_survey_response_path(@symbolset, @survey.id)}
+              = t('views.survey_editor.show.collect_feedback.paper_add_paper_feedback_button')
+              %i.fas.fa-chevron-right.pl-2
+        .tab-pane.fade#list-analyse{role: :tabpanel, class: ('active show' if @survey.status == 'analysing_results') }
+          %h1= t('views.survey_editor.show.analyse_results.heading')
+          - if @survey.responses.empty?
+            %p= t('views.survey_editor.show.analyse_results.results_appear_here')
+          - else
+            %p= t('views.survey_editor.show.analyse_results.responses_count', count: responses_count)
+            %p
+              %a.btn.btn-primary.mr-3{href: symbolset_survey_responses_path(survey_id: @survey.id)}
+                = t('views.survey_editor.show.analyse_results.button_individual_responses')
+                %i.fas.fa-chevron-right.pl-2
+              %a.btn.btn-primary{href: symbolset_survey_symbols_path(survey_id: @survey.id)}
+                = t('views.survey_editor.show.analyse_results.button_stats')
+                %i.fas.fa-chevron-right.pl-2
+            %h3.mt-5= t('views.survey_editor.show.analyse_results.export.heading')
+            %p= t('views.survey_editor.show.analyse_results.export.text_1')
+            %p= t('views.survey_editor.show.analyse_results.export.text_2')
+            %p= t('views.survey_editor.show.analyse_results.export.text_3')
+            %p
+              %a.btn.btn-primary{href: export_symbolset_survey_path(format: :xlsx), data: {turbolinks: false}}
+                %i.fas.fa-file-excel.pr-2
+                = t('dictionary.download')
+        .tab-pane.fade#list-archive{role: :tabpanel, class: ('active show' if @survey.status == 'archived') }
+          %h1= t('views.survey_editor.show.archive.heading')
+          .row
+            .col
+              - if @survey.status == 'archived'
+                %p= t('views.survey_editor.show.archive.survey_is_archived')
+              - elsif @survey.status != 'archived'
+                %p= t('views.survey_editor.show.archive.archive_description')
+
+                = bootstrap_form_with url: symbolset_survey_path(@survey.symbolset), model: @survey, id: :survey_form do |f|
+                  = f.hidden_field :status, value: 'archived'
+                  = f.primary nil, data: { confirm: t('views.survey_editor.show.archive.archive_confirm') } do
+                    = t('views.survey_editor.show.archive.archive_button')
+                    %i.fas.fa-chevron-right.pl-2
+            .col
+              %p= t('views.survey_editor.show.archive.delete_description')
+              = link_to symbolset_survey_path(@survey.symbolset), method: :delete, class: 'btn btn-danger', data: { confirm: t('views.survey_editor.show.archive.delete_confirm') } do
+                %i.fas.fa-trash-alt.pr-2
+                = t('views.survey_editor.show.archive.delete_button')

@@ -1,0 +1,962 @@
+ps:
+  activerecord:
+    attributes:
+      picto:
+        part_of_speech_options:
+          noun: نومه
+          modifier: مدبر
+          article: ماده
+          interjection: د ادعیه کول
+          conjunction: یو ځای کول
+          preposition: وړاندیز
+          pronoun: د ورایش
+          adverb: ادراب
+          adjective: صفت
+          verb: فعل
+        part_of_speech: د وینا یوه برخه
+        visibility_options:
+          collaborators: د سمبول سیټ همکار
+          everybody: هر څوک
+        visibility: لیدل کیږی په واسطه
+        image: تصویر
+        publisher_ref: د خپرونکی حواله
+      licence:
+        logo: لوګو
+        properties: ملکیتونه
+        version: نسخه
+        url: URL
+        name: نوم
+      language:
+        category: وېشنیزه
+        scope: ساحه
+        name: نوم
+        active: فعال
+      label:
+        description: تشریح
+        text_diacritised: ډیاسیټډ لیبل
+        text: لیبل
+      concept:
+        subject: موضوع
+      comment:
+        resolved: حل
+        read: ولولئ
+        comment: تبصره
+        cultural_rating_short: فرهنګی
+        cultural_rating: کلتوری درجه بندی
+        contrast_rating_short: مبادله
+        contrast_rating: د مبادله درجه بندی
+        representation_rating_short: استازیتوب
+        representation_rating: د استازیتوب درجه بندی
+        rating: درجه بندی
+      coding_framework:
+        www_uri_base: د WWW URI اساس
+        api_uri_base: د API URI اډه
+        structure: جوړښت
+        name: نوم
+      category:
+        name: نوم
+      symbolset:
+        name: نوم
+        description: تشریح
+        publisher: خپرونکی
+        logo: لوګو
+        status: حالت
+        statuses:
+          published: چاپ شوی
+          draft: مسوده
+          ingesting: نل کول
+        publisher_url: د ناشر URL
+      survey_response:
+        role: رول
+        organisation: موسسه
+        name: نوم
+      survey:
+        show_symbol_descriptions: د سمبول تشریحات وښایه
+        close_at: بندکړه At
+        status: حالت
+        introduction: مقدمه
+        name: نوم
+      user:
+        prename: لومړی نوم
+        surname: نوم
+        company: شرکت
+        location: ځای
+        password: پاسورډ
+        current_password: اوسنی پاسورډ
+        email: د بریښنالیک پته
+        language_id: غوره ژبه
+        remember_me: ما په یاد لره
+    models:
+      user: کاروونکی
+      symbolset_user: همکار
+      symbolset: د سمبول سیټ
+      survey_response: د سروې ځواب
+      survey_picto: سروې پیټو
+      survey: سروې
+      picto_concept: د پیټیو مفهوم
+      picto: سمبول
+      licence: د جواز ورکول
+      language: ژبه
+      label: لیبل
+      image: تصویر
+      concept: مفهوم
+      comment: تبصره
+      coding_framework: د کډینګ چوکاټ
+      category: وېشنیزه
+  doorkeeper:
+    scopes:
+      boardset:write: خپل بورډ سیټ ته ولیکئ
+      boardset:read: ستاسو د بورډ سیټونه ولولئ
+      identity:read:user: معلومات په خپل کاروونکی اکاونټ کې ولولئ
+      public: خپلو عامه معلوماتو ته لاسرسی
+  devise:
+    views:
+      sessions:
+        errors:
+          messages:
+            not_saved:
+              one: '1 غلطی دا %{resource} د خوندی کیدو څخه منع کړه:'
+              other: '%{count} تېروتنې دې %{سرچینې} له خوندي کیدو څخه منع کړې:'
+            not_locked: بند نه وو
+            not_found: پیدا نه شو
+            expired: پای ته رسیدلې ده، مهربانی وکړئ د نوی غوښتنه وکړئ
+            confirmation_period_expired: اړتیا لری چې د %{period} په دننه کې تایید شی
+              ، مهربانی وکړئ د نوی غوښتنه وکړئ
+            already_confirmed: مخکې تایید شوی وو، مهربانی وکړئ د لاسلیک کولو هڅه وکړئ
+        new:
+          sign_in_button: دننه شه
+          page_title: دننه شه
+      _shared:
+        _links:
+          new_unlock: ایا دا لارښوونه نه ده ترلاسه کړې؟
+          new_confirmation: ایا د تایید لارښوونې نه دی ترلاسه شوې؟
+          forgotten_password: خپل پاسورډ هیر کړی؟
+          sign_up: حساب جوړ کړئ
+          sign_in: دننه شه
+      passwords:
+        edit:
+          button: پاسورډ بدل کړئ
+          confirm_password_label: نوی پاسورډ تایید کړئ
+          new_password_helper: '%{var} د کرکترونو حد اقل'
+          new_password_label: نوی پاسورډ
+          heading: خپل پاسورډ بدل کړئ
+        instructions: خپل اکاونټ ایمیل ادرس داخل کړئ او موږ به ستاسو د پاسورډ د بیا
+          تنظیمولو لپاره یو لینک واستوو.
+        new:
+          page_title: د حساب اداره کول
+          button: د بریښنالیک بیا سټېټ لینک
+          email_helper: هغه بریښنالیک آدرس چې تاسو Global Symbols ته د لاسلیک کولو لپاره
+            کارولی
+          heading: بیا سمول پاسورډ
+      registrations:
+        account_saved:
+          return_to_gs_button: Global Symbols ته وگرځه
+          heading: اکاونټ نوی شوی
+        change_password:
+          account_indicator: د %{email} په توګه لاسلیک شوی
+          submit: پاسورډ بدل کړئ
+          manage_account: د حساب اداره کول
+          heading: پاسورډ بدل کړئ
+        edit:
+          awaiting_confirmation: 'په اوس وخت کې د تایید په انتظار کې د: %{unconfirmed_email}'
+          page_title: د حساب اداره کول
+          heading: د حساب اداره کول
+        _form:
+          button_change_password: پاسورډ بدل کړئ
+          cancel_account_button: زما اکاونټ حذف کړئ
+          cancel_account_confirm: تاسو ډاډه یاست؟ ستاسو Global Symbols حساب به د تل
+            لپاره حذف شي.
+          cancel_account_text: که تاسو غواړئ خپل Global Symbols حساب وتړئ …
+          cancel_account_header: زما اکاونټ لغوه کړه
+          button_save_changes: بدلونونه خوندی کړی
+          new_password_helper: ٪{var} د کرکترونو حد اقل. خالی پریږده که تاسو نه غواړئ
+            دا بدل کړئ.
+          current_password_helper: مونږ ستاسو اوسنی پاسورډ ته اړتیا لرو چې ستاسو بدلونونه
+            تایید کړو.
+          new_password_confirmation: نوی پاسورډ تایید کړئ
+          new_password: نوی پاسورډ
+          please_fix_errors: مهربانی وکړئ دا غلطیانې سم کړئ.
+          confirm_password: پاسورډ تایید کړئ
+          password_helper: '%{var} د کرکترونو حد اقل'
+          language_helper: سمبولونه به ستاسو د خوښی په ژبه وښودل شی چیرته چې ممکنه وی.
+        new:
+          sign_up_button: حساب جوړ کړئ
+          heading: حساب جوړ کړئ
+          page_title: حساب جوړ کړئ
+    unlocks:
+      unlocked: ستاسو اکاونټ په کامیابۍ سره خلاص شو. مهربانی وکړئ د دوام لپاره لاس ووزئ.
+      send_paranoid_instructions: که ستاسو اکاونټ موجود وی، تاسو ته به یو بریښنالیک
+        ترلاسه شی د لارښوونو سره د دې لپاره چې څنګه یې په څو دقیقو کې خلاص کړئ.
+      send_instructions: تاسو به یو بریښنالیک ترلاسه کړئ د لارښوونو سره د دې لپاره چې
+        څنګه خپل اکاونټ په څو دقیقو کې خلاص کړئ.
+    sessions:
+      already_signed_out: تاسو لاسلیک کړی دی.
+      signed_out: تاسو لاسلیک کړی دی.
+      signed_in: واپس ښه راغلاست!
+    registrations:
+      updated: ستاسو اکاونټ په بریالیتوب سره نوی شوی.
+      update_needs_confirmation: تاسو خپل اکاونټ په بریالیتوب سره اپډیټ کړ، مګر موږ
+        باید ستاسو نوی ایمیل ادرس تصدیق کړو. مهربانی وکړئ خپل ایمیل وګورئ او د تایید
+        لینک تعقیب کړئ ترڅو ستاسو نوی ایمیل پته تایید کړی.
+      signed_up_but_unconfirmed: ستاسو د بریښنالیک ادرس ته یو پیغام لیږل شوی دی. مهربانی
+        وکړئ د خپل اکاونټ فعالولو لپاره لینک تعقیب کړئ.
+      signed_up_but_locked: تاسو په کامیابۍ سره لاسلیک کړی دی. په هر صورت، مونږ تاسو
+        نه شو لاسلیک کولی ځکه چې ستاسو اکاونټ بند دی.
+      signed_up_but_inactive: تاسو په کامیابۍ سره لاسلیک کړی دی. په هر صورت، مونږ تاسو
+        نه شو لاسلیک کولی ځکه چې ستاسو اکاونټ تر اوسه نه دی فعال شوی.
+      signed_up: ښه راغلاست ! تاسو په کامیابۍ سره لاسلیک کړی دی.
+      destroyed: د خدای په امان! ستاسو اکاونټ په کامیابۍ سره لغوه شو. مونږ هیله لرو
+        چې تاسو به ډیر ژر بیا ووینو.
+    passwords:
+      updated_not_active: ستاسو پاسورډ په کامیابۍ سره بدل شو.
+      updated: ستاسو پاسورډ په کامیابۍ سره بدل شو. تاسو اوس په کښې لاسلیک شوی یاست.
+      send_paranoid_instructions: که چیرې ستاسو د بریښنالیک پته زمونږ په ډیټابیس کې
+        شتون ولری، نو تاسو به په څو دقیقو کې ستاسو په بریښنالیک ادرس کې د پاسورډ د بیا
+        موندلو لینک ترلاسه کړئ.
+      send_instructions: مونږ تاسو ته د پاسورډ بیا سیټ ایمیل درلیږلی دی.
+      no_token: تاسو دې پاڼې ته لاسرسی نه شئ کولی پرته له دې چې د پاسورډ د بیا تنظیم
+        ایمیل څخه راشی. که تاسو د پاسورډ د بیا تنظیم ایمیل څخه راشئ، مهربانی وکړئ ډاډ
+        ترلاسه کړئ چې تاسو بشپړ URL کارولی دی.
+    omniauth_callbacks:
+      success: په بریالیتوب سره د %{kind} اکاونټ څخه باوری شوی.
+      failure: تاسو د %{kind} څخه نشی باوری کولی ځکه چې "%{reason}".
+    mailer:
+      password_change:
+        subject: پاسورډ بدل شو
+      email_changed:
+        subject: ایمیل بدل شو
+      unlock_instructions:
+        subject: لارښوونې خلاصې کړه
+      reset_password_instructions:
+        subject: د پاسورډ لارښوونې بیا تنظیم کړئ
+      confirmation_instructions:
+        subject: د تایید لارښوونې
+    failure:
+      unconfirmed: تاسو باید خپل بریښنالیک ادرس تایید کړئ مخکې له دې چې دوام وکړی.
+      unauthenticated: تاسو اړتیا لرئ چې د دوام نه مخکې ځان ته لاس کړئ او یا هم ګډون
+        وکړئ.
+      timeout: ستاسو غونډه پای ته رسیدلې ده. مهربانی وکړئ یو ځل بیا د دوام لپاره لاس
+        ووزئ.
+      not_found_in_database: نامعتبر %{authentication_keys} یا پاسورډ.
+      last_attempt: تاسو یو بله هڅه لرئ مخکې له دې چې ستاسو اکاونټ بند شی.
+      locked: ستاسو اکاونټ بند دی.
+      invalid: نامعتبر %{authentication_keys} یا پاسورډ.
+      inactive: ستاسو اکاونټ تر اوسه نه دی فعال شوی.
+      already_authenticated: تاسو مخکې لاسلیک شوی یاست.
+    confirmations:
+      send_paranoid_instructions: که ستاسو د بریښنالیک پته زمونږ په ډیټابیس کې شتون
+        ولری، نو تاسو به د لارښوونې سره بریښنالیک ترلاسه کړئ چې څنګه په څو دقیقو کې
+        ستاسو د بریښنالیک پته تایید کړئ.
+      send_instructions: تاسو به یو بریښنالیک ترلاسه کړئ د لارښوونو سره د دې لپاره چې
+        څنګه خپل اکاونټ په څو دقیقو کې خلاص کړئ.
+      confirmed: ستاسو د بریښنالیک پته په بریالیتوب سره تایید شوې ده.
+  unauthorized:
+    update:
+      project: اجازه نه لری چی دا پروژه اپډیټ کړی.
+    manage:
+      picto: تاسو یوازې سمبلسیټونه اداره کولی شئ چې تاسو یو همکار یاست.
+      all: تاسو نشی کولی %{action} دا %{subject}.
+  views:
+    pages:
+      contact:
+        lead_text: مونږ ډیر خوشحاله یو چې د اړونده منابعو په اړه پوښتنې ، وړاندیزونه
+          او معلومات ترلاسه کړو.
+        _description: مونږ سره د عمومی اړتیاوو سره اړیکه ونیسئ، یا د خپل سمبول سیټ خپور
+          کړئ.
+        heading: په لمس کې لاس ته راوړئ
+        email_us: موږ ته ایمیل کړئ
+      home:
+        for_communicators: د مصاحبو لپاره
+        explore_heading: د سمبول سیټونه وسپموی
+        board_builder:
+          heading: Global Symbols Board Builder
+          subheading: د مخابراتو بورډونه اسانه لاره
+          storage: هرڅه ستاسو په Global Symbols حساب کې خوندي ساتل کیږي.
+          button_featured: د بورډ سیټونه
+          button_try: د بورډ جوړوونکی هڅه وکړئ
+          create: زموږ د کتابتون څخه د زرګونو وړیا تصویرونو په کارولو سره د مرستې لپاره
+            بورډونه جوړ کړئ، او حتی ستاسو خپل.
+          design: ډیزاین، جوړول، خوندی کول او چاپ کول د مخابراتو بورډونه آنلاین.
+        for_creators: د خالقانو لپاره
+        for_creators_text: د سمبول سیټونه اداره او خپرول
+        for_communicators_text: د مکالمو د جوړولو لپاره د انځورونو تبادله کول
+        for_everyone: د هر چا لپاره
+        for_everyone_text: کشف کړئ ، ګډ کړئ ، مېچ کړئ او سمبول شخصی وکاروئ
+        explore_button: نور سېمبل سیټونه راوسپموئ…
+      search:
+        search: لټون
+        search_for: لټون
+        symbolset_dropdown_any_symbol_set: هر سمبول سیټ
+        _title: لټون
+        no_results: مونږ هیڅ ډول سمبولونه نشو موندلې. یوه پراخه پلټنه هڅه وکړئ.
+    surveys:
+      _shared:
+        number_of_symbols:
+          one: دا سروې ستاسو لپاره د بیاکتنې لپاره {count}% سمبول لري.
+          other: دا سروې ستاسو لپاره د بیاکتنې لپاره {count}% سمبولونه لري.
+        questions:
+          feelings_rating: د سمبول په اړه احساسات د ټول په توګه
+          cultural_rating: کلتوری حساسیت
+          comments: اضافی تبصرې
+          representation_rating: د کلمې یا کلمې استازیتوب کوی
+          contrast_rating: د رنګ په خلاف
+        thank_you: مننه د سروې د پوره کولو لپاره!
+      show:
+        close_at_message: تاسو کولی شئ تر %{date} پورې برخه ولرئ.
+        provide_details: ستاسو د تفصیلاتو وړاندې کول اختیاری دی، او ممکن د سروې تنظیموونکو
+          سره مرسته وکړی.
+        provide_details_2: ستاسو توضیحات به ستاسو د نظریاتو په تړاو د سروې تنظیم کونکو
+          ته وښودل شي ، او هیڅکله د کوم بل هدف لپاره د Global Symbols لخوا نه کارول
+          کیږي.
+        closed_header: دا سروې په اوس وخت کې د غبرګون نه منل دی.
+        offline_participants: د ګډون کوونکو لپاره چې په اوبلن کې کار کوی…
+        begin_button: سروې پیل کړئ
+        closed_text: د سروې د تنظیموونکی سره اړیکه ونیسئ که تاسو تمه لرئ چې برخه واخلی.
+        offline_participants_button: د چاپ سروې د غبرګون فورمې
+      print:
+        heading: د چاپ تنظیمات
+        collect_names: د ګډون کوونکو نومونه راټول کړئ
+        show_instructions: لارښوونې وښایاست
+        show_instructions_helper: په دوی باندې په کلیک کولو سره لارښوونې بدل کړئ.
+        show_example_helper: یوه مثالی پوښتنه زیاتوی چې نمونه ځوابونه ښیی.
+        symbol_label_language: د سمبول لیبلونه په کې وښایاست
+        symbol_label_language_helper: د غوره پایلو لپاره، د عصری براوزر په کارولو سره
+          په رنګ چاپ کړئ او هدرونه او پایټرونه غیر فعال کړئ.
+        name_field: زما نوم دا دی
+        introduction: مقدمه
+        instructions_1: دا سروې به له تاسو څخه غوښتنه وکړی چې د هر سمبول څلور اړخونه
+          نرخ کړئ، او ځینې تبصرې وړاندې کړئ.
+        instructions_2: هر سمبول په یوه ترازو کې نرخ کړئ چیرته چې 1 'په بشپړه توګه د
+          منلو وړ نه دی' او 5 په بشپړ ډول د منلو وړ دی، په سم بکس کې د چک په ځای کولو
+          سره.
+        show_intro: د سروې مقدمه وښایه
+        show_intro_helper: د سروې په ایډیټ کولو سره مقدمه بدله کړئ.
+        show_example: یو مثال وښایه
+        symbol_label_language_all: ټولې موجودې ژبې
+        print_button: چاپ سروې
+        instructions_heading: لارښوونې
+      thank_you:
+        button_restart_survey: سروې بیا له سره شروع کړئ
+        feedback_is_saved: مونږ ستاسو ټول نظرونه خوندی کړی دی.
+        button_go_to_homepage: Global Symbols ته لاړشئ
+      _print_question:
+        example_text: دا ښیی چې تاسو څنګه کولی شئ پوښتنو ته ځواب ونه وایی
+        example_comment: دا ونه د بروکول په څیر ښکاری.
+        example_heading: مثال پوښتنه
+        symbol_counter: سمبول %{number}
+    symbolsets:
+      show:
+        no_symbols_for_collaborator: د خپل سمبول سیټ د جوړولو د پیل لپاره یو سمبول اضافه
+          کړئ
+        _description: په Global Symbols.کې ټاکل شوی {symbolset_name}% سمبول وپلټئ. د
+          ارتباط لپاره وړیا عکسونه او سمبولونه ترلاسه کړئ.
+      _topbar:
+        download: ډاونلوډ
+        button_archive: ارشیف شوی سمبولونه
+        button_add_symbol: اضافه کول سمبول
+        button_edit: ایډیټ
+        button_review: کره کتنه
+        button_translate: ژباړه وکړه
+      _form:
+        description_helper: دا تشریح به د سمبول سیټ تر څنګ ښکاره شی.
+        published_helper: خپور شوی سمبول سیټونه ټولو ته د لیدو وړ دی. د سمبول سیټونه
+          د ادمینو او د سمبول سیټ همكارانو ته د لیدو وړ دی.
+        publisher_helper: د هغه چا یا موسسې نوم چې د سمبول سیټ خپور وی.
+        logo_helper: دا لوګو به د سمبلسیټ په پاڼه کې ښکاره شی. دا باید یو تصویر وی،
+          په مثالی توګه یو SVG یا PNG، 300x200 پیکسلونه د شفاف شالید سره.
+        publisher_url_label: د ناشر URL
+        licence_prompt: د جواز انتخاب
+        save_button: د سمبول سیټ خوندی کړئ
+        publisher_url_helper: د خپرونکی ویب پاڼه پته.
+        logo_label: لوګو
+        publisher_placeholder: لکه د خلکو سمبولونو بنسټ
+        publisher_url_placeholder: لکه https://peoplesymbols.com
+        create_button: د سمبول سیټ جوړ کړئ
+      _review_row:
+        remove_confirmation: ایا مونږ به د دې سمبول څخه %{subject} لرې کوو؟
+      edit:
+        _title: Edit %{symbolset_name}
+      import:
+        introduction: خپل موجود سمبولونه Global Symbols ته اپلوډ کړئ.
+        _title: '%{symbolset_name}'
+        heading: د وارداتو سمبولونه
+      index:
+        create_symbol_set_button: د سمبول سیټ جوړ کړئ
+        _title: د سمبول سیټونه وسپموی
+        heading: د سمبول سیټونه وسپموی
+        _description: په Global Symbols کې د زرګونو وړیا ارتباطي سمبولونو لټون وکړئ.
+      new:
+        introduction: ستاسو نوی سمبول سیټ به په یوه مسوده حالت کې جوړ شی. دا به یوازې
+          تاسو او همفکرانو ته ښکاره وی چې تاسو یې اضافه کوئ، تاسو ته اجازه درکوی چې
+          سمبولونه اضافه کړئ او د سمبول سیټ چمتو کړئ.
+        guidance_link: خپل سمبول سیټ په Global Symbols کې خپور کړئ
+        _title: یو سمبول سیټ جوړ کړئ
+        heading: یو سمبول سیټ جوړ کړئ
+        guidance: موږ وړاندیز کوو چې تاسو د لارښودنو بیا کتنه وکړی د
+      _shared:
+        none_found: مونږ دلته هیڅ سمبول ونه شو موندلای!
+      review:
+        heading: کره کتنه
+        filter_all_symbols: ټول سمبولونه
+        filter_without_a_concept: بې له کوم مفهومه
+      archive:
+        heading: ارشیف شوی سمبولونه
+        none_found: په دې سمبول سیټ کې ارشیف شوی سمبولونه شتون نه لری
+        description: ارشیف شوی سمبولونه د سمبول په سیټ ، د لټون په پایلو یا ایپس کې
+          نه ښودل کیږی
+      translate:
+        heading: د ژباړې لیبلونه
+        button_find_untranslated: ناژباړل شوی سمبولونه پیدا کړئ
+        form:
+          target_lang_prompt: د هدف ژبه غوره کړئ
+          source_lang_label: څخه یې وژباړه
+          source_lang_option: '%{language_name} (%{labels_count} سمبولونه, %{coverage_percentage}
+            پوښښ)'
+          target_lang_label: ته
+        description: په اتومات ډول نوی ژبو ته د سمبول لیبل وژباړئ. دا وسیله په یو وخت
+          کې د %{symbols_limit} سمبولونو په برخه کې ژباړی.
+        title: Translate %{symbolset_name}
+      _symbolset_card:
+        image:
+          alt: '%{symbolset_name} لوګو'
+    pictos:
+      _comment_form:
+        save_button: تبصره خوندی کړه
+      _form:
+        label_label: د لیبل متن
+        save_button: سمبول خوندی کړه
+        to_download_symbols: د سمبولونو ښکته کول
+        image_helper: یو ایس وی جی (غوره) یا د پی این جی فارمټ تصویر پورته کړئ.
+        label_helper: لیبل ستاسو سمبول تشریح کوی چې خلک یې پیدا کړی. تاسو کولی شئ د
+          سمبول جوړولو وروسته په اضافی ژبو لیبلونه اضافه کړئ.
+        language_helper: د لیبل ژبه.
+        diacritised_label_helper: صرف د عربی ژبو لپاره. دا اضافی د نمو تفصیل ونه پلوری.
+        description_helper: په لنډ ډول د مرستې د پوهېدو سمبول واضح کړئ.
+        create_button: اضافه کول سمبول
+      edit:
+        _title: Edit %{picto_label} in %{symbolset_name}
+        heading: د سمبول ایډیټ کول
+      new:
+        heading: اضافه کول سمبول
+        _title: په %{symbolset_name} کې سمبول اضافه کړئ
+      show:
+        _title: '%{picto_label} in %{symbolset_name}'
+        concept_defined_in: تعریف شوی په %{coding_framework_name}
+        add_concept_button: یو مفهوم اضافه کړئ
+        archived_notice:
+          heading: ارشیف شوی سمبول
+          text: دا سمبول د سمبول په سیټ ، د لټون پایلو یا ایپس کې نه ښودل کیږی
+        no_concepts: دا سمبول هیڅ مفهوم نه لری چې دا تعریف کړی.
+        alternative_symbols_heading: بدیل سمبولونه
+        _description: "'%{picto_label}' سمبول، د %{symbolset_name} سمبول سیټ برخه. د\
+          \ مفاهمې لپاره په زرګونو وړیا سمبولونه پیدا کړئ."
+      _topbar:
+        download_button: 'ډاونلوډ کړئ %{file_type}'
+        not_publicly_visible: په ښکاره توګه نه لیدل کیږی
+    survey_editor:
+      _add_picto_to_survey:
+        button: سروې ته اضافه کړئ
+        option: '%{survey_name} in %{symbolset_name}'
+      _form:
+        show_symbol_descriptions_label: د سمبول تشریحات وښایه
+        save_button: سروی خوندی کړئ
+        name_helper: یو داسې نوم وړاندې کړئ چې د ګډون کوونکو سره د دې سروې په پېژندلو
+          کې مرسته کوی.
+        introduction_helper: اختیاری . دا ګډون کوونکو ته ښودل کیږی کله چې دوی سروې پیل
+          کړی.
+        close_at_helper: اختیاری . د ګډون کوونکو لپاره یو وخت وټاکې چې ځواب ورکړی.
+        language_label: د سمبول لیبلونه په کې وښایاست
+        language_helper: کله چې دا سروې اخلی، ګډون کوونکی په ټاکل شوې ژبه کې د سمبول
+          لیبل ونه ښودل شی.
+        language_blank_option: ټولې موجودې ژبې
+        show_symbol_descriptions_helper: ګډون کوونکو ته د سمبول تشریحات ښکاره کوی.
+        create_button: سروې جوړه کړئ
+      _picto:
+        no_label_for_language: نه %{language_name} لیبل
+        remove_confirm: ایا تاسو ډاډه یاست چې تاسو غواړئ دا سمبول د سروې څخه لرې کړئ؟
+      _sidebar:
+        stages:
+          plan: پلان
+          analyse: د تحلیل پایلې
+          archive: ارشیف یا حذف
+          analyse_results_description: د سروې پایلو ته کتنه
+          collect_feedback: د غبرګون راغونډولو
+          plan_description: نښانونه غوره کړئ چې په سروې کې شامل شی
+          collect_feedback_description: اجازه راکړئ چې ګډون کوونکی سروې بشپړه کړی
+        heading: پړاوونه
+      export_xlsx:
+        header_participant_number: ګډون کوونکی نمبرو
+        header_symbol_id: د سمبول ایډی
+        header_label: لیبل
+        header_contrast_rating: مبادله
+        header_comment: تبصره
+        sheet_name: تبصرې
+        header_participant_name: د ګډون کوونکی نوم
+        header_overall_rating: درجه بندی
+        header_representation_rating: استازیتوب
+        header_cultural_rating: فرهنګی
+        comment_participant_name: ګډون کوونکی اړتیا نه لری چې خپل نومونه وړاندې کړی،
+          نو ځینې حجرې ممکن خالی وی.
+      edit:
+        _title: 'Edit %{survey_name} in %{symbolset_name}'
+        heading: ایډیټ سروې
+      index:
+        _title: په %{symbolset_name}
+        get_help: د سروې ګانو لپاره د %{link} سپړنه
+        button_new_survey: سروې جوړه کړئ
+        no_surveys_at_stage: د %{stage} په مرحله کې سروی شتون نه لری.
+        get_help_link: مرسته او روزنه
+      show:
+        symbols_heading: په دې سروې کې سمبولونه
+        collect_feedback:
+          heading: د غبرګون راغونډولو
+          button_begin_collecting: د انډبایک راټولول پیل کړی
+          stop_button: سروې پای ته ورسی
+          paper_heading: د کاغذ سروې
+          paper_add_paper_feedback_button: د کاغذ غبرګون اضافه کړئ
+          survey_ended_add_paper: تاسو اوس هم په لاسی توګه د کاغذ د سروې فورمونو څخه
+            غبرګون اضافه کولی شئ.
+          text_1: کله چې تاسو د انډیباکو راټولول پیل کړئ، مونږ به تاسو ته یو URL درکړو
+            چرته چې خلک په ټولپوښتنه کې برخه اخستلی شی.
+          text_2: تاسو به ونه شئ کولی چې خپل سمبول ټاکنه بدل کړئ په داسې حال کې چې سروې
+            د نظر یې ټولول دی.
+          close_at_label: ځوابونه ومنئ تر هغه چې
+          close_at_helper: اختیاری . د سروې ځوابونو لپاره یو وخت وټاکې.
+          invite_at_this_url: خلک راوبلئ چې په دې URL کې ستاسو سروی واخلی.
+          invite_deadline: ګډون کوونکی تر %{close_at} پورې لری چې ځوابونه وړاندې کړی
+            (%{link}) .
+          responses_count:
+            one: ستاسو سروې %{count} ځواب لری.
+            other: ستاسو سروې %{count} ځوابونه لري.
+          confirm_stop: دا به خلک د سروې ځواب ودروی. آیا ته باوري یې?
+          paper_intro: ځینې ګډون کوونکی ممکن د کاغذ د سروې فورمې غوره کړی. دا وسیلې
+            وکاروئ خپل لیدک راټول کړئ او دلته یې واچوئ.
+          paper_customisation_invitation: ستاسو د ګډون کوونکو لپاره د سروې فورمې دود
+            او چاپ کړئ…
+          paper_print_button: د سروې چاپ فورمې
+          paper_to_include_results: ستاسو د سروې په پایلو کې د کاغذد سروې د فورمونو
+            پایلې شاملولو لپاره…
+          survey_ended: د دې سروې لپاره د ځواب ټولګه پای ته رسیدلې ده.
+        analyse_results:
+          heading: د تحلیل پایلې
+          button_stats: د سمبول احصایه
+          results_appear_here: پایلې به دلته ښکاره شی کله چې خلک ستاسو سروې ته ځواب
+            پیل کړی.
+          responses_count:
+            one: '{count}% شخص ستاسو سروې ته ځواب ورکړ.'
+            other: '{count}% خلکو ستاسو سروې ته ځواب ورکړ.'
+          button_individual_responses: انفرادی ځوابونه
+          export:
+            heading: ایکسل ته د صادراتو پایلې
+            text_1: دا وسیله د ټول سروی ډاونلوډ کولو لپاره وکاروئ، د درجه بندۍ او تبصرو
+              په شمول.
+            text_2: دا په ایکسل کې د خپل تحلیل ترسره کول اسانه کوی. مونږ وړاندیز کوو
+              چې تاسو د هر سمبل لپاره د حساب کولو او چارټ اوسط پایلې لپاره د Pivot میزونو
+              څخه کار واخۍ.
+            text_3: په ایکسل فایل کې هر قطار د یو واحد ګډون کوونکی بیا کتنه په سروې
+              کې د یو سمبول استازیتوب کوی.
+        archive:
+          archive_button: د سروې ارشیف
+          heading: ارشیف یا حذف
+          survey_is_archived: دا سروې ارشیف ده. تاسو اوس هم هر ډول پایلې تجزیه کولی
+            شئ.
+          archive_description: دا سروې ارشیف کړئ کله چې تاسو د دې سره پای ته واستوئ.
+            تاسو به بیا هم په دې سروې کښې د کومې نتیجې تحلیل کولې شئ.
+          archive_confirm: دا به خلک د سروې ځواب ودروی. آیا ته باوري یې?
+          delete_description: د دې سروې حذف به د تل لپاره هر هغه نتیجه چې تاسو راټول
+            کړی وی حذف کړی. هیڅ نښه به حذف نه شی.
+          delete_confirm: ایا تاسو ډاډه یاست چې تاسو غواړئ دا سروې او کوم ځوابونه حذف
+            کړئ؟
+          delete_button: سروې حذف کړئ
+        symbols_text: دې سروې ته سمبولونه په Global Symbols کې د دوی په لټون کولو او
+          'سروې کې اضافه کولو' غوره کولو سره اضافه کړئ.
+        symbols_search_helper: په دې سروې کې د اضافه کولو لپاره د سېمبلونو لټون وکړئ
+      destroy:
+        notice: مونږ ستاسو سروی %{name}حذف کړه.
+      new:
+        button_create: سروې جوړه کړئ
+      add_symbol:
+        notice_success: مونږ ستاسو سروې ته سمبول اضافه کړو. %{add_another_link}
+        notice_success_add_another: یو بل اضافه کړئ؟
+        alert_failure: دا سمبول له پخوا څخه په %{survey_link}
+    survey_picto_analysis:
+      index:
+        crumb_name: د سمبول احصایه
+        heading: د سمبول احصایه
+        column_heading_overall_average: په ټولیزه توګه اوسط
+        row_heading_averages: اوسط
+        intro: دا جدول په ټولپوښتنه کې د هر سمبول لپاره اوسط ځوابونه ښیی، د ترلاسه شوی
+          %{count} پر بنسټ.
+        column_heading_rating_description: د سمبول په اړه احساسات د ټول په توګه
+        column_heading_representation_rating_description: د کلمې یا کلمې استازیتوب کوی
+        column_heading_contrast_rating_description: د رنګ په خلاف
+        column_heading_cultural_rating_description: کلتوری مناسبیت
+    survey_response_analysis:
+      _sidebar:
+        heading: ځوابونه
+        participant_number: ګډون کوونکی %{number}
+      index:
+        heading: انفرادی ځوابونه
+        crumb_name: انفرادی ځوابونه
+      new:
+        label_contrast_rating: د رنګ په خلاف
+        label_cultural_rating: کلتوری حساسیت
+        save_button: ځوابونه خوندی کړی
+        heading: د کاغذ غبرګون اضافه کړئ
+        use_this_form_to: د Global Symbols ته د یوه کاغذ سروې خوندي کولو لپاره دا فورمه
+          وکاروئ. بیا به دا ستاسو د سروې احصایو ته حساب شي.
+        match_numbers: هغه شمېرې چې د هر سمبول بکس په لوړ ښی کې ښودل شوی دی باید د کاغذ
+          په فورمونو کې ښودل شوی وو سره سمون ولری، ترڅو ډاډ ترلاسه کړی چې تاسو د هر
+          سمبول لپاره صحیح درجه بندی داخل کړئ.
+        label_overall_rating: د سمبول په اړه احساسات
+        label_representation_rating: د کلام استازیتوب کوی
+        cancel_confirm: آیا ته باوري یې? تاسو به تر دې دمه کومه پایله له لاسه ورکوئ.
+      create:
+        notice_success: دا کاغذ ځواب وژغورل شو.
+    survey_questions:
+      _form:
+        please_fix_errors: مهربانی وکړئ لاندې غلطیانې سم کړئ.
+        button_save_answer: ځواب خوندی کړئ
+        comments_helper: اختیاری . مهربانی وکړئ هر ډول تبصرې اضافه کړئ چې مونږ سره د
+          دې سمبول په ښه کولو کې مرسته وکړی.
+        button_previous_question: مخکنۍ پوښتنه
+      _controller:
+        timed_out: بخښنه غواړم - ستاسو د سروې وخت د بې فعالیتۍ له امله وشو. مهربانی
+          وکړئ بیا سروې پیل کړئ.
+      show:
+        please_rate: مهربانی وکړئ دا سمبول په داسې کچه ووهئ چېرته چې 1 په بشپړه توګه
+          د منلو وړ نه دی او 5 په بشپړه توګه د منلو وړ دی.
+    collaborators:
+      index:
+        page_title: د %{name لپاره همکار
+        add_button: همکار اضافه کړئ
+        existing_heading: د موجوده همکارو
+        existing_none_found: هیڅ کاروونکی اجازه نه لری چې دا سمبول سیټ ایډیټ کړی.
+        added_at: اضافه شوی %{date}
+        remove_aria_label: همکاری وبایلی
+        add_heading: یو همکار اضافه کړئ
+        add_text: بل چا ته د دې سمبول سیټ ترمیم کولو اجازه ورکولو لپاره ، هغه بریښنالیک
+          آدرس دننه کړئ چې دوی یې Global Symbols ته لاسلیک کولو لپاره کارولی و.
+        existing_text: دا خلک اجازه لری چې دا سمبول سیټ ایډیټ کړی.
+        remove_confirm: ایا مونږ به د دې سمبول سیټ څخه %{email} لرې کړو؟
+      create:
+        alert_no_gs_account: '%{email_address} تر دې دمه Global Symbols حساب نلري.'
+        notice_success: مونږ %{email_address} د یو همکار په توګه اضافه کړه.
+      destroy:
+        notice_success: مونږ %{email_address} د یو همکار په توګه لرې کړو.
+    concepts:
+      show:
+        defined_in: یو مفهوم چې په
+        page_title: '%{subject} in %{coding_framework}'
+    picto_concepts:
+      index:
+        add_concept_invitation: مونږ هر هغه مفهوم اضافه کولی شو چې تاسو یې په مفهوم
+          نیټ کې موندلای شئ.
+        add_concept:
+          button: اضافه کول مفهوم
+          add: اضافه کول
+          heading: یو مفهوم اضافه کړئ
+          instruction: دې سمبول ته د یو مفهوم اضافه کولو لپاره، یوه کلمه داخل کړئ. مونږ
+            به دا مفهوم اضافه کړو که مونږ دا پیدا کړو.
+        existing_concepts:
+          added_at: اضافه شوی %{date}
+          none_found: دا سمبول هیڅ مفهوم نه لری
+          remove_aria_label: مفهوم لرې کړه
+          heading: موجوده مفاهیم
+          remove_confirm: ایا مونږ به د دې سمبول څخه %{subject} لرې کوو؟
+        intro: مفاهیم د کمپیوټر سره مرسته کوی چې ستاسو په سمبولونو پوه شی، نو ډاډ ترلاسه
+          کړئ چې دوی دقیق او ځانګړی دی.
+        page_title: د %{symbol} لپاره مفاهیم
+      create:
+        alert_failure: مونږ یو مفهوم نشو موندلې چې نوم یې %{concept}. بله کلمه هڅه وکړه.
+        notice_success: مونږ دې سمبول ته د %{concept} مفهوم ورزیات کړ.
+        alert_already_exists: '%{concept} مخکې له مخکې په دې سمبول باندې یو مفهوم دی.'
+      destroy:
+        notice_success: مونږ د دې سمبول څخه د %{concept} مفهوم لرې کړو.
+        alert_failure: مونږ د دې سمبول څخه د %{concept} مفهوم نه شو لرې کولی.
+    picto_labels:
+      _form:
+        language_helper: د لیبل ژبه.
+        label_label: لیبل متن
+        diacritised_label_helper: صرف د عربی ژبو لپاره. دا اضافی د نمو تفصیل ونه پلوری.
+        button_save: لیبل خوندی کړی
+        button_add: لیبل اضافه کړئ
+        diacritised_label_label: ډیاسیټډ لیبل
+        description_helper: په لنډ ډول د مرستې د پوهېدو سمبول واضح کړئ.
+      _picto_labels:
+        heading: '%{label_type} لیبلونه'
+        no_labels_found: هیڅ لیبل ونه موندل شو
+        remove_label_aria_label: لیبل لرې کړه
+        remove_label_confirm: ایا مونږ به د دې سمبول څخه %{text} لرې کړی؟
+      edit:
+        heading: ایډیټ لیبل
+        page_title: د %{symbol} لپاره لیبلونه
+        intro: لیبلونه د نورو خلکو سره مرسته کوی چې ستاسو په سمبولونو پوه شی. دوی مونږ
+          سره ستاسو د سمبول په معنی پوهیدلو کې مرسته کوی، نو ډاډ ترلاسه کړئ چې دوی دقیق
+          او ځانګړی دی.
+      index:
+        heading_add_label: یو لیبل اضافه کړئ
+        status_published: چاپ شوی
+        status_suggested: وړاندیز شوی
+        page_title: د %{symbol} لپاره لیبلونه
+        intro: لیبلونه د نورو خلکو سره مرسته کوی چې ستاسو په سمبولونو پوه شی. دوی مونږ
+          سره ستاسو د سمبول په معنی پوهیدلو کې مرسته کوی، نو ډاډ ترلاسه کړئ چې دوی دقیق
+          او ځانګړی دی.
+        instructions: سمبولونه باید لږ تر لږه یو لیبل ولری. که تاسو غواړئ، تاسو کولی
+          شئ د یوې ژبې څخه د زیاتو ژبو لپاره لیبل اضافه کړئ.
+      create:
+        notice_success: مونږ دې سمبول ته د %{label} لیبل اضافه کړو.
+        alert_failure: تاسو باید ځینې ستونزې حل کړئ مخکې له دې چې مونږ دا لیبل اضافه
+          کړو.
+      destroy:
+        notice_success: مونږ د دې سمبول څخه د %{label} لیبل لرې کړو.
+        alert_failure: مونږ نشو کولی د دې سمبول څخه د %{label} لیبل لرې کړو.
+      publish_translation:
+        notice_success: د %{language_name} لیبل خپور کړ.
+    application:
+      _copy_to_clipboard:
+        button: کاپی
+        button_title: کاپی کلیپ بورډ ته
+    pagination:
+      next: وروسته
+      last: وروستی
+      first: لومړی
+      previous: پریو
+    errors:
+      not_found:
+        description: موږ په دې پته څه نه شو موندلای
+    translations:
+      _translation_form:
+        publish_button: ټول %{language_name} ژباړه خپره کړئ
+        publish_button_working: د ټولو ژباړو خپراوی…
+        translation_complete_text: ټول سمبولونه %{language_name} ته ژباړل شوی دی.
+        button_translate: د سمبولونو ژباړه
+        button_translate_working: د سمبولونو ژباړنه…
+        translation_complete_heading: ژباړه بشپړه
+      _symbols_table:
+        heading_source_language: '%{language_name} سرچینه'
+        heading_destination_language: '%{language_name} ژباړه'
+        button_get_translation_working: ژباړنه…
+        heading_type: ټایپ
+        button_get_translation: ژباړه ترلاسه کړئ
+      _suggestion_form:
+        button_publish_working: نشر…
+        label: ژباړه
+        button_publish: خپراوی
+      _translations_published:
+        next_steps: د ژباړې لپاره نور سمبولونه پیدا کړئ، یا بله ژبه غوره کړئ.
+        heading: ژباړې چاپ شوې
+        labels_are_visible: نوې ژباړې اوس په Global Symbols او غوښتنلیکونو کې لیدل کیږي.
+        labels_saved: نوې ژباړې وژغورل شوې.
+    articles:
+      index:
+        title: خبرونه
+        more_button: نور لیکنې
+        description: د Global Symbols بلاګ - د سمبولونو سره په اړیکه کې ستاسو سره د
+          مرستې لپاره تازه معلومات ، نظریات او الهام.
+      _topbar:
+        header_news: Global Symbols خبرونه
+  date:
+    formats:
+      default: '%e %b%Y'
+      short: '%d %b'
+      long: '%d %B%Y'
+    day_names:
+    - یکشنبه
+    - دوشنبه
+    - سه شنبه
+    - چارشنبه
+    - پنجشنبه
+    - جمعه
+    abbr_day_names:
+    - لمر
+    - مون
+    - توئ
+    - Wed
+    - سټ
+    - فری
+    month_names:
+    - جنوری
+    - فبروری
+    - مارچ
+    - اپرېل
+    - جولای
+    - می
+    - جون
+    - اکتوبر
+    - نومبر
+    - دسمبر
+    abbr_month_names:
+    - جان
+    - د کب
+    - مار
+    - اپرټ
+    - می
+    - جون
+    - سپ
+    - یول
+    - اګ
+    - د اکټ
+    - د ډسی
+    order:
+    - کال
+    - میاشت
+    - ورځ
+  time:
+    formats:
+      default: '%a , %d %b %Y %H:%M:%S %z'
+      short: '%d %b %H :%M'
+      long: '%B %d , %Y %H :%M'
+    am: am
+    pm: ماپمن
+  errors:
+    messages:
+      model_invalid: 'اعتبار د ناکامیسره مخ شو: %{errors}'
+      exclusion: ساتل شوی دی
+      empty: خالی کیدی نه شی
+      greater_than: باید له %{count} څخه زیات وی
+      equal_to: باید د %{count} سره برابر وی
+      other_than: باید له %{count} څخه نور وی
+      even: حتی باید وی
+      wrong_size: دا غلطه اندازه ده ( باید %{file_size})
+      size_too_small: ډیر کوچنی دی ( حد اقل %{file_size})
+      size_too_big: ډیر لوی دی ( اعظمی %{file_size})
+      already_confirmed: مخکې تایید شوی وو، مهربانی وکړئ د لاسلیک کولو هڅه وکړئ
+      confirmation_period_expired: اړتیا لری چې د %{period} په دننه کې تایید شی ، مهربانی
+        وکړئ د نوی غوښتنه وکړئ
+      expired: پای ته رسیدلې ده، مهربانی وکړئ د نوی غوښتنه وکړئ
+      not_found: پیدا نه شو
+      not_locked: بند نه وو
+      not_saved:
+        one: '1 غلطی دا %{resource} د خوندی کیدو څخه منع کړه:'
+        other: '%{count} تېروتنې دې %{resource} له خوندي کیدو څخه منع کړې:'
+      inclusion: په لیست کې شامل نه دی
+      invalid: بې اعتباره دی
+      confirmation: د %{attribute} سره سمون نه خوری
+      accepted: باید ومنل شی
+      blank: خالی نه شی
+      present: باید خالی وی
+      too_long:
+        one: ډیر اوږد دی (اعظمی 1 خصلت دی)
+        other: خورا اوږد دی (اعظمي حد یې %{count} حروف دی)
+      too_short:
+        one: ډیر لنډ دی (لږ تر لږه 1 شخصیت دی)
+        other: خورا اوږد دی (اعظمي %{خورا لنډ دی (لږترلږه %{count} حروف دي) شمیره حروف)
+      wrong_length:
+        one: دا غلط اوږدوالی دی (باید 1 شخصیت وی)
+        other: غلط اوږدوالی دی (باید %{count} توري وي)
+      not_a_number: نمبر نه دی
+      not_an_integer: باید یو عدد وی
+      greater_than_or_equal_to: باید د %{count} څخه زیات یا مساوی وی
+      less_than: باید له %{count} څخه کم وی
+      less_than_or_equal_to: باید د %{count} څخه کم یا مساوی وی
+      odd: باید عجیبه وی
+  dictionary:
+    collaborator:
+      one: همکار
+      other: همکاران
+    concept:
+      one: مفهوم
+      other: مفهومونه
+    settings: تنظیمات
+    response:
+      one: ځواب
+      other: ځوابونه
+    survey:
+      one: سروې
+      other: سروې
+    go_back: بیرته لاړ شه
+    numbers:
+      '1': '1'
+      '2': '2'
+      '4': '4'
+      '5': '5'
+      '3': '3'
+    import: واردات
+    edit: ایډیټ
+    sign_in: دننه شه
+    view: لید
+    search: لټون
+    download: ډاونلوډ
+    page_not_found: پاڼه نه ده موندل شوې
+    label:
+      one: لیبل
+      other: لیبلونه
+    symbolset:
+      one: د سمبول سیټ
+      other: سمبول سیټونه
+    symbol:
+      one: سمبول
+      other: سمبولونه
+    unauthorised: نه دی وړاندې شوی
+    global_symbols: Global Symbols
+    back: شا
+    by: له خوا
+    remove: لرې کول
+    change: بدلون
+    archive: آرشیف
+    un-archive: د ملګرو ملتونو آرشیف
+    publish: خپراوی
+  languages:
+    en: انګلیسي
+    fr: فرانسوي ژبه
+    sr: سربیایي
+    sr_Cyrl: سربیا ( سریالیک )
+    ro: رومانیايي
+    el: یوناني
+    hy: ارمنستاني
+    sq: البانیاي
+    ca: کتلاني
+    da: ډنمارکي
+    hi: هندي
+    it: ایټالوي
+    sh: سربو - کروشیا
+    br: برټن
+    he: عبراني ژبه
+    pl: پولنډي
+    sk: سلواک
+    ur: اردو
+    de: الماني ژبه
+    hr: کروشیايی
+    sr_Latn: سربیا ( لاتین )
+    tr: ترکي
+    bg: بلغاریایي
+    nl: هالنډي
+    es: هسپانوي
+    ar: عربي
+    zh: چینايی
+    mk: مخدوني
+    mr: مراټي
+    pt: پرتګالي
+    ru: روسي
+    cnr: مونتېنګرین
+    an: اراګوسه
+    et: استونیاي
+    eu: بزوکه
+    fa: فارسي
+    gl: ګلیشن
+    hu: هنګري ژبه
+    sv: سویډني
+    val: ویس
+  layouts:
+    application:
+      menu:
+        training: روزنه
+        my_account: زما اکاونټ
+        sign_in: دننه شه
+        facebook: په فېسبوک کې Global Symbols
+        resources: منابع
+        board_builder: د بورډ جوړوونکی
+        news: خبرونه
+        sign_out: لاسلیک کول
+        sign_up: حساب جوړ کړئ
+        search_placeholder: لټون %{var}
+        twitter: په ټویټر کې Global Symbols
+      footer:
+        accessibility: لاسرسی
+        privacy_policy: د محرمیاتو پالیسی
+        terms: شرایط
+        about: په اړه
+        contact: اړیکه
+        language_label: ژبه
+      skip_to_main_content: اصلی محتوا ته تیریدل

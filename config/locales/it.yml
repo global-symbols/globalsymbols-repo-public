@@ -1,0 +1,969 @@
+it:
+  devise:
+    registrations:
+      signed_up: Benvenuto! Ti sei registrato con successo.
+      updated: Il tuo account è stato aggiornato correttamente.
+      update_needs_confirmation: Hai aggiornato il tuo account correttamente, ma dobbiamo
+        verificare il tuo nuovo indirizzo email. Controlla la tua e-mail e segui il
+        link di conferma per confermare il tuo nuovo indirizzo e-mail.
+      signed_up_but_unconfirmed: Un messaggio con un link di conferma è stato inviato
+        al tuo indirizzo email. Segui il link per attivare il tuo account.
+      signed_up_but_locked: Ti sei registrato con successo. Tuttavia, non abbiamo potuto
+        accedere perché il tuo account è bloccato.
+      signed_up_but_inactive: Ti sei registrato con successo. Tuttavia, non abbiamo
+        potuto accedere perché il tuo account non è ancora attivato.
+      destroyed: Arrivederci! Il tuo account è stato cancellato con successo. Speriamo
+        di rivedervi presto.
+    views:
+      sessions:
+        errors:
+          messages:
+            not_saved:
+              one: '1 errore ha impedito il salvataggio di questo %{resource}:'
+              other: ''
+            not_locked: non è stato bloccato
+            not_found: non trovato
+            expired: è scaduto, si prega di richiederne uno nuovo
+            confirmation_period_expired: deve essere confermato entro %{period}, si
+              prega di richiederne uno nuovo
+            already_confirmed: è già stato confermato, prova ad accedere
+        new:
+          sign_in_button: Accedi
+          page_title: Accedi
+      _shared:
+        _links:
+          new_unlock: Non hai ricevuto le istruzioni per lo sblocco?
+          new_confirmation: Non hai ricevuto le istruzioni di conferma?
+          forgotten_password: Hai dimenticato la password?
+          sign_up: Crea un account
+          sign_in: Accedi
+      passwords:
+        edit:
+          button: Cambia password
+          confirm_password_label: Conferma nuova password
+          new_password_helper: '%{var} caratteri minimo'
+          new_password_label: Nuova password
+          heading: Cambia la tua password
+        instructions: Inserisci l'indirizzo email del tuo account e ti invieremo un
+          link per reimpostare la password.
+        new:
+          page_title: Gestisci account
+          button: Link di ripristino e-mail
+          email_helper: L'indirizzo e-mail utilizzato per iscriversi a Simboli globali
+          heading: Reimposta password
+      registrations:
+        account_saved:
+          return_to_gs_button: Torna a Simboli globali
+          heading: Account aggiornato
+        change_password:
+          account_indicator: Accesso come %{email}
+          submit: Cambia password
+          manage_account: Gestisci account
+          heading: Cambia password
+        edit:
+          awaiting_confirmation: 'Attualmente in attesa di conferma per: %{unconfirmed_email}'
+          page_title: Gestisci account
+          heading: Gestisci account
+        _form:
+          button_change_password: Cambia password
+          cancel_account_button: Elimina il mio account
+          cancel_account_confirm: Sei sicuro? Il tuo account Simboli globali verrà eliminato
+            definitivamente.
+          cancel_account_text: Se desideri chiudere il tuo account Simboli globali…
+          cancel_account_header: Cancella il mio account
+          button_save_changes: Salva modifiche
+          new_password_helper: '%{var} caratteri minimo. Lascia vuoto se non vuoi cambiarlo.'
+          current_password_helper: Abbiamo bisogno della tua password attuale per confermare
+            le tue modifiche.
+          new_password_confirmation: Conferma nuova password
+          new_password: Nuova password
+          please_fix_errors: Correggi questi errori.
+          confirm_password: Conferma password
+          password_helper: '%{var} caratteri minimo'
+          language_helper: I simboli verranno mostrati nella tua lingua preferita, ove
+            possibile.
+        new:
+          sign_up_button: Crea un account
+          heading: Crea un account
+          page_title: Crea un account
+    unlocks:
+      unlocked: Il tuo account è stato sbloccato correttamente. Accedi per continuare.
+      send_paranoid_instructions: Se il tuo account esiste, riceverai un'e-mail con
+        le istruzioni su come sbloccarlo in pochi minuti.
+      send_instructions: Riceverai un'e-mail con le istruzioni su come sbloccare il
+        tuo account in pochi minuti.
+    sessions:
+      already_signed_out: Ti sei disconnesso.
+      signed_out: Ti sei disconnesso.
+      signed_in: Bentornato!
+    passwords:
+      updated_not_active: La password è stata modificata correttamente.
+      updated: La password è stata modificata correttamente. Ora hai effettuato l'accesso.
+      send_paranoid_instructions: Se il tuo indirizzo e-mail esiste nel nostro database,
+        riceverai un link di recupero della password al tuo indirizzo e-mail in pochi
+        minuti.
+      send_instructions: Ti abbiamo inviato un'email per la reimpostazione della password.
+      no_token: Non puoi accedere a questa pagina senza provenire da un'e-mail di reimpostazione
+        della password. Se provieni da un'e-mail di reimpostazione della password, assicurati
+        di aver utilizzato l'URL completo fornito.
+    omniauth_callbacks:
+      success: Autenticazione riuscita dall'account %{kind}.
+      failure: Impossibile autenticarti da %{kind} perché "%{reason}".
+    mailer:
+      password_change:
+        subject: Password modificata
+      email_changed:
+        subject: Email modificata
+      unlock_instructions:
+        subject: Istruzioni per lo sblocco
+      reset_password_instructions:
+        subject: Istruzioni per la reimpostazione della password
+      confirmation_instructions:
+        subject: Istruzioni di conferma
+    failure:
+      unconfirmed: Devi confermare il tuo indirizzo email prima di continuare.
+      unauthenticated: Devi accedere o registrarti prima di continuare.
+      timeout: La sessione è scaduta. Accedi di nuovo per continuare.
+      not_found_in_database: Password o password non valida %{authentication_keys}.
+      last_attempt: Hai un altro tentativo prima che il tuo account sia bloccato.
+      locked: Il tuo account è bloccato.
+      invalid: Password o password non valida %{authentication_keys}.
+      inactive: Il tuo account non è ancora attivato.
+      already_authenticated: Hai già effettuato l'accesso.
+    confirmations:
+      send_paranoid_instructions: Se il tuo indirizzo e-mail esiste nel nostro database,
+        riceverai un'e-mail con le istruzioni su come confermare il tuo indirizzo e-mail
+        in pochi minuti.
+      send_instructions: Riceverai un'e-mail con le istruzioni su come confermare il
+        tuo indirizzo e-mail in pochi minuti.
+      confirmed: Il tuo indirizzo email è stato confermato con successo.
+  errors:
+    messages:
+      present: deve essere vuoto
+      even: deve essere pari
+      odd: deve essere dispari
+      other_than: deve essere diverso da %{count}
+      less_than_or_equal_to: deve essere inferiore o uguale a %{count}
+      less_than: deve essere inferiore a %{count}
+      equal_to: deve essere uguale a %{count}
+      greater_than_or_equal_to: deve essere maggiore o uguale a %{count}
+      greater_than: deve essere maggiore di %{count}
+      not_an_integer: deve essere un numero intero
+      not_a_number: non è un numero
+      wrong_length:
+        one: è la lunghezza errata (dovrebbe essere di 1 carattere)
+        other: ''
+      too_short:
+        one: è troppo corto (almeno 1 carattere)
+        other: ''
+      too_long:
+        one: è troppo lungo (massimo è 1 carattere)
+        other: ''
+      blank: non può essere vuoto
+      empty: non può essere vuoto
+      accepted: deve essere accettato
+      confirmation: non corrisponde %{attribute}
+      invalid: non è valido
+      exclusion: è riservato
+      inclusion: non è incluso nell'elenco
+      model_invalid: 'Convalida non riuscita: %{errors}'
+      not_saved:
+        one: '1 errore ha impedito il salvataggio di questo %{resource}:'
+        other: ''
+      not_locked: non è stato bloccato
+      not_found: non trovato
+      expired: è scaduto, si prega di richiederne uno nuovo
+      confirmation_period_expired: deve essere confermato entro %{period}, si prega
+        di richiederne uno nuovo
+      already_confirmed: è già stato confermato, prova ad accedere
+      size_too_big: è troppo grande (il massimo è %{file_size})
+      size_too_small: è troppo piccolo (minimo è %{file_size})
+      wrong_size: è la dimensione sbagliata (dovrebbe essere %{file_size})
+  views:
+    pages:
+      contact:
+        heading: Mettiti in contatto
+        _description: Contattaci per richieste generali o per pubblicare il tuo set
+          di simboli.
+        email_us: Inviaci un'e-mail
+        lead_text: Siamo molto felici di ricevere domande, suggerimenti e informazioni
+          sulle risorse pertinenti.
+      search:
+        no_results: Non siamo riusciti a trovare alcun simbolo corrispondente. Prova
+          una ricerca più ampia.
+        _title: Ricerca
+        search_for: Cercare
+        search: Ricerca
+        symbolset_dropdown_any_symbol_set: Qualsiasi set di simboli
+      home:
+        board_builder:
+          button_try: Prova Board Builder
+          button_featured: Set di schede in primo piano
+          storage: Tutto è memorizzato in modo sicuro nel tuo account Simboli globali.
+          design: Progetta, costruisci, salva e stampa schede di comunicazione online.
+          create: Crea bacheche per facilitare la comunicazione utilizzando migliaia
+            di immagini gratuite dalla nostra libreria e persino la tua.
+          subheading: Schede di comunicazione in modo semplice
+          heading: Costruttore di schede di simboli globali
+        explore_button: Esplora altri set di simboli…
+        explore_heading: Esplora i set di simboli
+        for_everyone_text: Scopri, mescola, abbina e personalizza l'uso del simbolo
+        for_everyone: Per tutti
+        for_communicators_text: Scambia immagini per creare conversazioni
+        for_communicators: Per i comunicatori
+        for_creators_text: Gestire e pubblicare set di simboli
+        for_creators: Per i creatori
+    symbolsets:
+      _topbar:
+        button_edit: Redigere
+        button_translate: Traduci
+        button_archive: Simboli archiviati
+        button_review: Recensione
+        button_add_symbol: Aggiungi simbolo
+        download: Scaricare
+      translate:
+        heading: Traduci etichette
+        form:
+          source_lang_label: Traduci da
+          source_lang_option: '%{language_name} (%{labels_count} simboli, %{coverage_percentage}
+            copertura)'
+          target_lang_label: A
+          target_lang_prompt: Seleziona la lingua di destinazione
+        title: Traduci %{symbolset_name}
+        button_find_untranslated: Trova simboli non tradotti
+        description: Traduci automaticamente le etichette dei simboli in nuove lingue.
+          Questo strumento si traduce in lotti di %{symbols_limit} simboli alla volta.
+      archive:
+        description: I simboli archiviati non vengono visualizzati nel set di simboli,
+          nei risultati della ricerca o nelle app
+        none_found: Non ci sono simboli archiviati in questo set di simboli
+        heading: Simboli archiviati
+      review:
+        filter_without_a_concept: Senza un concetto
+        filter_all_symbols: Tutti i simboli
+        heading: Recensione
+      _shared:
+        none_found: Non siamo riusciti a trovare alcun simbolo qui!
+      new:
+        guidance_link: pubblicare il tuo set di simboli su Simboli globali
+        guidance: Ti suggeriamo di rivedere le linee guida per
+        introduction: Il nuovo set di simboli verrà creato in uno stato di bozza. Sarà
+          visibile solo a te e ai collaboratori che aggiungi, permettendoti di aggiungere
+          simboli e preparare il set di simboli.
+        heading: Creare un set di simboli
+        _title: Creare un set di simboli
+      index:
+        _description: Sfoglia migliaia di simboli di comunicazione gratuiti su Global
+          Symbols.
+        create_symbol_set_button: Crea set di simboli
+        heading: Esplora i set di simboli
+        _title: Esplora i set di simboli
+      import:
+        introduction: Carica i tuoi simboli esistenti in Simboli globali.
+        heading: Importa simboli
+        _title: Importa in %{symbolset_name}
+      edit:
+        _title: Modifica %{symbolset_name}
+      _symbolset_card:
+        image:
+          alt: '%{symbolset_name} logo'
+      _review_row:
+        remove_confirmation: Rimuoveremo %{text} da questo simbolo?
+      _form:
+        save_button: Salva set di simboli
+        create_button: Crea set di simboli
+        licence_prompt: Seleziona una licenza
+        publisher_url_placeholder: ad esempio https://peoplesymbols.com
+        publisher_placeholder: ad esempio la PeopleSymbols Foundation
+        publisher_url_label: URL dell'editore
+        logo_label: Logo
+        logo_helper: Questo logo verrà visualizzato nella pagina Set di simboli. Questa
+          dovrebbe essere un'immagine, idealmente SVG o PNG, 300x200 pixel con uno sfondo
+          trasparente.
+        publisher_url_helper: L'indirizzo del sito web dell'editore.
+        publisher_helper: Nome della persona o dell'organizzazione che pubblica il set
+          di simboli.
+        published_helper: I set di simboli pubblicati sono visibili a tutti. I set di
+          simboli bozza sono visibili agli amministratori e ai collaboratori del set
+          di simboli.
+        description_helper: Questa descrizione verrà visualizzata accanto al set di
+          simboli.
+      show:
+        _description: Esplora il set di simboli %{symbolset_name} in Simboli globali.
+          Ottieni immagini e simboli gratuiti per la comunicazione.
+        no_symbols_for_collaborator: Aggiungi un simbolo per iniziare a creare il tuo
+          set di simboli
+    survey_editor:
+      _add_picto_to_survey:
+        button: Aggiungi al sondaggio
+        option: '%{survey_name} in %{symbolset_name}'
+      _sidebar:
+        stages:
+          plan: Piano
+          analyse_results_description: Esaminare i risultati del sondaggio
+          collect_feedback_description: Consenti ai partecipanti di completare il sondaggio
+          plan_description: Scegli simboli da includere nel sondaggio
+          archive: Archivia o elimina
+          analyse: Analizza i risultati
+          collect_feedback: Raccogli feedback
+        heading: Fasi
+      export_xlsx:
+        header_comment: Commento
+        sheet_name: Commenti
+        comment_participant_name: I partecipanti non sono tenuti a fornire i loro nomi,
+          quindi alcune celle potrebbero essere vuote.
+        header_cultural_rating: Culturale
+        header_contrast_rating: Contrasto
+        header_representation_rating: Rappresentazione
+        header_overall_rating: Valutazione
+        header_label: Etichetta
+        header_symbol_id: ID simbolo
+        header_participant_name: Nome del partecipante
+        header_participant_number: Numero partecipante
+      show:
+        analyse_results:
+          export:
+            heading: Esportare i risultati in Excel
+            text_3: Ogni riga del file Excel rappresenta la revisione di un singolo
+              partecipante di un simbolo nel sondaggio.
+            text_2: In questo modo è facile eseguire la propria analisi in Excel. Ti
+              consigliamo di utilizzare le tabelle pivot per calcolare e tracciare i
+              risultati medi per ogni simbolo.
+            text_1: Utilizza questo strumento per scaricare tutti i dati del sondaggio,
+              incluse valutazioni e commenti.
+          button_stats: Statistiche dei simboli
+          button_individual_responses: Risposte individuali
+          responses_count:
+            one: '%{count} la persona ha risposto al sondaggio.'
+            other: ''
+          results_appear_here: I risultati appariranno qui quando le persone inizieranno
+            a rispondere alla tua indagine.
+          heading: Analizza i risultati
+        archive:
+          delete_button: Eliminare il sondaggio
+          delete_confirm: Sei sicuro di voler eliminare questo sondaggio e le eventuali
+            risposte?
+          delete_description: L'eliminazione di questo sondaggio eliminerà definitivamente
+            tutti i risultati che hai raccolto. Nessun simbolo verrà eliminato.
+          archive_button: Archivia il sondaggio
+          archive_confirm: Ciò impedirà alle persone di rispondere al sondaggio. Sei
+            sicuro?
+          archive_description: Archivia questo sondaggio quando hai finito con esso.
+            Sarai comunque in grado di analizzare tutti i risultati di questo sondaggio.
+          survey_is_archived: Questo sondaggio è archiviato. È comunque possibile analizzare
+            tutti i risultati.
+          heading: Archivia o elimina
+        collect_feedback:
+          survey_ended_add_paper: Puoi comunque aggiungere manualmente feedback dai
+            moduli di indagine cartacei.
+          survey_ended: La raccolta delle risposte per questo sondaggio è terminata.
+          paper_add_paper_feedback_button: Aggiungi feedback su Paper
+          paper_to_include_results: Per includere i risultati dei moduli di indagine
+            cartacei nei risultati dell'indagine…
+          paper_print_button: Stampa moduli di indagine
+          paper_customisation_invitation: Per personalizzare e stampare i moduli dei
+            sondaggi per i partecipanti…
+          paper_intro: Alcuni partecipanti potrebbero preferire moduli di sondaggio
+            cartacei. Utilizza questi strumenti per raccogliere il loro feedback e memorizzarlo
+            qui.
+          paper_heading: Sondaggi cartacei
+          stop_button: Terminare il sondaggio
+          confirm_stop: Ciò impedirà alle persone di rispondere al sondaggio. Sei sicuro?
+          responses_count:
+            one: La tua indagine ha %{count} risposta.
+            other: ''
+          invite_deadline: I partecipanti hanno tempo fino a %{close_at} per fornire
+            risposte (%{link}).
+          invite_at_this_url: Invita le persone a partecipare alla tua indagine a questo
+            URL.
+          button_begin_collecting: Inizia a raccogliere feedback
+          close_at_helper: Opzionale. Imposta una scadenza per le risposte al sondaggio.
+          close_at_label: Accetta risposte fino a
+          text_2: Non potrai modificare le selezioni dei simboli mentre il sondaggio
+            raccoglie feedback.
+          text_1: Quando inizi a raccogliere feedback, ti forniremo un URL in cui le
+            persone possono partecipare al sondaggio.
+          heading: Raccogli feedback
+        symbols_search_helper: Cerca i simboli da aggiungere a questo sondaggio
+        symbols_text: Aggiungi simboli a questo sondaggio cercandoli in Simboli globali
+          e scegliendo "Aggiungi al sondaggio".
+        symbols_heading: Simboli in questo sondaggio
+      add_symbol:
+        alert_failure: Questo simbolo è già presente in %{survey_link}
+        notice_success_add_another: Aggiungerne un altro?
+        notice_success: Abbiamo aggiunto il simbolo alla tua indagine. %{add_another_link}
+      new:
+        button_create: Crea sondaggio
+      index:
+        get_help_link: Aiuto e formazione
+        get_help: Esplora %{link} per i sondaggi
+        no_surveys_at_stage: Non ci sono sondaggi nella fase %{stage}.
+        button_new_survey: Crea sondaggio
+        _title: Sondaggi in %{symbolset_name}
+      edit:
+        heading: Modifica sondaggio
+        _title: Modifica %{survey_name} in %{symbolset_name}
+      destroy:
+        notice: Abbiamo eliminato il tuo sondaggio %{name}.
+      _picto:
+        remove_confirm: Sei sicuro di voler rimuovere questo simbolo dal sondaggio?
+        no_label_for_language: Nessuna etichetta %{language_name}
+      _form:
+        create_button: Crea sondaggio
+        save_button: Salva sondaggio
+        show_symbol_descriptions_helper: Visualizza le descrizioni dei simboli ai partecipanti.
+        show_symbol_descriptions_label: Mostra descrizioni dei simboli
+        language_blank_option: Tutte le lingue disponibili
+        language_helper: Durante questo sondaggio, ai partecipanti vengono mostrate
+          le etichette dei simboli nella lingua selezionata.
+        language_label: Mostra etichette simboliche in
+        close_at_helper: Opzionale. Stabilisci una scadenza per la risposta dei partecipanti.
+        introduction_helper: Opzionale. Questo viene mostrato ai partecipanti quando
+          iniziano il sondaggio.
+        name_helper: Fornisci un nome che aiuti i partecipanti a identificare questo
+          sondaggio.
+    survey_questions:
+      _form:
+        button_save_answer: Salva risposta
+        button_previous_question: Domanda precedente
+        comments_helper: Opzionale. Si prega di aggiungere eventuali commenti per aiutarci
+          a migliorare questo simbolo.
+        please_fix_errors: Correggi gli errori riportati di seguito.
+      _controller:
+        timed_out: Siamo spiacenti, il tuo sondaggio è scaduto a causa dell'inattività.
+          Si prega di ricominciare il sondaggio.
+      show:
+        please_rate: Si prega di valutare questo simbolo su una scala in cui 1 è "completamente
+          inaccettabile" e 5 è "completamente accettabile".
+    pagination:
+      previous: Prev
+      first: Primo
+      last: Ultimo
+      next: Prossimo
+    articles:
+      index:
+        more_button: Altri articoli
+        description: The Global Symbols Blog - Aggiornamenti, idee e ispirazione per
+          aiutarti a comunicare con i simboli.
+        title: Notizie
+      _topbar:
+        header_news: Notizie sui simboli globali
+    translations:
+      _translations_published:
+        labels_saved: Le nuove traduzioni sono state salvate.
+        next_steps: Trova altri simboli da tradurre o scegli un'altra lingua.
+        labels_are_visible: Le nuove traduzioni sono ora visibili sui simboli globali
+          e nelle app.
+        heading: Traduzioni Pubblicate
+      _suggestion_form:
+        label: Traduzione
+        button_publish_working: Editoria…
+        button_publish: Pubblicare
+      _symbols_table:
+        heading_type: Digitare
+        button_get_translation_working: Traduzione in corso…
+        button_get_translation: Ottieni traduzione
+        heading_destination_language: '%{language_name} Traduzione'
+        heading_source_language: '%{language_name} Fonte'
+      _translation_form:
+        translation_complete_text: Tutti i simboli sono stati tradotti in %{language_name}.
+        translation_complete_heading: Traduzione completata
+        publish_button_working: Pubblicazione di tutte le traduzioni…
+        publish_button: Pubblica tutte le %{language_name} Traduzioni
+        button_translate_working: Tradurre simboli…
+        button_translate: Traduci simboli
+    errors:
+      not_found:
+        description: Non siamo riusciti a trovare nulla a questo indirizzo
+    application:
+      _copy_to_clipboard:
+        button: Copiare
+        button_title: Copia negli Appunti
+    picto_labels:
+      publish_translation:
+        notice_success: Pubblicata l'etichetta %{language_name}.
+      destroy:
+        alert_failure: Non è stato possibile rimuovere l'etichetta %{label} da questo
+          simbolo.
+        notice_success: Abbiamo rimosso l'etichetta %{label} da questo simbolo.
+      create:
+        alert_failure: È necessario risolvere alcuni problemi prima di poter aggiungere
+          questa etichetta.
+        notice_success: Abbiamo aggiunto l'etichetta %{label} a questo simbolo.
+      index:
+        status_suggested: Suggerito
+        status_published: Edito
+        heading_add_label: Aggiungere un'etichetta
+        instructions: I simboli devono avere almeno un'etichetta. Se lo desideri, puoi
+          aggiungere un'etichetta per più di una lingua.
+        intro: Le etichette aiutano altre persone a capire i tuoi simboli. Ci aiutano
+          a capire il significato del tuo simbolo, quindi assicurati che siano accurati
+          e specifici.
+        page_title: Etichette per %{symbol}
+      edit:
+        intro: Le etichette aiutano altre persone a capire i tuoi simboli. Ci aiutano
+          a capire il significato del tuo simbolo, quindi assicurati che siano accurati
+          e specifici.
+        heading: Modifica etichetta
+        page_title: Etichette per %{symbol}
+      _picto_labels:
+        no_labels_found: Non sono state trovate etichette
+        remove_label_confirm: Rimuoveremo %{text} da questo simbolo?
+        remove_label_aria_label: Rimuovi etichetta
+        heading: '%{label_type} Etichette'
+      _form:
+        button_add: Aggiungi etichetta
+        button_save: Salva etichetta
+        description_helper: Descrivi brevemente il simbolo per aiutare la comprensione.
+        diacritised_label_helper: Solo per le lingue arabe. Questo memorizza ulteriori
+          dettagli di pronuncia.
+        diacritised_label_label: Etichetta diacritizzata
+        label_label: Testo etichetta
+        language_helper: Lingua dell'etichetta.
+    picto_concepts:
+      destroy:
+        alert_failure: Non potevamo rimuovere il concetto %{concept} da questo simbolo.
+        notice_success: Abbiamo rimosso il concetto %{concept} da questo simbolo.
+      create:
+        alert_already_exists: '%{concept} è già un concetto su questo simbolo.'
+        alert_failure: Non siamo riusciti a trovare un concetto chiamato %{concept}.
+          Prova un'altra parola.
+        notice_success: Abbiamo aggiunto il concetto %{concept} a questo simbolo.
+      index:
+        page_title: Concetti per %{symbol}
+        existing_concepts:
+          remove_aria_label: Rimuovi concetto
+          remove_confirm: Rimuoveremo %{text} da questo simbolo?
+          none_found: Questo simbolo non ha concetti
+          added_at: Aggiunto %{date}
+          heading: Concetti esistenti
+        add_concept:
+          add: Aggiungere
+          button: Aggiungi concetto
+          instruction: Per aggiungere un concetto a questo simbolo, immettere una parola.
+            Aggiungeremo il concetto se riusciremo a trovarlo.
+          heading: Aggiungi un concetto
+        add_concept_invitation: Possiamo aggiungere qualsiasi concetto che puoi trovare
+          su ConceptNet.
+        intro: I concetti aiutano i computer a comprendere i tuoi simboli, quindi assicurati
+          che siano accurati e specifici.
+    concepts:
+      show:
+        defined_in: Un concetto definito in
+        page_title: '%{subject} in %{coding_framework}'
+    collaborators:
+      destroy:
+        notice_success: Abbiamo rimosso %{email_address} come collaboratore.
+      create:
+        alert_no_gs_account: '%{email_address} non ha ancora un account Simboli globali.'
+        notice_success: Abbiamo aggiunto %{email_address} come collaboratore.
+      index:
+        remove_aria_label: Rimuovi collaboratore
+        remove_confirm: Rimuoveremo %{email} da questo set di simboli?
+        added_at: Aggiunto %{date}
+        existing_none_found: Nessun utente è autorizzato a modificare questo set di
+          simboli.
+        existing_text: Queste persone sono autorizzate a modificare questo set di simboli.
+        existing_heading: Collaboratori esistenti
+        add_button: Aggiungi collaboratore
+        add_text: Per consentire a qualcun altro di modificare questo set di simboli,
+          inserisci l'indirizzo e-mail utilizzato per iscriversi a Simboli globali.
+        add_heading: Aggiungere un collaboratore
+        page_title: Collaboratori per %{name}
+    survey_response_analysis:
+      create:
+        notice_success: Questa risposta cartacea è stata salvata.
+      new:
+        save_button: Salva risposte
+        cancel_confirm: Sei sicuro? Perderai tutti i risultati finora.
+        label_cultural_rating: Sensibilità culturale
+        label_contrast_rating: Contrasto cromatico
+        label_representation_rating: Rappresenta la parola
+        label_overall_rating: Sentimenti sul simbolo
+        match_numbers: I numeri mostrati in alto a destra di ogni casella di simboli
+          devono corrispondere a quelli mostrati sui moduli cartacei, per assicurarti
+          di inserire le valutazioni corrette per ciascun simbolo.
+        use_this_form_to: Utilizza questo modulo per salvare un singolo sondaggio cartaceo
+          in Simboli globali. Verrà quindi conteggiato ai fini delle statistiche del
+          sondaggio.
+        heading: Aggiungi feedback su Paper
+      index:
+        heading: Risposte individuali
+        crumb_name: Risposte individuali
+      _sidebar:
+        participant_number: Partecipante %{number}
+        heading: Risposte
+    survey_picto_analysis:
+      index:
+        column_heading_cultural_rating_description: Idoneità culturale
+        column_heading_contrast_rating_description: Contrasto cromatico
+        column_heading_representation_rating_description: Rappresenta la parola o la
+          frase
+        column_heading_rating_description: Sentimenti sul simbolo nel suo complesso
+        row_heading_averages: Medie
+        column_heading_overall_average: Media complessiva
+        intro: Questa tabella mostra le risposte medie per ciascun simbolo nel sondaggio,
+          sulla base di un totale di %{count} ricevuti.
+        heading: Statistiche dei simboli
+        crumb_name: Statistiche dei simboli
+    pictos:
+      _form:
+        language_helper: Lingua dell'etichetta.
+        label_helper: L'etichetta descrive il tuo simbolo in modo che le persone possano
+          trovarlo. È possibile aggiungere etichette in altre lingue dopo aver creato
+          il simbolo.
+        image_helper: Carica un'immagine in formato SVG (preferito) o PNG.
+        to_download_symbols: per scaricare simboli
+        create_button: Aggiungi simbolo
+        save_button: Salva simbolo
+        description_helper: Descrivi brevemente il simbolo per aiutare la comprensione.
+        diacritised_label_helper: Solo per le lingue arabe. Questo memorizza ulteriori
+          dettagli di pronuncia.
+        label_label: Testo dell'etichetta
+      _comment_form:
+        save_button: Salva commento
+      show:
+        archived_notice:
+          text: Questo simbolo non viene visualizzato nel set di simboli, nei risultati
+            della ricerca o nelle app
+          heading: Simbolo archiviato
+        _description: Simbolo '%{picto_label}', parte del set di simboli %{symbolset_name}.
+          Trova migliaia di simboli gratuiti per la comunicazione.
+        alternative_symbols_heading: Simboli alternativi
+        add_concept_button: Aggiungi un concetto
+        no_concepts: Questo simbolo non ha concetti per definirlo.
+        concept_defined_in: Definito in %{coding_framework_name}
+        _title: '%{survey_name} in %{symbolset_name}'
+      new:
+        heading: Aggiungi simbolo
+        _title: Aggiungi simbolo in %{symbolset_name}
+      edit:
+        heading: Modifica simbolo
+        _title: Modifica %{survey_name} in %{symbolset_name}
+      _topbar:
+        not_publicly_visible: Non visibile pubblicamente
+        download_button: Scarica %{file_type}
+    surveys:
+      _print_question:
+        example_comment: Questo albero sembra un broccolo.
+        symbol_counter: Simbolo %{number}
+        example_text: Questo mostra come puoi rispondere alle domande
+        example_heading: Esempio di domanda
+      thank_you:
+        button_restart_survey: Riavviare il sondaggio
+        button_go_to_homepage: Passare a Simboli globali
+        feedback_is_saved: Abbiamo salvato tutti i tuoi feedback.
+      print:
+        instructions_2: Valuta ogni simbolo su una scala in cui 1 è "completamente inaccettabile"
+          e 5 è "completamente accettabile", posizionando un segno di spunta nella casella
+          corretta.
+        instructions_1: Questo sondaggio ti chiederà di valutare quattro aspetti di
+          ciascun simbolo e di fornire alcuni commenti.
+        instructions_heading: Disposizioni
+        introduction: Introduzione
+        name_field: Mi chiamo
+        print_button: Stampa sondaggio
+        symbol_label_language_helper: Per ottenere i migliori risultati, stampa a colori
+          utilizzando un browser moderno e disabilita intestazioni e piè di pagina.
+        symbol_label_language_all: Tutte le lingue disponibili
+        symbol_label_language: Mostra etichette simbolo in
+        show_example_helper: Aggiunge una domanda di esempio che mostra le risposte
+          di esempio.
+        show_example: Mostra un esempio
+        show_instructions_helper: Cambia le istruzioni facendo clic su di esse.
+        show_instructions: Mostra le istruzioni
+        show_intro_helper: Modificare l'introduzione modificando il sondaggio.
+        show_intro: Mostra l'introduzione al sondaggio
+        collect_names: Raccogliere i nomi dei partecipanti
+        heading: Impostazioni di stampa
+      show:
+        offline_participants_button: Stampa moduli di feedback per sondaggi
+        offline_participants: Per i partecipanti che lavorano offline…
+        closed_text: Contatta l'organizzatore del sondaggio se prevedi di poter partecipare.
+        closed_header: Questo sondaggio non accetta feedback al momento.
+        provide_details_2: I tuoi dati saranno mostrati agli organizzatori del sondaggio
+          in relazione al tuo feedback e mai utilizzati da Global Symbols per altri
+          scopi.
+        provide_details: Fornire i tuoi dati è facoltativo e può aiutare gli organizzatori
+          del sondaggio.
+        begin_button: Inizia il sondaggio
+        close_at_message: Puoi partecipare fino a %{date}.
+      _shared:
+        questions:
+          comments: Commenti aggiuntivi
+          cultural_rating: Sensibilità culturale
+          contrast_rating: Contrasto cromatico
+          representation_rating: Rappresenta la parola o la frase
+          feelings_rating: Sentimenti sul simbolo nel suo complesso
+        thank_you: Grazie per aver completato il sondaggio!
+        number_of_symbols:
+          one: Questo sondaggio ha %{count} Simbolo da rivedere.
+          other: ''
+  layouts:
+    application:
+      skip_to_main_content: Vai al contenuto principale
+      footer:
+        language_label: Lingua
+        contact: Contatto
+        about: Circa
+        accessibility: Accessibilità
+        terms: Termini
+        privacy_policy: Informativa sulla privacy
+      menu:
+        twitter: Simboli globali su Twitter
+        facebook: Simboli globali su Facebook
+        search_placeholder: Ricerca %{var}
+        sign_up: Crea un account
+        sign_in: Accedi
+        my_account: Il mio account
+        sign_out: Esci
+        news: Notizie
+        training: Formazione
+        board_builder: Costruttore di schede
+        resources: Risorse
+  languages:
+    ur: Urdu
+    uk: Ucraino
+    val: Vehes ·
+    sv: Svedese
+    sk: Slovacco
+    ps: Pashto
+    pl: Polacco
+    hu: Ungherese
+    he: Ebraico
+    gl: Galiziano
+    fa: Farsi
+    eu: Basco
+    et: Estone
+    br: Bretone
+    an: Aragonese
+    cnr: Montenegrino
+    sh: Serbo-Croato
+    ru: Russo
+    pt: Portoghese
+    mr: Marathi
+    mk: Macedone
+    it: Italiano
+    hi: Hindi
+    da: Danese
+    zh: Cinese
+    ar: Arabo
+    es: Spagnolo
+    nl: Olandese
+    ca: Catalano
+    bg: Bulgaro
+    sq: Albanese
+    tr: Turco
+    hy: Armeno
+    el: Greco
+    ro: Rumeno
+    sr_Latn: Serbo (alfabeto latino)
+    sr_Cyrl: Serbo (alfabeto cirillico)
+    sr: Serbo
+    hr: Croato
+    de: Tedesco
+    fr: Francese
+    en: Inglese
+  dictionary:
+    publish: Pubblicare
+    un-archive: Annulla archiviazione
+    archive: Archivio
+    page_not_found: Pagina non trovata
+    download: Scaricare
+    change: cambiare
+    search: Ricerca
+    remove: Togliere
+    view: Vista
+    sign_in: Accedi
+    edit: Redigere
+    import: Importazione
+    by: Presso
+    back: Indietro
+    numbers:
+      '5': '5'
+      '4': '4'
+      '3': '3'
+      '2': '2'
+      '1': '1'
+    global_symbols: Simboli globali
+    go_back: Indietro
+    unauthorised: Non autorizzato
+    survey:
+      one: Sondaggio
+      other: ''
+    response:
+      one: Risposta
+      other: ''
+    symbol:
+      one: Simbolo
+      other: ''
+    symbolset:
+      one: Set di simboli
+      other: ''
+    label:
+      one: Etichetta
+      other: ''
+    settings: Impostazioni
+    concept:
+      one: Concetto
+      other: ''
+    collaborator:
+      one: Collaboratore
+      other: ''
+  time:
+    pm: pm
+    am: sono
+    formats:
+      long: '%B %d, %Y %H:%M'
+      short: '%d %b %H:%M'
+      default: '%a, %d %b %Y %H:%M:%S %z'
+  date:
+    order:
+    - anno
+    - mese
+    abbr_month_names:
+    - Dic
+    - Giovanna
+    - Feb
+    - Guastare
+    - Apr
+    - Maggio
+    - Giu
+    month_names:
+    - Dicembre
+    - Gennaio
+    - Febbraio
+    - Marzo
+    - Aprile
+    - Maggio
+    - Giugno
+    abbr_day_names:
+    - Sole
+    - Mon
+    - mar
+    - Mercoledì
+    day_names:
+    - Domenica
+    - Lunedì
+    - Martedì
+    - Mercoledì
+    formats:
+      long: '%d %B %Y'
+      short: '%d %b'
+      default: '%d %B %Y'
+  activerecord:
+    attributes:
+      user:
+        remember_me: Ricordati di me
+        current_password: Password corrente
+        password: Parola d’ordine
+        language_id: Lingua preferita
+        location: Ubicazione
+        company: Società
+        surname: Cognome
+        prename: Nome di battesimo
+        email: Indirizzo email
+      symbolset:
+        statuses:
+          ingesting: Ingestione
+          draft: Bozza
+          published: Edito
+        status: Stato
+        logo: Logo
+        publisher_url: URL dell'editore
+        publisher: Editore
+        description: Descrizione
+        name: Nome
+      survey_response:
+        role: Ruolo
+        organisation: Organizzazione
+        name: Nome
+      survey:
+        show_symbol_descriptions: Mostra descrizioni dei simboli
+        close_at: Chiudi a
+        status: Stato
+        introduction: Introduzione
+        name: Nome
+      picto:
+        visibility_options:
+          collaborators: Collaboratori di Symbolset
+          everybody: Tutti
+        visibility: Visibile da
+        image: Immagine
+        publisher_ref: Riferimento per l'editore
+        part_of_speech_options:
+          modifier: Modificatore
+          article: Articolo
+          interjection: Interiezione
+          conjunction: Congiunzione
+          preposition: Preposizione
+          pronoun: Pronome
+          adverb: Avverbio
+          adjective: Aggettivo
+          verb: Verbo
+          noun: Sostantivo
+        part_of_speech: Parte del discorso
+      licence:
+        logo: Logo
+        properties: Proprietà
+        version: Versione
+        url: URL
+        name: Nome
+      language:
+        category: Categoria
+        scope: Portata
+        name: Nome
+        active: Attivo
+      label:
+        description: Descrizione
+        text_diacritised: Etichetta diacritizzata
+        text: Etichetta
+      concept:
+        subject: Oggetto
+      comment:
+        resolved: Risoluto
+        read: Leggere
+        comment: Commento
+        cultural_rating_short: Culturale
+        cultural_rating: Valutazione culturale
+        contrast_rating_short: Contrasto
+        contrast_rating: Valutazione del contrasto
+        representation_rating_short: Rappresentazione
+        representation_rating: Valutazione della rappresentazione
+        rating: Valutazione
+      coding_framework:
+        www_uri_base: WWW URI Base
+        api_uri_base: API URI Base
+        structure: Struttura
+        name: Nome
+      category:
+        name: Nome
+    models:
+      user: Utente
+      symbolset_user: Collaboratore
+      symbolset: Set di simboli
+      survey_response: Risposta al sondaggio
+      survey_picto: Sondaggio Picto
+      survey: Sondaggio
+      picto_concept: Concetto Picto
+      picto: Simbolo
+      licence: Licenza
+      language: Lingua
+      label: Etichetta
+      image: Immagine
+      concept: Concetto
+      comment: Commento
+      coding_framework: Framework di codifica
+      category: Categoria
+  doorkeeper:
+    scopes:
+      boardset:write: Scrivi ai tuoi set di schede
+      boardset:read: Leggi i tuoi set di schede
+      identity:read:user: Leggere i dati nell'account utente
+      public: Accedi ai tuoi dati pubblici
+  unauthorized:
+    update:
+      project: Non è consentito aggiornare questo progetto.
+    manage:
+      picto: È possibile gestire solo i set di simboli di cui si è collaboratori.
+      all: Non si può %{action} questo %{subject}.

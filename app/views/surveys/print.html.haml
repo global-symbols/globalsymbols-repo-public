@@ -1,0 +1,80 @@
+- title @survey.name
+- content_for(:topbar, render('topbar'))
+
+%main.container-xl
+  .row.justify-content-md-center
+    .col-md-6
+      .card.mb-3.d-print-none
+        .card-header= t('views.surveys.print.heading')
+        .card-body
+
+          .custom-control.custom-switch.mb-2
+            %input.custom-control-input#customSwitch4{type: "checkbox", 'data-toggle': "collapse", 'data-target': "#surveyParticipantName", 'aria-expanded': "false", 'aria-controls': "surveyParticipantName"}
+            %label.custom-control-label{for: "customSwitch4"}= t('views.surveys.print.collect_names')
+
+          .custom-control.custom-switch.mb-2
+            %input.custom-control-input#customSwitch2{type: "checkbox", 'data-toggle': "collapse", 'data-target': "#surveyIntroduction", 'aria-expanded': "false", 'aria-controls': "surveyIntroduction", checked: (:checked if @survey.introduction.present?), disabled: (:disabled if @survey.introduction.nil?)}
+            %label.custom-control-label{for: "customSwitch2"}
+              = t('views.surveys.print.show_intro')
+              %br
+              %small= t('views.surveys.print.show_intro_helper')
+
+          .custom-control.custom-switch.mb-2
+            %input.custom-control-input#customSwitch3{type: "checkbox", 'data-toggle': "collapse", 'data-target': "#surveyInstructions", 'aria-expanded': "false", 'aria-controls': "surveyInstructions", checked: 'checked'}
+            %label.custom-control-label{for: "customSwitch3"}
+              = t('views.surveys.print.show_instructions')
+              %br
+              %small= t('views.surveys.print.show_instructions_helper')
+
+          .custom-control.custom-switch.mb-3
+            %input.custom-control-input#customSwitch1{type: "checkbox", 'data-toggle': "collapse", 'data-target': "#exampleQuestion", 'aria-expanded': "false", 'aria-controls': "exampleQuestion"}
+            %label.custom-control-label{for: "customSwitch1"}
+              = t('views.surveys.print.show_example')
+              %br
+              %small= t('views.surveys.print.show_example_helper')
+
+          .custom-control.custom-switch.mb-2
+            .form-inline
+              %label.mr-2{for: :survey_print_language_selector}= t('views.surveys.print.symbol_label_language')
+              = select_tag :language, options_from_collection_for_select(@languages, :iso639_3, :name), id: :survey_print_language_selector, class: 'form-control form-control-sm my-1', include_blank: t('views.surveys.print.symbol_label_language_all')
+
+          %p.mt-3
+            %small= t('views.surveys.print.symbol_label_language_helper')
+
+          %a.btn.btn-primary{href: '#', onclick: 'window.print();return false;'}
+            %i.fas.fa-print.mr-1
+            = t('views.surveys.print.print_button')
+
+  .d-none.d-print-block
+    .row.mb-3
+      .col
+        %h1
+          = t('dictionary.survey')
+          · #{@survey.name}
+      .col-auto
+        %h2.my-3.text-center.text-primary
+          %img.pr-3{src: asset_path('logo-square-512.png'), style: 'max-height: 3.5rem'}
+          = t('dictionary.global_symbols')
+
+  #surveyParticipantName.collapse
+    .row.justify-content-md-center
+      .col-md-6
+        .card
+          .card-body.lead= t('views.surveys.print.name_field')
+  .row
+    .col
+      - if @survey.introduction.present?
+        #surveyIntroduction.collapse.show
+          %h3= t('views.surveys.print.introduction')
+          %p= @survey.introduction
+      #surveyInstructions.collapse.show
+        %h3= t('views.surveys.print.instructions_heading')
+        %div{contenteditable: true}
+          %p= t('views.surveys.print.instructions_1')
+          %p{contenteditable: true}= t('views.surveys.print.instructions_2')
+      %p= t('views.surveys._shared.number_of_symbols', count: @survey.pictos.count)
+      #exampleQuestion.collapse
+        = render 'print_question', picto: @example_symbol, counter: 0, image_src: asset_path('tree.svg'), example: true
+      - @survey.pictos.each_with_index do |picto, index|
+        = render 'print_question', picto: picto, counter: index, image_src: picto.images.last.imagefile.url
+      %h2.text-center= t('views.surveys._shared.thank_you')

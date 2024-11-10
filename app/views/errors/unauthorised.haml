@@ -1,0 +1,6 @@
+%main.container-xl.text-center
+  .row.justify-content-center
+    .col-md-8
+      %h1= t('dictionary.unauthorised')
+
+      = render 'errors/error_notice', status: :unauthorised, text: @alert

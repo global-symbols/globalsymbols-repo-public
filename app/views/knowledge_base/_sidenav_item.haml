@@ -1,0 +1,39 @@
+- articles.each do |article|
+  - if article.is_a?(Contentful::Entry)
+
+    :ruby
+      expand_node = false
+
+      def extract_ids(articles, ids)
+        articles.map do |article|
+          ids << article.id
+          if article.is_a?(Contentful::Entry) and article.try(:child_articles)
+            extract_ids(article.child_articles, ids)
+          end
+        end
+      end
+
+      if current_article_id
+
+        if article.id == current_article_id
+          expand_node = true
+        else
+          ids = []
+          extract_ids(article.child_articles, ids) if article.try(:child_articles)
+          expand_node = true if ids.include?(current_article_id)
+        end
+      end
+
+
+    %li.nav-item.d-flex
+      - if article.try(:child_articles)
+        %a.tree-control{href: "#collapse-" + article.id, 'data-toggle': :collapse, 'aria-expanded': expand_node ? 'true' : 'false'}
+          = render 'sidenav_handle'
+      %a.nav-link{href: knowledge_base_path(article.id), class: ('ml-4' unless article.try(:child_articles))}
+        %span{class: ('font-weight-bolder' if current_article_id and current_article_id == article.id)}
+          = article.title
+      -# - if article.child_articles
+      -#  %a.nav-link{href: "#collapse-"+article.id, 'data-toggle': :collapse} Uncollapse
+        -# = article.child_articles.count
+    .collapse.ml-3{id: "collapse-" + article.id, class: ('show' if expand_node)}
+      = render('sidenav_item', articles: article.child_articles, current_article_id: current_article_id) if article.try(:child_articles)

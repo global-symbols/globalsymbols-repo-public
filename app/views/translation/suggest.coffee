@@ -1,0 +1,1 @@
+$("#get_suggestion_for_picto_<%= @label.picto.id %>").replaceWith('<%= escape_javascript render('suggestion_form', suggestion: @label) %>')

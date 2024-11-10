@@ -1,0 +1,27 @@
+- title @survey.name
+- content_for(:topbar, render('surveys/topbar', percent_complete: (@question.to_f / @survey.survey_pictos.count * 100).to_i))
+%main.container-xl
+  .row
+    .col-md-3
+      %img.img-fluid.mb-5{src: @picto.images.last.imagefile.url}
+      - if @survey.language.present?
+        - label = @picto.labels.where(language: @survey.language).first
+        - if label.present?
+          .text-center
+            %p.lead= label.text
+            = label.description if @survey.show_symbol_descriptions
+
+      - else
+        %table.table.table-bordered.table-sm
+          %tbody
+            - @picto.labels.each do |label|
+              %tr
+                %th.text-right= label.language.name
+                %td
+                  = label.text
+                  - if @survey.show_symbol_descriptions
+                    %br
+                    %small= label.description
+    .col
+      %p= t('views.survey_questions.show.please_rate')
+      = render 'form'

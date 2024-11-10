@@ -1,0 +1,16 @@
+- title t('devise.views.passwords.edit.heading')
+%main.container-xl
+  .justify-content-md-center
+    %h1.mb-4= t('devise.views.passwords.edit.heading')
+    = bootstrap_form_for(resource, as: resource_name, url: password_path(resource_name), layout: :vertical, html: { method: :put }) do |f|
+      = devise_error_messages!
+      = f.hidden_field :reset_password_token
+
+      .row.mt-4
+        .col-sm
+          = f.password_field :password, autofocus: true, autocomplete: "new-password", label: t('devise.views.passwords.edit.new_password_label'), help: t('devise.views.passwords.edit.new_password_helper', var: @minimum_password_length), required: true
+        .col-sm
+          = f.password_field :password_confirmation, autocomplete: "new-password", label: t('devise.views.passwords.edit.confirm_password_label'), required: true
+      .mt-3.text-right
+        = f.primary t('devise.views.passwords.edit.button')
+    = render "devise/shared/links", cache: true

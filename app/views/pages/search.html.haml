@@ -1,0 +1,29 @@
+- title t('views.pages.search._title')
+%main.container-xl
+  .row
+    .col-md-8
+      = bootstrap_form_with url: search_path, local: true, method: :get, layosut: :horizontal do |f|
+        = f.hidden_field :locale, value: I18n.locale
+        = f.form_group do
+          .row
+            .col-md-3
+              = f.text_field :query, wrapper: { class: 'mb-0'}, label: t('views.pages.search.search_for'), value: @search[:query], required: true
+            .col-md-3.col-6
+              = f.collection_select :language, Language.where(active: true), :iso639_3, Proc.new {|record| t("languages.#{record.iso639_1_or_3_code}") }, {selected: @search[:language], label: t('activerecord.models.language')}, {class: 'mr-2'}
+            .col-md-3.col-6
+              = f.collection_select :symbolset, @symbolsets, :slug, :name, {selected: @search[:symbolset], include_blank: t('views.pages.search.symbolset_dropdown_any_symbol_set'), label: t('activerecord.models.symbolset')}
+            .col-md-3.mt-2rem
+              = f.primary t('views.pages.search.search')
+          -#= f.form_group layout: :horizontal do
+
+
+  .row
+    .col
+      -if @labels.length > 0
+        .row.row-cols-2.row-cols-sm-3.row-cols-md-5.text-center
+          - @labels.each do |label|
+            .col.mb-4
+              = render 'picto_labels/picto_label_card', label: label, cache: true
+        = paginate @labels
+      - else
+        = render 'errors/error_notice', status: :empty, text: t('views.pages.search.no_results')

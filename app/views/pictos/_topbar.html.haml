@@ -1,0 +1,31 @@
+= render 'symbolsets/topbar', symbolset: picto.symbolset, stacking: true, cache: true
+.bg-light#symbol-topbar
+  .container-xl
+    .row.py-2
+      .col.text-center.text-sm-left
+        %h2.d-inline
+          %a{href: symbolset_symbol_path(picto.symbolset, picto)}= render 'pictos/label', label: picto.best_label_for(locale), cache: true
+        %span.font-weight-light
+          ·
+          = picto.part_of_speech
+
+      .col-sm-auto.text-center.text-sm-right
+        - if picto.visibility != 'everybody'
+          %i.text-muted.fas.fa-lock.pr-2{title: t('views.pictos._topbar.not_publicly_visible'), 'data-toggle': 'tooltip', 'data-placement': 'left'}
+        - if current_user
+          - if @surveys
+            = render 'survey_editor/add_picto_to_survey', picto: picto, surveys: @surveys
+          - if can? :manage, picto.symbolset
+            %a.btn.btn-sm.btn-primary.mt-2.mt-sm-0{href: edit_symbolset_symbol_path(picto.symbolset, picto)}= t('dictionary.edit')
+
+            = form_with(url: symbolset_symbol_path(picto.symbolset, picto), model: picto, local: false, class: 'd-inline') do |form|
+              = form.hidden_field :archived, value: !picto.archived
+              %button.btn.btn-sm.btn-primary.mt-2.mt-sm-0{type: :submit}= picto.archived ? t('dictionary.un-archive') : t('dictionary.archive')
+
+          - base_format = picto.images.last.imagefile.file.extension.downcase
+          %a.btn.btn-sm.btn-primary.mt-2.mt-sm-0{href: symbolset_symbol_path(picto.symbolset, picto, format: base_format, download: 1)}= t('views.pictos._topbar.download_button', file_type: base_format.upcase)
+          - if base_format == 'svg'
+            %a.btn.btn-sm.btn-primary.mt-2.mt-sm-0{href: symbolset_symbol_path(picto.symbolset, picto, format: :png, download: 1)}= t('views.pictos._topbar.download_button', file_type: 'PNG')
+        - else
+          %a{href: new_user_session_path}= t('dictionary.sign_in')
+          = t('views.pictos._form.to_download_symbols')

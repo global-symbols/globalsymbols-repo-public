@@ -1,0 +1,11 @@
+%a.card.mb-4{href: symbolset_survey_path(survey.symbolset, survey)}
+  .card-header.d-flex.justify-content-between.align-items-center
+    %span= survey.name
+    %small
+      = "#{survey.pictos.count} " + t('dictionary.symbol', count: survey.pictos.count)
+      = ' · '
+      = "#{survey.responses.count} " + t('dictionary.response', count: survey.responses.count)
+  - if survey.pictos.any?
+    .card-body.pb-0
+      - survey.pictos.take(8).each do |picto|
+        %img.pr-3.mb-3{src: picto.images.first.imagefile.url, style: 'max-height: 4rem'}

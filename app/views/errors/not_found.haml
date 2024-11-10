@@ -1,0 +1,6 @@
+%main.container-xl.text-center
+  .row.justify-content-center
+    .col-md-8
+      %h1= t('dictionary.page_not_found')
+
+      = render 'errors/error_notice', status: :not_found, text: t('views.errors.not_found.description')

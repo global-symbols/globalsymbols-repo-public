@@ -1,0 +1,336 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, or any plugin's
+ * vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
+ * files in this directory. Styles in this file should be added after the last require_* statement.
+ * It is generally better to create a new file per style scope.
+ *
+ */
+
+$blue:                        #006ABA !default;
+//$light: #e9ecef !default;
+$light:                       lighten($blue, 60%) !default;
+
+$gray-base:                   #000 !default;
+$gray-light:                  lighten($gray-base, 40%) !default; // #777
+
+$navbar-dark-color:           rgba(white, .9) !default;
+$navbar-dark-hover-color:     rgba(white, 1) !default;
+
+$font-family-sans-serif:      system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !default;
+
+$headings-font-weight:        300;
+
+$font-size-base:              1rem !default; // Assumes the browser default, typically `16px`
+$h1-font-size:                $font-size-base * 1.75 !default;
+$h2-font-size:                $font-size-base * 1.5 !default;
+$h3-font-size:                $font-size-base * 1.3 !default;
+$h4-font-size:                $font-size-base * 1.1 !default;
+$h5-font-size:                $font-size-base * 1.0 !default;
+$h6-font-size:                $font-size-base !default;
+
+$tooltip-bg:                  $blue !default;
+
+
+$enable-responsive-font-sizes:true;
+
+$controls-background:         lighten($blue, 50%); // #C1E0FC
+
+$card-cap-bg:                 $light;
+$card-cap-color:              $blue;
+
+// Custom bootstrap variables must be set or imported *before* bootstrap.
+@import "bootstrap_loader";
+@import "rails_bootstrap_forms";
+@import 'survey_print';
+
+@import 'bootstrap-sortable';  // Sorts tables in Surveys
+
+// Loads CSS for only the fontawesome icons that are needed.
+@import 'fontawesome_loader';
+
+@media(min-resolution: 144dpi) {
+  nav,
+   nav .btn,
+   nav .form-control {
+     font-weight: $font-weight-light;
+   }
+}
+
+.mt-2rem {
+  margin-top: 2rem;
+}
+
+.mh-100 {
+  min-height: 100%;
+}
+
+nav {
+  .fa {
+    font-size: 1.3em;
+  }
+
+  img {
+    height: 2.5rem;
+    opacity: 0.75;
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  .btn-outline-light:hover {
+    color: $blue;
+  }
+
+  .social-button {
+    width: 2rem;
+  }
+
+  .form-control {
+    background-color: $controls-background;
+  }
+}
+
+.form-group.row > label.col-form-label {
+  text-align: right;
+  color: $gray-700;
+}
+
+.bg-light-1 {
+  background-color: lighten($primary, 50%) !important;
+}
+
+ul.pagination > li.page-item {
+  min-width: 2.35rem;
+  text-align: center;
+}
+
+article.news_article {
+  iframe {
+    @extend .w-100
+  }
+}
+
+.status-image {
+  max-height: 15rem;
+}
+
+$gs-deck-5-cards-per-line: (
+  xs: 1,
+  sm: 3,
+  md: 4,
+  lg: 4,
+  xl: 5
+);
+
+$gs-deck-4-cards-per-line: (
+        xs: 1,
+        sm: 2,
+        md: 3,
+        lg: 4,
+        xl: 4
+);
+
+@each $name, $breakpoint in $grid-breakpoints {
+  @media (min-width: $breakpoint) {
+    .card-deck.gs-deck-5 .card {
+      flex: 0 0 calc(#{100%/map-get($gs-deck-5-cards-per-line, $name)} - #{$grid-gutter-width});
+    }
+    .card-deck.gs-deck-4 .card {
+      flex: 0 0 calc(#{100%/map-get($gs-deck-4-cards-per-line, $name)} - #{$grid-gutter-width});
+    }
+  }
+}
+
+.display-1 {
+  font-size: 2rem;
+}
+
+// Push the body down below the navbar
+// Important is needed to enforce this when in @print mode.
+body {
+  padding-top: ($navbar-padding-y * 2) + ($navbar-brand-padding-y * 2) + $navbar-brand-height !important;
+}
+
+main {
+  margin-top: map-get($spacers, 4);
+}
+
+label.required:after {
+  content:" *";
+}
+
+.turbolinks-progress-bar {
+  height: 5px;
+  background-color: white;
+}
+
+a.card {
+  color: $body-color;
+  &:hover, &:focus, &:active {
+    border-color: $primary;
+    text-decoration: none;
+    color: $link-hover-color;
+    .card-footer {
+      background: rgba($primary, .1);
+    }
+  }
+}
+
+#symbolset-topbar {
+  h1 {
+    span.badge {
+      font-size: 60%;
+    }
+  }
+}
+
+.symbolsets-card-deck {
+  .symbolset-logo {
+    min-height: 100px;
+    max-height: 100px;
+    > img {
+      max-height: 100px;
+    }
+  }
+}
+
+#symbolset-collaborators {
+  img {
+    max-height: 3em;
+  }
+}
+
+#symbolset-review{
+  img {
+    max-height: 6em;
+  }
+}
+
+.card-body-picto {
+  // Make it square
+  width: 100%;
+  height: 0;
+  padding-bottom: 100%;
+
+  background: no-repeat center center;
+  background-size: contain;
+}
+
+.list-group-item a.close {
+  margin-bottom: 0.2em;
+}
+
+.greyscale-faded {
+  filter: grayscale(100%) opacity(20%);
+}
+
+html[class^="translated"] nav.fixed-top {
+  margin-top: 38px;
+}
+
+// Limit the height of picto images at md and above.
+@media (min-width: map-get($grid-breakpoints, 'md')) {
+  .show-picto-image {
+    max-height: 20vw;
+  }
+}
+
+footer #select_locale {
+  font-size: 0.7rem;
+}
+
+.auth-layout footer #select_locale {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.translation-table {
+  img {
+    max-width: 100px;
+    max-height: 100px;
+  }
+}
+
+
+.auth-layout {
+  h1, h2, h3 {
+    font-weight: bold;
+  }
+
+  .card-img-top {
+    img {
+      height: 75px;
+      margin: 0.25rem 0;
+    }
+  }
+}
+
+
+
+
+ul.nav.gs-tree {
+
+  font-size: 0.8rem;
+
+  $marginY: 0.6rem;
+  $paddingX: 0.2em;
+
+  li.nav-item {
+    a.nav-link {
+
+      padding: $paddingX 0;
+      margin: 0 $marginY;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    a.tree-control {
+      height: 1em;
+      width: 1em;
+      min-width: 1em;
+      line-height: 1em;
+      margin-top: $paddingX + 0.2em;
+
+      svg {
+        transition: all 0.2s ease-in-out;
+      }
+
+      &[aria-expanded='true'] {
+        svg {
+          transform: rotate(90deg);
+        }
+      }
+
+      &:hover svg path {
+        fill: $primary;
+      }
+    }
+  }
+}
+
+.kb-sections img {
+  min-height: 100px;
+  max-height: 100px;
+}
+
+.kb-article {
+  img.hero-image {
+    max-height: 250px;
+  }
+}
+
+.form-control.is-search {
+  padding-left: calc(1.5em + 0.75rem)!important;
+  background-image: url("data:image/svg+xml,%3csvg aria-label='Search' role='img' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cg fill='currentColor'%3e%3cpath d='m8.368 16.736c-4.614 0-8.368-3.754-8.368-8.368s3.754-8.368 8.368-8.368 8.368 3.754 8.368 8.368-3.754 8.368-8.368 8.368m0-14.161c-3.195 0-5.793 2.599-5.793 5.793s2.599 5.793 5.793 5.793 5.793-2.599 5.793-5.793-2.599-5.793-5.793-5.793'%3e%3c/path%3e%3cpath d='m18.713 20c-.329 0-.659-.126-.91-.377l-4.552-4.551c-.503-.503-.503-1.318 0-1.82.503-.503 1.318-.503 1.82 0l4.552 4.551c.503.503.503 1.318 0 1.82-.252.251-.581.377-.91.377'%3e%3c/path%3e%3c/g%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: left calc(0.375em + 0.1875rem) center;
+  padding-left: 40px;
+  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}

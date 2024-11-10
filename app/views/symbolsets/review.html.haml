@@ -1,0 +1,24 @@
+- title "Review #{@symbolset.name}"
+- content_for(:topbar, render('topbar', symbolset: @symbolset))
+.container-xl-fluid.bg-light#symbol-topbar
+  .container-xl
+    .row.py-1
+      .col-auto
+        %h2.pt-1
+          = t('views.symbolsets.review.heading')
+      .col.text-right
+        %div.btn-group.btn-group-sm.my-1{role: :group, 'aria-label': 'Symbol filter controls'}
+          %a.btn{href: review_symbolset_path(@symbolset), class: (@filter == 'all' ? "btn-primary" : "btn-outline-primary")}= t('views.symbolsets.review.filter_all_symbols')
+          %a.btn{href: review_symbolset_path(@symbolset, filter: :without_concept), class: (@filter == 'without_concept' ? "btn-primary" : "btn-outline-primary")}= t('views.symbolsets.review.filter_without_a_concept')
+%main.container-xl
+  .row
+    .col
+      -if @pictos.any?
+        .card.mb-5#symbolset-review
+          .list-group.list-group-flush
+            - @pictos.each do |picto|
+              = render 'review_row', picto: picto
+
+        = paginate @pictos
+      - else
+        %p.lead.text-center= t('views.symbolsets._shared.none_found')

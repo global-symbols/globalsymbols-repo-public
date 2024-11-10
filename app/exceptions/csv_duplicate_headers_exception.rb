@@ -1,0 +1,2 @@
+class CsvDuplicateHeadersException < Exception
+end

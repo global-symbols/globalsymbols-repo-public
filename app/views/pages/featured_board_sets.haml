@@ -1,0 +1,37 @@
+:ruby
+  title 'Featured Board Sets'
+
+  set_meta_tags og: {
+    url: @og_url
+  }
+
+%main.mt-0
+  %article
+    = render 'topbar' do
+      Featured Board Sets
+    .container-xl.mt-4
+      .row.justify-content-center
+        .col-md-8
+          .row
+            %p
+              Download handy pre-made Communication Boards as PDFs to print or use them on-screen.
+            %p.mb-5 Open a Communication Board in Board Builder (with an account) to take your own copy and make changes.
+
+          - @board_sets.each do |board_set|
+            .row.mb-5
+
+              .col-sm-8
+                %a{href: "https://app.globalsymbols.com/boardsets/#{board_set.board_set_id.to_s}", target: '_blank'}
+                  %h2= board_set.title
+                %p= board_set.description
+                .text-right
+                  - if board_set.pdf
+                    %a.btn.btn-primary{href: "https://app.globalsymbols.com/boardsets/#{board_set.board_set_id.to_s}", target: :_blank, title: "Open '#{board_set.title}' in Board Builder"} Open in Board Builder
+                    %a.btn.btn-primary{href: board_set.pdf.url, target: :_blank, title: "Open '#{board_set.title}' as a PDF"} Open PDF
+                -#%p.text-right
+                -#  %a.btn.btn-outline-primary{href: "https://app.globalsymbols.com/boardsets/#{board_set.board_set_id.to_s}", target: '_blank'} Open in Board Builder
+
+              .col-sm-4.text-center.text-sm-left
+                - if board_set.thumbnail
+                  %a{href: "https://app.globalsymbols.com/boardsets/#{board_set.board_set_id.to_s}", target: '_blank'}
+                    %img.img-fluid{src: board_set.thumbnail.url, alt: board_set.title}

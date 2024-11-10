@@ -1,0 +1,12 @@
+.bg-light-1.d-print-none#symbolset-topbar
+  .container-xl
+    .row.py-2
+      .col-sm-8
+        %h1.mb-1
+          %a{href: survey_path(@survey)}
+            = t('dictionary.survey.one')
+            · #{@survey.name}
+      - if defined? percent_complete
+        .col-sm-4.pt-2
+          .progress{style: 'height: 1.4rem'}
+            .progress-bar{role: :progressbar, style: "width: #{percent_complete}%", 'aria-valuenow': percent_complete, 'aria-valuemin': 0, 'aria-valuemax': 100} #{percent_complete}%

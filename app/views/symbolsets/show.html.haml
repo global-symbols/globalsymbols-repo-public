@@ -1,0 +1,48 @@
+:ruby
+  title @symbolset.name
+  description t('views.symbolsets.show._description', symbolset_name: @symbolset.name)
+  content_for(:topbar, render('topbar', symbolset: @symbolset), cache: true)
+  set_meta_tags og: {
+    image: @symbolset.logo.try(:url) || asset_url('logo-square.svg'),
+    url: symbolset_url(@symbolset),
+    type: 'object',
+    updated_time: @symbolset.updated_at.iso8601
+  }
+
+%main.container-xl
+  .row
+    .col
+      - if @pictos.length > 0
+        .row.row-cols-2.row-cols-sm-4.row-cols-lg-5.text-center
+          - @pictos.order(@order_nulls_last).order('labels.text').each do |picto|
+            .col.mb-4
+              -# = render 'pictos/picto_card', picto: label, cache: true
+              %a.card.mb-4.h-100{href: symbolset_symbol_path(picto.symbolset, picto)}
+                .card-body.d-flex.flex-column.justify-content-between
+                  .mb-3.text-center
+                    .card-body-picto{style: "background-image: url(#{picto.images.last.imagefile.url})"}
+                  %h3.card-title.mb-0
+                    = picto.text || picto.best_label_for(@language).try(:text)
+
+                - if picto.visibility != 'everybody'
+                  %i.text-muted.fas.fa-lock.pl-2{title: t('views.pictos._topbar.not_publicly_visible'), 'data-toggle': 'tooltip'}
+        = paginate @pictos
+        = rel_next_prev_link_tags @pictos
+
+      - else
+        = render 'errors/error_notice', status: :empty, text: t('views.symbolsets._shared.none_found')
+        - if can? :manage, @pictos
+          %p.text-center= t('views.symbolsets.show.no_symbols_for_collaborator')
+
+      -# - if @labels.length > 0
+      -#   .row.row-cols-2.row-cols-sm-4.row-cols-lg-5.text-center
+      -#     - @labels.each do |label|
+      -#       .col.mb-4
+      -#         -# = render 'pictos/picto_card', picto: label, cache: true
+      -#         = render 'picto_labels/picto_label_card', label: label, cache: true
+      -#   = paginate @labels
+      -#   = rel_next_prev_link_tags @labels
+      -# - else
+      -#   = render 'errors/error_notice', status: :empty, text: t('views.symbolsets._shared.none_found')
+      -#   - if can? :manage, @labels
+      -#     %p.text-center= t('views.symbolsets.show.no_symbols_for_collaborator')

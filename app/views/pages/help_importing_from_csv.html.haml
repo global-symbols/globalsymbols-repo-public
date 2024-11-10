@@ -1,0 +1,72 @@
+- title "Help: CSV File Format"
+%main.container-xl
+  .row
+    .col
+      %h1 Importing Symbols from CSV Files
+      %p.lead This article describes how to import existing symbols to Global Symbols using a CSV file.
+      %h2 Steps
+      %ol
+        %li Prepare a CSV file of your symbols, according to the specification below.
+        %li Create a new, empty Symbol Set.
+        %li
+          Use the Import function to upload your CSV file.
+          %ul
+            %li If the import fails, remedy the errors raised in your CSV file and upload again.
+        %li Review and amend any of the imported symbols.
+      %h2 CSV File Format
+      %p Each row in your CSV file should describe a label. If a symbol has labels in multiple languages, provide a row for each language.
+      %p The first row should contain the column name headings we specify.
+      %p Your CSV file should contain these columns, in any order:
+      %table.table.table-sm.table-hover
+        %thead
+          %tr
+            %th Column Name
+            %th Presence
+            %th Description
+            %th Example
+        %tbody
+          %tr
+            %th language
+            %td Required
+            %td
+              An ISO639-3 language code. Find codes at
+              %a{href: 'https://iso639-3.sil.org/code_tables/639/data', target: :blank} iso639-3.sil.org
+            %td eng
+          %tr
+            %th part_of_speech
+            %td Yes
+            %td
+              Must be one of:
+              %br
+              noun, verb, adjective, adverb, pronoun, preposition, conjunction, interjection, article or modifier.
+            %td verb
+          %tr
+            %th label
+            %td Required
+            %td A short text label for the symbol, up to 255 characters in length. For Arabic languages, this label should not contain diacritics.
+            %td carrot
+          %tr
+            %th filename
+            %td Required
+            %td The name of the symbol file.
+            %td carrot-1.svg
+          %tr
+            %th diacritised_label
+            %td Optional
+            %td For Arabic languages only. The same as label, with diacritics added. Up to 255 characters in length.
+            %td
+          -#%tr
+          -#  %th category
+          -#  %td Optional
+          -#  %td A text category for the symbol.
+          -#  %td Food
+          %tr
+            %th description
+            %td Optional
+            %td Optional. A longer description of the symbol. This may be useful to disambiguate the symbol.
+            %td An orange vegetable.
+          %tr
+            %th publisher_ref
+            %td Optional
+            %td Optional. Your reference for the symbol. This may be a number or text, which allows you to identify the symbol within your own records.
+            %td 9472

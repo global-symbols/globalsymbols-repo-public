@@ -1,0 +1,4 @@
+- if resource.errors.any?
+  .alert.alert-danger
+    - resource.errors.full_messages.each do |message|
+      .message= message

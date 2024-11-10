@@ -1,0 +1,16 @@
+.list-group-item.flex-column{id: "picto-review-row-#{picto.id}"}
+  .d-flex.w-100.align-items-center
+    %div.mr-3
+      %img.rounded{src: picto.images.last.imagefile.url}
+    %div.mr-3
+      %a{href: edit_symbolset_symbol_path(picto.symbolset, picto)}= picto.best_label_for(locale).text
+      %br
+      %em.text-muted= picto.part_of_speech
+    %div.flex-grow-1.text-left.mr-3
+      - picto.picto_concepts.each do |pc|
+        %div.btn-group.btn-group-sm.my-1{role: :group, 'aria-label': 'Concept controls'}
+          %a.btn.btn-primary{href: concept_path(pc.concept)}= pc.concept.subject
+          %a.btn.btn-secondary{href: symbolset_symbol_concept_path(picto.symbolset, picto, pc, format: :js), "aria-label" => 'Remove Concept', data: {method: :delete, remote: "true", confirm: t('views.symbolsets._review_row.remove_confirmation', subject: pc.concept.subject)}}
+            %span{"aria-hidden" => 'true'} ×
+    %div
+      = render 'picto_concepts/inline_form', picto: picto

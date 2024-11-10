@@ -1,0 +1,984 @@
+mk:
+  activerecord:
+    models:
+      comment: Коментар
+      picto: Симбол
+      licence: Дозвола
+      survey: Истражување
+      survey_picto: Истражување Пикто
+      symbolset_user: Соработник
+      user: Корисник
+      category: Категорија
+      concept: Концепт
+      label: Етикета
+      language: Јазик
+      picto_concept: Концепт на пикто
+      survey_response: Одговор на истражување
+      coding_framework: Рамка за кодирање
+      image: Слика
+      symbolset: Сет на симбол
+    attributes:
+      comment:
+        contrast_rating: Контрастен рејтинг
+        rating: Рејтинг
+        representation_rating: Рејтинг на претставата
+        representation_rating_short: Застапеност
+        contrast_rating_short: Контраст
+        cultural_rating: Културен рејтинг
+        cultural_rating_short: Културна
+        comment: Коментар
+        read: Читај
+        resolved: Решено
+      picto:
+        part_of_speech_options:
+          noun: Именка.
+          pronoun: Заменка
+          interjection: Мешање
+          adjective: Придавка
+          preposition: Предлог
+          conjunction: Конјункција
+          article: Член
+          modifier: Модификатор
+          verb: Глагол
+          adverb: Навраќање
+        part_of_speech: Дел од говорот
+        image: Слика
+        publisher_ref: Референца на издавачот
+        visibility: Видлив со
+        visibility_options:
+          collaborators: Симболсет соработници
+          everybody: Сите
+      survey:
+        show_symbol_descriptions: Прикажување на описите на симболот
+        name: Име.
+        introduction: Вовед
+        status: Статус
+        close_at: Затвори ја твојата желба
+      survey_response:
+        name: Име.
+        organisation: Организација
+        role: Улога
+      symbolset:
+        publisher: Издавач
+        description: Опис
+        publisher_url: URL на издавачот
+        logo: Лого
+        status: Статус
+        statuses:
+          published: Објавено
+          draft: Нацрт
+          ingesting: Ингестирање
+        name: Име.
+      user:
+        email: Е-маил адреса
+        prename: Име
+        password: Лозинка
+        remember_me: Запомни ме
+        surname: Презиме
+        company: Компанија
+        location: Локација
+        language_id: Најпосакуван јазик
+        current_password: Тековна лозинка
+      label:
+        text_diacritised: Дијакритизирана етикета
+        text: Етикета
+        description: Опис
+      language:
+        active: Активен
+        scope: Оптерет
+        category: Категорија
+        name: Име.
+      category:
+        name: Име.
+      coding_framework:
+        structure: Структура
+        api_uri_base: API URI база
+        name: Име.
+        www_uri_base: Www URI База
+      concept:
+        subject: Субјект
+      licence:
+        name: Име.
+        url: URL
+        version: Верзија
+        properties: Имоти
+        logo: Лого
+  errors:
+    messages:
+      not_found: Не е пронајден
+      size_too_big: е преголем (максимум е %{file_size})
+      inclusion: Не е вклучена во списокот
+      empty: Не можам да бидам празен
+      blank: Не можам да бидам празен
+      present: Мора да е празно
+      even: Мора да е дури и такво
+      less_than: мора да биде помалку од %{count}
+      less_than_or_equal_to: мора да биде помала или еднаква на %{count}
+      wrong_size: е погрешна големина (треба да биде %{file_size})
+      expired: Истече, ве молам побарајте нова
+      confirmation_period_expired: Треба да биде потврдено во %{period}, ве молам
+        побарајте нова
+      model_invalid: 'Потврдата е неуспешна: %{errors}'
+      not_saved:
+        one: '1 грешка го забрани ова %{resource} да се спаси:'
+        other: '%{count} грешки го забранија овој %{resource} да се зачува:'
+      exclusion: Е задржан
+      invalid: Не е невалиден
+      confirmation: не се совпаѓа %{attribute}
+      accepted: Мора да се прифати
+      size_too_small: е премногу мал (минимум е %{file_size})
+      other_than: мора да е поинаку од %{count}
+      odd: Мора да е чудно
+      too_short:
+        one: е прекраток (минимум е 1 карактер)
+        other: е премногу краток (минимумот е %{count} знаци)
+      wrong_length:
+        one: е погрешна должина (треба да биде 1 знак)
+        other: е погрешна должина (треба да биде %{count} знаци)
+      not_a_number: Не е бројка
+      not_an_integer: Мора да е цел број
+      greater_than: мора да биде поголема од %{count}
+      greater_than_or_equal_to: мора да биде поголем или еднаков на %{count}
+      already_confirmed: Веќе беше потврдено, те молам обиди се да се пријавиш
+      not_locked: Не беше заклучен
+      equal_to: мора да биде еднаков на %{count}
+      too_long:
+        one: е предолг (максимум е 1 знак)
+        other: е предолг (максимумот е %{count} знаци)
+  devise:
+    views:
+      registrations:
+        new:
+          sign_up_button: Креирај сметка
+          page_title: Креирај сметка
+          heading: Креирај сметка
+        change_password:
+          submit: Промена на лозинката
+          account_indicator: Пријави се како %{email}
+          heading: Промена на лозинката
+          manage_account: Управување со сметка
+        _form:
+          language_helper: Симболите ќе бидат прикажани на вашиот претпочитан јазик
+            каде што е можно.
+          cancel_account_button: Избришете го мојот Профил
+          button_change_password: Промена на лозинката
+          cancel_account_text: Ако сакаш да ја затвориш твојата сметка за глобални
+            симболи…
+          current_password_helper: Ни треба твојата моментална лозинка за да ги потврдиме
+            твоите промени.
+          password_helper: '%{var} карактери минимум'
+          confirm_password: Потврдете ја лозинката
+          please_fix_errors: Те молам поправи ги грешките.
+          new_password: Нова лозинка
+          new_password_confirmation: Потврдете ја новата лозинка
+          new_password_helper: '%{var} карактери минимум. Остави празно ако не сакаш
+            да го смениш.'
+          button_save_changes: Зачувај ги промените
+          cancel_account_header: Откажи ја мојата сметка
+          cancel_account_confirm: Сигурен си? Вашиот глобален симболи профил ќе биде
+            трајно избришан.
+        edit:
+          awaiting_confirmation: 'Моментално чекаме потврда за: %{unconfirmed_email}'
+          heading: Управување со сметка
+          page_title: Управување со сметка
+        account_saved:
+          heading: Сметката е обновена
+          return_to_gs_button: Враќање на глобалните симболи
+      passwords:
+        new:
+          heading: Ресетирај ја лозинката
+          email_helper: Email адресата која ја користевте за да се пријавите на Global
+            Symbols
+          button: Линк за ресетирање на е-пошта
+          page_title: Управување со сметка
+        instructions: Внесете ја вашата email адреса и ќе испратиме линк за ресетирање
+          на вашата лозинка.
+        edit:
+          confirm_password_label: Потврдете ја новата лозинка
+          new_password_helper: '%{var} карактери минимум'
+          heading: Смени ја лозинката
+          new_password_label: Нова лозинка
+          button: Промена на лозинката
+      _shared:
+        _links:
+          new_confirmation: Не доби инструкции за потврда?
+          sign_in: Пријави се
+          sign_up: Креирај сметка
+          forgotten_password: Си ја заборави лозинката?
+          new_unlock: Не доби инструкции за отклучување?
+      sessions:
+        errors:
+          messages:
+            expired: Истече, ве молам побарајте нова
+            not_locked: Не беше заклучен
+            already_confirmed: Веќе беше потврдено, те молам обиди се да се пријавиш
+            confirmation_period_expired: Треба да биде потврдено во %{period}, ве
+              молам побарајте нова
+            not_found: Не е пронајден
+            not_saved:
+              one: '1 грешка го забрани ова %{resource} да се спаси:'
+              other: '%{count} грешки го забранија овој %{resource} да се зачува:'
+        new:
+          page_title: Пријави се
+          sign_in_button: Пријави се
+    omniauth_callbacks:
+      success: Успешно потврдено од %{kind} сметка.
+      failure: Не можел да ве потврди од %{kind} бидејќи "%{reason}".
+    sessions:
+      signed_out: Се отпишавте.
+      already_signed_out: Се отпишавте.
+      signed_in: Добредојдовте назад!
+    confirmations:
+      send_paranoid_instructions: Ако вашата email адреса постои во нашата база на
+        податоци, ќе добиете е-пошта со инструкции за тоа како да ја потврдите вашата
+        адреса за е-пошта за неколку минути.
+      confirmed: Вашата имејл адреса е успешно потврдена.
+      send_instructions: Ќе добиете мејл со инструкции за тоа како да ја потврдите
+        вашата адреса за е-пошта за неколку минути.
+    failure:
+      invalid: Невалиден %{authentication_keys} или лозинка.
+      not_found_in_database: Невалиден %{authentication_keys} или лозинка.
+      unauthenticated: Треба да се пријавиш или да се пријавиш пред да продолжиш.
+      already_authenticated: Веќе сте пријавиле.
+      inactive: Твојата сметка сеуште не е активирана.
+      locked: Твојата сметка е заклучена.
+      last_attempt: Имате уште еден обид пред вашата сметка да биде заклучена.
+      timeout: Твојата сесија истече. Ве молам внесете се повторно за да продолжите.
+      unconfirmed: Мораш да ја потврдиш твојата мејл адреса пред да продолжиш.
+    mailer:
+      confirmation_instructions:
+        subject: Инструкции за потврда
+      reset_password_instructions:
+        subject: Ресетирајте ги инструкциите за лозинката
+      password_change:
+        subject: Сменета лозинка
+      unlock_instructions:
+        subject: Отклучи ги инструкциите
+      email_changed:
+        subject: Е-поштата е променета
+    passwords:
+      no_token: Не можете да пристапите до оваа страница без да дојдете од мејл за
+        ресетирање на лозинка. Ако доаѓате од е-пошта за ресетирање на лозинка, ве
+        молиме осигурајте се дека сте го користеле целиот URL обезбеден.
+      send_paranoid_instructions: Ако вашата мејл адреса постои во нашата база на
+        податоци, ќе добиете линк за враќање на лозинка на вашата email адреса за
+        неколку минути.
+      updated_not_active: Твојата лозинка е променета успешно.
+      send_instructions: Ти испративме мејл за ресетирање на лозинка.
+      updated: Твојата лозинка е променета успешно. Сега си потпишан.
+    registrations:
+      destroyed: Чао! Вашата сметка е успешно откажана. Се надеваме дека ќе ве видиме
+        повторно наскоро.
+      signed_up_but_inactive: Успешно се пријавивте. Сепак, не можевме да ве пријавиме
+        бидејќи вашата сметка сé уште не е активирана.
+      signed_up_but_locked: Успешно се пријавивте. Сепак, не можевме да ве пријавиме
+        бидејќи вашата сметка е заклучена.
+      signed_up_but_unconfirmed: Порака со линк за потврда е испратена на вашата email
+        адреса. Ве молам следете го линкот за да ја активирате вашата сметка.
+      update_needs_confirmation: Успешно ја ажуриравте вашата сметка, но мораме да
+        ја потврдиме вашата нова мејл адреса. Ве молиме проверете го вашиот мејл и
+        следете го линкот за потврда за да ја потврдите вашата нова мејл адреса.
+      updated: Вашата сметка е успешно обновена.
+      signed_up: Добредојдовте! Успешно се пријавивте.
+    unlocks:
+      send_paranoid_instructions: Ако вашиот профил постои, ќе добиете мејл со инструкции
+        како да го отклучите за неколку минути.
+      send_instructions: Ќе добиете меил со инструкции како да ја отклучите вашата
+        сметка за неколку минути.
+      unlocked: Вашата сметка е отклучена успешно. Ве молам пријавете се за да продолжите.
+  doorkeeper:
+    scopes:
+      boardset:read: Прочитајте ги вашите одборни сетови
+      identity:read:user: Прочитај ги податоците во твојот кориснички профил
+      public: Пристапете до вашите јавни податоци
+      boardset:write: Пишувај на твојот одбор сетови
+  dictionary:
+    back: Назад.
+    collaborator:
+      one: Соработник
+      other: Соработници
+    numbers:
+      '2': '2'
+      '4': '4'
+      '1': '1'
+      '3': '3'
+      '5': '5'
+    sign_in: Пријави се
+    archive: Архива
+    concept:
+      one: Концепт
+      other: Концепти
+    remove: Тргни го
+    by: Од
+    settings: Подесувања
+    label:
+      one: Етикета
+      other: Етикети
+    response:
+      one: Одговор
+      other: Одговори
+    go_back: Врати се
+    edit: Уредување
+    search: Пребарајте
+    change: промена
+    download: Симни го
+    page_not_found: Страницата не е пронајдена
+    un-archive: Архива на ОН
+    publish: Објавување
+    unauthorised: Неовластено
+    import: Увоз
+    view: Погледајте
+    symbolset:
+      one: Сет на симбол
+      other: Збирки на симболи
+    symbol:
+      one: Симбол
+      other: Симболи
+    survey:
+      one: Анкета
+      other: Анкети
+    global_symbols: Global Symbols
+  languages:
+    hy: Ерменски
+    tr: Турски
+    nl: Холандски
+    ru: Руски
+    ur: Урду
+    val: Вехес
+    hr: Хрватски
+    en: Англиски
+    fr: Француски
+    de: Германски
+    sr: Српски
+    sr_Cyrl: Српски (кирилица)
+    sr_Latn: Српски (латински)
+    ro: Романски
+    el: Грчки
+    sq: Албански
+    bg: Бугарски
+    ca: Каталонски
+    es: Шпански
+    ar: Арапски
+    zh: Кинески
+    da: Дански
+    hi: Хинду
+    it: Италијански
+    mk: Македонски
+    mr: Марати
+    pt: Португалски
+    sh: Србино-хрватски
+    cnr: Црногорски
+    an: Арагонски
+    br: Бретон
+    et: Естонски
+    eu: Баскијски
+    fa: Персиски
+    gl: Галициски
+    he: Хебрејски
+    hu: Унгарски
+    pl: Полски
+    sk: Словачки
+    sv: Шведски
+    ps: Пашто
+  views:
+    pages:
+      home:
+        explore_heading: Истражувајте ги симболските сетови
+        board_builder:
+          design: Дизајнирај, гради, заштеди и печати комуникациски табли онлајн.
+          heading: Global Symbols Board Builder
+          subheading: Комуникациските одбори на лесниот начин
+          create: Креирајте табли за помош на комуникацијата користејќи илјадници
+            бесплатни слики од нашата библиотека, па дури и вашиот.
+          storage: Се се чува безбедно во вашиот глобален симболи профил.
+          button_featured: Прикажани сетови на таблата
+          button_try: Обиди се со градежникот на одборот
+        for_creators: За креаторите
+        for_communicators: За комуникаторите
+        for_communicators_text: Размени слики за да создадеш разговори
+        for_everyone: За сите
+        for_everyone_text: Откриј, мешај, совпаѓај и направи симболот да користи личен
+        explore_button: Истражувај повеќе симболски сетови…
+        for_creators_text: Управување и објавување на симболски сетови
+      search:
+        symbolset_dropdown_any_symbol_set: Било кој симболски сет
+        search: Пребарајте
+        search_for: Потрага по
+        _title: Пребарајте
+        no_results: Не можевме да најдеме симболи. Обиди се со поширока потрага.
+      contact:
+        heading: Влези во допир
+        lead_text: Многу сме среќни што добиваме прашања, предлози и информации за
+          релевантните ресурси.
+        email_us: Пратете ни мејл
+        _description: Контактирајте не со општите барања, или за да го објавите вашиот
+          симболски сет.
+    surveys:
+      show:
+        provide_details_2: Вашите детали ќе бидат прикажани на организаторите на истражувањето
+          во врска со вашата повратна информација, и никогаш не се користат од Global
+          Symbols за било која друга цел.
+        close_at_message: Можете да учествувате до %{date}.
+        begin_button: Започни го анкета
+        provide_details: Обезбедувањето на вашите детали е опционално, и може да им
+          помогне на организаторите на истражувањето.
+        closed_header: Ова истражување не прифаќа повратни информации во моментов.
+        closed_text: Контактирајте го организаторот на истражувањето ако очекувате
+          да можете да учествувате.
+        offline_participants: За учесниците кои работат офлајн…
+        offline_participants_button: Формулари за повратни информации од испитување
+          на печатеното истражување
+      print:
+        show_intro: Прикажување на воведувањето на истражувањето
+        instructions_1: Ова истражување ќе ве замоли да оцените четири аспекти на
+          секој симбол, и да дадете некои коментари.
+        heading: Подесувања за печатење
+        show_instructions_helper: Сменете ги инструкциите со кликнување на нив.
+        show_example: Покажи пример
+        show_example_helper: Додава примерно прашање кое покажува примерок на одговори.
+        symbol_label_language_helper: За најдобри резултати, печатете во боја користејќи
+          модерен прелистувач и забранете ги хедерите и подножјата.
+        print_button: Испитување на печатот
+        name_field: Моето име е
+        instructions_heading: Упатство
+        collect_names: Собирај ги имињата на учесниците
+        show_intro_helper: Променете го воведот со уредување на истражувањето.
+        show_instructions: Покажи ги инструкциите
+        symbol_label_language: Прикажување на етикетите на симболот во
+        symbol_label_language_all: Сите достапни јазици
+        introduction: Вовед
+        instructions_2: Оценете го секој симбол на скала каде 1 е "целосно неприфатлив"
+          и 5 е "целосно прифатлив", со ставање на чек во правилната кутија.
+      _shared:
+        number_of_symbols:
+          one: Оваа анкета има симбол %{count} за да го видите.
+          other: Оваа анкета има %{count} симболи за прегледување.
+        thank_you: Ви благодарам што го комплетиравте истражувањето!
+        questions:
+          feelings_rating: Чувствата за симболот во целина
+          representation_rating: Го претставува зборот или фразата
+          contrast_rating: Контраст на бојата
+          cultural_rating: Културна чувствителност
+          comments: Дополнителни коментари
+      thank_you:
+        button_restart_survey: Реставрирај го анкета
+        button_go_to_homepage: Продолжете кон глобалните симболи
+        feedback_is_saved: Ги зачувавме сите ваши повратни информации.
+      _print_question:
+        example_heading: Пример Прашање
+        example_text: Ова покажува како можете да одговорите на прашањата
+        symbol_counter: Симбол %{number}
+        example_comment: Ова дрво изгледа како брокула.
+    symbolsets:
+      _form:
+        description_helper: Овој опис ќе се појави заедно со симболскиот сет.
+        publisher_url_helper: Адресата на веб-страницата на издавачот.
+        logo_label: Лого
+        published_helper: Објавените симболски сетови се видливи за сите. Нацрт симболските
+          сетови се видливи за Admins и Symbol Set Collaborators.
+        publisher_helper: Името на лицето или организацијата која го објавува симболот.
+        logo_helper: Ова лого ќе се појави на страницата симболи. Ова треба да биде
+          слика, идеално SVG или PNG, 300x200 пиксели со транспарентна позадина.
+        publisher_url_label: URL на издавачот
+        publisher_placeholder: На пр. Фондацијата PeopleSymbols
+        publisher_url_placeholder: на пр. https://peoplesymbols.com
+        licence_prompt: Изберете Лиценца
+        create_button: Креирај симболски сет
+        save_button: Зачувај го симболот
+      translate:
+        description: Автоматски преведете симболски етикети на нови јазици. Оваа алатка
+          се преведува во делови од %{symbols_limit} симболи во исто време.
+        heading: Преведи ги етикетите
+        button_find_untranslated: Најди непреведени симболи
+        title: Преведи %{symbolset_name}
+        form:
+          target_lang_prompt: Изберете целен јазик
+          target_lang_label: да се
+          source_lang_label: Преведи од
+          source_lang_option: '%{language_name} (%{labels_count} симболи, %{coverage_percentage}
+            покриеност)'
+      review:
+        filter_all_symbols: Сите симболи
+        heading: Преглед
+        filter_without_a_concept: Без концепт
+      show:
+        no_symbols_for_collaborator: Додадете симбол за да почнете да го градите вашиот
+          симболски сет
+        _description: Истражувајте го %{symbolset_name} симболот поставен на Global
+          Symbols. Добиј бесплатни слики и симболи за комуникација.
+      _topbar:
+        button_edit: Уредување
+        button_review: Преглед
+        button_archive: Архивирани симболи
+        download: Симни го
+        button_translate: Преведи
+        button_add_symbol: Додади симбол
+      import:
+        introduction: Качете ги вашите постоечки симболи во Глобални симболи.
+        _title: Увоз на %{symbolset_name}
+        heading: Увоз на симболи
+      index:
+        _title: Истражувајте ги симболските сетови
+        heading: Истражувајте ги симболските сетови
+        create_symbol_set_button: Креирај симболски сет
+        _description: Пребарајте илјадници симболи за слободна комуникација на Global
+          Symbols.
+      new:
+        _title: Создадете симболски сет
+        guidance: Ви предлагаме да ги прегледате насоките за
+        heading: Создадете симболски сет
+        introduction: Твојот нов симбол ќе биде создаден во нацрт-состојба. Тоа ќе
+          биде видливо само за вас и соработниците кои ги додавате, овозможувајќи
+          ви да додадете симболи и да го подготвите симболскиот сет.
+        guidance_link: Добивање на вашиот симбол сет објавен на Глобални симболи
+      _shared:
+        none_found: Не можевме да најдеме симболи овде!
+      _review_row:
+        remove_confirmation: Да ги извадиме %{subject} од овој симбол?
+      edit:
+        _title: Уредување %{symbolset_name}
+      archive:
+        heading: Архивирани симболи
+        none_found: Не постојат архивирани симболи во овој симболски сет
+        description: Архивираните симболи не се прикажани во симболскиот сет, резултатите
+          од пребарувањето или апликациите
+      _symbolset_card:
+        image:
+          alt: '%{symbolset_name} лого'
+    pictos:
+      _form:
+        description_helper: Кратко опишувајте го симболот за да му помогнете на разбирањето.
+        create_button: Додади симбол
+        label_helper: Етикетата го опишува твојот симбол за да можат луѓето да го
+          најдат. Можете да додадете етикети на дополнителни јазици откако ќе го создадете
+          симболот.
+        language_helper: Јазикот на етикетата.
+        label_label: Текст на етикетата
+        diacritised_label_helper: Само за арапски јазици. Во ова се чуваат дополнителни
+          изговорни детали.
+        save_button: Спасете го симболот
+        to_download_symbols: да симнеш симболи
+        image_helper: Качете SVG (претпочитана) или PNG формат слика.
+      edit:
+        heading: Уредување на симболот
+        _title: Уредување %{picto_label} во %{symbolset_name}
+      _topbar:
+        download_button: Превземи %{file_type}
+        not_publicly_visible: Не е јавно видлив
+      new:
+        _title: Додади симбол во %{symbolset_name}
+        heading: Додади симбол
+      show:
+        _title: '%{picto_label} во %{symbolset_name}'
+        concept_defined_in: Дефинирано во %{coding_framework_name}
+        no_concepts: Овој симбол нема концепти да го дефинира.
+        add_concept_button: Додадете концепт
+        alternative_symbols_heading: Алтернативни симболи
+        _description: "'%{picto_label}' симбол, дел од симболсетот %{symbolset_name}.\
+          \ Најди илјадници бесплатни симболи за комуникација."
+        archived_notice:
+          text: Овој симбол не е прикажан во симболскиот сет, резултатите од пребарувањето
+            или апликациите
+          heading: Архивиран симбол
+      _comment_form:
+        save_button: Зачувај коментар
+    survey_editor:
+      _sidebar:
+        stages:
+          analyse: Анализирај ги резултатите
+          plan: План.
+          collect_feedback: Собирај повратна врска
+          archive: Архива или Избришете
+          collect_feedback_description: Нека учесниците го завршат Истражувањето
+          analyse_results_description: Преглед на резултатите од истражувањето
+          plan_description: Избери симболи кои ќе ги вклучат во истражувањето
+        heading: Етапи
+      _form:
+        introduction_helper: По избор. Ова им се прикажува на учесниците кога ќе го
+          започнат истражувањето.
+        save_button: Зачувај анкета
+        language_blank_option: Сите достапни јазици
+        show_symbol_descriptions_label: Прикажување на описите на симболот
+        show_symbol_descriptions_helper: Ги прикажува симболските описи на учесниците.
+        close_at_helper: По избор. Одредете краен рок за одговор на учесниците.
+        language_label: Прикажување на етикетите на симболот во
+        language_helper: При земањето на ова истражување, на учесниците им се прикажани
+          симболски етикети на избраниот јазик.
+        create_button: Креирај анкета
+        name_helper: Обезбедете име кое им помага на учесниците да го идентификуваат
+          ова истражување.
+      show:
+        collect_feedback:
+          paper_intro: Некои учесници може да претпочитаат форми на истражување на
+            хартија. Користете ги овие алатки собирајте ги нивните повратни информации
+            и складирајте ги тука.
+          heading: Собирај повратна врска
+          close_at_label: Прифатете ги одговорите додека
+          invite_at_this_url: Поканете ги луѓето да го земат вашето истражување на
+            овој URL.
+          invite_deadline: Учесниците имаат до %{close_at} да обезбедат одговори (%{link}).
+          responses_count:
+            one: Вашата анкета има %{count} одговор.
+            other: Вашата анкета има %{count} одговори.
+          confirm_stop: Ова ќе ги спречи луѓето да одговараат на истражувањето. Сигурен
+            си?
+          paper_customisation_invitation: Да ги прилагодиш и печатиш испитуваш формите
+            за твоите учесници…
+          paper_print_button: Формулари за испитување на печатот
+          paper_to_include_results: За да ги вклучите резултатите од формите на истражување
+            на хартијата во резултатите од вашето истражување…
+          paper_add_paper_feedback_button: Додадете повратна врска на хартија
+          survey_ended: Собирањето одговори за ова истражување заврши.
+          survey_ended_add_paper: Сеуште можете рачно да додавате повратни информации
+            од формите за истражување на хартија.
+          button_begin_collecting: Почнете да собирате повратни информации
+          text_1: Кога ќе почнете да собирате повратни информации, ќе ви дадеме URL
+            каде што луѓето можат да учествуваат во истражувањето.
+          text_2: Нема да можете да ги промените селекциите на симболот додека истражувањето
+            собира повратни информации.
+          close_at_helper: По избор. Одреди краен рок за одговорите на истражувањата.
+          stop_button: Крај на истражувањето
+          paper_heading: Истражувања на хартија
+        archive:
+          delete_button: Избришете ја Анкетата
+          survey_is_archived: Ова истражување е Архивирано. Сеуште можеш да ги анализираш
+            сите резултати.
+          archive_description: Архивирај го ова Истражување кога ќе завршиш со тоа.
+            Сеуште ќе можеш да ги анализираш резултатите од ова истражување.
+          archive_confirm: Ова ќе ги спречи луѓето да одговараат на истражувањето.
+            Сигурен си?
+          archive_button: Архивирајте ја анкетата
+          delete_description: Бришењето на ова Истражување трајно ќе ги избрише сите
+            резултати кои сте ги собрале. Нема да бидат избришани симболите.
+          heading: Архива или Избришете
+          delete_confirm: Дали сте сигурни дека сакате да го избришете ова Истражување
+            и било какви одговори?
+        symbols_heading: Симболи во ова истражување
+        symbols_text: Додадете симболи во ова Истражување со потрага по нив во Глобални
+          симболи и одберете 'Add to Survey'.
+        symbols_search_helper: Пребарајте ги симболите за да го додадете ова Истражување
+        analyse_results:
+          button_stats: Симбол статистика
+          heading: Анализирај ги резултатите
+          results_appear_here: Резултатите ќе се појават овде кога луѓето ќе почнат
+            да одговараат на вашето Истражување.
+          button_individual_responses: Индивидуални одговори
+          export:
+            text_1: Користете ја оваа алатка за преземање на сите податоци од истражувањето,
+              вклучувајќи ги и рејтингот и коментарите.
+            text_2: Ова овозможува лесно да се изврши сопствена анализа во Excel.
+              Ви предлагаме да ги користите Pivot Tables за да ги пресметате и нацртате
+              просечните резултати за секој симбол.
+            text_3: Секој ред во excel фајлот претставува преглед на еден учесник
+              на симбол во истражувањето.
+            heading: Извоз на резултати во Excel
+          responses_count:
+            one: '%{count} лице одговори на вашата анкета.'
+            other: '%{count} луѓе одговориле на вашата анкета.'
+      export_xlsx:
+        header_label: Етикета
+        header_participant_number: Учесник Бројо
+        header_participant_name: Име на учесникот
+        header_symbol_id: ИД на симболот
+        header_overall_rating: Рејтинг
+        header_representation_rating: Застапеност
+        header_contrast_rating: Контраст
+        header_comment: Коментар
+        sheet_name: Коментари
+        header_cultural_rating: Културна
+        comment_participant_name: Од учесниците не се бара да ги обезбедат своите
+          имиња, па некои клетки може да бидат празни.
+      _add_picto_to_survey:
+        option: '%{survey_name} во %{symbolset_name}'
+        button: Додади во анкета
+      _picto:
+        no_label_for_language: No %{language_name} етикета
+        remove_confirm: Дали сте сигурни дека сакате да го отстраните овој симбол
+          од истражувањето?
+      destroy:
+        notice: Го избришавме вашето Истражување %{name}.
+      edit:
+        _title: Уредување %{survey_name} во %{symbolset_name}
+        heading: Уредување на истражувањето
+      index:
+        _title: Истражувања во %{symbolset_name}
+        button_new_survey: Креирај анкета
+        get_help: Истражувајте %{link} за истражувања
+        get_help_link: Помош и обука
+        no_surveys_at_stage: Не постојат истражувања на %{stage} етапа.
+      new:
+        button_create: Креирај анкета
+      add_symbol:
+        notice_success_add_another: Додадете уште еден?
+        alert_failure: Овој симбол е веќе во %{survey_link}
+        notice_success: Го додадовме симболот на вашето Истражување. %{add_another_link}
+    survey_questions:
+      _form:
+        please_fix_errors: Ве молам поправете ги грешките подолу.
+        button_save_answer: Спасете одговор
+        comments_helper: По избор. Ве молиме да додадете било какви коментари за да
+          ни помогне да го подобриме овој симбол.
+        button_previous_question: Претходно прашање
+      show:
+        please_rate: Ве молиме да го ставите овој симбол на скала каде 1 е "целосно
+          неприфатлив" и 5 е "целосно прифатлив".
+      _controller:
+        timed_out: Извинете, вашето истражување истече поради неактивност. Ве молам,
+          започнете со истражувањето повторно.
+    picto_concepts:
+      index:
+        existing_concepts:
+          remove_confirm: Да ги извадиме %{subject} од овој симбол?
+          heading: Постоечки концепти
+          added_at: Додадено %{date}
+          none_found: Овој Симбол нема концепти
+          remove_aria_label: Тргни го концептот
+        intro: Концептите им помагаат на компјутерите да ги разберат вашите симболи,
+          па затоа осигурајте се дека се точни и специфични.
+        add_concept_invitation: Можеме да додадеме било кој концепт што ќе го најдете
+          на ConceptNet.
+        add_concept:
+          heading: Додадете концепт
+          instruction: За да додадете концепт на овој симбол, внесете збор. Ќе го
+            додадеме концептот ако го најдеме.
+          button: Додади концепт
+          add: Додадете
+        page_title: Концепти за %{symbol}
+      create:
+        alert_failure: Не можевме да најдеме концепт наречен %{concept}. Пробај уште
+          еден збор.
+        notice_success: Го додадовме концептот %{concept} на овој симбол.
+        alert_already_exists: '%{concept} е веќе концепт на овој симбол.'
+      destroy:
+        notice_success: Го отстранивме концептот %{concept} од овој симбол.
+        alert_failure: Не можевме да го отстраниме концептот %{concept} од овој симбол.
+    picto_labels:
+      index:
+        intro: Етикетите им помагаат на другите луѓе да ги разберат вашите симболи.
+          Тие ни помагаат да го разбереме значењето на вашиот симбол, па затоа осигурајте
+          се дека се точни и специфични.
+        page_title: Етикети за %{symbol}
+        instructions: Симболите мора да имаат барем една етикета. Ако сакате, можете
+          да додадете етикета за повеќе од еден јазик.
+        heading_add_label: Додадете ознака
+        status_published: Објавено
+        status_suggested: Предложено
+      _form:
+        language_helper: Јазикот на етикетата.
+        label_label: Текст на етикета
+        diacritised_label_label: Дијакритизирана етикета
+        diacritised_label_helper: Само за арапски јазици. Во ова се чуваат дополнителни
+          изговорни детали.
+        description_helper: Кратко опишувајте го симболот за да му помогнете на разбирањето.
+        button_save: Зачувај ја етикетата
+        button_add: Додадете етикета
+      _picto_labels:
+        heading: '%{label_type} Етикети'
+        remove_label_aria_label: Тргнете ја етикетата
+        remove_label_confirm: Да ги извадиме %{text} од овој симбол?
+        no_labels_found: Не беа пронајдени етикети
+      edit:
+        page_title: Етикети за %{symbol}
+        heading: Уредување на етикетата
+        intro: Етикетите им помагаат на другите луѓе да ги разберат вашите симболи.
+          Тие ни помагаат да го разбереме значењето на вашиот симбол, па затоа осигурајте
+          се дека се точни и специфични.
+      publish_translation:
+        notice_success: Ја објавил етикетата %{language_name}.
+      create:
+        notice_success: Ја додадовме етикетата %{label} на овој симбол.
+        alert_failure: Мора да се справите со некои проблеми пред да можеме да ја
+          додадеме оваа етикета.
+      destroy:
+        notice_success: Ја извадивме етикетата %{label} од овој симбол.
+        alert_failure: Не можевме да ја извадиме етикетата %{label} од овој симбол.
+    application:
+      _copy_to_clipboard:
+        button_title: Копирај во клипбордот
+        button: Копирај
+    translations:
+      _symbols_table:
+        button_get_translation_working: Преведува…
+        heading_source_language: '%{language_name} Извор'
+        heading_destination_language: '%{language_name} Превод'
+        button_get_translation: Добиј превод
+        heading_type: Тип
+      _suggestion_form:
+        button_publish: Објавување
+        button_publish_working: Издаваш…
+        label: Превод
+      _translation_form:
+        button_translate: Преведи симболи
+        button_translate_working: Преведување на симболи…
+        publish_button: Објавете ги сите %{language_name} Преводи
+        publish_button_working: Објавување на сите преводи…
+        translation_complete_heading: Преводот е завршен
+        translation_complete_text: Сите симболи се преведени на %{language_name}.
+      _translations_published:
+        heading: Објавени преводи
+        labels_are_visible: Новите преводи сега се видливи на Global Symbols и во
+          апликации.
+        next_steps: Најдете повеќе симболи за преведување, или изберете друг јазик.
+        labels_saved: Новите преводи се зачувани.
+    survey_picto_analysis:
+      index:
+        heading: Симбол статистика
+        intro: Оваа табела ги прикажува просечните одговори за секој симбол во истражувањето,
+          врз основа на вкупно %{count} добиени.
+        row_heading_averages: Просечни просеки
+        column_heading_rating_description: Чувствата за симболот во целина
+        column_heading_representation_rating_description: Го претставува зборот или
+          фразата
+        column_heading_contrast_rating_description: Контраст на бојата
+        crumb_name: Симбол статистика
+        column_heading_overall_average: Севкупен просек
+        column_heading_cultural_rating_description: Културна соодветност
+    survey_response_analysis:
+      _sidebar:
+        heading: Одговори
+        participant_number: Учесник %{number}
+      index:
+        crumb_name: Индивидуални одговори
+        heading: Индивидуални одговори
+      new:
+        label_representation_rating: Го претставува зборот
+        heading: Додадете повратна врска на хартија
+        use_this_form_to: Користете го овој формулар за да заштедите едно истражување
+          на хартија во Global Symbols. Тогаш ќе се смета за твојата статистика.
+        match_numbers: Броевите прикажани во горниот десен дел на секоја симболска
+          кутија треба да се совпаѓаат со оние прикажани на хартиените форми, за да
+          се осигураат дека ќе ги внесете правилните оценки за секој симбол.
+        label_overall_rating: Чувства за симболот
+        label_contrast_rating: Контраст на бојата
+        label_cultural_rating: Културна чувствителност
+        cancel_confirm: Сигурен си? Ќе изгубиш какви било резултати досега.
+        save_button: Зачувај ги одговорите
+      create:
+        notice_success: Реакцијата на хартијата е спасена.
+    collaborators:
+      index:
+        page_title: Соработници за %{name}
+        add_heading: Додадете соработник
+        add_text: За да му дозволите на некој друг да го уредува овој симболски сет,
+          внесете ја мејл адресата која ја користеле за да се пријавите на Global
+          Symbols.
+        add_button: Додадете соработник
+        existing_heading: Постојни соработници
+        existing_text: На овие луѓе им е дозволено да го уредат овој симболски сет.
+        existing_none_found: Не им е дозволено на корисниците да го уредуваат овој
+          симболски сет.
+        added_at: Додадено %{date}
+        remove_confirm: Да ги отстраниме %{email} од симболот?
+        remove_aria_label: Отстрани го соработникот
+      create:
+        notice_success: Додадовме %{email_address} како соработник.
+        alert_no_gs_account: '%{email_address} сé уште нема глобален профил на симболи.'
+      destroy:
+        notice_success: Го отстранивме %{email_address} како соработник.
+    concepts:
+      show:
+        page_title: '%{subject} во %{coding_framework}'
+        defined_in: Концепт дефиниран во
+    pagination:
+      next: Следна
+      last: Последниот
+      previous: Прев.
+      first: Прво
+    errors:
+      not_found:
+        description: Не можевме да најдеме ништо на оваа адреса
+    articles:
+      _topbar:
+        header_news: Вести од глобални симболи
+      index:
+        title: Вести
+        description: Блогот Global Symbols - Новости, идеи и инспирација за да ви
+          помогне да комуницирате со симболи.
+        more_button: Повеќе статии
+  date:
+    day_names:
+    - Недела
+    - Понеделник
+    - Вторник
+    - Петок
+    - четврток
+    - петок
+    abbr_day_names:
+    - Сонце
+    - Мон.
+    - Tue
+    - Ср.
+    - Така.
+    - Фра.
+    - Седнав.
+    month_names:
+    - Јануари
+    - Февруари
+    - Марш
+    - Април
+    - Мај
+    - Јуни
+    - Јули
+    - Август
+    - Септември
+    - Октомври
+    - Ноември
+    - Декември
+    - декември
+    abbr_month_names:
+    - Џен
+    - Феб.
+    - Мар.
+    - Apr
+    - Мај
+    - Џун.
+    - Џул.
+    - Ауг
+    - Сеп.
+    - Окт.
+    - Ное.
+    - Дек.
+    - Дек.
+    order:
+    - Година
+    - месец
+    - Ден.
+    formats:
+      default: '%e %b %Y'
+      short: '%d %b'
+      long: '%d %B %Y'
+  unauthorized:
+    manage:
+      all: Не можете да %{action} ова %{subject}.
+      picto: Можете да управувате само со Симболи на кои сте соработник.
+    update:
+      project: Не е дозволено да се ажурира овој проект.
+  layouts:
+    application:
+      menu:
+        sign_in: Пријави се
+        sign_up: Креирај сметка
+        resources: Ресурси
+        training: Обука
+        news: Вести
+        sign_out: Отпиши се
+        search_placeholder: Пребарајте %{var}
+        facebook: Глобални симболи на Фејсбук
+        twitter: Глобални симболи на Твитер
+        my_account: Моја сметка
+        board_builder: Board Builder
+      footer:
+        contact: Контактирајте
+        privacy_policy: Политика на приватност
+        terms: Услови
+        accessibility: Достапност
+        about: За тоа
+        language_label: Јазик
+      skip_to_main_content: Прескокни до главната содржина
+  time:
+    formats:
+      default: '%a, %d %b %Y %H:%M:%S %z'
+      short: '%d %b %H:%M'
+      long: '%B %d, %Y %H:%M'
+    am: Јас сум.
+    pm: PM
