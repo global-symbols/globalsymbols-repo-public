@@ -11,6 +11,9 @@ module GlobalsymbolsRepo
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 6.0
 
+    config.allowed_image_extensions = %w[jpg jpeg gif png svg webp].freeze
+    config.allowed_image_mimetypes = [/image\/svg\+xml/, 'image/jpeg', 'image/png', 'image/gif', 'image/webp'].freeze
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files

@@ -26,6 +26,22 @@ class Boardbuilder::Media < ApplicationRecord
   }
 
   before_validation :update_file_attributes
+  after_initialize :calculate_and_set_file_hash
+
+  attr_accessor :resize_width, :resize_height
+
+  def initialize(attributes = {})
+    @resize_width = attributes.delete(:resize_width)
+    @resize_height = attributes.delete(:resize_height)
+    super(attributes)
+  end
+
+  def calculate_and_set_file_hash
+    if file.present? && file_hash.blank?
+      content = file.file.read
+      self.file_hash = Utils.calculate_hash(content)
+    end
+  end
 
   private
 
@@ -34,5 +50,6 @@ class Boardbuilder::Media < ApplicationRecord
       self.format = file.file.content_type
       self.filesize = file.file.size
     end
+    calculate_and_set_file_hash
   end
 end

@@ -4,7 +4,7 @@ class User < ApplicationRecord
 
   has_many :boardbuilder_board_set_users, class_name: 'Boardbuilder::BoardSetUser', inverse_of: :user
   has_many :boardbuilder_board_sets, class_name: 'Boardbuilder::BoardSet', through: :boardbuilder_board_set_users, source: :board_set, inverse_of: :users
-  has_many :boardbuilder_library_images, class_name: 'Boardbuilder::LibraryImage', inverse_of: :user
+  has_many :boardbuilder_library_images, class_name: 'Boardbuilder::Media', inverse_of: :user
   has_many :comments, inverse_of: :user
   has_many :survey_responses, inverse_of: :user
   has_many :symbolset_users, inverse_of: :user

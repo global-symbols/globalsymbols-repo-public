@@ -10,9 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_08_26_120946) do
+ActiveRecord::Schema.define(version: 2024_08_07_100727) do
 
-  create_table "active_storage_attachments", charset: "utf8", force: :cascade do |t|
+  create_table "active_storage_attachments", charset: "utf8mb3", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
     t.bigint "record_id", null: false
@@ -22,7 +22,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
 
-  create_table "active_storage_blobs", charset: "utf8", force: :cascade do |t|
+  create_table "active_storage_blobs", charset: "utf8mb3", force: :cascade do |t|
     t.string "key", null: false
     t.string "filename", null: false
     t.string "content_type"
@@ -34,13 +34,13 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
-  create_table "active_storage_variant_records", charset: "utf8", force: :cascade do |t|
+  create_table "active_storage_variant_records", charset: "utf8mb3", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "boardbuilder_board_set_users", charset: "utf8", force: :cascade do |t|
+  create_table "boardbuilder_board_set_users", charset: "utf8mb3", force: :cascade do |t|
     t.bigint "boardbuilder_board_set_id", null: false
     t.bigint "user_id", null: false
     t.integer "role", null: false
@@ -50,16 +50,25 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.index ["user_id"], name: "index_boardbuilder_board_set_users_on_user_id"
   end
 
-  create_table "boardbuilder_board_sets", charset: "utf8", force: :cascade do |t|
+  create_table "boardbuilder_board_sets", charset: "utf8mb3", force: :cascade do |t|
     t.string "name"
     t.boolean "public"
     t.integer "featured_level"
     t.datetime "opened_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "download_count", default: 0
+    t.text "description"
+    t.json "tags"
+    t.string "lang"
+    t.string "author"
+    t.string "author_url"
+    t.boolean "self_contained", default: false
+    t.bigint "thumbnail_id"
+    t.index ["thumbnail_id"], name: "fk_rails_57fe97592a"
   end
 
-  create_table "boardbuilder_boards", charset: "utf8", force: :cascade do |t|
+  create_table "boardbuilder_boards", charset: "utf8mb3", force: :cascade do |t|
     t.bigint "boardbuilder_board_set_id", null: false
     t.string "name", null: false
     t.string "description"
@@ -74,7 +83,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.index ["header_boardbuilder_media_id"], name: "index_boardbuilder_boards_on_header_boardbuilder_media_id"
   end
 
-  create_table "boardbuilder_cells", charset: "utf8", force: :cascade do |t|
+  create_table "boardbuilder_cells", charset: "utf8mb3", force: :cascade do |t|
     t.bigint "boardbuilder_board_id", null: false
     t.bigint "linked_to_boardbuilder_board_id"
     t.bigint "picto_id"
@@ -95,7 +104,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.index ["picto_id"], name: "index_boardbuilder_cells_on_picto_id"
   end
 
-  create_table "boardbuilder_media", charset: "utf8", force: :cascade do |t|
+  create_table "boardbuilder_media", charset: "utf8mb3", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "file"
     t.string "format", null: false
@@ -106,10 +115,11 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.string "canvas"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "file_hash"
     t.index ["user_id"], name: "index_boardbuilder_media_on_user_id"
   end
 
-  create_table "categories", charset: "utf8", force: :cascade do |t|
+  create_table "categories", charset: "utf8mb3", force: :cascade do |t|
     t.string "name", null: false
     t.bigint "concept_id", null: false
     t.datetime "created_at", null: false
@@ -117,7 +127,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.index ["concept_id"], name: "index_categories_on_concept_id"
   end
 
-  create_table "coding_frameworks", charset: "utf8", force: :cascade do |t|
+  create_table "coding_frameworks", charset: "utf8mb3", force: :cascade do |t|
     t.string "name", null: false
     t.integer "structure", null: false
     t.string "api_uri_base"
@@ -126,7 +136,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "comments", charset: "utf8", force: :cascade do |t|
+  create_table "comments", charset: "utf8mb3", force: :cascade do |t|
     t.bigint "picto_id", null: false
     t.bigint "survey_response_id"
     t.bigint "user_id"
@@ -144,7 +154,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.index ["user_id"], name: "index_comments_on_user_id"
   end
 
-  create_table "concepts", charset: "utf8", force: :cascade do |t|
+  create_table "concepts", charset: "utf8mb3", force: :cascade do |t|
     t.bigint "coding_framework_id", null: false
     t.bigint "language_id"
     t.string "subject", null: false
@@ -154,7 +164,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.index ["language_id"], name: "index_concepts_on_language_id"
   end
 
-  create_table "images", charset: "utf8", force: :cascade do |t|
+  create_table "images", charset: "utf8mb3", force: :cascade do |t|
     t.bigint "picto_id", null: false
     t.boolean "adaptable", default: false, null: false
     t.string "imagefile"
@@ -163,7 +173,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.index ["picto_id"], name: "index_images_on_picto_id"
   end
 
-  create_table "import_jobs", charset: "utf8", force: :cascade do |t|
+  create_table "import_jobs", charset: "utf8mb3", force: :cascade do |t|
     t.bigint "symbolset_id"
     t.integer "status"
     t.string "message"
@@ -174,7 +184,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.index ["symbolset_id"], name: "index_import_jobs_on_symbolset_id"
   end
 
-  create_table "labels", charset: "utf8", force: :cascade do |t|
+  create_table "labels", charset: "utf8mb3", force: :cascade do |t|
     t.bigint "language_id", null: false
     t.bigint "picto_id", null: false
     t.bigint "source_id"
@@ -192,7 +202,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.index ["text_diacritised"], name: "index_labels_on_text_diacritised"
   end
 
-  create_table "languages", charset: "utf8", force: :cascade do |t|
+  create_table "languages", charset: "utf8mb3", force: :cascade do |t|
     t.boolean "active", default: false, null: false
     t.boolean "azure_translate_supported"
     t.bigint "language_id"
@@ -212,7 +222,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.index ["name"], name: "index_languages_on_name"
   end
 
-  create_table "licences", charset: "utf8", force: :cascade do |t|
+  create_table "licences", charset: "utf8mb3", force: :cascade do |t|
     t.string "name", null: false
     t.string "url"
     t.string "version"
@@ -222,7 +232,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "oauth_access_grants", charset: "utf8", force: :cascade do |t|
+  create_table "oauth_access_grants", charset: "utf8mb3", force: :cascade do |t|
     t.bigint "resource_owner_id", null: false
     t.bigint "application_id", null: false
     t.string "token", null: false
@@ -238,7 +248,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.index ["token"], name: "index_oauth_access_grants_on_token", unique: true
   end
 
-  create_table "oauth_access_tokens", charset: "utf8", force: :cascade do |t|
+  create_table "oauth_access_tokens", charset: "utf8mb3", force: :cascade do |t|
     t.bigint "resource_owner_id"
     t.bigint "application_id", null: false
     t.string "token", null: false
@@ -254,7 +264,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.index ["token"], name: "index_oauth_access_tokens_on_token", unique: true
   end
 
-  create_table "oauth_applications", charset: "utf8", force: :cascade do |t|
+  create_table "oauth_applications", charset: "utf8mb3", force: :cascade do |t|
     t.string "name", null: false
     t.string "uid", null: false
     t.string "secret", null: false
@@ -266,13 +276,13 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
   end
 
-  create_table "oauth_openid_requests", charset: "utf8", force: :cascade do |t|
+  create_table "oauth_openid_requests", charset: "utf8mb3", force: :cascade do |t|
     t.bigint "access_grant_id", null: false
     t.string "nonce", null: false
     t.index ["access_grant_id"], name: "index_oauth_openid_requests_on_access_grant_id"
   end
 
-  create_table "picto_concepts", charset: "utf8", force: :cascade do |t|
+  create_table "picto_concepts", charset: "utf8mb3", force: :cascade do |t|
     t.bigint "concept_id"
     t.bigint "picto_id"
     t.datetime "created_at", null: false
@@ -281,7 +291,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.index ["picto_id"], name: "index_picto_concepts_on_picto_id"
   end
 
-  create_table "pictos", charset: "utf8", force: :cascade do |t|
+  create_table "pictos", charset: "utf8mb3", force: :cascade do |t|
     t.bigint "category_id"
     t.bigint "source_id"
     t.bigint "symbolset_id", null: false
@@ -301,7 +311,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.index ["visibility"], name: "index_pictos_on_visibility"
   end
 
-  create_table "sources", charset: "utf8", force: :cascade do |t|
+  create_table "sources", charset: "utf8mb3", force: :cascade do |t|
     t.string "name", null: false
     t.string "slug", null: false
     t.boolean "authoritative", null: false
@@ -311,7 +321,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "survey_pictos", charset: "utf8", force: :cascade do |t|
+  create_table "survey_pictos", charset: "utf8mb3", force: :cascade do |t|
     t.bigint "survey_id", null: false
     t.bigint "picto_id", null: false
     t.datetime "created_at", null: false
@@ -320,7 +330,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.index ["survey_id"], name: "index_survey_pictos_on_survey_id"
   end
 
-  create_table "survey_responses", charset: "utf8", force: :cascade do |t|
+  create_table "survey_responses", charset: "utf8mb3", force: :cascade do |t|
     t.bigint "survey_id", null: false
     t.bigint "user_id"
     t.string "name"
@@ -332,7 +342,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.index ["user_id"], name: "index_survey_responses_on_user_id"
   end
 
-  create_table "surveys", charset: "utf8", force: :cascade do |t|
+  create_table "surveys", charset: "utf8mb3", force: :cascade do |t|
     t.bigint "symbolset_id", null: false
     t.bigint "previous_survey_id"
     t.bigint "language_id"
@@ -348,7 +358,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.index ["symbolset_id"], name: "index_surveys_on_symbolset_id"
   end
 
-  create_table "symbolset_users", charset: "utf8", force: :cascade do |t|
+  create_table "symbolset_users", charset: "utf8mb3", force: :cascade do |t|
     t.bigint "symbolset_id", null: false
     t.bigint "user_id", null: false
     t.integer "role", null: false
@@ -358,7 +368,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.index ["user_id"], name: "index_symbolset_users_on_user_id"
   end
 
-  create_table "symbolsets", charset: "utf8", force: :cascade do |t|
+  create_table "symbolsets", charset: "utf8mb3", force: :cascade do |t|
     t.bigint "licence_id", null: false
     t.string "name", null: false
     t.string "description"
@@ -376,7 +386,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.index ["status"], name: "index_symbolsets_on_status"
   end
 
-  create_table "users", charset: "utf8", force: :cascade do |t|
+  create_table "users", charset: "utf8mb3", force: :cascade do |t|
     t.bigint "language_id"
     t.string "email", default: "", null: false
     t.integer "role", null: false
@@ -406,6 +416,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "boardbuilder_board_set_users", "boardbuilder_board_sets"
   add_foreign_key "boardbuilder_board_set_users", "users"
+  add_foreign_key "boardbuilder_board_sets", "boardbuilder_media", column: "thumbnail_id"
   add_foreign_key "boardbuilder_boards", "boardbuilder_board_sets"
   add_foreign_key "boardbuilder_boards", "boardbuilder_media", column: "header_boardbuilder_media_id"
   add_foreign_key "boardbuilder_cells", "boardbuilder_boards"
