@@ -24,6 +24,7 @@ Rails.application.configure do
 
       # Allow CORS to the images
       resource '/uploads/*', headers: :any, methods: [:get]
+      resource '/development/users/*', headers: :any, methods: [:get]
     end
 
 
