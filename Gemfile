@@ -39,9 +39,9 @@ gem 'devise' # User authentication
 gem 'cancancan', '3.2.1'
 
 #gem 'doorkeeper' # OAuth2
-gem 'doorkeeper', '5.4.0'
+gem 'doorkeeper', '5.6.9'
 
-gem 'doorkeeper-openid_connect' # Layer to support OIDC authentication.
+gem 'doorkeeper-openid_connect', '1.8.8' # Layer to support OIDC authentication.
 
 #gem 'activerecord-import'
 gem 'activerecord-import', '1.0.8'
