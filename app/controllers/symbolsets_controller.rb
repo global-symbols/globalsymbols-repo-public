@@ -1,10 +1,10 @@
 class SymbolsetsController < ApplicationController
-  
+
   skip_before_action :authenticate_user!, only: [:index, :show, :download]
   load_and_authorize_resource find_by: :slug # Loads @symbolsets available to current_user by their Abilities
 
   add_breadcrumb 'Symbolsets', :symbolsets, only: [:index, :show]
-  
+
   def index
     @symbolsets = @symbolsets.order(:name)
   end
@@ -42,7 +42,7 @@ class SymbolsetsController < ApplicationController
 
     # @languages = Language.where(id: @symbolset.labels.select(:language_id).distinct).order(:name)
   end
-  
+
   def new
   end
 
@@ -52,13 +52,20 @@ class SymbolsetsController < ApplicationController
   def create
     # Add the current_user as a manager on the Symbolset
     @symbolset.users << current_user
-    redirect_to @symbolset if @symbolset.save
+
+    if @symbolset.save
+      redirect_to @symbolset, notice: 'Symbolset was successfully created.'
+    else
+      logger.error "Failed to create Symbolset: #{@symbolset.errors.full_messages.join(", ")}"
+      flash.now[:alert] = 'There was an error creating the Symbolset. Please check your input and try again.'
+      render :new
+    end
   end
-  
+
   def update
     redirect_to @symbolset if @symbolset.update(symbolset_params)
   end
-  
+
   def review
     @pictos = @symbolset.pictos.where(archived: false).accessible_by(current_ability)
     @filter = params[:filter] || 'all'
@@ -114,17 +121,17 @@ class SymbolsetsController < ApplicationController
 
 
   end
-  
+
   def import
     # TODO: Add to Abilities
   end
-  
+
   def upload
     uploader = SymbolsetCsvUploader.new
     uploader.cache!(params[:csv_file])
     SymbolsetImporter.new(uploader.path, @symbolset)
   end
-  
+
   def download
     redirect_to rails_blob_path(@symbolset.zip_bundle, disposition: :attachment)
   end
@@ -138,14 +145,14 @@ class SymbolsetsController < ApplicationController
   end
 
   private
-  
+
     def symbolset_params
       keys = [:name, :description, :publisher, :publisher_url, :licence_id, :logo]
-      
+
       # Only admins are allowed to change the :status.
       keys << :status if current_user.admin?
       keys << :featured_level if current_user.admin?
-      
+
       params.require(:symbolset).permit(keys)
     end
 
