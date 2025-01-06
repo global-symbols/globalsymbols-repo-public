@@ -3,8 +3,8 @@
     .px-2.mb-4.d-flex.justify-content-center.symbolset-logo
       %img.img-fluid.align-self-center{ alt: t('views.symbolsets._symbolset_card.image.alt',
         symbolset_name: symbolset_card.name),
-        src: (symbolset_card.logo.file && File.exist?(Rails.root.join("public", "uploads", Rails.env, "symbolset", "logo", symbolset_card.id.to_s, "#{symbolset_card.id}#{symbolset_card.logo.file.filename}")) ? "/uploads/#{Rails.env}/symbolset/logo/#{symbolset_card.id}/#{symbolset_card.id}#{symbolset_card.logo.file.filename}" : asset_path('logo-square.svg')),
-        class: (symbolset_card.logo.file && File.exist?(Rails.root.join("public", "uploads", Rails.env, "symbolset", "logo", symbolset_card.id.to_s, "#{symbolset_card.id}#{symbolset_card.logo.file.filename}")) ? nil : 'greyscale-faded')
+        src: (symbolset_card.logo.file && File.exist?(Rails.root.join("public", "uploads", Rails.env, "symbolset", "logo", symbolset_card.id.to_s, "#{symbolset_card.logo.file.filename}")) ? "/uploads/#{Rails.env}/symbolset/logo/#{symbolset_card.id}/#{symbolset_card.logo.file.filename}" : asset_path('logo-square.svg')),
+        class: (symbolset_card.logo.file && File.exist?(Rails.root.join("public", "uploads", Rails.env, "symbolset", "logo", symbolset_card.id.to_s, "#{symbolset_card.logo.file.filename}")) ? nil : 'greyscale-faded')
       }
     %h3.card-title{translate: :no}= symbolset_card.name
     %p.card-title

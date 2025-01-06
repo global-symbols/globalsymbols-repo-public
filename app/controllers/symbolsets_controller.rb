@@ -62,9 +62,26 @@ class SymbolsetsController < ApplicationController
     end
   end
 
+  # def update
+  #   redirect_to @symbolset if @symbolset.update(symbolset_params)
+  # end
+
   def update
-    redirect_to @symbolset if @symbolset.update(symbolset_params)
+    if symbolset_params[:logo].present?
+      @symbolset.logo.remove! # Remove the old file
+      @symbolset.logo = symbolset_params[:logo] # Assign the new logo
+    end
+
+    if @symbolset.update(symbolset_params)
+      redirect_to @symbolset, notice: 'Symbolset updated successfully.'
+    else
+      flash.now[:alert] = 'Failed to update Symbolset.'
+      render :edit
+    end
   end
+
+
+
 
   def review
     @pictos = @symbolset.pictos.where(archived: false).accessible_by(current_ability)
