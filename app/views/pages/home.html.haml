@@ -40,7 +40,26 @@
         = render partial: 'symbolsets/symbolset_card', collection: @symbolsets, cached: -> record { [I18n.locale, record] }
   .row.justify-content-sm-center
     .col-sm-6
-      %a.btn.btn-primary.btn-block{href: symbolsets_path}= t('views.pages.home.explore_button')
+      %a.btn.btn-primary.btn-block{href: symbolsets_path, style: "max-width: 400px; margin: auto; display: block;"}= t('views.pages.home.explore_button')
+
+
+  / New Sponsors Section
+  .row.mt-5.pt-5.pb-3.bg-light.rounded-2
+    .col.text-center
+      %h2.display-1.mb-3 Our Sponsors
+      %p.lead.mt-2 We are grateful to our sponsors for their generous support in making this project possible.
+
+      .row.justify-content-center.mt-3
+        .col-12.col-md-6.bg-light.p-4.d-flex.align-items-center.justify-content-end
+          %a{href: "https://www.microsoft.com/en-us/accessibility/innovation", target: "_blank", rel: "noopener noreferrer"}
+            %img.sponsor-logo.float-right.mr-5{src: asset_path('home/microsoft_logo.png'), alt: 'Sponsor 1', style: 'object-fit: contain;'}
+        .col-12.col-md-6.bg-light.p-4.d-flex.align-items-center.justify-content-start
+          %a{href: "https://register-of-charities.charitycommission.gov.uk/en/charity-search/-/charity-details/4050067/charity-overview", target: "_blank", rel: "noopener noreferrer"}
+            %img.sponsor-logo.float-left.ml-5{src: asset_path('home/seneca_trust.png'), alt: 'Sponsor 2', style: 'object-fit: contain;'}
+
+      .col-sm-12.text-center.mt-3.mb-3
+        %a.btn.btn-primary.mt-3{href: "about/sponsors"} More about our sponsors
+
 
 %script{type:"application/ld+json"}
   :plain
