@@ -20,7 +20,8 @@ module BoardBuilder::V1
       get :public do
         query = Boardbuilder::BoardSet.where(public: true)
         if !params[:search].blank?
-          query = query.where(['author LIKE :search OR name LIKE :search OR CAST(tags AS CHAR) LIKE :search', search: "%#{params[:search]}%"])
+          search_term = ActiveRecord::Base.sanitize_sql_like(params[:search])
+          query = query.where(['author LIKE :search OR name LIKE :search OR CAST(tags AS CHAR) LIKE :search', search: "%#{search_term}%"])
         end
         if !params[:lang].blank?
           query = query.where(['lang LIKE ? OR lang IS NULL', "%#{params[:lang]}%"])
