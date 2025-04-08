@@ -29,3 +29,5 @@
                   %a.btn-sm.dropdown-item{href: review_symbolset_path(symbolset)}= t('views.symbolsets._topbar.button_review')
                   %a.btn-sm.dropdown-item{href: symbolset_surveys_path(symbolset)}= t('dictionary.survey.other')
                   %a.btn-sm.dropdown-item{href: translate_symbolset_path(symbolset)}= t('views.symbolsets._topbar.button_translate')
+                  %a.btn-sm.dropdown-item{href: bulk_upload_symbolset_path(slug: symbolset.slug)} Bulk Upload
+                  %a.btn-sm.dropdown-item{href: bulk_upload_metadata_path(symbolset_slug: @symbolset.slug)} Metadata
