@@ -6,6 +6,7 @@ class Image < ApplicationRecord
   mount_uploader :imagefile, ImageUploader
 
   validates_presence_of :picto, :imagefile
+  validate :imagefile_size
 
   after_initialize :set_defaults, if: :new_record?
   before_save :set_adaptable, if: :imagefile_changed?
@@ -18,4 +19,11 @@ class Image < ApplicationRecord
     def set_adaptable
       self.adaptable = self.imagefile.file.extension.downcase == 'svg' && self.imagefile.read.match?(/aac-(?:hair|skin)-fill/)
     end
+
+    def imagefile_size
+    max_size = 800.kilobytes
+    if imagefile.file && File.size(imagefile.file.path) > max_size
+      errors.add(:imagefile, "filesize too large")
+    end
+  end
 end
