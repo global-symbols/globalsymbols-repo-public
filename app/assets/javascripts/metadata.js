@@ -1,7 +1,14 @@
+// app/assets/javascripts/metadata.js
 function initializeMetadata() {
   const toggleCheckbox = document.getElementById('toggle-image-background');
+  const imageColumns = document.querySelectorAll('.image-column');
+  const posDropdown = document.querySelector('.pos-dropdown');
   const posApplyButton = document.querySelector('.pos-apply-button');
+  const posSelects = document.querySelectorAll('select[name^="part_of_speech"]');
+  const langDropdown = document.querySelector('.lang-dropdown');
   const langApplyButton = document.querySelector('.lang-apply-button');
+  const langSelects = document.querySelectorAll('select[name^="language_ids"]');
+  const filenameDropdown = document.querySelector('.filename-dropdown');
   const filenameApplyButton = document.querySelector('.filename-apply-button');
   const rows = document.querySelectorAll('.spreadsheet-table tbody tr');
   const finishButton = document.getElementById('finish');
@@ -10,85 +17,60 @@ function initializeMetadata() {
     return;
   }
 
-  // Replace optional chaining with explicit if checks
   toggleCheckbox.replaceWith(toggleCheckbox.cloneNode(true));
-  if (posApplyButton) posApplyButton.replaceWith(posApplyButton.cloneNode(true));
-  if (langApplyButton) langApplyButton.replaceWith(langApplyButton.cloneNode(true));
-  if (filenameApplyButton) filenameApplyButton.replaceWith(filenameApplyButton.cloneNode(true));
+  posApplyButton?.replaceWith(posApplyButton?.cloneNode(true));
+  langApplyButton?.replaceWith(langApplyButton?.cloneNode(true));
+  filenameApplyButton?.replaceWith(filenameApplyButton?.cloneNode(true));
   finishButton.replaceWith(finishButton.cloneNode(true));
 
   const newToggleCheckbox = document.getElementById('toggle-image-background');
   const newPosApplyButton = document.querySelector('.pos-apply-button');
   const newLangApplyButton = document.querySelector('.lang-apply-button');
   const newFilenameApplyButton = document.querySelector('.filename-apply-button');
-
-  function setBackground(row) {
-    const imageCell = row.querySelector('.image');
-    const image = imageCell.querySelector('img');
-    const checkbox = row.querySelector('input[type="checkbox"]');
-
-    if (!image || !checkbox) return;
-
-    if (checkbox.checked) {
-      imageCell.classList.add('white-background');
-      image.classList.add('white-background');
-    } else {
-      imageCell.classList.remove('white-background');
-      image.classList.remove('white-background');
-    }
-  }
+  const newFinishButton = document.getElementById('finish');
 
   newToggleCheckbox.addEventListener('change', () => {
-    rows.forEach(row => {
-      const checkbox = row.querySelector('input[type="checkbox"]');
-      if (checkbox) {
-        checkbox.checked = newToggleCheckbox.checked;
-        setBackground(row);
-      }
+    imageColumns.forEach(cell => {
+      cell.classList.toggle('black-background', newToggleCheckbox.checked);
     });
   });
 
-  rows.forEach(row => {
-    const checkbox = row.querySelector('input[type="checkbox"]');
-    if (checkbox) {
-      checkbox.addEventListener('change', () => setBackground(row));
-      setBackground(row);
-    }
-  });
-
-  if (newPosApplyButton) {
+  if (posDropdown && newPosApplyButton && posSelects.length > 0) {
     newPosApplyButton.addEventListener('click', () => {
-      const pos = document.getElementById('bulk-part-of-speech').value;
-      if (pos) {
-        rows.forEach(row => {
-          const posInput = row.querySelector('input[name="pictos[][part_of_speech]"]');
-          if (posInput) posInput.value = pos;
-        });
-      }
+      const selectedPos = posDropdown.value;
+      if (selectedPos) posSelects.forEach(select => select.value = selectedPos);
     });
   }
 
-  if (newLangApplyButton) {
+  if (langDropdown && newLangApplyButton && langSelects.length > 0) {
     newLangApplyButton.addEventListener('click', () => {
-      const lang = document.getElementById('bulk-language').value;
-      if (lang) {
+      const selectedLang = langDropdown.value;
+      if (selectedLang) langSelects.forEach(select => select.value = selectedLang);
+    });
+  }
+
+  if (filenameDropdown && newFilenameApplyButton && rows.length > 0) {
+    newFilenameApplyButton.addEventListener('click', () => {
+      if (filenameDropdown.value === 'basic_formatting') {
         rows.forEach(row => {
-          const langInput = row.querySelector('input[name="pictos[][language_id]"]');
-          if (langInput) langInput.value = lang;
+          const filenameCell = row.querySelector('td:nth-child(2)');
+          const labelInput = row.querySelector('td:nth-child(4) input');
+          if (filenameCell && labelInput) {
+            let filename = filenameCell.textContent.trim();
+            if (filename && filename !== 'N/A') {
+              filename = filename.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' ');
+              filename = filename.charAt(0).toUpperCase() + filename.slice(1).toLowerCase();
+              labelInput.value = filename;
+            }
+          }
         });
       }
     });
   }
 
-  if (newFilenameApplyButton) {
-    newFilenameApplyButton.addEventListener('click', () => {
-      rows.forEach(row => {
-        const filename = row.querySelector('.filename').textContent.trim();
-        const label = row.querySelector('input[name="pictos[][text]"]');
-        if (label) label.value = filename;
-      });
-    });
-  }
+  newFinishButton.addEventListener('click', () => {
+    window.location.href = `/symbolsets/${window.symbolsetSlug}`;
+  });
 }
 
 document.addEventListener('DOMContentLoaded', initializeMetadata);

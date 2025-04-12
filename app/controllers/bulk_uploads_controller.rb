@@ -96,7 +96,7 @@ class BulkUploadsController < ApplicationController
                         .joins(:labels)
                         .where(labels: { text: 'Bulk Uploaded Symbol' })
                         .order(created_at: :desc)
-                        .limit(10)
+                        .limit(40)
   rescue ActiveRecord::RecordNotFound
     Rails.logger.error "Symbolset with slug '#{params[:symbolset_slug]}' not found"
     raise
