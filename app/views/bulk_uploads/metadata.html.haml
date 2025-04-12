@@ -229,6 +229,20 @@
       background-color: #5a6268; /* Slightly darker secondary color on hover */
     }
 
+    #finish {
+      background: none;
+      border: none;
+      padding: 0;
+      color: #006ABA;
+      text-decoration: none; /* No underline */
+      cursor: pointer;
+      font-size: 16.8px;
+    }
+    #finish:hover {
+      color: #0056b3;
+      background: none;
+    }
+
 %main.container-xl
   .header.text-center.py-4
     %h1 Metadata for Uploaded Symbols
@@ -252,6 +266,7 @@
                   %select.filename-dropdown{name: 'bulk_filename_action'}
                     %option{value: ''} Select
                     %option{value: 'basic_formatting'} Basic Formatting
+                    %option{value: 'basic_remove_numbers'} Basic & Remove Numbers
                   %button.filename-apply-button{type: 'button'}
               %th
               %th
@@ -299,9 +314,11 @@
                   = f.select "part_of_speech[#{picto.id}]", options_for_select(['noun', 'verb', 'adjective', 'adverb', 'pronoun', 'preposition', 'conjunction', 'interjection'], picto.part_of_speech), { include_blank: true }, class: 'form-control'
 
         .footer
-          = link_to "Back", bulk_upload_symbolset_path(slug: @symbolset.slug), class: 'btn btn-secondary'
-          = f.submit "Apply Changes", id: 'apply-changes'
-          %button#finish{type: 'button'} Finish
+          %div
+            = link_to "Back", bulk_upload_symbolset_path(slug: @symbolset.slug), class: 'btn btn-secondary', style: 'margin-top: -2px;'
+            = f.submit "Apply Changes", id: 'apply-changes'
+          %div
+            %button.mt-3#finish{type: 'button'} View Symbolset
 
 -# Pass Ruby values to JavaScript as variables
 = javascript_tag do

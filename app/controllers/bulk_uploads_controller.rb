@@ -1,4 +1,3 @@
-# app/controllers/bulk_uploads_controller.rb
 class BulkUploadsController < ApplicationController
   before_action :log_request
 
@@ -19,7 +18,7 @@ class BulkUploadsController < ApplicationController
 
   def create
     Rails.logger.info "Entering create action with params: #{params.inspect}"
-    Rails.logger.info "File name: #{params[:file].original_filename if params[:file]}" # Log the file name
+    Rails.logger.info "File name: #{params[:file].original_filename if params[:file]}"
     Rails.logger.info "Database: #{ActiveRecord::Base.connection_db_config.database}"
     @symbolset = Symbolset.find_by(id: params[:symbolset_id])
     if @symbolset.nil?
@@ -32,8 +31,7 @@ class BulkUploadsController < ApplicationController
     @picto = @symbolset.pictos.build
     authorize! :create, @picto
 
-    # Set default values for required fields
-    @picto.part_of_speech = "noun" # Updated to lowercase to match enum value
+    @picto.part_of_speech = "noun"
     @picto.visibility = "everybody"
 
     source = Source.find_by(slug: 'global-symbols')
@@ -43,27 +41,40 @@ class BulkUploadsController < ApplicationController
     end
     @picto.source = source
 
-    # Add a default label (required for validation)
     @picto.labels.build(
       language: current_user.language || "en",
-      text: "Bulk Uploaded Symbol", # Placeholder label
+      text: "Bulk Uploaded Symbol",
       source: source
     )
 
     if request.format.json? && params[:file].present?
-      # Save the original filename along with the image
+      max_size = 800.kilobytes
+      if params[:file].size > max_size
+        Rails.logger.info "File '#{params[:file].original_filename}' exceeds size limit of #{max_size / 1024}KB"
+        respond_to do |format|
+          format.json { render json: { status: 'error', errors: ["filesize too large"] }, status: :unprocessable_entity, content_type: 'application/json' }
+        end
+        return
+      end
       @picto.images.build(imagefile: params[:file], original_filename: params[:file].original_filename)
     else
       Rails.logger.info "No file present in params: #{params.inspect}"
+      respond_to do |format|
+        format.json { render json: { status: 'error', errors: ["No file provided"] }, status: :unprocessable_entity, content_type: 'application/json' }
+      end
+      return
     end
 
     respond_to do |format|
       if @picto.save
         Rails.logger.info "Picto saved successfully with id: #{@picto.id}"
-        format.json { render json: { status: 'success', id: @picto.id }, status: :ok }
+        format.json { render json: { status: 'success', id: @picto.id }, status: :ok, content_type: 'application/json' }
       else
         Rails.logger.info "Picto save failed: #{@picto.errors.full_messages}"
-        format.json { render json: { status: 'error', errors: @picto.errors.full_messages }, status: :unprocessable_entity }
+        errors = @picto.errors.full_messages.map do |msg|
+          msg.match(/is too large/) ? "filesize too large" : msg
+        end
+        format.json { render json: { status: 'error', errors: errors }, status: :unprocessable_entity, content_type: 'application/json' }
       end
     end
   rescue ActiveRecord::RecordNotFound
@@ -81,7 +92,6 @@ class BulkUploadsController < ApplicationController
     Rails.logger.info "Metadata: Symbolset loaded with id: #{@symbolset.id}, slug: #{@symbolset.slug}"
     authorize! :manage, @symbolset
 
-    # Fetch Picto records for this Symbolset with label 'Bulk Uploaded Symbol'
     @pictos = @symbolset.pictos
                         .joins(:labels)
                         .where(labels: { text: 'Bulk Uploaded Symbol' })
@@ -101,18 +111,15 @@ class BulkUploadsController < ApplicationController
     end
     authorize! :manage, @symbolset
 
-    # Get the form data
     labels = params[:labels] || {}
     language_ids = params[:language_ids] || {}
     parts_of_speech = params[:part_of_speech] || {}
 
-    # Update each Picto's label, language, and part of speech
     success = true
     ActiveRecord::Base.transaction do
       labels.each do |picto_id, new_label_text|
         picto = @symbolset.pictos.find_by(id: picto_id)
         if picto
-          # Update label
           label = picto.labels.first
           if label
             label.text = new_label_text
@@ -128,7 +135,6 @@ class BulkUploadsController < ApplicationController
             raise ActiveRecord::Rollback
           end
 
-          # Update part of speech
           if parts_of_speech[picto_id].present?
             picto.part_of_speech = parts_of_speech[picto_id]
             unless picto.save
@@ -146,7 +152,15 @@ class BulkUploadsController < ApplicationController
     end
 
     if success
-      redirect_to bulk_upload_metadata_path(symbolset_slug: @symbolset.slug), notice: "Metadata updated successfully."
+      remaining_bulk_symbols = @symbolset.pictos
+                                        .joins(:labels)
+                                        .where(labels: { text: 'Bulk Uploaded Symbol' })
+                                        .count
+      if remaining_bulk_symbols.zero?
+        redirect_to symbolset_path(@symbolset.slug), notice: "All metadata updated, returning to Symbolset page."
+      else
+        redirect_to bulk_upload_metadata_path(symbolset_slug: @symbolset.slug), notice: "Metadata updated successfully."
+      end
     else
       redirect_to bulk_upload_metadata_path(symbolset_slug: @symbolset.slug), alert: "Failed to update metadata. Please try again."
     end
@@ -156,7 +170,6 @@ class BulkUploadsController < ApplicationController
   end
 
   private
-
   def log_request
     Rails.logger.info "Request: #{request.method} #{request.fullpath}"
     Rails.logger.info "Params: #{params.inspect}"

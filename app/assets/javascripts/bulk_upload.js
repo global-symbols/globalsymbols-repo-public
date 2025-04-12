@@ -1,141 +1,190 @@
-// app/assets/javascripts/bulk_upload.js
-document.addEventListener('DOMContentLoaded', () => {
-  // Ensure this code only runs once by checking for a flag
-  if (window.bulkUploadInitialized) return;
-  window.bulkUploadInitialized = true;
-
+function initializeBulkUpload() {
   const dropZone = document.getElementById('drop-zone');
   const fileInput = document.getElementById('file-input');
   const browseButton = document.getElementById('browse-files');
   const fileList = document.getElementById('file-list');
   const nextStepButton = document.getElementById('next-step');
-  let uploadCount = 0; // Total number of files to upload across all batches
-  let completedCount = 0; // Total number of completed uploads
 
-  // Guard clause: Exit if required elements are not found (e.g., on a different page)
   if (!dropZone || !fileInput || !browseButton || !fileList || !nextStepButton) {
     return;
   }
 
-  // Remove existing event listeners to prevent duplicates (if any)
-  const browseButtonClone = browseButton.cloneNode(true);
-  browseButton.parentNode.replaceChild(browseButtonClone, browseButton);
-  const fileInputClone = fileInput.cloneNode(true);
-  fileInput.parentNode.replaceChild(fileInputClone, fileInput);
+  dropZone.replaceWith(dropZone.cloneNode(true));
+  fileInput.replaceWith(fileInput.cloneNode(true));
+  browseButton.replaceWith(browseButton.cloneNode(true));
+  nextStepButton.replaceWith(nextStepButton.cloneNode(true));
 
-  // Reassign elements after cloning
-  const newBrowseButton = document.getElementById('browse-files');
+  const newDropZone = document.getElementById('drop-zone');
   const newFileInput = document.getElementById('file-input');
+  const newBrowseButton = document.getElementById('browse-files');
+  const newNextStepButton = document.getElementById('next-step');
 
-  // Trigger file input click when "Browse Files" is clicked
+  const MAX_UPLOADS = 200;
+  let totalFilesAdded = 0;
+  let uploadCount = 0;
+  let completedCount = 0;
+  const uploadedFilenames = new Set();
+
   newBrowseButton.addEventListener('click', () => {
-    console.log('Browse Files button clicked'); // Debug log
     newFileInput.click();
   });
 
-  // Handle drag-and-drop events
-  dropZone.addEventListener('dragover', (e) => {
+  newDropZone.addEventListener('dragover', (e) => {
     e.preventDefault();
-    dropZone.classList.add('dragover');
+    newDropZone.classList.add('dragover');
   });
 
-  dropZone.addEventListener('dragleave', () => {
-    dropZone.classList.remove('dragover');
+  newDropZone.addEventListener('dragleave', () => {
+    newDropZone.classList.remove('dragover');
   });
 
-  dropZone.addEventListener('drop', (e) => {
+  newDropZone.addEventListener('drop', (e) => {
     e.preventDefault();
-    dropZone.classList.remove('dragover');
+    newDropZone.classList.remove('dragover');
     handleFiles(e.dataTransfer.files);
   });
 
-  // Handle file input change
   newFileInput.addEventListener('change', () => {
-    console.log('File input changed, files:', newFileInput.files); // Debug log
     handleFiles(newFileInput.files);
-    // Clear the file input to prevent duplicate uploads
     newFileInput.value = '';
   });
 
-  function handleFiles(files) {
-    // Increment the total upload count with the new batch of files
-    uploadCount += files.length;
+  newNextStepButton.addEventListener('click', () => {
+    window.location.href = `/symbolsets/${window.symbolsetSlug}/metadata`;
+  });
 
-    Array.from(files).forEach((file) => {
+  function handleFiles(files) {
+    const remainingCapacity = MAX_UPLOADS - totalFilesAdded;
+    if (files.length > remainingCapacity) {
+      if (remainingCapacity > 0) {
+        alert(`You can only upload a maximum of ${MAX_UPLOADS} images per page load. ` +
+              `You've already added ${totalFilesAdded} files. ` +
+              `Please select ${remainingCapacity} or fewer additional files.`);
+      } else {
+        alert(`You’ve reached the maximum of ${MAX_UPLOADS} images per page load. ` +
+              `Refresh the page to start over.`);
+      }
+      return;
+    }
+
+    const filesArray = Array.from(files);
+    const uniqueFiles = filesArray.filter(file => {
+      if (uploadedFilenames.has(file.name)) {
+        displayFileStatus(file.name, 'error', 'Duplicate filenames are not allowed in one session.');
+        return false;
+      }
+      return true;
+    });
+
+    if (uniqueFiles.length === 0) {
+      return;
+    }
+
+    totalFilesAdded += uniqueFiles.length;
+    uploadCount += uniqueFiles.length;
+    uniqueFiles.forEach(file => {
+      uploadedFilenames.add(file.name);
       displayFileStatus(file.name, 'uploading');
       uploadFile(file);
     });
   }
 
-  function displayFileStatus(fileName, status) {
+  function displayFileStatus(fileName, status, customMessage) {
     const fileItem = document.createElement('div');
     fileItem.className = 'file-item';
+    fileItem.setAttribute('data-filename', fileName); // Add identifier for easier lookup
     let icon = '';
+    let message = status;
     if (status === 'uploading') {
       icon = '<i class="fas fa-spinner fa-spin"></i>';
     } else if (status === 'success') {
       icon = '<i class="fas fa-check" style="color: green;"></i>';
+      message = 'Uploaded successfully';
     } else if (status === 'error') {
       icon = '<i class="fas fa-exclamation-triangle" style="color: red;"></i>';
+      message = customMessage ? `error - ${customMessage}` : 'error - Upload failed';
     }
-    fileItem.innerHTML = `
-      <span>${fileName}</span>
-      <span class="status">${icon} ${status}</span>
-    `;
+    fileItem.innerHTML = `<span>${fileName}</span><span class="status">${icon} ${message}</span>`;
     fileList.appendChild(fileItem);
   }
 
-  function uploadFile(file) {
+  async function uploadFile(file) {
     const formData = new FormData();
     formData.append('file', file);
 
-    Rails.ajax({
-      url: `/symbolsets/${window.symbolsetId}/bulk_symbols`,
-      type: 'POST',
-      data: formData,
-      dataType: 'json',
-      success: (data) => {
-        completedCount++;
-        if (data.status === 'success') {
-          updateFileStatus(file.name, 'success');
-        } else {
-          updateFileStatus(file.name, 'error');
+    try {
+      const response = await fetch(`/symbolsets/${window.symbolsetId}/bulk_symbols`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Accept': 'application/json',
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content // Include CSRF token for Rails
         }
-        checkAllUploadsComplete();
-      },
-      error: (error) => {
-        console.error('Upload error:', error);
-        completedCount++;
-        updateFileStatus(file.name, 'error');
-        checkAllUploadsComplete();
+      });
+
+      const data = await response.json();
+
+      completedCount++;
+      if (response.ok && data.status === 'success') {
+        updateFileStatus(file.name, 'success');
+      } else if (data.status === 'error' && data.errors) {
+        const errorMessage = data.errors.join('; ');
+        updateFileStatus(file.name, 'error', errorMessage);
+      } else {
+        updateFileStatus(file.name, 'error', 'Upload failed');
       }
-    });
+    } catch (error) {
+      completedCount++;
+      let errorMessage = 'Upload failed';
+      if (error.response) {
+        try {
+          const data = await error.response.json();
+          if (data && data.errors) {
+            errorMessage = Array.isArray(data.errors) ? data.errors.join('; ') : data.errors.toString();
+          } else {
+            errorMessage = 'Upload failed - Invalid server response';
+          }
+        } catch (e) {
+          errorMessage = 'Upload failed - Unable to parse server response';
+        }
+      } else {
+        errorMessage = 'Upload failed - Network error';
+      }
+      setTimeout(() => {
+        updateFileStatus(file.name, 'error', errorMessage);
+      }, 0);
+    }
+    checkAllUploadsComplete();
   }
 
-  function updateFileStatus(fileName, status) {
+  function updateFileStatus(fileName, status, customMessage) {
     const items = fileList.getElementsByClassName('file-item');
+    let found = false;
     for (let item of items) {
-      if (item.firstElementChild.textContent === fileName) {
-        let icon = '';
-        if (status === 'success') {
-          icon = '<i class="fas fa-check" style="color: green;"></i>';
-        } else if (status === 'error') {
-          icon = '<i class="fas fa-exclamation-triangle" style="color: red;"></i>';
+      if (item.getAttribute('data-filename') === fileName) {
+        let icon = status === 'success'
+          ? '<i class="fas fa-check" style="color: green;"></i>'
+          : '<i class="fas fa-exclamation-triangle" style="color: red;"></i>';
+        let message = status === 'success'
+          ? 'Uploaded successfully'
+          : (customMessage ? `error - ${customMessage}` : 'error - Upload failed');
+        const statusElement = item.querySelector('.status');
+        if (statusElement) {
+          statusElement.innerHTML = `${icon} ${message}`;
         }
-        item.lastElementChild.innerHTML = `${icon} ${status}`;
+        found = true;
         break;
       }
+    }
+    if (!found) {
+      console.error('File item not found for:', fileName);
     }
   }
 
   function checkAllUploadsComplete() {
-    if (completedCount === uploadCount) {
-      nextStepButton.disabled = false;
-    }
+    if (completedCount === uploadCount) newNextStepButton.disabled = false;
   }
+}
 
-  // Add redirect to metadata screen on "Next Step" click
-  nextStepButton.addEventListener('click', () => {
-    window.location.href = `/symbolsets/${window.symbolsetSlug}/metadata`;
-  });
-});
+document.addEventListener('DOMContentLoaded', initializeBulkUpload);
+document.addEventListener('turbolinks:load', initializeBulkUpload);
