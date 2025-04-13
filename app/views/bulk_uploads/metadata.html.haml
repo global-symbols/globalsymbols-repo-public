@@ -178,6 +178,7 @@
       padding: 0 2px;
       border: none;
       border-radius: 4px; /* Add border radius */
+     \"preformatted"
       background-color: #fff; /* Match the table header background */
       cursor: pointer;
       display: flex;
@@ -266,7 +267,7 @@
                   %select.filename-dropdown{name: 'bulk_filename_action'}
                     %option{value: ''} Select
                     %option{value: 'basic_formatting'} Basic Formatting
-                    %option{value: 'basic_remove_numbers'} Basic & Remove Numbers
+                    %option{value: 'basic_and_remove_numbers'} Basic Formatting & Remove Numbers
                   %button.filename-apply-button{type: 'button'}
               %th
               %th
@@ -318,7 +319,7 @@
             = link_to "Back", bulk_upload_symbolset_path(slug: @symbolset.slug), class: 'btn btn-secondary', style: 'margin-top: -2px;'
             = f.submit "Apply Changes", id: 'apply-changes'
           %div
-            %button.mt-3#finish{type: 'button'} View Symbolset
+            = link_to "View Symbolset", symbolset_path(@symbolset), class: 'btn mt-3', id: 'finish'
 
 -# Pass Ruby values to JavaScript as variables
 = javascript_tag do

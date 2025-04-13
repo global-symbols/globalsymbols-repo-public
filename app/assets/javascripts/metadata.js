@@ -21,13 +21,11 @@ function initializeMetadata() {
   posApplyButton?.replaceWith(posApplyButton?.cloneNode(true));
   langApplyButton?.replaceWith(langApplyButton?.cloneNode(true));
   filenameApplyButton?.replaceWith(filenameApplyButton?.cloneNode(true));
-  finishButton.replaceWith(finishButton.cloneNode(true));
 
   const newToggleCheckbox = document.getElementById('toggle-image-background');
   const newPosApplyButton = document.querySelector('.pos-apply-button');
   const newLangApplyButton = document.querySelector('.lang-apply-button');
   const newFilenameApplyButton = document.querySelector('.filename-apply-button');
-  const newFinishButton = document.getElementById('finish');
 
   newToggleCheckbox.addEventListener('change', () => {
     imageColumns.forEach(cell => {
@@ -51,6 +49,7 @@ function initializeMetadata() {
 
   if (filenameDropdown && newFilenameApplyButton && rows.length > 0) {
     newFilenameApplyButton.addEventListener('click', () => {
+      // Basic formatting logic (remove extension, replace underscores/hyphens, capitalize first letter, lowercase rest, remove brackets)
       if (filenameDropdown.value === 'basic_formatting') {
         rows.forEach(row => {
           const filenameCell = row.querySelector('td:nth-child(2)');
@@ -58,8 +57,32 @@ function initializeMetadata() {
           if (filenameCell && labelInput) {
             let filename = filenameCell.textContent.trim();
             if (filename && filename !== 'N/A') {
-              filename = filename.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' ');
-              filename = filename.charAt(0).toUpperCase() + filename.slice(1).toLowerCase();
+              filename = filename.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' '); // Remove extension, replace underscores/hyphens
+              filename = filename.replace(/\([^()]*\)/g, ''); // Remove brackets and their contents
+              filename = filename.replace(/\s+/g, ' ').trim(); // Clean up extra spaces
+              filename = filename.charAt(0).toUpperCase() + filename.slice(1).toLowerCase(); // Capitalize first letter, lowercase rest
+              labelInput.value = filename;
+            }
+          }
+        });
+      }
+      // Basic formatting + remove numbers and brackets
+      else if (filenameDropdown.value === 'basic_and_remove_numbers') {
+        rows.forEach(row => {
+          const filenameCell = row.querySelector('td:nth-child(2)');
+          const labelInput = row.querySelector('td:nth-child(4) input');
+          if (filenameCell && labelInput) {
+            let filename = filenameCell.textContent.trim();
+            if (filename && filename !== 'N/A') {
+              // Apply basic formatting
+              filename = filename.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' '); // Remove extension, replace underscores/hyphens
+              filename = filename.replace(/\([^()]*\)/g, ''); // Remove brackets and their contents
+              filename = filename.replace(/\s+/g, ' ').trim(); // Clean up extra spaces
+              filename = filename.charAt(0).toUpperCase() + filename.slice(1).toLowerCase(); // Capitalize first letter, lowercase rest
+              // Remove numbers
+              filename = filename.replace(/\d+/g, '');
+              // Clean up extra spaces that might result from removing numbers
+              filename = filename.replace(/\s+/g, ' ').trim();
               labelInput.value = filename;
             }
           }
@@ -67,10 +90,6 @@ function initializeMetadata() {
       }
     });
   }
-
-  newFinishButton.addEventListener('click', () => {
-    window.location.href = `/symbolsets/${window.symbolsetSlug}`;
-  });
 }
 
 document.addEventListener('DOMContentLoaded', initializeMetadata);
