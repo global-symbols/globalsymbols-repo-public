@@ -41,6 +41,12 @@ Rails.application.routes.draw do
       get 'preview/:id', controller: :articles, action: :preview, as: :preview # Previewer for Articles
     end
   end
+  #
+  # resources :symbolsets, param: :slug do
+  #   member do
+  #     get :bulk_upload, to: 'pictos#bulk_upload'
+  #   end
+  # end
 
   resources :symbolsets do
     member do
@@ -76,6 +82,16 @@ Rails.application.routes.draw do
       resources :symbols, only: [:index], controller: :survey_picto_analysis
     end
   end
+
+  # Custom route for bulk_upload using slugs
+  get '/symbolsets/:slug/bulk_upload', to: 'bulk_uploads#bulk_upload', as: :bulk_upload_symbolset
+  # Custom route for creating a Picto via bulk upload (uses ID since symbols uses IDs)
+  post '/symbolsets/:symbolset_id/bulk_symbols', to: 'bulk_uploads#create', as: :bulk_upload_symbolset_symbols
+# Custom route for the metadata screen
+  get '/symbolsets/:symbolset_slug/metadata', to: 'bulk_uploads#metadata', as: :bulk_upload_metadata
+  # Custom route for updating labels
+    patch '/symbolsets/:symbolset_slug/update_labels', to: 'bulk_uploads#update_labels', as: :bulk_upload_update_labels
+
 
   resources :translation, only: [:create, :update] do
     post :suggest
