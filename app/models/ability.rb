@@ -23,6 +23,9 @@ class Ability
       # Users can create Symbolsets
       can :create, Symbolset
 
+      # Users can create Pictos for Symbolsets they manage
+      can :create, Picto, symbolset: { symbolset_users: { user_id: user.id } }
+
       # Users can manage Symbolsets they are assigned to
       can :manage, Symbolset, symbolset_users: { user_id: user.id }
       can :manage, Picto, symbolset: { symbolset_users: { user_id: user.id } }
@@ -53,11 +56,8 @@ class Ability
       # Restrict bulk upload and metadata actions for non-admins
       unless user.admin?
         cannot :bulk_upload, Symbolset
-        cannot :manage, Symbolset # Blocks metadata and update_labels
-        cannot :create, Picto # Blocks create action
-        # Re-allow other manage actions for Symbolset and Picto
-        can [:read, :update, :create, :destroy], Symbolset, symbolset_users: { user_id: user.id }
-        can [:read, :update, :destroy], Picto, symbolset: { symbolset_users: { user_id: user.id } }
+        cannot :metadata, Symbolset
+        cannot :update_labels, Symbolset
       end
 
       # Additional permissions for administrators
@@ -65,6 +65,8 @@ class Ability
         can :manage, SymbolsetUser
         can :manage, Symbolset
         can :bulk_upload, Symbolset # Explicit for clarity
+        can :metadata, Symbolset # Explicit for clarity
+        can :update_labels, Symbolset # Explicit for clarity
         can :manage, Picto
         can :manage, Image
         can :manage, Label
