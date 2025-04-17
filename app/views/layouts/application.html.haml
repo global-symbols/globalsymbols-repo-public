@@ -98,7 +98,13 @@
                 %label.col-form-label.col-form-label-sm{for: :select_locale}= t('layouts.application.footer.language_label')
                 %select.w-auto.custom-select.custom-select-sm.my-1.ml-2#select_locale
                   = options_for_select(translation_languages, I18n.locale)
-
+          .mt-4
+            %a.btn.btn-sm.btn-outline-light.mr-2.social-button{href: 'https://facebook.com/globalsymbols', title: t('layouts.application.menu.facebook'), rel: :noopener}
+              %i.fab.fa-facebook-f
+              .sr-only= t('layouts.application.menu.facebook')
+            %a.btn.btn-sm.btn-outline-light.mr-4.social-button{href: 'https://twitter.com/globalsymbols', title: t('layouts.application.menu.twitter'), rel: :noopener}
+              %i.fab.fa-twitter
+              .sr-only= t('layouts.application.menu.twitter')
           .mt-4
             %small
               %a.btn.btn-sm.btn-link.text-white{href: about_page_path('privacy-policy')}= t('layouts.application.footer.privacy_policy')

@@ -48,6 +48,16 @@ class BulkUploadsController < ApplicationController
     )
 
     if request.format.json? && params[:file].present?
+      # Check file extension and reject SVGs, BMPs, and GIFs
+      file_extension = File.extname(params[:file].original_filename).downcase
+      if ['.svg', '.bmp', '.gif'].include?(file_extension)
+        Rails.logger.warn "Rejected file #{params[:file].original_filename}: SVG, BMP, and GIF files are not allowed"
+        respond_to do |format|
+          format.json { render json: { status: 'error', errors: ["SVG, BMP, and GIF files are not allowed"] }, status: :unprocessable_entity, content_type: 'application/json' }
+        end
+        return
+      end
+
       max_size = 800.kilobytes
       if params[:file].size > max_size
         Rails.logger.info "File '#{params[:file].original_filename}' exceeds size limit of #{max_size / 1024}KB"
