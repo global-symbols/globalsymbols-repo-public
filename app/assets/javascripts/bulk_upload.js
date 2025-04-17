@@ -20,10 +20,12 @@ function initializeBulkUpload() {
   const newNextStepButton = document.getElementById('next-step');
 
   const MAX_UPLOADS = 200;
+  const allowedExtensions = ['jpg', 'jpeg', 'png']; // Allowed file extensions (removed gif, bmp)
   let totalFilesAdded = 0;
   let uploadCount = 0;
   let completedCount = 0;
   const uploadedFilenames = new Set();
+  let validFiles = []; // Track valid files for submission
 
   newBrowseButton.addEventListener('click', () => {
     newFileInput.click();
@@ -46,7 +48,7 @@ function initializeBulkUpload() {
 
   newFileInput.addEventListener('change', () => {
     handleFiles(newFileInput.files);
-    newFileInput.value = '';
+    newFileInput.value = ''; // Clear the input after processing
   });
 
   newNextStepButton.addEventListener('click', () => {
@@ -68,7 +70,19 @@ function initializeBulkUpload() {
     }
 
     const filesArray = Array.from(files);
-    const uniqueFiles = filesArray.filter(file => {
+    const rejectedFiles = [];
+
+    // Validate file extensions
+    const newValidFiles = filesArray.filter(file => {
+      const fileExtension = file.name.split('.').pop().toLowerCase();
+      if (fileExtension === 'svg' || fileExtension === 'bmp' || fileExtension === 'gif') {
+        rejectedFiles.push(file.name);
+        return false;
+      }
+      if (!allowedExtensions.includes(fileExtension)) {
+        rejectedFiles.push(file.name);
+        return false;
+      }
       if (uploadedFilenames.has(file.name)) {
         displayFileStatus(file.name, 'error', 'Duplicate filenames are not allowed in one session.');
         return false;
@@ -76,17 +90,27 @@ function initializeBulkUpload() {
       return true;
     });
 
-    if (uniqueFiles.length === 0) {
+    if (newValidFiles.length === 0) {
+      if (rejectedFiles.length > 0) {
+        displayRejectedFiles(rejectedFiles);
+      }
       return;
     }
 
-    totalFilesAdded += uniqueFiles.length;
-    uploadCount += uniqueFiles.length;
-    uniqueFiles.forEach(file => {
+    // Add valid files to the global list
+    validFiles = [...validFiles, ...newValidFiles];
+    totalFilesAdded += newValidFiles.length;
+    uploadCount += newValidFiles.length;
+
+    newValidFiles.forEach(file => {
       uploadedFilenames.add(file.name);
       displayFileStatus(file.name, 'uploading');
       uploadFile(file);
     });
+
+    if (rejectedFiles.length > 0) {
+      displayRejectedFiles(rejectedFiles);
+    }
   }
 
   function displayFileStatus(fileName, status, customMessage) {
@@ -106,6 +130,13 @@ function initializeBulkUpload() {
     }
     fileItem.innerHTML = `<span>${fileName}</span><span class="status">${icon} ${message}</span>`;
     fileList.appendChild(fileItem);
+  }
+
+  function displayRejectedFiles(rejectedFiles) {
+    const errorMessage = document.createElement('div');
+    errorMessage.className = 'error-message';
+    errorMessage.innerHTML = `The following files were rejected (SVG, BMP, and GIF files are not allowed): ${rejectedFiles.join(', ')}`;
+    fileList.appendChild(errorMessage);
   }
 
   async function uploadFile(file) {
@@ -182,7 +213,9 @@ function initializeBulkUpload() {
   }
 
   function checkAllUploadsComplete() {
-    if (completedCount === uploadCount) newNextStepButton.disabled = false;
+    if (completedCount === uploadCount) {
+      newNextStepButton.disabled = false;
+    }
   }
 }
 

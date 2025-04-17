@@ -49,7 +49,7 @@ function initializeMetadata() {
 
   if (filenameDropdown && newFilenameApplyButton && rows.length > 0) {
     newFilenameApplyButton.addEventListener('click', () => {
-      // Basic formatting logic (remove extension, replace underscores/hyphens, capitalize first letter, lowercase rest, remove brackets)
+      // Basic formatting logic (remove extension, replace underscores/hyphens, lowercase all, remove brackets)
       if (filenameDropdown.value === 'basic_formatting') {
         rows.forEach(row => {
           const filenameCell = row.querySelector('td:nth-child(2)');
@@ -60,7 +60,7 @@ function initializeMetadata() {
               filename = filename.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' '); // Remove extension, replace underscores/hyphens
               filename = filename.replace(/\([^()]*\)/g, ''); // Remove brackets and their contents
               filename = filename.replace(/\s+/g, ' ').trim(); // Clean up extra spaces
-              filename = filename.charAt(0).toUpperCase() + filename.slice(1).toLowerCase(); // Capitalize first letter, lowercase rest
+              filename = filename.toLowerCase(); // Lowercase all letters
               labelInput.value = filename;
             }
           }
@@ -78,7 +78,7 @@ function initializeMetadata() {
               filename = filename.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' '); // Remove extension, replace underscores/hyphens
               filename = filename.replace(/\([^()]*\)/g, ''); // Remove brackets and their contents
               filename = filename.replace(/\s+/g, ' ').trim(); // Clean up extra spaces
-              filename = filename.charAt(0).toUpperCase() + filename.slice(1).toLowerCase(); // Capitalize first letter, lowercase rest
+              filename = filename.toLowerCase(); // Lowercase all letters
               // Remove numbers
               filename = filename.replace(/\d+/g, '');
               // Clean up extra spaces that might result from removing numbers
