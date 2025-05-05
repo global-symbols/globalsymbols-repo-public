@@ -30,6 +30,10 @@ gem 'jbuilder', '~> 2.5'
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
+gem 'redis', '~> 4.8'
+gem 'sidekiq', '~> 6.5'
+gem 'sidekiq-unique-jobs', '~> 7.1'
+
 gem 'rack-cors', require: 'rack/cors'
 
 # Reduces boot times through caching; required in config/boot.rb

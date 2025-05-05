@@ -1,0 +1,87 @@
+- content_for :topbar do
+  = render partial: 'symbolsets/topbar', locals: { symbolset: @symbolset }
+
+%style
+  :css
+    .header {
+      background-color: #007bff;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+    }
+    .main-content {
+      padding: 20px;
+    }
+    .upload-area {
+      border: 2px dashed #ccc;
+      padding: 20px;
+      text-align: center;
+    }
+    .upload-area.dragover {
+      background-color: #f0f0f0;
+    }
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+    .footer {
+      margin-top: 20px;
+      text-align: right;
+    }
+    h1 {
+      font-weight: 300;
+      color: #006ABA;
+      font-size: 40px;
+    }
+    #next-step:disabled {
+      background-color: #ccc;
+    }
+    #browse-files, #next-step {
+      font-size: 16.8px;
+      padding: 12px 24px;
+      background-color: #006ABA;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+    #browse-files:hover, #next-step:hover {
+      background-color: #0056b3;
+    }
+    .error-message {
+      color: red;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    .note {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+%link{rel: "stylesheet", href: "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"}
+
+%main.container-xl
+  .header.text-center.py-4
+    %h1 Bulk Upload
+    %br
+    .step-indicator Step 1
+
+  .main-content
+    #drop-zone.upload-area.py-5.mb-4
+      %i.fa.fa-arrow-up.fa-3x
+      %p Drag Your Symbol Files Here
+      %p.guidelines Maximum of 200 images per upload. Only JPG, JPEG, PNG, and SVG files are supported. BMP and GIF files are not allowed. Max image size 800kb. SVG files will be converted to PNG in the background.
+    %input#file-input{type: "file", multiple: true, accept: "image/jpeg,image/png,image/svg+xml", style: "display: none;"}
+    %button#browse-files.d-block.mx-auto Browse Files
+    #file-list
+
+  .footer
+    %button#next-step{disabled: true} Next Step
+
+= javascript_tag do
+  window.symbolsetId = "#{@symbolset.id}";
+  window.symbolsetSlug = "#{@symbolset.slug}";
+
+= javascript_include_tag 'bulk_upload'

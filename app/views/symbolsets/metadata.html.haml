@@ -1,41 +1,5 @@
 - content_for :topbar do
-  .bg-light-1#symbolset-topbar
-    .container-xl
-      .row.pb-4.pt-3.align-items-center
-        .col.text-center.text-sm-left
-          %h1
-            %a{href: symbolset_path(@symbolset.slug), translate: :no}= @symbolset.name
-            - unless @symbolset.published?
-              %span.badge.badge-light
-                %a{href: help_path(article: :publishing_a_symbolset)}= t('activerecord.attributes.symbolset.statuses.draft')
-          .font-weight-light
-            = t('dictionary.by')
-            - if @symbolset.publisher
-              %a{href: @symbolset.publisher_url, target: '_blank', translate: :no, rel: :noopener}= @symbolset.publisher
-            - else
-              Unknown Publisher
-            - if @symbolset.licence
-              · #{@symbolset.licence.name}
-            - else
-              · Unknown License
-        .col-sm-auto.text-center.text-sm-right
-          - if @symbolset.zip_bundle.attached?
-            %a.btn.btn-sm.btn-outline-primary{href: download_symbolset_path(@symbolset.slug), data: {turbolinks: 'false'}}= t('views.symbolsets._topbar.download')
-          - if can? :manage, @symbolset
-            .btn-group
-              %a.btn.btn-sm.btn-outline-primary{href: new_symbolset_symbol_path(@symbolset.slug)}= t('views.symbolsets._topbar.button_add_symbol')
-              %a.btn.btn-sm.btn-outline-primary{href: edit_symbolset_path(@symbolset.slug)}= t('views.symbolsets._topbar.button_edit')
-
-              .btn-group
-                %button.btn.btn-sm.btn-outline-primary.dropdown-toggle#topBarDropdownMenuLink{'data-toggle': :dropdown, 'aria-haspopup': :true, 'aria-expanded': :false, title: 'More Actions'}
-
-                .dropdown-menu.dropdown-menu-right{'aria-labelledby': :topBarDropdownMenuLink}
-                  %a.btn-sm.dropdown-item{href: archive_symbolset_path(@symbolset.slug)}= t('views.symbolsets._topbar.button_archive')
-                  %a.btn-sm.dropdown-item{href: review_symbolset_path(@symbolset.slug)}= t('views.symbolsets._topbar.button_review')
-                  %a.btn-sm.dropdown-item{href: symbolset_surveys_path(@symbolset.slug)}= t('dictionary.survey.other')
-                  %a.btn-sm.dropdown-item{href: translate_symbolset_path(@symbolset.slug)}= t('views.symbolsets._topbar.button_translate')
-                  %a.btn-sm.dropdown-item{href: bulk_upload_symbolset_path(slug: @symbolset.slug)} Bulk Upload
-                  %a.btn-sm.dropdown-item{href: bulk_upload_metadata_path(symbolset_slug: @symbolset.slug)} Metadata
+  = render partial: 'symbolsets/topbar', locals: { symbolset: @symbolset }
 
 %style
   :css
@@ -82,31 +46,31 @@
       box-sizing: border-box;
     }
     .spreadsheet-table input[type="text"] {
-      min-width: 290px; /* Added min-width for label input box */
+      min-width: 290px;
     }
     .spreadsheet-table td.image-column.black-background {
       background-color: black;
-      color: white; /* Ensure text is readable on black background */
+      color: white;
     }
     .toggle-row th {
-      border: none; /* Remove borders to make the row invisible */
-      padding: 0; /* Remove padding to minimize height */
-      background: none; /* No background */
-      height: 40px; /* Increased height to 40px */
+      border: none;
+      padding: 0;
+      background: none;
+      height: 40px;
     }
     .toggle-container {
       display: flex;
       align-items: center;
-      justify-content: flex-start; /* Align toggle to the left */
-      padding-left: 8px; /* Match the padding of the table cells below */
-      height: 40px; /* Match the row height */
+      justify-content: flex-start;
+      padding-left: 8px;
+      height: 40px;
     }
     .custom-toggle {
       position: relative;
       display: inline-block;
-      width: 35.2px; /* Reduced by 20% from 44px */
-      height: 19.2px; /* Reduced by 20% from 24px */
-      margin-top: 10px; /* Added 10px top margin */
+      width: 35.2px;
+      height: 19.2px;
+      margin-top: 10px;
     }
     .custom-toggle input {
       opacity: 0;
@@ -120,55 +84,55 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-color: #fff; /* White background when off */
-      border: 1px solid #ccc; /* Light grey border */
-      border-radius: 19.2px; /* Fully rounded, matching height */
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 19.2px;
       transition: background-color 0.3s ease;
     }
     .custom-toggle-slider:before {
       position: absolute;
       content: "";
-      height: 16px; /* Reduced by 20% from 20px */
-      width: 16px; /* Reduced by 20% from 20px */
-      left: 1.6px; /* Reduced by 20% from 2px */
-      bottom: 1.6px; /* Reduced by 20% from 2px */
-      background-color: #007bff; /* Blue circle when off */
+      height: 16px;
+      width: 16px;
+      left: 1.6px;
+      bottom: 1.6px;
+      background-color: #007bff;
       border-radius: 50%;
       transition: transform 0.3s ease, background-color 0.3s ease;
     }
     .custom-toggle input:checked + .custom-toggle-slider {
-      background-color: #007bff; /* Blue background when on */
-      border-color: #007bff; /* Match border to background */
+      background-color: #007bff;
+      border-color: #007bff;
     }
     .custom-toggle input:checked + .custom-toggle-slider:before {
-      transform: translateX(16px); /* Reduced by 20% from 20px */
-      background-color: #fff; /* White circle when on */
+      transform: translateX(16px);
+      background-color: #fff;
     }
     .filename-container, .pos-container, .lang-container {
       display: flex;
       align-items: center;
-      height: 40px; /* Match the row height */
-      gap: 5px; /* Space between dropdown and button */
+      height: 40px;
+      gap: 5px;
     }
     .filename-container, .pos-container {
-      justify-content: flex-start; /* Keep left-aligned */
-      padding-left: 8px; /* Match the padding of the table cells below */
+      justify-content: flex-start;
+      padding-left: 8px;
     }
     .lang-container {
-      padding-right: 8px; /* Add padding on the right for symmetry */
-      max-width: 190px; /* Limit the width */
+      padding-right: 8px;
+      max-width: 190px;
       float: right;
     }
     .filename-dropdown, .pos-dropdown, .lang-dropdown {
-      width: 120px; /* Fixed width to fit within the column */
-      height: 22px; /* Adjusted to fit the smaller font and no y padding */
-      padding: 0 4px; /* Removed y padding, kept x padding */
+      width: 120px;
+      height: 22px;
+      padding: 0 4px;
       border: 1px solid #ccc;
       border-radius: 4px;
-      font-size: 14px; /* Updated to 14px */
+      font-size: 14px;
       background-color: white;
       cursor: pointer;
-      line-height: 20px; /* Adjusted to center the text vertically */
+      line-height: 20px;
       display: flex;
       align-items: center;
       padding-top: 0px !important;
@@ -177,25 +141,24 @@
     .filename-apply-button, .pos-apply-button, .lang-apply-button {
       padding: 0 2px;
       border: none;
-      border-radius: 4px; /* Add border radius */
-     \"preformatted"
-      background-color: #fff; /* Match the table header background */
+      border-radius: 4px;
+      background-color: #fff;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
     }
     .filename-apply-button:hover, .pos-apply-button:hover, .lang-apply-button:hover {
-      background-color: #e9ecef; /* Slightly darker on hover */
+      background-color: #e9ecef;
     }
     .filename-apply-button::after {
-      content: '\25BA'; /* Unicode right arrow */
-      font-size: 15px; /* Adjusted font size */
+      content: '\25BA';
+      font-size: 15px;
       color: #006abb;
     }
     .pos-apply-button::after, .lang-apply-button::after {
-      content: '\2193'; /* Unicode down arrow */
-      font-size: 15px; /* Adjusted font size */
+      content: '\2193';
+      font-size: 15px;
       color: #006abb;
     }
     .footer {
@@ -203,39 +166,38 @@
       text-align: right;
     }
     h1 {
-      font-weight: 700; /* Bolder font weight */
-      color: #006ABA; /* Blue color scheme */
-      font-size: 40px; /* Increased by 25% from 32px (default h1 size) */
+      font-weight: 700;
+      color: #006ABA;
+      font-size: 40px;
     }
     #apply-changes, #finish {
-      font-size: 16.8px; /* Match bulk upload buttons */
-      padding: 12px 24px; /* Match bulk upload buttons */
-      background-color: #006ABA; /* Blue color scheme */
+      font-size: 16.8px;
+      padding: 12px 24px;
+      background-color: #006ABA;
       color: white;
-      border: none; /* Remove borders */
-      border-radius: 4px; /* Add border radius */
+      border: none;
+      border-radius: 4px;
     }
     #apply-changes:hover, #finish:hover {
-      background-color: #0056b3; /* Slightly darker blue on hover */
+      background-color: #0056b3;
     }
     .btn-secondary {
-      font-size: 16.8px; /* Match bulk upload buttons */
-      padding: 12px 24px; /* Match bulk upload buttons */
-      background-color: #6c757d; /* Default secondary color */
+      font-size: 16.8px;
+      padding: 12px 24px;
+      background-color: #6c757d;
       color: white;
-      border: none; /* Remove borders */
-      border-radius: 4px; /* Add border radius */
+      border: none;
+      border-radius: 4px;
     }
     .btn-secondary:hover {
-      background-color: #5a6268; /* Slightly darker secondary color on hover */
+      background-color: #5a6268;
     }
-
     #finish {
       background: none;
       border: none;
       padding: 0;
       color: #006ABA;
-      text-decoration: none; /* No underline */
+      text-decoration: none;
       cursor: pointer;
       font-size: 16.8px;
     }
@@ -253,7 +215,7 @@
     - if @pictos.empty?
       %p No symbols uploaded yet.
     - else
-      = form_with url: bulk_upload_update_labels_path(symbolset_slug: @symbolset.slug), method: :patch, local: true do |f|
+      = form_with url: update_labels_symbolset_path(@symbolset), method: :patch, local: true do |f|
         %table.spreadsheet-table
           %thead
             %tr.toggle-row
@@ -316,15 +278,13 @@
 
         .footer
           %div
-            = link_to "Back", bulk_upload_symbolset_path(slug: @symbolset.slug), class: 'btn btn-secondary', style: 'margin-top: -2px;'
+            = link_to "Back", bulk_upload_symbolset_path(@symbolset), class: 'btn btn-secondary', style: 'margin-top: -2px;'
             = f.submit "Apply Changes", id: 'apply-changes'
           %div
             = link_to "View Symbolset", symbolset_path(@symbolset), class: 'btn mt-3', id: 'finish'
 
--# Pass Ruby values to JavaScript as variables
 = javascript_tag do
   window.symbolsetId = "#{@symbolset.id}";
   window.symbolsetSlug = "#{@symbolset.slug}";
 
--# Load the JavaScript file using Sprockets
 = javascript_include_tag 'metadata'
