@@ -1,4 +1,3 @@
-// app/assets/javascripts/metadata.js
 function initializeMetadata() {
   const toggleCheckbox = document.getElementById('toggle-image-background');
   const imageColumns = document.querySelectorAll('.image-column');

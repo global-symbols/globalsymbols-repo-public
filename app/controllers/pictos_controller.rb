@@ -80,9 +80,9 @@ class PictosController < ApplicationController
     end
 
     if @picto.save
-      redirect_to symbolset_symbol_path(id: @picto), notice: 'Picto was successfully created.'
+      redirect_to symbolset_symbol_path(id: @picto), notice: 'Symbol was successfully created.'
     else
-      flash.now[:alert] = @picto.errors.full_messages.join(", ") || 'Failed to create Picto.'
+      flash.now[:alert] = @picto.errors.full_messages.join(", ") || 'Failed to create Symbol.'
       @picto.images.build if @picto.images.empty?
       render :new, status: :unprocessable_entity
     end
@@ -101,16 +101,16 @@ class PictosController < ApplicationController
     end
 
     if @picto.update(picto_params)
-      redirect_to symbolset_symbol_path(id: @picto), notice: 'Picto was successfully updated.'
+      redirect_to symbolset_symbol_path(id: @picto), notice: 'Symbol was successfully updated.'
     else
-      flash.now[:alert] = @picto.errors.full_messages.join(", ") || 'Failed to update Picto.'
+      flash.now[:alert] = @picto.errors.full_messages.join(", ") || 'Failed to update Symbol.'
       render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
     @picto.destroy
-    redirect_to symbolset_path(@symbolset), notice: 'Picto was successfully deleted.'
+    redirect_to symbolset_path(@symbolset), notice: 'Symbol was successfully deleted.'
   end
 
   def comment
