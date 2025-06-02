@@ -1,7 +1,11 @@
 class AddPropertiesToBoardSets < ActiveRecord::Migration[6.1]
   def change
-    add_column :boardbuilder_board_sets, :download_count, :integer, default: 0
-    add_column :boardbuilder_board_sets, :description, :text, limit: 1000
+    unless column_exists?(:boardbuilder_board_sets, :download_count)
+        add_column :boardbuilder_board_sets, :download_count, :integer, default: 0
+    end
+    unless column_exists?(:boardbuilder_board_sets, :description)
+        add_column :boardbuilder_board_sets, :description, :text, limit: 1000
+    end
     add_column :boardbuilder_board_sets, :tags, :text
     add_column :boardbuilder_board_sets, :lang, :string
     add_column :boardbuilder_board_sets, :author, :string
