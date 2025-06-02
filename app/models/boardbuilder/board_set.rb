@@ -1,4 +1,6 @@
 class Boardbuilder::BoardSet < ApplicationRecord
+  serialize :tags, JSON
+
   has_many :boards, inverse_of: :board_set, foreign_key: 'boardbuilder_board_set_id', dependent: :destroy
   has_many :board_set_users, inverse_of: :board_set, foreign_key: 'boardbuilder_board_set_id', dependent: :destroy
   has_many :users, through: :board_set_users, inverse_of: :boardbuilder_board_sets

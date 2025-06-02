@@ -2,7 +2,7 @@ class AddPropertiesToBoardSets < ActiveRecord::Migration[6.1]
   def change
     add_column :boardbuilder_board_sets, :download_count, :integer, default: 0
     add_column :boardbuilder_board_sets, :description, :text, limit: 1000
-    add_column :boardbuilder_board_sets, :tags, :json
+    add_column :boardbuilder_board_sets, :tags, :text
     add_column :boardbuilder_board_sets, :lang, :string
     add_column :boardbuilder_board_sets, :author, :string
     add_column :boardbuilder_board_sets, :author_url, :string
