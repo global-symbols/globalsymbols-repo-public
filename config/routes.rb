@@ -5,7 +5,6 @@ Rails.application.routes.draw do
   devise_scope :user do
     get 'users/change_password' => 'users/registrations#change_password'
     put 'users/change_password' => 'users/registrations#update_password'
-
     get 'users/saved' => 'users/registrations#saved'
   end
   devise_for :users, controllers: {
@@ -13,7 +12,6 @@ Rails.application.routes.draw do
     sessions: 'users/sessions'
   }
 
-  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   root controller: :pages, action: :home
 
   get :search, controller: :pages, action: :search
@@ -25,9 +23,7 @@ Rails.application.routes.draw do
   resources :concepts, only: [:index, :show]
 
   resources :surveys, only: [:show] do
-    resources :questions, only: [:show, :update], controller: :survey_questions do
-
-    end
+    resources :questions, only: [:show, :update], controller: :survey_questions
     member do
       get :print
       post :create_response
@@ -37,8 +33,8 @@ Rails.application.routes.draw do
 
   resources :news, controller: :articles, only: [:index, :show] do
     collection do
-      get 'page/:page', controller: :articles, action: :index, as: :page # Paginates Articles
-      get 'preview/:id', controller: :articles, action: :preview, as: :preview # Previewer for Articles
+      get 'page/:page', controller: :articles, action: :index, as: :page
+      get 'preview/:id', controller: :articles, action: :preview, as: :preview
     end
   end
 
@@ -50,6 +46,10 @@ Rails.application.routes.draw do
       post :import, to: 'symbolsets#upload'
       get :download
       get :translate
+      get :bulk_upload
+      post :bulk_create
+      get :metadata
+      patch :update_labels
     end
 
     resources :symbols, controller: :pictos do
@@ -71,11 +71,12 @@ Rails.application.routes.draw do
         post :remove_symbol
         get :export
       end
-
       resources :responses, only: [:index, :show, :new, :create], controller: :survey_response_analysis
       resources :symbols, only: [:index], controller: :survey_picto_analysis
     end
   end
+
+  get '/images/:image_id/status', to: 'symbolsets#image_status', as: :image_status
 
   resources :translation, only: [:create, :update] do
     post :suggest
@@ -86,11 +87,9 @@ Rails.application.routes.draw do
   get '/help', to: 'pages#help_article'
 
   get 'about/featured-board-sets', controller: :pages, action: :featured_board_sets
-  # Contentful-based about/*something* pages.
   get 'about/:id', controller: :pages, action: :contentful_page, as: :about_page
   get :about, controller: :pages, action: :contentful_page, id: :about
 
-  # get 'kb/:id', controller: :pages, action: :contentful_kb_article
   resources :knowledge_base, path: 'knowledge-base', only: [:index, :show] do
     collection do
       get :search

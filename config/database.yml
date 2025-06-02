@@ -22,6 +22,7 @@ development:
   database: gs-repo-dev
   username: gs-repo-dev
   password: gs-repo-dev
+  host: db
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".

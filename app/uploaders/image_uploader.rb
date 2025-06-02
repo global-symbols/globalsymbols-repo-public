@@ -8,7 +8,7 @@ class ImageUploader < CarrierWave::Uploader::Base
   end
 
   def asset_host
-    Rails.env.development? ? 'http://localhost:3000' : 'https://globalsymbols.com'
+    ENV['ASSET_HOST'] || (Rails.env.development? ? 'http://localhost:3000' : 'https://globalsymbols.com')
   end
 
   # Include RMagick or MiniMagick support:
@@ -42,7 +42,7 @@ class ImageUploader < CarrierWave::Uploader::Base
   # def scale(width, height)
   #   # do something
   # end
-  
+
   version :svg2png, if: :svg? do
     def full_filename(for_file)
       'picto.png'
@@ -74,7 +74,7 @@ class ImageUploader < CarrierWave::Uploader::Base
         image
       end
     end
-    
+
     def convert_to_png_minimagick
       begin
         manipulate! do |image|
@@ -155,7 +155,7 @@ class ImageUploader < CarrierWave::Uploader::Base
       var = :"@#{mounted_as}_secure_token"
       model.instance_variable_get(var) or model.instance_variable_set(var, SecureRandom.uuid)
     end
-    
+
     def svg?(new_file)
       new_file.extension.downcase == 'svg'
     end

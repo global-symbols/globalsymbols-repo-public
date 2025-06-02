@@ -11,13 +11,7 @@
     .col-sm-6.pb-3.text-center
       %img.img-fluid{src: asset_path('logo-with-text.svg'), style: 'max-height: 14rem', alt: 'Global Symbols'}
     .col-sm-6.text-center.text-sm-left
-      %h2.display-1= t('views.pages.home.for_creators')
-      %p.lead= t('views.pages.home.for_creators_text')
-      %h2.display-1= t('views.pages.home.for_communicators')
-      %p.lead= t('views.pages.home.for_communicators_text')
-      %h2.display-1= t('views.pages.home.for_everyone')
-      %p.lead= t('views.pages.home.for_everyone_text')
-
+      %p.lead You will find a large range of different styled symbols that can be used in various contexts, such as education, healthcare, and daily living. The platform also includes tools for personalising and localising communication boards as well as creating new symbols to meet specific needs and reflecting language and culture of the user.
 
   .row.align-items-center.mt-5
     .col-sm-6.pb-3.text-center.text-sm-right
@@ -27,8 +21,10 @@
       %p.lead= t('views.pages.home.board_builder.create')
       %p.lead= t('views.pages.home.board_builder.design')
       %p.lead= t('views.pages.home.board_builder.storage')
+      %h2.display-1.mb-4 Create Symbols with AI
       %a.btn.btn-outline-primary{href: "/about/featured-board-sets"}= t('views.pages.home.board_builder.button_featured')
-      %a.btn.btn-primary{href: "https://app.globalsymbols.com/", target: '_blank'}= t('views.pages.home.board_builder.button_try')
+      %a.btn.btn-outline-primary{href: "https://app.globalsymbols.com/", target: '_blank'}= t('views.pages.home.board_builder.button_try')
+      %a.btn.btn-primary{href: "https://scai.globalsymbols.com/", target: '_blank'} Symbol Creator AI
 
     .col-sm-6
       %img.img-fluid{src: asset_path('home/boardbuilder-1.svg'), alt: 'Board Builder'}
@@ -40,7 +36,26 @@
         = render partial: 'symbolsets/symbolset_card', collection: @symbolsets, cached: -> record { [I18n.locale, record] }
   .row.justify-content-sm-center
     .col-sm-6
-      %a.btn.btn-primary.btn-block{href: symbolsets_path}= t('views.pages.home.explore_button')
+      %a.btn.btn-primary.btn-block{href: symbolsets_path, style: "max-width: 400px; margin: auto; display: block;"}= t('views.pages.home.explore_button')
+
+
+  / New Sponsors Section
+  .row.mt-5.pt-5.pb-3.bg-light.rounded-2
+    .col.text-center
+      %h2.display-1.mb-3 Our Sponsors
+      %p.lead.mt-2 We are grateful to our sponsors for their generous support in making this project possible.
+
+      .row.justify-content-center.mt-3
+        .col-12.col-md-6.bg-light.p-4.d-flex.align-items-center.justify-content-end
+          %a{href: "https://www.microsoft.com/en-us/accessibility/innovation", target: "_blank", rel: "noopener noreferrer"}
+            %img.sponsor-logo.mr-5{src: asset_path('home/microsoft_logo.png'), alt: 'Sponsor 1', style: 'object-fit: contain;'}
+        .col-12.col-md-6.bg-light.p-4.d-flex.align-items-center.justify-content-start
+          %a{href: "https://register-of-charities.charitycommission.gov.uk/en/charity-search/-/charity-details/4050067/charity-overview", target: "_blank", rel: "noopener noreferrer"}
+            %img.sponsor-logo.ml-5{src: asset_path('home/seneca_trust.png'), alt: 'Sponsor 2', style: 'object-fit: contain;'}
+
+      .col-sm-12.text-center.mt-3.mb-3
+        %a.btn.btn-primary.mt-3{href: "about/sponsors"} More about our sponsors
+
 
 %script{type:"application/ld+json"}
   :plain

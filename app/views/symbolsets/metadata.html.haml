@@ -1,0 +1,290 @@
+- content_for :topbar do
+  = render partial: 'symbolsets/topbar', locals: { symbolset: @symbolset }
+
+%style
+  :css
+    .header {
+      background-color: #007bff;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+    }
+    .main-content {
+      padding: 20px;
+    }
+    .spreadsheet-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    .spreadsheet-table th, .spreadsheet-table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    .spreadsheet-table th {
+      background-color: #f8f9fa;
+      font-weight: bold;
+    }
+    .spreadsheet-table tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    .spreadsheet-table tr:hover {
+      background-color: #f1f1f1;
+    }
+    .spreadsheet-table img {
+      max-width: 50px;
+      max-height: 50px;
+      border-radius: 4px;
+    }
+    .spreadsheet-table input[type="text"], .spreadsheet-table select {
+      width: 100%;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .spreadsheet-table input[type="text"] {
+      min-width: 290px;
+    }
+    .spreadsheet-table td.image-column.black-background {
+      background-color: black;
+      color: white;
+    }
+    .toggle-row th {
+      border: none;
+      padding: 0;
+      background: none;
+      height: 40px;
+    }
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding-left: 8px;
+      height: 40px;
+    }
+    .custom-toggle {
+      position: relative;
+      display: inline-block;
+      width: 35.2px;
+      height: 19.2px;
+      margin-top: 10px;
+    }
+    .custom-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .custom-toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 19.2px;
+      transition: background-color 0.3s ease;
+    }
+    .custom-toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 1.6px;
+      bottom: 1.6px;
+      background-color: #007bff;
+      border-radius: 50%;
+      transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+    .custom-toggle input:checked + .custom-toggle-slider {
+      background-color: #007bff;
+      border-color: #007bff;
+    }
+    .custom-toggle input:checked + .custom-toggle-slider:before {
+      transform: translateX(16px);
+      background-color: #fff;
+    }
+    .filename-container, .pos-container, .lang-container {
+      display: flex;
+      align-items: center;
+      height: 40px;
+      gap: 5px;
+    }
+    .filename-container, .pos-container {
+      justify-content: flex-start;
+      padding-left: 8px;
+    }
+    .lang-container {
+      padding-right: 8px;
+      max-width: 190px;
+      float: right;
+    }
+    .filename-dropdown, .pos-dropdown, .lang-dropdown {
+      width: 120px;
+      height: 22px;
+      padding: 0 4px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+      background-color: white;
+      cursor: pointer;
+      line-height: 20px;
+      display: flex;
+      align-items: center;
+      padding-top: 0px !important;
+      padding-bottom: 0px !important;
+    }
+    .filename-apply-button, .pos-apply-button, .lang-apply-button {
+      padding: 0 2px;
+      border: none;
+      border-radius: 4px;
+      background-color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .filename-apply-button:hover, .pos-apply-button:hover, .lang-apply-button:hover {
+      background-color: #e9ecef;
+    }
+    .filename-apply-button::after {
+      content: '\25BA';
+      font-size: 15px;
+      color: #006abb;
+    }
+    .pos-apply-button::after, .lang-apply-button::after {
+      content: '\2193';
+      font-size: 15px;
+      color: #006abb;
+    }
+    .footer {
+      margin-top: 20px;
+      text-align: right;
+    }
+    h1 {
+      font-weight: 700;
+      color: #006ABA;
+      font-size: 40px;
+    }
+    #apply-changes, #finish {
+      font-size: 16.8px;
+      padding: 12px 24px;
+      background-color: #006ABA;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+    #apply-changes:hover, #finish:hover {
+      background-color: #0056b3;
+    }
+    .btn-secondary {
+      font-size: 16.8px;
+      padding: 12px 24px;
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+    .btn-secondary:hover {
+      background-color: #5a6268;
+    }
+    #finish {
+      background: none;
+      border: none;
+      padding: 0;
+      color: #006ABA;
+      text-decoration: none;
+      cursor: pointer;
+      font-size: 16.8px;
+    }
+    #finish:hover {
+      color: #0056b3;
+      background: none;
+    }
+
+%main.container-xl
+  .header.text-center.py-4
+    %h1{style: "font-weight: 300;"} Metadata for Uploaded Symbols
+    .step-indicator Step 2
+
+  .main-content
+    - if @pictos.empty?
+      %p No symbols uploaded yet.
+    - else
+      = form_with url: update_labels_symbolset_path(@symbolset), method: :patch, local: true do |f|
+        %table.spreadsheet-table
+          %thead
+            %tr.toggle-row
+              %th
+                .toggle-container
+                  %label.custom-toggle
+                    %input#toggle-image-background{type: 'checkbox'}
+                    %span.custom-toggle-slider
+              %th
+                .filename-container
+                  %select.filename-dropdown{name: 'bulk_filename_action'}
+                    %option{value: ''} Select
+                    %option{value: 'basic_formatting'} Basic Formatting
+                    %option{value: 'basic_and_remove_numbers'} Basic Formatting & Remove Numbers
+                  %button.filename-apply-button{type: 'button'}
+              %th
+              %th
+              %th
+                .lang-container
+                  %select.lang-dropdown{name: 'bulk_language_id'}
+                    %option{value: ''} Select
+                    = options_from_collection_for_select(Language.all, :id, :name)
+                  %button.lang-apply-button{type: 'button'}
+              %th
+                .pos-container
+                  %select.pos-dropdown{name: 'bulk_part_of_speech'}
+                    %option{value: ''} Select
+                    %option{value: 'noun'} Noun
+                    %option{value: 'verb'} Verb
+                    %option{value: 'adjective'} Adjective
+                    %option{value: 'adverb'} Adverb
+                    %option{value: 'pronoun'} Pronoun
+                    %option{value: 'preposition'} Preposition
+                    %option{value: 'conjunction'} Conjunction
+                    %option{value: 'interjection'} Interjection
+                  %button.mr-1.pos-apply-button{type: 'button'}
+            %tr
+              %th Image
+              %th Original Filename
+              %th GS ID
+              %th Label
+              %th Label Language
+              %th Part of Speech
+          %tbody
+            - @pictos.each do |picto|
+              %tr
+                %td.image-column
+                  - if picto.images.any? && picto.images.first.imagefile?
+                    = image_tag picto.images.first.imagefile.url, alt: "Symbol Image"
+                  - else
+                    No image
+                %td= picto.images.first&.original_filename || 'N/A'
+                %td= picto.id
+                %td
+                  = f.text_field "labels[#{picto.id}]", value: (picto.labels.first&.text || ''), class: 'form-control'
+                %td
+                  = f.select "language_ids[#{picto.id}]", options_from_collection_for_select(Language.all, :id, :name, picto.labels.first&.language_id), { include_blank: true }, class: 'form-control'
+                %td
+                  = f.select "part_of_speech[#{picto.id}]", options_for_select(['noun', 'verb', 'adjective', 'adverb', 'pronoun', 'preposition', 'conjunction', 'interjection'], picto.part_of_speech), { include_blank: true }, class: 'form-control'
+
+        .footer
+          %div
+            = link_to "Back", bulk_upload_symbolset_path(@symbolset), class: 'btn btn-secondary', style: 'margin-top: -2px;'
+            = f.submit "Apply Changes", id: 'apply-changes'
+          %div
+            = link_to "View Symbolset", symbolset_path(@symbolset), class: 'btn mt-3', id: 'finish'
+
+= javascript_tag do
+  window.symbolsetId = "#{@symbolset.id}";
+  window.symbolsetSlug = "#{@symbolset.slug}";
+
+= javascript_include_tag 'metadata'

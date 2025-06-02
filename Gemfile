@@ -13,8 +13,10 @@ gem 'puma', '~> 5.2.2'
 # Use SCSS for stylesheets
 gem 'sass-rails'
 # Use Uglifier as compressor for JavaScript assets
-gem 'uglifier', '>= 1.3.0'
+# gem 'uglifier', '>= 1.3.0'
 # Use CoffeeScript for .coffee assets and views
+gem 'terser'
+
 gem 'coffee-rails'
 # Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
 gem 'turbolinks', '~> 5'
@@ -29,6 +31,10 @@ gem 'jbuilder', '~> 2.5'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
+
+gem 'redis', '~> 4.8'
+gem 'sidekiq', '~> 6.5'
+gem 'sidekiq-unique-jobs', '~> 7.1'
 
 gem 'rack-cors', require: 'rack/cors'
 
