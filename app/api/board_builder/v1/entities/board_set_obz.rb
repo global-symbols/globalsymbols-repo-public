@@ -23,7 +23,7 @@ module BoardBuilder
 
     expose :obz_file_map do |board_set|
       boards = board_set.boards.sort_by{|e| e[:index]}
-      BoardsToObz.boards_to_obz_file_map(boards)
+      BoardBuilder::Util::BoardsToObz.boards_to_obz_file_map(boards)
     end
 
     expose :owner do |board_set|

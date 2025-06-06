@@ -186,7 +186,7 @@ module BoardBuilder::V1
         obz_file_map = JSON.parse(filtered_params[:obz_file_map])
         saved_images = save_images(obz_file_map, return_media: true)
 
-        boards = ObzToBoards.obz_file_map_to_gs_boards(obz_file_map, saved_images)
+        boards = BoardBuilder::Util::ObzToBoards.obz_file_map_to_gs_boards(obz_file_map, saved_images)
 
         thumbnail = nil
         if !filtered_params[:thumbnail].blank?
