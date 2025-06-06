@@ -15,7 +15,7 @@ module BoardBuilder
 
             obf_files.each_value do |obf_board|
               obf_id_to_obf[obf_board["id"]] = obf_board
-              gs_boards << self.transform_obf_to_board(obf_board, media_map)
+              gs_boards << transform_obf_to_board(obf_board, media_map)
             end
 
             # transform load_board.path attributes to actual id of linked board

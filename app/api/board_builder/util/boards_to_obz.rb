@@ -60,8 +60,8 @@ module BoardBuilder
 
             cells = gs_board.cells.map(&:attributes)
             cells.each_with_index do |cell, index|
-              button_id = self.generate_unique_id("button", cell["id"])
-              image_id = self.generate_unique_id("image", cell["id"])
+              button_id = generate_unique_id("button", cell["id"])
+              image_id = generate_unique_id("image", cell["id"])
 
               button = {
                 "id" => button_id,
