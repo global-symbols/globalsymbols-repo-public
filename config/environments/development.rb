@@ -81,4 +81,9 @@ Rails.application.configure do
       resource '/api/*', headers: :any, methods: [:get, :post, :options, :put]
     end
   end
+
+  # Add uploader storage settings
+    config.uploader_storage = :file
+    # No need for uploader_aws_bucket or uploader_asset_host in development
+
 end
