@@ -134,4 +134,6 @@ Rails.application.configure do
     config.uploader_aws_bucket = 'gs-boardbuilder-userimages-preprod'
     config.uploader_asset_host = 'https://userassets.app.gs-test.co.uk'
 
+  config.x.openid_connect_issuer = 'https://gs-test.co.uk'
+
 end

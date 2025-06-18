@@ -86,4 +86,6 @@ Rails.application.configure do
     config.uploader_storage = :file
     # No need for uploader_aws_bucket or uploader_asset_host in development
 
+  config.x.openid_connect_issuer = 'http://localhost:3000'
+
 end
