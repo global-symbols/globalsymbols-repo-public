@@ -2,8 +2,13 @@
 
 Doorkeeper::OpenidConnect.configure do
   
-  issuer Rails.application.config.x.openid_connect_issuer
+# Force HTTPS except in development
+  protocol do
+    Rails.env.development? ? :http : :https
+  end
 
+  issuer Rails.application.config.x.openid_connect_issuer
+  
   signing_key <<~KEY
     -----BEGIN RSA PRIVATE KEY-----
     MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDTJALBWerTYBLP
