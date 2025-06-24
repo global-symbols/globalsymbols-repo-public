@@ -38,7 +38,7 @@ class Boardbuilder::Media < ApplicationRecord
 
   def calculate_and_set_file_hash
     if file.present? && file_hash.blank?
-      content = file.file.read
+      content = file.read
       self.file_hash = Utils.calculate_hash(content)
     end
   end
