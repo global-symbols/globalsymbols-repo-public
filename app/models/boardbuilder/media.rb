@@ -37,9 +37,14 @@ class Boardbuilder::Media < ApplicationRecord
   end
 
   def calculate_and_set_file_hash
-    if file.present? && file_hash.blank?
+    return unless file.present? && file_hash.blank?
+
+    begin
       content = file.read
       self.file_hash = Utils.calculate_hash(content)
+    rescue StandardError => e
+      Rails.logger.warn("could not calculate hash of media: #{e.message}")
+      self.file_hash = nil
     end
   end
 
