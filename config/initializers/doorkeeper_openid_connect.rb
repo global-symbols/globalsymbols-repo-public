@@ -1,8 +1,14 @@
 # frozen_string_literal: true
 
 Doorkeeper::OpenidConnect.configure do
-  issuer Rails.env.production? ? 'https://globalsymbols.com' : 'http://localhost:3000'
+  
+# Force HTTPS except in development
+  protocol do
+    Rails.env.development? ? :http : :https
+  end
 
+  issuer Rails.application.config.x.openid_connect_issuer
+  
   signing_key <<~KEY
     -----BEGIN RSA PRIVATE KEY-----
     MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDTJALBWerTYBLP
