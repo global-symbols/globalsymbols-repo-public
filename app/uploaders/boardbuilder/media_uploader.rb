@@ -25,7 +25,7 @@ class Boardbuilder::MediaUploader < CarrierWave::Uploader::Base
 
   def store_dir
     if Rails.application.config.uploader_storage == :aws
-      "#{Rails.env}/users/#{model.user.id}/#{model.class.to_s.underscore}/#{model.id}"
+      "#{Rails.env}/users/#{model.user_id}/#{model.class.to_s.underscore}/#{model.id}"
     else
       "public/uploads/#{Rails.env}/#{model.class.to_s.underscore}/#{model.id}"
     end
