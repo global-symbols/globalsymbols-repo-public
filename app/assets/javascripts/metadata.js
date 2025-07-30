@@ -87,6 +87,27 @@ function initializeMetadata() {
           }
         });
       }
+      // Basic formatting + remove numbers and brackets, keep capitalization
+      else if (filenameDropdown.value === 'basic_and_remove_numbers_capitalised') {
+        rows.forEach(row => {
+          const filenameCell = row.querySelector('td:nth-child(2)');
+          const labelInput = row.querySelector('td:nth-child(4) input');
+          if (filenameCell && labelInput) {
+            let filename = filenameCell.textContent.trim();
+            if (filename && filename !== 'N/A') {
+              // Apply basic formatting
+              filename = filename.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' '); // Remove extension, replace underscores/hyphens
+              filename = filename.replace(/\([^()]*\)/g, ''); // Remove brackets and their contents
+              filename = filename.replace(/\s+/g, ' ').trim(); // Clean up extra spaces
+              // Remove numbers
+              filename = filename.replace(/\d+/g, '');
+              // Clean up extra spaces that might result from removing numbers
+              filename = filename.replace(/\s+/g, ' ').trim();
+              labelInput.value = filename;
+            }
+          }
+        });
+      }
     });
   }
 }
