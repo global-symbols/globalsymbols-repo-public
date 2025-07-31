@@ -251,6 +251,7 @@ class SymbolsetsController < ApplicationController
   authorize! :metadata, @symbolset
 
   @pictos = @symbolset.pictos
+                      .where(archived: false)
                       .joins(:labels)
                       .where(labels: { text: 'Bulk Uploaded Symbol' })
                       .joins("LEFT OUTER JOIN images ON images.picto_id = pictos.id")
@@ -314,6 +315,7 @@ end
 
     if success
       remaining_bulk_symbols = @symbolset.pictos
+                                        .where(archived: false)
                                         .joins(:labels)
                                         .where(labels: { text: 'Bulk Uploaded Symbol' })
                                         .count

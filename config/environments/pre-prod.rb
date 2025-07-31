@@ -131,9 +131,9 @@ Rails.application.configure do
 
   # Add uploader storage settings
     config.uploader_storage = :aws
-    config.uploader_aws_bucket = 'gs-boardbuilder-userimages'
-    config.uploader_asset_host = 'https://userassets.app.globalsymbols.com'
+    config.uploader_aws_bucket = 'gs-boardbuilder-userimages-preprod'
+    config.uploader_asset_host = 'https://userassets.app.gs-test.co.uk'
 
-    config.x.openid_connect_issuer = 'https://globalsymbols.com'
-    
+  config.x.openid_connect_issuer = 'https://gs-test.co.uk'
+
 end
