@@ -52,6 +52,7 @@ module BoardBuilder
     mount BoardBuilder::V1::Media
     mount BoardBuilder::V1::Search
     mount BoardBuilder::V1::Templates
+    mount BoardBuilder::V1::Ai
 
     add_swagger_documentation \
       doc_version: version,

@@ -20,6 +20,8 @@ class Ability
 
     # Permissions for logged-in Users
     if user.present?
+      # Allow AI generation for signed-in users
+      can :manage, :ai
       # Users can create Symbolsets
       can :create, Symbolset
 
