@@ -28,9 +28,10 @@ module BoardBuilder
           optional :guidance_scale, type: Float, desc: 'Guidance scale for image generation', default: 7.0
           optional :num_images, type: Integer, desc: 'Number of images to generate', default: 4, values: 1..10
           optional :image, type: String, desc: 'Image data (base64 or URL) for image+text mode'
+          optional :adapter_name, type: String, desc: 'Name of the LoRA adapter to use for style fine-tuning'
         end
         post :generate_image, protected: true, oauth2: ['ai:write'] do
-          Rails.logger.info("[AI] generate_image start: prompt_len=#{params[:prompt].to_s.length}, steps=#{params[:steps]}, guidance_scale=#{params[:guidance_scale]}, num_images=#{params[:num_images]}, image_present=#{params[:image].present?}, mock=#{MOCK_GENERATE_IMAGE}")
+          Rails.logger.info("[AI] generate_image start: prompt_len=#{params[:prompt].to_s.length}, steps=#{params[:steps]}, guidance_scale=#{params[:guidance_scale]}, num_images=#{params[:num_images]}, image_present=#{params[:image].present?}, adapter_name=#{params[:adapter_name]}, mock=#{MOCK_GENERATE_IMAGE}")
           #authorize! :manage, :ai  # Use CanCan if needed, per application_controller.rb
 
           if MOCK_GENERATE_IMAGE
@@ -55,11 +56,13 @@ module BoardBuilder
             num_images: params[:num_images]
           }
           body[:image] = params[:image] if params[:image].present?  # Handle image+text mode
+          body[:adapter_name] = params[:adapter_name] if params[:adapter_name].present?  # Handle LoRA adapter
 
           begin
-            azure_base = ENV['AZURE_API_BASE']
-            azure_key  = ENV['AZURE_API_KEY']
-
+            # azure_base = ENV['AZURE_API_BASE']
+            # azure_key  = ENV['AZURE_API_KEY']
+            azure_base = 'http://57.154.240.25:8000'
+            azure_key  = '11543801-f6f7-4395-8d84-4809effb5725'
             
             Rails.logger.info("[AI] Using Azure base=#{azure_base} (key_present=#{azure_key.present?})")
 
@@ -73,7 +76,8 @@ module BoardBuilder
               steps: body[:steps],
               guidance_scale: body[:guidance_scale],
               num_images: body[:num_images],
-              image: body[:image].present? ? "[base64: #{(body[:image].bytesize / 1024.0).round(1)}KB]" : nil
+              image: body[:image].present? ? "[base64: #{(body[:image].bytesize / 1024.0).round(1)}KB]" : nil,
+              adapter_name: body[:adapter_name]
             }.compact
             masked_headers = { 'x-api-key' => '[MASKED]', 'Content-Type' => 'application/json' }
             Rails.logger.info("[AI] → Request url=#{azure_base}/generate-image headers=#{masked_headers} body=#{sanitized_body}")
@@ -84,7 +88,7 @@ module BoardBuilder
               'x-api-key' => azure_key,
               'Content-Type' => 'application/json'
             ) do |req|
-              req.options.timeout = 30
+              req.options.timeout = 65
               req.options.open_timeout = 5
             end
 
