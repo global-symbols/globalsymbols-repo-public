@@ -1,3 +1,5 @@
+require 'stringio'
+
 module BoardBuilder
   module V1
     class Ai < Grape::API
@@ -123,6 +125,100 @@ module BoardBuilder
           rescue => e
             Rails.logger.error("[AI] Unexpected error: #{e.class} - #{e.message}")
             error!({ detail: 'Internal error' }, 500)
+          end
+        end
+
+        desc 'Remove background from image', {
+          headers: {
+            'Authorization' => { description: 'OAuth2 Bearer token with ai:write scope', required: true }
+          }
+        }
+        params do
+          optional :image_url, type: String, desc: 'URL of the image to process'
+        end
+        post :remove_background, protected: true, oauth2: ['ai:write'] do
+          Rails.logger.info("[AI] remove_background start: image_url=#{params[:image_url]}, all_params=#{params.inspect}")
+
+          # Check if image_url is provided
+          if params[:image_url].blank?
+            error!({ detail: 'image_url parameter is required' }, 422)
+          end
+
+          begin
+            azure_base = 'http://57.154.240.25:8000'
+            azure_key  = '11543801-f6f7-4395-8d84-4809effb5725'
+
+            Rails.logger.info("[AI] Using Azure base=#{azure_base} for remove_background (key_present=#{azure_key.present?})")
+
+            if azure_base.blank? || azure_key.blank?
+              error!({ detail: 'Azure configuration missing: set AZURE_API_BASE and AZURE_API_KEY' }, 500)
+            end
+
+            # Prepare JSON payload with image URL for Azure API
+            payload = {
+              image_url: params[:image_url]
+            }.to_json
+
+            # Log outbound request
+            masked_headers = { 'x-api-key' => '[MASKED]', 'Content-Type' => 'application/json' }
+            Rails.logger.info("[AI] → Request url=#{azure_base}/remove-background headers=#{masked_headers} image_url=#{params[:image_url]}")
+
+            response = Faraday.post(
+              "#{azure_base}/remove-background",
+              payload,
+              'x-api-key' => azure_key,
+              'Content-Type' => 'application/json'
+            ) do |req|
+              req.options.timeout = 65
+              req.options.open_timeout = 5
+            end
+
+            Rails.logger.info("[AI] ← Response status=#{response.status} success=#{response.success?} content_type=#{response.headers['content-type']} body_len=#{response.body&.length}")
+            Rails.logger.info("[AI] ← Response body preview: #{response.body.to_s[0, 200]}")
+
+            if response.success?
+              # Check if response is JSON (contains image URL) or binary (processed image)
+              if response.headers['content-type']&.include?('application/json')
+                # Parse JSON response for image URL
+                parsed = JSON.parse(response.body) rescue {}
+                image_url = parsed['image_url'] || parsed['image_urls']&.first || parsed['rembg_url']
+
+                if image_url.present?
+                  Rails.logger.info("[AI] Returning processed image URL: #{image_url}")
+                  present({ image_url: image_url })
+                else
+                  Rails.logger.error("[AI] Azure returned JSON but no image_url found")
+                  error!({ detail: 'Processing completed but no result URL returned' }, 500)
+                end
+              else
+                # Azure returned binary image data - need to upload it somewhere and return URL
+                Rails.logger.info("[AI] Azure returned binary image data, need to upload to storage")
+                # For now, return error since we need storage integration
+                error!({ detail: 'Binary image response not yet supported - need storage integration' }, 501)
+              end
+            else
+              error_detail = 'Error processing image background removal'
+              case response.status
+              when 400
+                error_detail = 'Invalid image file or unsupported format'
+              when 429
+                error_detail = 'Server busy, try again later'
+              when 503
+                error_detail = 'Remove background server not running'
+              end
+              error!({ detail: error_detail }, response.status)
+            end
+          rescue Faraday::Error => e
+            Rails.logger.error("[AI] Faraday error: #{e.class} - #{e.message}")
+            error!({ detail: 'Remove background server not running' }, 503)
+          rescue JSON::ParserError => e
+            Rails.logger.error("[AI] JSON parse error: #{e.class} - #{e.message}")
+            error!({ detail: 'Invalid response from processing server' }, 500)
+          rescue => e
+            Rails.logger.error("[AI] Unexpected error: #{e.class} - #{e.message}")
+            error!({ detail: 'Internal error' }, 500)
+          ensure
+            # No cleanup needed for base64 approach
           end
         end
       end
