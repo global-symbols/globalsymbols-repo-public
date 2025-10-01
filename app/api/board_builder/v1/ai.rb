@@ -16,16 +16,15 @@ module BoardBuilder
       helpers do
         include SharedHelpers  # If needed, matching board_sets.rb
 
-        # Helper method for fetching IP country from papi.co
+        # Helper method for fetching IP country from ipapi.co
         def fetch_ip_country(client_ip = nil)
           return nil if client_ip.blank?
 
           begin
             Rails.logger.info("[AI Analytics] Fetching country for IP: #{client_ip}")
 
-            response = Faraday.get('https://papi.co/ip/') do |req|
+            response = Faraday.get("https://ipapi.co/#{client_ip}/json/") do |req|
               req.headers['Accept'] = 'application/json'
-              req.params['ip'] = client_ip
               req.options.timeout = 10        # Total timeout for the request
               req.options.open_timeout = 6   # Timeout for establishing connection
             end
@@ -36,11 +35,17 @@ module BoardBuilder
               Rails.logger.info("[AI Analytics] Country for IP #{client_ip}: #{country_code}")
               country_code
             else
-              Rails.logger.warn("[AI Analytics] Failed to fetch country for IP #{client_ip}: #{response.status}")
+              Rails.logger.warn("[AI Analytics] Failed to fetch country for IP #{client_ip}: HTTP #{response.status}")
               nil
             end
+          rescue Faraday::ConnectionFailed => e
+            Rails.logger.warn("[AI Analytics] ipapi.co connection failed for IP #{client_ip}: #{e.message}")
+            nil
+          rescue Faraday::TimeoutError => e
+            Rails.logger.warn("[AI Analytics] ipapi.co timeout for IP #{client_ip}: #{e.message}")
+            nil
           rescue => e
-            Rails.logger.error("[AI Analytics] Error fetching IP country: #{e.class} - #{e.message}")
+            Rails.logger.error("[AI Analytics] Unexpected error fetching IP country: #{e.class} - #{e.message}")
             nil
           end
         end
