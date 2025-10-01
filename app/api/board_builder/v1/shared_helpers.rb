@@ -27,6 +27,7 @@ module BoardBuilder::V1::SharedHelpers
   def current_user_id_hash
     # Prefer a dedicated secret if configured
     # Hardcoded fallback (for dev only) to avoid nil hashes when secrets are not set.
+    dev_fallback_secret = ''
     secret = ENV['AI_ANALYTICS_HASH_SECRET'].presence || dev_fallback_secret
     return nil if secret.blank?
 
