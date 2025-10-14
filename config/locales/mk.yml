@@ -383,7 +383,7 @@ mk:
   views:
     pages:
       home:
-        explore_heading: Истражувајте ги симболските сетови
+        explore_heading: Истакнати симболски сетови
         board_builder:
           design: Дизајнирај, гради, заштеди и печати комуникациски табли онлајн.
           heading: Global Symbols Board Builder

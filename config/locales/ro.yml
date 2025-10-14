@@ -468,7 +468,7 @@ ro:
       home:
         for_communicators: Pentru interlocutori
         explore_button: Explorarea mai multor seturi de simboluri…
-        explore_heading: Explorarea seturilor de simboluri
+        explore_heading: Seturile de simboluri recomandate
         for_everyone_text: Descoperirea, amestecarea, potrivirea și personalizarea
           simbolurilor
         for_everyone: Pentru toți
