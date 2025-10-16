@@ -321,7 +321,7 @@ sr_Latn:
         for_everyone: Za svakoga
         for_everyone_text: Otkrivanje, mešanje, podudaranje i kreiranje simbola korišćenje
           ličnog
-        explore_heading: Istraživanje skupova simbola
+        explore_heading: Istaknuti skupovi simbola
         explore_button: Istražite više skupova simbola…
         board_builder:
           subheading: Komunikacione table na lakši način

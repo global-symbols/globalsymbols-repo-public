@@ -251,7 +251,7 @@ Doorkeeper.configure do
   #
   default_scopes  :public
   # optional_scopes :write, :update
-  optional_scopes 'identity:read:user', 'boardset:read', 'boardset:write', 'offline_access', 'openid', 'profile', 'email'
+  optional_scopes 'identity:read:user', 'boardset:read', 'boardset:write', 'offline_access', 'openid', 'profile', 'email', 'symbolset:read', 'symbolset:write', 'ai:write'
 
   # Allows to restrict only certain scopes for grant_type.
   # By default, all the scopes will be available for all the grant types.

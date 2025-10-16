@@ -23,4 +23,12 @@ module ApplicationHelper
   def text_direction
     I18n.locale.in?([:ar, :ps, :ur]) ? :rtl : :ltr
   end
+
+  def bb_url
+    if Rails.env.development?
+      "http://#{request.host}:4200"
+    else
+      "https://app.#{request.host}/en"
+    end
+  end
 end

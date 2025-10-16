@@ -509,7 +509,7 @@ sr_Cyrl:
         symbolset_dropdown_any_symbol_set: Било који скуп симбола
       home:
         explore_button: Истражите више скупова симбола…
-        explore_heading: Истраживање скупова симбола
+        explore_heading: Истакнути скупови симбола
         for_everyone_text: Откривање, мешање, подударање и креирање симбола коришћење
           личног
         for_everyone: За свакога
