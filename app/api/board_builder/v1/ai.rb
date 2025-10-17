@@ -177,6 +177,7 @@ module BoardBuilder
                 azure_base = ENV['AZURE_API_BASE']
                 azure_key  = ENV['AZURE_API_KEY']
 
+
             Rails.logger.info("[AI] Using Azure base=#{azure_base} (key_present=#{azure_key.present?})")
 
             if azure_base.blank? || azure_key.blank?
@@ -625,7 +626,7 @@ module BoardBuilder
           }
         }
         params do
-          optional :prompt_id, type: Integer, desc: 'Prompt ID (for image generation errors)'
+          optional :session_id, type: Integer, desc: 'Session ID (always included for consistent reporting)'
           optional :generated_image_id, type: Integer, desc: 'Generated image ID (for background removal errors)'
           optional :http_code, type: String, desc: 'HTTP status code'
           optional :description, type: String, desc: 'Error description'
@@ -633,7 +634,7 @@ module BoardBuilder
         post :errors, protected: true, oauth2: ['ai:write'] do
           # Prepare request body for Directus
           directus_body = {
-            prompt_id: params[:prompt_id],
+            session_id: params[:session_id],
             generated_image_id: params[:generated_image_id],
             http_code: params[:http_code],
             description: params[:description]
@@ -644,7 +645,7 @@ module BoardBuilder
 
           present({
             id: error_data['id'],
-            prompt_id: error_data['prompt_id'],
+            session_id: error_data['session_id'],
             generated_image_id: error_data['generated_image_id'],
             http_code: error_data['http_code'],
             description: error_data['description']
