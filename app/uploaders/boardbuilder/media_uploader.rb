@@ -1,7 +1,7 @@
 class Boardbuilder::MediaUploader < CarrierWave::Uploader::Base
   include CarrierWave::MiniMagick
 
-  process resize_to_fit: [300, 300], if: :not_svg?
+  process resize_to_fit: [512, 512], if: :not_svg?
   process :store_dimensions
 
   # Set storage based on environment configuration
