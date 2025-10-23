@@ -26,6 +26,27 @@ class Boardbuilder::Media < ApplicationRecord
   }
 
   before_validation :update_file_attributes
+  after_initialize :calculate_and_set_file_hash
+
+  attr_accessor :resize_width, :resize_height
+
+  def initialize(attributes = {})
+    @resize_width = attributes.delete(:resize_width)
+    @resize_height = attributes.delete(:resize_height)
+    super(attributes)
+  end
+
+  def calculate_and_set_file_hash
+    return unless file.present? && file_hash.blank?
+
+    begin
+      content = file.read
+      self.file_hash = Utils.calculate_hash(content)
+    rescue StandardError => e
+      Rails.logger.warn("could not calculate hash of media: #{e.message}")
+      self.file_hash = nil
+    end
+  end
 
   private
 
@@ -34,5 +55,6 @@ class Boardbuilder::Media < ApplicationRecord
       self.format = file.file.content_type
       self.filesize = file.file.size
     end
+    calculate_and_set_file_hash
   end
 end

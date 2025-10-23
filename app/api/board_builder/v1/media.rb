@@ -62,12 +62,28 @@ module BoardBuilder::V1
       end
       oauth2 'boardset:read'
       get do
-        media = Boardbuilder::Media.accessible_by(current_ability).where(user: current_user)
+        media = Boardbuilder::Media
+                  .accessible_by(current_ability)
+                  .where(user: current_user)
+                  .where.not(id: Boardbuilder::BoardSet.select(:thumbnail_id).where.not(thumbnail_id: nil))
         media = media.includes(cells: { board: :board_set } ) if params[:expand]
 
         present media.order(updated_at: :desc), with: Entities::Media, expand: params[:expand]
       end
 
+      desc 'Destroys unreferenced Media belonging to the current user'
+      oauth2 'boardset:write'
+      delete "delete_unreferenced" do
+        referenced_in_cells = Boardbuilder::Cell.accessible_by(current_ability).where.not(boardbuilder_media_id: nil).pluck(:boardbuilder_media_id)
+        referenced_as_thumbnail = Boardbuilder::BoardSet.accessible_by(current_ability).where.not(thumbnail_id: nil).pluck(:thumbnail_id)
+        referenced_as_header = Boardbuilder::Board.accessible_by(current_ability).where.not(header_boardbuilder_media_id: nil).pluck(:header_boardbuilder_media_id)
+        referenced_ids = referenced_in_cells + referenced_as_thumbnail + referenced_as_header
+
+        unreferenced_media = Boardbuilder::Media.where(user_id: current_user.id).where.not(id: referenced_ids)
+        count = unreferenced_media.count
+        unreferenced_media.delete_all
+        present ({ "deleted" => count })
+      end
 
       route_param :id do
 
@@ -109,8 +125,6 @@ module BoardBuilder::V1
           media.destroy!
           present nil
         end
-
-
       end
     end
   end

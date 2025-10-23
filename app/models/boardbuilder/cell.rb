@@ -10,12 +10,12 @@ class Boardbuilder::Cell < ApplicationRecord
   # When creating a Board with Cells in nested_attributes, the Cells cannot see their neighbours any earlier in the lifecycle.
   before_save :generate_index, if: :new_record?
 
+  after_initialize :set_defaults, if: :new_record?
+
   validates :caption, length: { maximum: 250 }
 
   # Validate correct ancestry when a linked_board is set. Only on changes.
   validate :linked_board_is_in_board_set, if: [:linked_to_boardbuilder_board_id_changed?, :linked_board ]
-  validate :linked_board_is_not_ancestor, if: [:linked_to_boardbuilder_board_id_changed?, :linked_board ]
-  validate :linked_board_is_not_descendent, if: [:linked_to_boardbuilder_board_id_changed?, :linked_board ]
 
   validates :background_colour, format: { with: /\A#?(?:[A-F0-9]{3}){1,2}\z/i, message: "must be a hexadecimal colour code" }, allow_blank: true
   validates :border_colour,     format: { with: /\A#?(?:[A-F0-9]{3}){1,2}\z/i, message: "must be a hexadecimal colour code" }, allow_blank: true
@@ -29,18 +29,7 @@ class Boardbuilder::Cell < ApplicationRecord
 
   # Returns an array of Boards that can be linked to from this Cell
   def linkable_boards
-    # Ancestors and descendents cannot be linked to
-    disallowed_board_ids =
-            board.ancestor_boards.pluck(:id) +
-            board.descendent_boards.pluck(:id)
-
-    # A Board cannot link to itself!
-    disallowed_board_ids << board.id
-
-    # A Board cannot link to any other linked-to Board in the set.
-    disallowed_board_ids << board.board_set.cells.where.not(linked_to_boardbuilder_board_id: nil).pluck(:linked_to_boardbuilder_board_id).uniq
-
-    board.board_set.boards.where.not(id: disallowed_board_ids.flatten.uniq)
+    board.board_set.boards.where.not(id: board.id).order(:name)
   end
   
   def pdf_colours
@@ -56,6 +45,10 @@ class Boardbuilder::Cell < ApplicationRecord
   end
 
   private
+    def set_defaults
+      self.created_at ||= Time.current
+      self.updated_at ||= Time.current
+    end
 
     def hex_colour_without_hash(colour)
       match = colour.match(/rgba?\((?<r>\d+),\s?(?<g>\d+),\s?(?<b>\d+)/)
@@ -70,7 +63,9 @@ class Boardbuilder::Cell < ApplicationRecord
     end
 
     def generate_index
-      self.index = (self.board.cells.maximum(:index) || 0) + 1
+      if self.index.blank?
+        self.index = (self.board.cells.maximum(:index) || 0) + 1
+      end
     end
 
     def linked_board_is_in_board_set
