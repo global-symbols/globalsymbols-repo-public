@@ -1,7 +1,7 @@
 class Boardbuilder::MediaUploader < CarrierWave::Uploader::Base
   include CarrierWave::MiniMagick
 
-
+  #process resize_to_fit: [512, 512], if: :not_svg?
   process :resize, if: :not_svg?
   process :store_dimensions
 
@@ -50,6 +50,12 @@ class Boardbuilder::MediaUploader < CarrierWave::Uploader::Base
   def secure_token
     var = :"@#{mounted_as}_secure_token"
     model.instance_variable_get(var) or model.instance_variable_set(var, SecureRandom.uuid)
+  end
+
+  def store_dimensions
+    if file && model
+      model.width, model.height = ::MiniMagick::Image.open(file.file)[:dimensions]
+    end
   end
 
   private
