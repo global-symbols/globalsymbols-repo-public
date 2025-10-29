@@ -1,7 +1,8 @@
 class Boardbuilder::MediaUploader < CarrierWave::Uploader::Base
   include CarrierWave::MiniMagick
 
-  process resize_to_fit: [512, 512], if: :not_svg?
+  #process resize_to_fit: [512, 512], if: :not_svg?
+  process :resize, if: :not_svg?
   process :store_dimensions
 
   # Set storage based on environment configuration
@@ -26,18 +27,18 @@ class Boardbuilder::MediaUploader < CarrierWave::Uploader::Base
 
   def store_dir
     if Rails.application.config.uploader_storage == :aws
-      "#{Rails.env}/users/#{model.user.id}/#{model.class.to_s.underscore}/#{model.id}"
+      "#{Rails.env}/users/#{model.user_id}/#{model.class.to_s.underscore}/#{model.id}"
     else
       "public/uploads/#{Rails.env}/#{model.class.to_s.underscore}/#{model.id}"
     end
   end
 
   def extension_allowlist
-    %w[jpg jpeg gif png svg]
+    Rails.application.config.allowed_image_extensions
   end
 
   def content_type_allowlist
-    [/image\/svg\+xml/, 'image/jpeg', 'image/png', 'image/gif']
+    Rails.application.config.allowed_image_mimetypes
   end
 
   def filename
@@ -51,15 +52,21 @@ class Boardbuilder::MediaUploader < CarrierWave::Uploader::Base
     model.instance_variable_get(var) or model.instance_variable_set(var, SecureRandom.uuid)
   end
 
-  private
-
   def store_dimensions
     if file && model
       model.width, model.height = ::MiniMagick::Image.open(file.file)[:dimensions]
     end
   end
 
+  private
+
   def not_svg?(file)
     file.content_type != 'image/svg+xml'
+  end
+
+  def resize
+    width = model.resize_width || 512
+    height = model.resize_height || 512
+    resize_to_limit(width, height, combine_options: {"define" => 'png:exclude-chunk="*"'})
   end
 end

@@ -17,7 +17,7 @@ module BoardBuilder
     expose :cells, with: V1::Entities::Cell, if: lambda { |cells, options|
       options[:expand].try(:include?, options[:attr_path].join('.'))
     } do |board|
-      board.cells.order :index
+      board.cells.sort_by{|e| e[:index]}
     end
 
     expose :board_set, with: V1::Entities::BoardSet, if: lambda { |board_set, options|
