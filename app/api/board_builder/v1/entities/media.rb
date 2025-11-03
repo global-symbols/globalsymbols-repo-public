@@ -27,4 +27,9 @@ module BoardBuilder
       media.cells
     end
   end
+
+  class V1::Entities::PagedMediaResponse < Grape::Entity
+    expose :items, with: V1::Entities::Media
+    expose :total, documentation: { type: 'Integer', example: '42', required: true }
+  end
 end

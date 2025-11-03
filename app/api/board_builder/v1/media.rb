@@ -59,16 +59,33 @@ module BoardBuilder::V1
         is_array: true
       params do
         use :expand
+        optional :page, type: Integer, default: 1
+        optional :per_page, type: Integer, default: 100
       end
       oauth2 'boardset:read'
       get do
-        media = Boardbuilder::Media
+        scope = Boardbuilder::Media
                   .accessible_by(current_ability)
                   .where(user: current_user)
                   .where.not(id: Boardbuilder::BoardSet.select(:thumbnail_id).where.not(thumbnail_id: nil))
-        media = media.includes(cells: { board: :board_set } ) if params[:expand]
+        scope = scope.includes(cells: { board: :board_set } ) if params[:expand]
 
-        present media.order(updated_at: :desc), with: Entities::Media, expand: params[:expand]
+        # Always use pagination for media library requests
+        page = [params[:page].to_i, 1].max
+        per_page = [[params[:per_page].to_i, 1].max, 100].min
+
+        total = scope.count
+
+        paged = scope
+                  .order(updated_at: :desc)
+                  .offset((page - 1) * per_page)
+                  .limit(per_page)
+
+        # Return paginated response
+        present({
+          items: paged,
+          total: total
+        }, with: Entities::PagedMediaResponse)
       end
 
       desc 'Destroys unreferenced Media belonging to the current user'
