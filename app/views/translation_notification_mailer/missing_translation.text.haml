@@ -1,0 +1,16 @@
+Translation Missing Alert
+
+A translation is missing for content in the system.
+
+DETAILS:
+Collection: #{@collection.titleize}
+Item ID: #{@item_id}
+Requested Language: #{@requested_language}
+Fallback Language: #{@fallback_language}
+= "Item Title: #{@item_title}" if @item_title.present?
+
+The system automatically fell back to the default language (#{@fallback_language}) for this content.
+Please add the missing translation to ensure all users see content in their preferred language.
+
+This notification was generated on #{@timestamp.strftime('%B %d, %Y at %H:%M %Z')}
+Global Symbols Translation System

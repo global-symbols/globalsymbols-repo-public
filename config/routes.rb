@@ -31,12 +31,15 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :news, controller: :articles, only: [:index, :show] do
-    collection do
-      get 'page/:page', controller: :articles, action: :index, as: :page
-      get 'preview/:id', controller: :articles, action: :preview, as: :preview
-    end
-  end
+  # resources :news, controller: :articles, only: [:index, :show] do
+  #   collection do
+  #     get 'page/:page', controller: :articles, action: :index, as: :page
+  #     get 'preview/:id', controller: :articles, action: :preview, as: :preview
+  #   end
+  # end
+
+  get 'news/', controller: :articles, action: :index
+  get 'news/:slug', controller: :articles, action: :show, as: :article
 
   resources :symbolsets do
     member do
@@ -97,6 +100,12 @@ Rails.application.routes.draw do
   end
 
   get 'uploads/:environment/image/imagefile/:id/:hash', controller: :images, action: :show
+
+  # Directus webhooks for cache invalidation
+  post 'webhooks/directus', to: 'webhooks#directus'
+
+  # Development-only webhook simulation endpoint
+  get 'webhooks/directus/simulate', to: 'webhooks#simulate'
 
   get '*path', controller: :errors, action: :not_found, via: :all, constraints: lambda { |request| !request.path_parameters[:path].start_with?('rails/') }
 end

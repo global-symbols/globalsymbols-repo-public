@@ -8,26 +8,141 @@
   }
 = render partial: 'topbar', cache: true
 
-%main.container-xl
-  %section.row.justify-content-md-center
-    .col-md-8
-      - @posts.each do |post|
-        %article.row.mb-5
-          .col.order-sm-last
-            %h2= link_to post.title, news_path(slug_for post)
-            = post.description
-          .col-sm-3.text-right.mt-1.font-weight-light.text-muted
-            %a.text-dark{href: news_path(slug_for post)}
-              %time{datetime: post.publish_date.strftime('%Y-%m-%d'), pubdate: true}= l(post.publish_date.to_date, format: :long)
-            %br.d-none.d-sm-inline
-            %span.d-sm-none ·
-            %span.mt-1= post.author.name
+- if @featured_article.present?
+  - featured_translations = @featured_article['translations'] || []
+  - featured_current_lang = DIRECTUS_LANGUAGE_MAPPING[I18n.locale.to_sym] || DIRECTUS_DEFAULT_LANGUAGE
+  - featured_requested_translation = featured_translations.find { |t| t['languages_code'] == featured_current_lang }
+  - featured_fallback_translation = featured_translations.find { |t| t['languages_code'] == DIRECTUS_DEFAULT_LANGUAGE }
+  - featured_translation = featured_requested_translation || featured_fallback_translation || {}
+  - featured_using_fallback = featured_requested_translation.nil? && featured_fallback_translation.present?
 
-      - if @page == 1
-        .row
-          .col.offset-3.text-center
-            %a.btn.btn-primary{href: page_news_index_path(2)}
-              = t('views.articles.index.more_button')
-              %i.fas.fa-chevron-right.ml-1
-      - else
-        = paginate_articles @posts, @pagination_params
+  %section.featured-article-hero
+    .featured-strap FEATURED
+    - if @featured_article['image'] && !@featured_article['image'].empty?
+      - hero_image_url = "https://cms.gs-test.co.uk/assets/#{@featured_article['image']}"
+      .hero-background{style: "background-image: url('#{hero_image_url}');"}
+    .hero-overlay
+      .container-xl
+        .hero-content
+          %h1.hero-title= featured_translation['title'] || 'Featured Article'
+          - if featured_using_fallback
+            %small.text-warning.mb-3 (#{DIRECTUS_DEFAULT_LANGUAGE})
+          .hero-meta
+            - if @featured_article['author'] && @featured_article['author']['first_name']
+              - author_name = [@featured_article['author']['first_name'], @featured_article['author']['last_name']].compact.join(' ')
+              - if author_name.present?
+                %span.hero-author By #{author_name}
+            - if @featured_article['date_created']
+              %span.hero-date= " • #{Date.parse(@featured_article['date_created']).strftime('%B %d, %Y')}"
+          .hero-actions.mt-4
+            %a.btn.btn-primary.btn-lg{href: article_path(@featured_article['slug'])} Read More
+
+%main.container-xl
+  %section.mt-5
+    - if @directus_error
+      .alert.alert-warning
+        %h4 Unable to Load Articles
+        %p We're currently experiencing issues connecting to our content management system. Please try again later.
+
+    -# Category filter links
+    - if @categories.present? && @categories.length > 1
+      .mb-5.category-filter
+        .d-flex.flex-wrap.align-items-center.mb-3
+          %a.btn.btn-outline-primary.btn-sm.mb-1{href: news_path, class: @selected_category.blank? ? 'active' : '', style: "margin-right: 8px"}
+            All
+          - @categories.each do |category|
+            - category_param = { category: category }
+            - category_param[:page] = @current_page if @current_page > 1
+            %a.btn.btn-outline-primary.btn-sm.mb-1{href: news_path(category_param), class: @selected_category == category ? 'active' : '', style: "margin-right: 8px"}
+              = category.to_s.titleize
+
+    .row
+      - @articles.each do |article|
+        -# Get the translation for the current language or fallback
+        - translations = article['translations'] || []
+        - current_lang_code = DIRECTUS_LANGUAGE_MAPPING[I18n.locale.to_sym] || DIRECTUS_DEFAULT_LANGUAGE
+        - requested_translation = translations.find { |t| t['languages_code'] == current_lang_code }
+        - fallback_translation = translations.find { |t| t['languages_code'] == DIRECTUS_DEFAULT_LANGUAGE }
+        - translation = requested_translation || fallback_translation || {}
+        - using_fallback = requested_translation.nil? && fallback_translation.present?
+        -# Responsive grid: 6 articles per row on mobile (col-6), 3 per row on desktop (col-md-4)
+        .col-6.col-md-4.mb-4
+          .card.h-100.news-article-card
+            - if article['image'] && !article['image'].empty?
+              - image_url = "https://cms.gs-test.co.uk/assets/#{article['image']}"
+              %img.card-img-top{src: image_url, alt: translation['title'] || 'Article image', style: "max-width: 100%; height: auto;"}
+            .card-body.d-flex.flex-column
+              %h3.card-title{:style => "font-weight: 600"}
+                = translation['title'] || 'Article Title'
+                - if using_fallback
+                  %small.text-warning (#{DIRECTUS_DEFAULT_LANGUAGE})
+              %p.card-text.text-muted
+                - if article['author'] && article['author']['first_name']
+                  - author_name = [article['author']['first_name'], article['author']['last_name']].compact.join(' ')
+                  - if author_name.present?
+                    = "By #{author_name},"
+                - if article['date_created']
+                  = " On #{Date.parse(article['date_created']).strftime('%B %d, %Y')}"
+              .mt-auto
+                %a.btn.btn-primary{href: article_path(article['slug'])} Read More
+
+      - if @articles.empty? && !@directus_error
+        .col-12
+          .text-center.mt-5
+            %h4 No Articles Found
+            %p
+              - if @selected_category.present?
+                = "No articles found in the '#{@selected_category.to_s.titleize}' category."
+                %br
+                %a{href: news_path} View all articles
+              - else
+                There are currently no articles to display.
+
+    -# Pagination controls
+    - if @total_pages > 1
+      .d-flex.justify-content-center.mt-5
+        %nav{"aria-label" => "Article pagination"}
+          %ul.pagination
+            - if @has_previous_page
+              %li.page-item
+                %a.page-link{href: news_path(category: @selected_category, page: @previous_page), "aria-label" => "Previous"}
+                  %span{"aria-hidden" => "true"} ‹
+                  %span.sr-only Previous
+            - else
+              %li.page-item.disabled
+                %span.page-link
+                  %span{"aria-hidden" => "true"} ‹
+                  %span.sr-only Previous
+
+            -# Page number links (show current page and a few around it)
+            - start_page = [@current_page - 2, 1].max
+            - end_page = [@current_page + 2, @total_pages].min
+
+            - if start_page > 1
+              %li.page-item
+                %a.page-link{href: news_path(category: @selected_category, page: 1)} 1
+              - if start_page > 2
+                %li.page-item.disabled
+                  %span.page-link …
+
+            - (start_page..end_page).each do |page_num|
+              %li.page-item{class: page_num == @current_page ? 'active' : ''}
+                %a.page-link{href: news_path(category: @selected_category, page: page_num)}= page_num
+
+            - if end_page < @total_pages
+              - if end_page < @total_pages - 1
+                %li.page-item.disabled
+                  %span.page-link …
+              %li.page-item
+                %a.page-link{href: news_path(category: @selected_category, page: @total_pages)}= @total_pages
+
+            - if @has_next_page
+              %li.page-item
+                %a.page-link{href: news_path(category: @selected_category, page: @next_page), "aria-label" => "Next"}
+                  %span{"aria-hidden" => "true"} ›
+                  %span.sr-only Next
+            - else
+              %li.page-item.disabled
+                %span.page-link
+                  %span{"aria-hidden" => "true"} ›
+                  %span.sr-only Next

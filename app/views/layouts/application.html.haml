@@ -68,7 +68,7 @@
               .dropdown-menu{'aria-labelledby': :navbarDropdownMenuLink}
                 %a.dropdown-item{href: about_page_path('training-resources')}= t('layouts.application.menu.training')
                 %a.dropdown-item{href: knowledge_base_index_path}= t('layouts.application.menu.knowledge_base')
-                %a.dropdown-item{href: news_index_path}= t('layouts.application.menu.news')
+                %a.dropdown-item{href: news_path}= t('layouts.application.menu.news')
 
           = bootstrap_form_with url: search_path, local: true, method: :get, layout: :horizontal, label_col: 'col', control_col: 'col-sm-12', class: 'form-inline my-2 my-lg-0 mr-4' do |f|
             = f.hidden_field :symbolset, value: current_symbolset_id, id: :navbar_search_symbolset

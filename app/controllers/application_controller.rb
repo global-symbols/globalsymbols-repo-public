@@ -115,4 +115,10 @@ class ApplicationController < ActionController::Base
     def allow_iframe
       response.headers.except! 'X-Frame-Options'
     end
-end
+
+    # Returns the Directus language code for the current Rails locale
+    # Falls back to DIRECTUS_DEFAULT_LANGUAGE if mapping not found
+    def directus_language_code
+      DIRECTUS_LANGUAGE_MAPPING[I18n.locale.to_sym] || DIRECTUS_DEFAULT_LANGUAGE
+    end
+  end

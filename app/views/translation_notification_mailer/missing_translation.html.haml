@@ -1,0 +1,40 @@
+!!! 5
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %title Translation Missing Notification
+  %body{:style => "font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4;"}
+    .container{:style => "max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"}
+      %h1{:style => "color: #d32f2f; margin-bottom: 20px;"} Translation Missing Alert
+
+      %p{:style => "color: #333; font-size: 16px; line-height: 1.5; margin-bottom: 20px;"}
+        A translation is missing for content in the system.
+
+      .details{:style => "background-color: #f9f9f9; padding: 15px; border-radius: 4px; margin-bottom: 20px;"}
+        %table{:style => "width: 100%; border-collapse: collapse;"}
+          %tr
+            %td{:style => "padding: 8px 0; font-weight: bold; color: #555;"} Collection:
+            %td{:style => "padding: 8px 0; color: #333;"}= @collection.titleize
+          %tr
+            %td{:style => "padding: 8px 0; font-weight: bold; color: #555;"} Item ID:
+            %td{:style => "padding: 8px 0; color: #333;"}= @item_id
+          %tr
+            %td{:style => "padding: 8px 0; font-weight: bold; color: #555;"} Requested Language:
+            %td{:style => "padding: 8px 0; color: #d32f2f; font-weight: bold;"}= @requested_language
+          %tr
+            %td{:style => "padding: 8px 0; font-weight: bold; color: #555;"} Fallback Language:
+            %td{:style => "padding: 8px 0; color: #333;"}= @fallback_language
+          - if @item_title.present?
+            %tr
+              %td{:style => "padding: 8px 0; font-weight: bold; color: #555;"} Item Title:
+              %td{:style => "padding: 8px 0; color: #333;"}= @item_title
+
+      %p{:style => "color: #666; font-size: 14px; line-height: 1.5; margin-bottom: 20px;"}
+        The system automatically fell back to the default language (#{@fallback_language}) for this content.
+        Please add the missing translation to ensure all users see content in their preferred language.
+
+      .footer{:style => "border-top: 1px solid #eee; padding-top: 15px; margin-top: 30px; color: #999; font-size: 12px;"}
+        %p
+          This notification was generated on #{@timestamp.strftime('%B %d, %Y at %H:%M %Z')}
+          %br
+          Global Symbols Translation System

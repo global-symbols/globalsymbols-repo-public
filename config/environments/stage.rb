@@ -12,7 +12,6 @@ Rails.application.configure do
 
   # Full error reports are disabled and caching is turned on.
   config.consider_all_requests_local       = false
-  config.action_controller.perform_caching = true
 
   config.active_job.queue_adapter = :sidekiq
 
@@ -57,8 +56,10 @@ Rails.application.configure do
   # Prepend all log lines with the following tags.
   config.log_tags = [ :request_id ]
 
-  # Use a different cache store in production.
-  # config.cache_store = :mem_cache_store # For the Dalli gem.
+  # In-memory cache (no Redis, always on)
+
+  config.action_controller.perform_caching = true
+
   config.cache_store = :memory_store, { size: 64.megabytes }
 
   # Use a real queuing backend for Active Job (and separate queues per environment).

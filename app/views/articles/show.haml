@@ -1,19 +1,21 @@
 :ruby
-  title @post.title
-  description @post.description
+  # Use the translation determined by the controller (requested language or fallback)
+  translation = @translation_used || {}
+  title = translation['title'] || 'Article'
+  description = translation['excerpt'] || translation['title'] || 'Article from Global Symbols'
 
   set_meta_tags({
     site: 'Global Symbols News',
     article: {
-      published_time: @post.publish_date,
-      modified_time: @post.updated_at,
+      published_time: @article['date_created'],
+      modified_time: @article['date_updated'] || @article['date_created'],
       publisher: 'https://globalsymbols.com'
     },
     twitter: {
       creator: '@globalsymbols',
     },
     og: {
-      url: news_url(slug_for @post),
+      url: article_url(@article['slug']),
       type: 'article',
     }
   })
@@ -22,14 +24,15 @@
   rich_data_base = {
       mainEntityOfPage: {
           '@type':   'WebPage',
-          '@id': news_url(slug_for @post)
+          '@id': article_url(@article['slug'])
       },
-      headline:      @post.title,
-      datePublished: @post.publish_date,
-      dateModified:  @post.updated_at,
+      headline:      translation['title'] || 'Article',
+      inLanguage:    @article['requested_language'] || DIRECTUS_DEFAULT_LANGUAGE,
+      datePublished: @article['date_created'],
+      dateModified:  @article['date_updated'] || @article['date_created'],
       author: {
         '@type': 'Person',
-        name:    @post.author.try(:name),
+        name:    @article['author'] ? [@article['author']['first_name'], @article['author']['last_name']].compact.join(' ') : 'Global Symbols',
       },
       publisher: {
           '@type': 'Organization',
@@ -45,31 +48,41 @@
   }
 
   # If there's an image...
-  if @post.hero_image and @png_heroimage_url
-    # Add the image, to the JSON+LD
-    rich_data_base[:image] = @png_heroimage_url
-
-    # Add the image to OG an other <meta>data
-    set_meta_tags({
-      image_src: @png_heroimage_url,
-      twitter: { image: @png_heroimage_url }
-    })
+  if @article['image'] and !@article['image'].empty?
+    rich_data_base[:image] = "https://cms.gs-test.co.uk/assets/#{@article['image']}"
   end
 
-= render partial: 'topbar', cache: true
-
 %main.container-lg.mt-0
+  %nav.mt-4.breadcrumb-horizontal{"aria-label" => "breadcrumb"}
+    %span.breadcrumb-link
+      = link_to 'All News', news_path
+    %span.breadcrumb-separator>
+    %span.breadcrumb-current
+      = @article['slug'] || 'article'
+
   %section.row.justify-content-center
     .col-md-8
       %article.news_article
-        - if @post.hero_image
-          %img.img-fluid{src: @post.hero_image.url, alt: @post.hero_image.description}
-        %header.row.my-4
-          .col-sm-4.text-right.text-muted
-            %time.h1{datetime: @publish_date.strftime('%Y-%m-%d'), pubdate: true}= l(@publish_date.to_date, format: :long)
-            %p.mt-2.font-weight-light= @post.author.try(:name)
-          .col
-            %h1= @post.title
-            = redcarpet(NewsArticleRenderer).render(@post.body).html_safe
+        %header.mt-5
+          .row.justify-content-center
+            .col-auto
+              %h1.text-center{:style => "font-weight: 600; font-size: 3.5rem"}
+                = translation['title'] || 'Article Title'
+                - if @using_fallback
+                  %small.text-warning.ml-2 (Displayed in #{DIRECTUS_DEFAULT_LANGUAGE})
+          .row.justify-content-center.mt-3
+            .col-auto.text-center.text-muted
+              - if @article['date_created']
+                %time{datetime: Date.parse(@article['date_created']).strftime('%Y-%m-%d'), pubdate: true}= Date.parse(@article['date_created']).strftime('%B %d, %Y')
+              - if @article['author']
+                %p.mt-1.font-weight-light= [@article['author']['first_name'], @article['author']['last_name']].compact.join(' ')
+        - if @article['image'] && !@article['image'].empty?
+          - image_url = "https://cms.gs-test.co.uk/assets/#{@article['image']}"
+          - set_meta_tags({image_src: image_url, twitter: { image: image_url }})
+          %img.mb-5.img-fluid{src: image_url, alt: translation['title'] || 'Article image'}
+        - if translation['body']
+          = redcarpet(NewsArticleRenderer).render(translation['body']).html_safe
+        - elsif translation['content']
+          = redcarpet(NewsArticleRenderer).render(translation['content']).html_safe
 = render 'rich_data', data: rich_data_base.merge({'@type': 'NewsArticle'}), cache: true
 = render 'rich_data', data: rich_data_base.merge({'@type': 'BlogPosting'}), cache: true
