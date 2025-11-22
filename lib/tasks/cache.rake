@@ -117,6 +117,11 @@ namespace :cache do
     puts "   Cache entries created: #{new_entries_created}"
     puts "   Final cache count: #{final_cache_count}"
 
+    # Debug: Show what keys actually exist
+    puts ""
+    puts "🔍 Cache verification:"
+    show_sample_cache_entries
+
     if new_entries_created < (total_expected_entries + 1) * 0.8 # Less than 80% success
       puts "⚠️  WARNING: Cache warming incomplete. Expected #{total_expected_entries + 1} entries, got #{new_entries_created}"
       exit 1
@@ -164,9 +169,11 @@ end
 
 def count_cache_entries
   begin
-    all_keys = Rails.cache.redis.keys("globalsymbols_cache:directus*")
-    all_keys.length
-  rescue
+    all_keys = Rails.cache.redis.keys("*")
+    directus_keys = all_keys.select { |k| k.include?('directus') }
+    directus_keys.length
+  rescue => e
+    puts "Error counting cache entries: #{e.message}"
     0
   end
 end
@@ -179,13 +186,25 @@ end
 
 def show_sample_cache_entries
   begin
-    keys = Rails.cache.redis.keys("globalsymbols_cache:directus*")
-    keys.first(5).each do |key|
-      # Remove the namespace prefix for cleaner display
-      clean_key = key.sub('globalsymbols_cache:', '')
-      puts "  - #{clean_key}"
+    all_keys = Rails.cache.redis.keys("*")
+    directus_keys = all_keys.select { |k| k.include?('directus') }
+
+    puts "  Total Redis keys in DB: #{all_keys.length}"
+    puts "  Directus-related keys: #{directus_keys.length}"
+
+    if directus_keys.any?
+      puts "  Sample cache entries:"
+      directus_keys.first(5).each do |key|
+        puts "    - #{key}"
+      end
+      puts "    ... and #{directus_keys.length - 5} more" if directus_keys.length > 5
+    else
+      puts "  No directus keys found. All keys in DB:"
+      all_keys.first(10).each do |key|
+        puts "    - #{key}"
+      end
+      puts "    ... and #{all_keys.length - 10} more" if all_keys.length > 10
     end
-    puts "  ... and #{keys.length - 5} more" if keys.length > 5
   rescue => e
     puts "  Error listing cache entries: #{e.message}"
   end
