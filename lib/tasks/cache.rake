@@ -168,6 +168,18 @@ namespace :cache do
           puts "❌ Language config NOT readable via Rails.cache.read"
         end
 
+        # Test cache write/read cycle
+        puts "Testing cache write/read cycle..."
+        test_key = 'test/cache/debug'
+        test_value = 'debug_value'
+        Rails.cache.write(test_key, test_value, expires_in: 5.minutes)
+        read_value = Rails.cache.read(test_key)
+        if read_value == test_value
+          puts "✅ Cache write/read cycle works"
+        else
+          puts "❌ Cache write/read cycle failed"
+        end
+
         if cache_count > 0
           puts "Sample cache entries:"
           show_sample_cache_entries
@@ -182,23 +194,46 @@ end
 
 def count_cache_entries
   begin
-    redis = Rails.cache.redis
-    puts "DEBUG: Connected to Redis DB #{redis.connection[:db]} at #{redis.connection[:host]}:#{redis.connection[:port]}"
+    # Try to get the underlying Redis connection from Rails cache
+    cache_store = Rails.cache
+    puts "DEBUG: Rails cache store class: #{cache_store.class}"
 
-    all_keys = redis.keys("*")
-    puts "DEBUG: Found #{all_keys.length} total keys in Redis DB"
+    if cache_store.respond_to?(:redis)
+      redis = cache_store.redis
+      puts "DEBUG: Connected to Redis DB #{redis.connection[:db]} at #{redis.connection[:host]}:#{redis.connection[:port]}"
 
-    directus_keys = all_keys.select { |k| k.include?('directus') }
-    puts "DEBUG: Found #{directus_keys.length} directus keys"
+      all_keys = redis.keys("*")
+      puts "DEBUG: Found #{all_keys.length} total keys in Redis DB"
 
-    if directus_keys.any?
-      puts "DEBUG: Sample directus keys: #{directus_keys.first(3)}"
+      directus_keys = all_keys.select { |k| k.include?('directus') }
+      puts "DEBUG: Found #{directus_keys.length} directus keys"
+
+      if directus_keys.any?
+        puts "DEBUG: Sample directus keys: #{directus_keys.first(3)}"
+      end
+
+      directus_keys.length
+    else
+      puts "DEBUG: Rails cache does not respond to :redis method"
+      puts "DEBUG: Cache store: #{cache_store.inspect}"
+
+      # Try alternative approach - check if we can read known cache keys
+      test_keys = ['directus/language_config']
+      readable_count = 0
+      test_keys.each do |key|
+        if Rails.cache.read(key)
+          readable_count += 1
+          puts "DEBUG: Can read cache key: #{key}"
+        else
+          puts "DEBUG: Cannot read cache key: #{key}"
+        end
+      end
+
+      readable_count
     end
-
-    directus_keys.length
   rescue => e
     puts "Error counting cache entries: #{e.message}"
-    puts "DEBUG: Rails.cache.redis class: #{Rails.cache.redis.class}"
+    puts "DEBUG: Rails.cache class: #{Rails.cache.class}"
     0
   end
 end
