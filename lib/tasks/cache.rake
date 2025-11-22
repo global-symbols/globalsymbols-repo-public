@@ -44,9 +44,10 @@ namespace :cache do
 
       param_sets = DirectusCollectionWarmerJob::COLLECTION_PARAMS_MAP[collection]
       locales = DirectusCollectionWarmerJob::ALL_LOCALES
-      expected_for_collection = param_sets.length * locales.length
+      expected_for_collection = param_sets.length  # 1 cache entry per unique API request
 
-      puts "  Expected cache entries: #{expected_for_collection} (#{param_sets.length} param sets × #{locales.length} locales)"
+      puts "  Warming operations: #{param_sets.length * locales.length} (#{param_sets.length} param sets × #{locales.length} locales)"
+      puts "  Expected cache entries: #{expected_for_collection} (#{param_sets.length} unique API requests)"
       total_expected_entries += expected_for_collection
 
       successful_locales = 0
@@ -104,7 +105,7 @@ namespace :cache do
 
     # Final verification
     final_cache_count = count_cache_entries
-    new_entries_created = final_cache_count - (initial_cache_count - count_cache_entries_cleared)
+    new_entries_created = final_cache_count  # We cleared cache first, so all entries are new
 
     end_time = Time.current
     duration = end_time - start_time
@@ -171,7 +172,8 @@ def count_cache_entries
 end
 
 def count_cache_entries_cleared
-  # We cleared directus keys, so this is 0 for our calculation
+  # We clear all directus cache entries before warming
+  # Since we don't track the exact count cleared, we use 0 in calculations
   0
 end
 
