@@ -155,11 +155,24 @@ namespace :cache do
 
       if connection_test[:success]
         # Check current cache keys
+        puts "Checking cache entries..."
         cache_count = count_cache_entries
         puts "Cached Directus entries: #{cache_count}"
 
+        # Test Rails.cache.read directly
+        puts "Testing Rails.cache.read for language config..."
+        lang_config = Rails.cache.read('directus/language_config')
+        if lang_config
+          puts "✅ Language config readable via Rails.cache.read"
+        else
+          puts "❌ Language config NOT readable via Rails.cache.read"
+        end
+
         if cache_count > 0
           puts "Sample cache entries:"
+          show_sample_cache_entries
+        else
+          puts "No cache entries found - running full diagnostic:"
           show_sample_cache_entries
         end
       end
@@ -169,11 +182,23 @@ end
 
 def count_cache_entries
   begin
-    all_keys = Rails.cache.redis.keys("*")
+    redis = Rails.cache.redis
+    puts "DEBUG: Connected to Redis DB #{redis.connection[:db]} at #{redis.connection[:host]}:#{redis.connection[:port]}"
+
+    all_keys = redis.keys("*")
+    puts "DEBUG: Found #{all_keys.length} total keys in Redis DB"
+
     directus_keys = all_keys.select { |k| k.include?('directus') }
+    puts "DEBUG: Found #{directus_keys.length} directus keys"
+
+    if directus_keys.any?
+      puts "DEBUG: Sample directus keys: #{directus_keys.first(3)}"
+    end
+
     directus_keys.length
   rescue => e
     puts "Error counting cache entries: #{e.message}"
+    puts "DEBUG: Rails.cache.redis class: #{Rails.cache.redis.class}"
     0
   end
 end
