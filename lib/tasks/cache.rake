@@ -24,33 +24,87 @@ namespace :cache do
       exit 1
     end
 
-    # Warm all collections that the app caches
-    collections_warmed = 0
-    collections_failed = 0
+    # Track cache entries before warming
+    initial_cache_count = count_cache_entries
+    puts "Cache entries before warming: #{initial_cache_count}"
+
+    # Clear existing cache to ensure fresh warming
+    puts "Clearing existing Directus cache..."
+    DirectusService.clear_cache!
+    LanguageConfigurationService.invalidate_cache!
+    puts "✅ Cache cleared"
+
+    # Warm collections with detailed tracking
+    total_expected_entries = 0
+    total_actual_entries = 0
 
     DirectusCollectionWarmerJob::COLLECTION_PARAMS_MAP.each_key do |collection|
       puts ""
       puts "🔄 Warming collection: #{collection}"
-      begin
-        # Warm with all locales (nil means all locales)
-        DirectusCollectionWarmerJob.perform_now(collection, nil)
-        puts "✅ Successfully warmed #{collection}"
-        collections_warmed += 1
-      rescue => e
-        puts "❌ Failed to warm #{collection}: #{e.message}"
-        collections_failed += 1
+
+      param_sets = DirectusCollectionWarmerJob::COLLECTION_PARAMS_MAP[collection]
+      locales = DirectusCollectionWarmerJob::ALL_LOCALES
+      expected_for_collection = param_sets.length * locales.length
+
+      puts "  Expected cache entries: #{expected_for_collection} (#{param_sets.length} param sets × #{locales.length} locales)"
+      total_expected_entries += expected_for_collection
+
+      successful_locales = 0
+      failed_locales = 0
+
+      param_sets.each do |params|
+        locales.each do |locale|
+          begin
+            # Force fresh fetch and cache
+            DirectusService.fetch_collection_with_translations(
+              collection,
+              locale,
+              params,
+              nil, # cache_ttl = nil for indefinite caching
+              false, # notify_missing = false to avoid spam during warming
+              { force: true } # force refresh to ensure fresh data
+            )
+            successful_locales += 1
+            print "."
+          rescue => e
+            failed_locales += 1
+            print "x"
+          end
+        end
+      end
+
+      puts ""
+      puts "  ✅ #{successful_locales} successful, ❌ #{failed_locales} failed for #{collection}"
+
+      if failed_locales > 0
+        puts "  ⚠️  Some #{collection} locales failed to cache"
       end
     end
 
-    # Also warm language configuration
+    # Warm language configuration with verification
     puts ""
     puts "🔄 Warming language configuration..."
     begin
-      LanguageConfigurationService.config
-      puts "✅ Successfully warmed language configuration"
+      # Force fresh fetch
+      LanguageConfigurationService.invalidate_cache!
+      config = LanguageConfigurationService.config
+
+      # Verify it was actually cached
+      cached_config = Rails.cache.read('directus/language_config')
+      if cached_config
+        puts "✅ Language configuration cached successfully"
+        puts "  Available locales: #{cached_config['available_locales']&.length || 0}"
+        total_actual_entries += 1
+      else
+        puts "❌ Language configuration fetch succeeded but was not cached"
+      end
     rescue => e
       puts "❌ Failed to warm language configuration: #{e.message}"
     end
+
+    # Final verification
+    final_cache_count = count_cache_entries
+    new_entries_created = final_cache_count - (initial_cache_count - count_cache_entries_cleared)
 
     end_time = Time.current
     duration = end_time - start_time
@@ -58,14 +112,15 @@ namespace :cache do
     puts ""
     puts "🎉 Cache warming completed!"
     puts "   Duration: #{duration.round(2)} seconds"
-    puts "   Collections warmed: #{collections_warmed}"
-    puts "   Collections failed: #{collections_failed}"
+    puts "   Expected entries: #{total_expected_entries + 1}" # +1 for language config
+    puts "   Cache entries created: #{new_entries_created}"
+    puts "   Final cache count: #{final_cache_count}"
 
-    if collections_failed > 0
-      puts "⚠️  Some collections failed to warm. Check logs for details."
+    if new_entries_created < (total_expected_entries + 1) * 0.8 # Less than 80% success
+      puts "⚠️  WARNING: Cache warming incomplete. Expected #{total_expected_entries + 1} entries, got #{new_entries_created}"
       exit 1
     else
-      puts "✅ All collections warmed successfully."
+      puts "✅ Cache warming successful!"
     end
   end
 
@@ -94,14 +149,42 @@ namespace :cache do
 
       if connection_test[:success]
         # Check current cache keys
-        cache_keys = Rails.cache.redis.keys("directus/*")
-        puts "Cached Directus responses: #{cache_keys.length}"
+        cache_count = count_cache_entries
+        puts "Cached Directus entries: #{cache_count}"
 
-        if cache_keys.any?
-          puts "Sample cache keys:"
-          cache_keys.first(3).each { |key| puts "  - #{key}" }
+        if cache_count > 0
+          puts "Sample cache entries:"
+          show_sample_cache_entries
         end
       end
     end
+  end
+end
+
+def count_cache_entries
+  begin
+    all_keys = Rails.cache.redis.keys("globalsymbols_cache:directus*")
+    all_keys.length
+  rescue
+    0
+  end
+end
+
+def count_cache_entries_cleared
+  # We cleared directus keys, so this is 0 for our calculation
+  0
+end
+
+def show_sample_cache_entries
+  begin
+    keys = Rails.cache.redis.keys("globalsymbols_cache:directus*")
+    keys.first(5).each do |key|
+      # Remove the namespace prefix for cleaner display
+      clean_key = key.sub('globalsymbols_cache:', '')
+      puts "  - #{clean_key}"
+    end
+    puts "  ... and #{keys.length - 5} more" if keys.length > 5
+  rescue => e
+    puts "  Error listing cache entries: #{e.message}"
   end
 end
