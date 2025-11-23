@@ -7,7 +7,8 @@ class DirectusCollectionWarmerJob < ApplicationJob
   # Each collection contains an array of parameter hashes that the app actually uses
   COLLECTION_PARAMS_MAP = {
     'articles' => [
-      { limit: 9 }
+      { limit: 1000 },  # Used by articles index for pagination/filtering
+      { limit: 9 }      # Used for featured articles or small lists
     ]
   }.freeze
 
