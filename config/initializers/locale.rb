@@ -46,16 +46,7 @@ LanguageConfig.default_language = 'en-GB'.freeze
 # Set initial Rails config
 I18n.available_locales = LanguageConfig.available_locales
 
-# Load initial configuration in background
-Thread.new do
-  begin
-    Rails.logger.info("Loading initial language configuration from Directus...")
-    LanguageConfigurationService.update_live_config
-  rescue => e
-    Rails.logger.error("Failed to load initial language configuration from Directus: #{e.message}")
-    Rails.logger.warn("Using minimal fallback language configuration")
-  end
-end
+# Language configuration will be loaded on-demand or via deployment scripts
 
 # Create global variables that can be updated live
 $directus_language_mapping = LanguageConfig.language_mapping
