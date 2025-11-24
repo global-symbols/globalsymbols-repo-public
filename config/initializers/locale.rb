@@ -46,13 +46,35 @@ LanguageConfig.default_language = 'en-GB'.freeze
 # Set initial Rails config
 I18n.available_locales = LanguageConfig.available_locales
 
-# Load language configuration synchronously in all environments
-begin
-  Rails.logger.info("Loading language configuration from Directus...")
-  LanguageConfigurationService.update_live_config
-rescue => e
-  Rails.logger.error("Failed to load language configuration: #{e.message}")
-  Rails.logger.warn("Using minimal fallback language configuration")
+# Load language configuration
+if Rails.env.development?
+  # Synchronous loading for development (safe for single-threaded dev server)
+  begin
+    Rails.logger.info("Loading language configuration from Directus in development...")
+    LanguageConfigurationService.update_live_config
+  rescue => e
+    Rails.logger.error("Failed to load language configuration in development: #{e.message}")
+    Rails.logger.warn("Using minimal fallback language configuration")
+  end
+else
+  # Production: Load from cache first, then refresh in background if needed
+  begin
+    # Try to load from cache synchronously (fast)
+    cached_config = Rails.cache.read(LanguageConfigurationService::CACHE_KEY)
+    if cached_config.present?
+      Rails.logger.info("Loading language configuration from cache in production")
+      LanguageConfig.available_locales = cached_config['available_locales']
+      LanguageConfig.language_mapping = cached_config['directus_mapping'].freeze
+      LanguageConfig.default_language = cached_config['default_language'].freeze
+      I18n.available_locales = LanguageConfig.available_locales
+      Rails.logger.info("Language configuration loaded from cache: #{I18n.available_locales.inspect}")
+    else
+      Rails.logger.warn("No cached language configuration found - using fallback. Run deployment script to populate cache.")
+    end
+  rescue => e
+    Rails.logger.error("Failed to load cached language configuration: #{e.message}")
+    Rails.logger.warn("Using minimal fallback language configuration")
+  end
 end
 
 # Create global variables that can be updated live

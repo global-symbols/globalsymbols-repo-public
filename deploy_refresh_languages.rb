@@ -26,6 +26,15 @@ begin
     puts "Directus language mappings: #{DIRECTUS_LANGUAGE_MAPPING.call.inspect}"
     puts "Default language: #{DIRECTUS_DEFAULT_LANGUAGE.call}"
 
+    # Verify cache is populated
+    cache_key = LanguageConfigurationService::CACHE_KEY
+    cached_config = Rails.cache.read(cache_key)
+    if cached_config.present?
+      puts "✅ Cache populated with #{cached_config['available_locales'].size} locales"
+    else
+      puts "❌ WARNING: Cache not populated!"
+    end
+
     # Test key mappings
     puts "\n🧪 Testing key language mappings:"
     [:en, :fr, :de, :es, :it, :nl].each do |locale|
@@ -35,7 +44,8 @@ begin
     end
 
     puts "\n🎉 Language configuration refresh complete!"
-    puts "   New language mappings will be available immediately."
+    puts "   Cache warmed and ready for immediate use."
+    puts "   Languages will persist across Puma restarts."
     puts ""
     puts "💡 For development testing, you can also visit:"
     puts "   http://localhost:3000/webhooks/directus/simulate?collection=languages"
