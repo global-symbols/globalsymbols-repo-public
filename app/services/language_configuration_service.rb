@@ -114,7 +114,7 @@ class LanguageConfigurationService
       Rails.logger.error("Failed to update live language configuration: #{e.message}")
       false
     end
-    end
+  end
 
     private
 
