@@ -45,16 +45,7 @@ begin
   puts "Fresh config directus_mapping: #{fresh_config['directus_mapping'].inspect}"
   puts "Fresh config default_language: #{fresh_config['default_language'].inspect}"
 
-  puts "\n⚡ Testing update_live_config:"
-  puts "Calling LanguageConfigurationService.update_live_config..."
-  result = LanguageConfigurationService.update_live_config
-  puts "update_live_config result: #{result.inspect}"
-
-  puts "\n📊 After update_live_config:"
-  puts "I18n.available_locales: #{I18n.available_locales.inspect}"
-  puts "LanguageConfig.available_locales: #{LanguageConfig.available_locales.inspect}"
-  puts "LanguageConfig.language_mapping: #{LanguageConfig.language_mapping.inspect}"
-  puts "LanguageConfig.default_language: #{LanguageConfig.default_language.inspect}"
+  puts "\n✅ Language configuration is loaded during Rails startup in all environments"
 
 rescue => e
   puts "❌ Directus connection failed: #{e.message}"

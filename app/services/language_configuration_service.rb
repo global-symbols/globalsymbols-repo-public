@@ -91,24 +91,18 @@ class LanguageConfigurationService
       invalidate_cache!
       language_config = fetch_fresh_config
 
-      Rails.logger.info("DEBUG: language_config = #{language_config.inspect}")
-
       # Update LanguageConfig module if available
       if defined?(LanguageConfig)
-        Rails.logger.info("DEBUG: Updating LanguageConfig module")
         LanguageConfig.available_locales = language_config['available_locales']
         LanguageConfig.language_mapping = language_config['directus_mapping'].freeze
         LanguageConfig.default_language = language_config['default_language'].freeze
-        Rails.logger.info("DEBUG: LanguageConfig updated - available_locales: #{LanguageConfig.available_locales.inspect}")
       else
         Rails.logger.warn("Language config: LanguageConfig module not defined!")
       end
 
         # Update Rails I18n
       if defined?(LanguageConfig)
-        Rails.logger.info("DEBUG: Updating I18n.available_locales to: #{LanguageConfig.available_locales.inspect}")
         I18n.available_locales = LanguageConfig.available_locales
-        Rails.logger.info("DEBUG: I18n.available_locales is now: #{I18n.available_locales.inspect}")
       else
         # Fallback
         I18n.available_locales = language_config['available_locales']
@@ -118,7 +112,6 @@ class LanguageConfigurationService
       true
     rescue => e
       Rails.logger.error("Failed to update live language configuration: #{e.message}")
-      Rails.logger.error("DEBUG: Exception backtrace: #{e.backtrace.first(5).join("\n")}")
       false
     end
   end
