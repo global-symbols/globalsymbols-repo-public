@@ -72,6 +72,11 @@ class DirectusService
 
       items = fetch_collection(collection, translation_params, cache_ttl)
 
+      # Skip filtering if requested (for showing all articles regardless of translations)
+      if options[:skip_translation_filter] == true
+        return items
+      end
+
       # Filter items to only include those with translations in the requested language
       # or fallback to default language (en-GB)
       filtered_items = items.select do |item|
@@ -114,9 +119,11 @@ class DirectusService
       translations = item['translations'] || []
       requested_translation = translations.find { |t| t['languages_code'] == language_code }
       fallback_translation = translations.find { |t| t['languages_code'] == DIRECTUS_DEFAULT_LANGUAGE }
+      # Always try English as final fallback, even if default language is different
+      english_translation = translations.find { |t| t['languages_code'] == 'en-GB' }
 
-      if requested_translation.nil? && fallback_translation.nil?
-        Rails.logger.warn("Item #{collection}/#{id} has no translations in #{language_code} or #{DIRECTUS_DEFAULT_LANGUAGE}")
+      if requested_translation.nil? && fallback_translation.nil? && english_translation.nil?
+        Rails.logger.warn("Item #{collection}/#{id} has no translations in #{language_code}, #{DIRECTUS_DEFAULT_LANGUAGE}, or en-GB")
         return nil
       end
 

@@ -34,6 +34,8 @@ curl "http://localhost:3000/webhooks/directus/simulate"
 - Processing results (cache invalidation, job execution)
 - Affected locales detected
 
+**Security**: Only available in development environment.
+
 ### 2. Rake Task Simulation
 
 **Command**: `bundle exec rake webhook:simulate[collection,locales]`

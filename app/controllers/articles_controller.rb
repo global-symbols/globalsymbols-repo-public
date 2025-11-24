@@ -23,20 +23,12 @@ class ArticlesController < ApplicationController
       # Fetch all articles to get categories and handle pagination/filtering
       all_articles = DirectusService.fetch_collection_with_translations('articles', language_code, {
         limit: 1000  # Fetch enough articles for pagination and category filtering
-      })
+      }, nil, true, { skip_translation_filter: true }) # Skip translation filtering to show all articles
 
+      # Show all articles - let the view handle translation fallbacks
+      # Articles without translations in the requested language will show in English
+      translated_articles = all_articles
 
-      # Filter articles to only include those with translations in the requested language
-      # or fallback to default language (en-GB)
-      translated_articles = all_articles.select do |article|
-        translations = article['translations'] || []
-        requested_translation = translations.find { |t| t['languages_code'] == language_code }
-        fallback_translation = translations.find { |t| t['languages_code'] == DIRECTUS_DEFAULT_LANGUAGE }
-
-        # Use requested language if available, otherwise fallback
-        translation_to_use = requested_translation || fallback_translation
-        translation_to_use.present? && translation_to_use['title'].present?
-      end
 
       # Extract unique categories for filter links (before filtering)
       # categories is a M2M relationship: categories.article_categories_id.name
@@ -86,6 +78,7 @@ class ArticlesController < ApplicationController
       end_index = start_index + @articles_per_page - 1
       @articles = non_featured_articles[start_index..end_index] || []
 
+
       # Pagination metadata
       @has_previous_page = @current_page > 1
       @has_next_page = @current_page < @total_pages
@@ -105,19 +98,20 @@ class ArticlesController < ApplicationController
     # Get the Directus language code from the current Rails locale
     language_code = directus_language_code
 
+
     # Fetch article from Directus CMS by slug with language-specific translation filtering
     begin
       # Fetch articles filtered by slug
       articles = DirectusService.fetch_collection_with_translations('articles', language_code, {
         filter: { slug: { _eq: params[:slug] } }
-      })
+      }, nil, true, { skip_translation_filter: true }) # Skip translation filtering to allow English-only articles
 
       @article = articles.first
 
       # If article is nil, it means the article doesn't exist, isn't published,
-      # or has no translations in the requested or fallback language
+      # or has no translations in the requested, default, or English language
       if @article.nil? || @article.empty?
-        Rails.logger.warn("Article with slug #{params[:slug]} not found, not published, or has no translations in #{language_code} or #{DIRECTUS_DEFAULT_LANGUAGE}")
+        Rails.logger.warn("Article with slug #{params[:slug]} not found, not published, or has no translations in #{language_code}, #{DIRECTUS_DEFAULT_LANGUAGE}, or en-GB")
         redirect_to news_path, alert: "Article not found or not available in the requested language."
         return
       end
@@ -126,14 +120,16 @@ class ArticlesController < ApplicationController
       translations = @article['translations'] || []
       requested_translation = translations.find { |t| t['languages_code'] == language_code }
       fallback_translation = translations.find { |t| t['languages_code'] == DIRECTUS_DEFAULT_LANGUAGE }
+      # Always try English as final fallback, even if default language is different
+      english_translation = translations.find { |t| t['languages_code'] == 'en-GB' }
 
       # Determine which translation to use
-      @translation_used = requested_translation || fallback_translation
-      @using_fallback = requested_translation.nil? && fallback_translation.present?
+      @translation_used = requested_translation || fallback_translation || english_translation
+      @using_fallback = requested_translation.nil? && (fallback_translation.present? || english_translation.present?)
 
       if @translation_used.nil? || @translation_used['title'].blank?
-        Rails.logger.warn("Article with slug #{params[:slug]} has no valid translation in #{language_code} or #{DIRECTUS_DEFAULT_LANGUAGE}")
-        redirect_to news_path, alert: 'Article not available in the requested language.'
+        Rails.logger.warn("Article with slug #{params[:slug]} has no valid translation in #{language_code}, #{DIRECTUS_DEFAULT_LANGUAGE}, or en-GB")
+        redirect_to news_path, alert: 'Article not found or not available in the requested language.'
         return
       end
 

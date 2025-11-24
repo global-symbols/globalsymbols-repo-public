@@ -4,6 +4,15 @@
   title = translation['title'] || 'Article'
   description = translation['excerpt'] || translation['title'] || 'Article from Global Symbols'
 
+  # Debug logging for article show
+  if @article && @article['id'] == 4
+    Rails.logger.info("  - Article ID: #{@article['id']}")
+    Rails.logger.info("  - Using fallback: #{@using_fallback}")
+    Rails.logger.info("  - Translation used: #{translation['languages_code']}")
+    Rails.logger.info("  - Title: '#{title}'")
+    Rails.logger.info("  - Translation title: '#{translation['title']}'")
+  end
+
   set_meta_tags({
     site: 'Global Symbols News',
     article: {
@@ -27,7 +36,7 @@
           '@id': article_url(@article['slug'])
       },
       headline:      translation['title'] || 'Article',
-      inLanguage:    @article['requested_language'] || DIRECTUS_DEFAULT_LANGUAGE,
+      inLanguage:    @translation_used['languages_code'] || 'en-GB',
       datePublished: @article['date_created'],
       dateModified:  @article['date_updated'] || @article['date_created'],
       author: {
@@ -69,7 +78,7 @@
               %h1.text-center{:style => "font-weight: 600; font-size: 3.5rem"}
                 = translation['title'] || 'Article Title'
                 - if @using_fallback
-                  %small.text-warning.ml-2 (Displayed in #{DIRECTUS_DEFAULT_LANGUAGE})
+                  %small.text-warning.ml-2 (Displayed in en-GB)
           .row.justify-content-center.mt-3
             .col-auto.text-center.text-muted
               - if @article['date_created']

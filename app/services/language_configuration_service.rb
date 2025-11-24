@@ -96,12 +96,12 @@ class LanguageConfigurationService
         LanguageConfig.available_locales = language_config['available_locales']
         LanguageConfig.language_mapping = language_config['directus_mapping'].freeze
         LanguageConfig.default_language = language_config['default_language'].freeze
+      else
+        Rails.logger.warn("Language config: LanguageConfig module not defined!")
+      end
 
-        # Update global variables for constants
-        $directus_language_mapping = LanguageConfig.language_mapping
-        $directus_default_language = LanguageConfig.default_language
-
-        # Update Rails I18n
+      # Update Rails I18n
+      if defined?(LanguageConfig)
         I18n.available_locales = LanguageConfig.available_locales
       else
         # Fallback

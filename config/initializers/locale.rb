@@ -61,9 +61,12 @@ end
 $directus_language_mapping = LanguageConfig.language_mapping
 $directus_default_language = LanguageConfig.default_language
 
-# Define constants that reference the global variables
-DIRECTUS_LANGUAGE_MAPPING = $directus_language_mapping
-DIRECTUS_DEFAULT_LANGUAGE = $directus_default_language
+# The LanguageConfig module has attr_accessor which creates the getter methods
+# So LanguageConfig.language_mapping returns the instance variable set by update_live_config
+
+# Define constants that reference the LanguageConfig methods
+DIRECTUS_LANGUAGE_MAPPING = LanguageConfig.method(:language_mapping)
+DIRECTUS_DEFAULT_LANGUAGE = LanguageConfig.method(:default_language)
 
 Rails.application.configure do
   config.i18n.default_locale = :en

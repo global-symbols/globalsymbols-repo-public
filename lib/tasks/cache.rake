@@ -1,5 +1,29 @@
 # lib/tasks/cache.rake
 namespace :cache do
+  desc "Refresh language configuration from Directus (run when adding new languages)"
+  task refresh_languages: :environment do
+    puts "Refreshing language configuration from Directus..."
+
+    # Check if Directus is configured
+    unless ENV['DIRECTUS_URL'].present? && ENV['DIRECTUS_TOKEN_CMS'].present?
+      puts "❌ ERROR: Directus not configured. Set DIRECTUS_URL and DIRECTUS_TOKEN_CMS environment variables."
+      exit 1
+    end
+
+    # Update language configuration
+    result = LanguageConfigurationService.update_live_config
+
+    if result
+      puts "✅ Language configuration refreshed successfully"
+      puts "Available locales: #{I18n.available_locales.inspect}"
+      puts "Language mappings: #{DIRECTUS_LANGUAGE_MAPPING.call.inspect}"
+      puts "Default language: #{DIRECTUS_DEFAULT_LANGUAGE.call}"
+    else
+      puts "❌ Failed to refresh language configuration"
+      exit 1
+    end
+  end
+
   desc "Warm all Directus caches for current environment (run after deployments)"
   task warm_all: :environment do
     puts "Starting manual cache warming for #{Rails.env} environment..."
@@ -194,46 +218,40 @@ end
 
 def count_cache_entries
   begin
-    # Try to get the underlying Redis connection from Rails cache
     cache_store = Rails.cache
-    puts "DEBUG: Rails cache store class: #{cache_store.class}"
 
-    if cache_store.respond_to?(:redis)
+    case cache_store
+    when ActiveSupport::Cache::RedisCacheStore
+      # Redis-based cache
       redis = cache_store.redis
-      puts "DEBUG: Connected to Redis DB #{redis.connection[:db]} at #{redis.connection[:host]}:#{redis.connection[:port]}"
-
       all_keys = redis.keys("*")
-      puts "DEBUG: Found #{all_keys.length} total keys in Redis DB"
-
       directus_keys = all_keys.select { |k| k.include?('directus') }
-      puts "DEBUG: Found #{directus_keys.length} directus keys"
-
-      if directus_keys.any?
-        puts "DEBUG: Sample directus keys: #{directus_keys.first(3)}"
-      end
-
       directus_keys.length
-    else
-      puts "DEBUG: Rails cache does not respond to :redis method"
-      puts "DEBUG: Cache store: #{cache_store.inspect}"
 
-      # Try alternative approach - check if we can read known cache keys
-      test_keys = ['directus/language_config']
-      readable_count = 0
-      test_keys.each do |key|
-        if Rails.cache.read(key)
-          readable_count += 1
-          puts "DEBUG: Can read cache key: #{key}"
-        else
-          puts "DEBUG: Cannot read cache key: #{key}"
+    when ActiveSupport::Cache::FileStore
+      # File-based cache - count files in cache directory
+      cache_dir = Rails.root.join('tmp', 'cache')
+      if cache_dir.exist?
+        # Count files that contain 'directus' in their path or content
+        Dir.glob("#{cache_dir}/**/*").count do |file|
+          File.file?(file) && (file.include?('directus') || File.read(file).include?('directus'))
         end
+      else
+        0
       end
 
-      readable_count
+    when ActiveSupport::Cache::MemoryStore
+      # Memory store - we can't easily count entries
+      puts "Note: MemoryStore doesn't support entry counting"
+      1 if Rails.cache.read('directus/language_config') # At least check if language config exists
+
+    else
+      # Fallback - try to read known keys
+      known_keys = ['directus/language_config', 'directus/articles', 'directus/users']
+      known_keys.count { |key| Rails.cache.read(key) }
     end
   rescue => e
-    puts "Error counting cache entries: #{e.message}"
-    puts "DEBUG: Rails.cache class: #{Rails.cache.class}"
+    puts "Error counting cache entries: #{e.message} (Cache store: #{Rails.cache.class})"
     0
   end
 end
@@ -246,26 +264,69 @@ end
 
 def show_sample_cache_entries
   begin
-    all_keys = Rails.cache.redis.keys("*")
-    directus_keys = all_keys.select { |k| k.include?('directus') }
+    cache_store = Rails.cache
 
-    puts "  Total Redis keys in DB: #{all_keys.length}"
-    puts "  Directus-related keys: #{directus_keys.length}"
+    case cache_store
+    when ActiveSupport::Cache::RedisCacheStore
+      # Redis-based cache
+      all_keys = cache_store.redis.keys("*")
+      directus_keys = all_keys.select { |k| k.include?('directus') }
 
-    if directus_keys.any?
-      puts "  Sample cache entries:"
-      directus_keys.first(5).each do |key|
-        puts "    - #{key}"
+      puts "  Total Redis keys in DB: #{all_keys.length}"
+      puts "  Directus-related keys: #{directus_keys.length}"
+
+      if directus_keys.any?
+        puts "  Sample cache entries:"
+        directus_keys.first(5).each do |key|
+          puts "    - #{key}"
+        end
+        puts "    ... and #{directus_keys.length - 5} more" if directus_keys.length > 5
+      else
+        puts "  No directus keys found. All keys in DB:"
+        all_keys.first(10).each do |key|
+          puts "    - #{key}"
+        end
+        puts "    ... and #{all_keys.length - 10} more" if all_keys.length > 10
       end
-      puts "    ... and #{directus_keys.length - 5} more" if directus_keys.length > 5
+
+    when ActiveSupport::Cache::FileStore
+      # File-based cache
+      cache_dir = Rails.root.join('tmp', 'cache')
+      if cache_dir.exist?
+        cache_files = Dir.glob("#{cache_dir}/**/*").select { |f| File.file?(f) }
+        directus_files = cache_files.select do |file|
+          file.include?('directus') || File.read(file).include?('directus')
+        end
+
+        puts "  Total cache files: #{cache_files.length}"
+        puts "  Directus-related files: #{directus_files.length}"
+
+        if directus_files.any?
+          puts "  Sample cache files:"
+          directus_files.first(5).each do |file|
+            relative_path = file.sub("#{cache_dir}/", '')
+            puts "    - #{relative_path}"
+          end
+          puts "    ... and #{directus_files.length - 5} more" if directus_files.length > 5
+        else
+          puts "  No directus cache files found. Sample files:"
+          cache_files.first(5).each do |file|
+            relative_path = file.sub("#{cache_dir}/", '')
+            puts "    - #{relative_path}"
+          end
+        end
+      else
+        puts "  Cache directory doesn't exist: #{cache_dir}"
+      end
+
+    when ActiveSupport::Cache::MemoryStore
+      puts "  MemoryStore doesn't support file listing"
+      puts "  Language config cached: #{Rails.cache.read('directus/language_config') ? '✅' : '❌'}"
+
     else
-      puts "  No directus keys found. All keys in DB:"
-      all_keys.first(10).each do |key|
-        puts "    - #{key}"
-      end
-      puts "    ... and #{all_keys.length - 10} more" if all_keys.length > 10
+      puts "  Unsupported cache store: #{cache_store.class}"
     end
   rescue => e
-    puts "  Error listing cache entries: #{e.message}"
+    puts "  Error listing cache entries: #{e.message} (Cache store: #{Rails.cache.class})"
   end
 end

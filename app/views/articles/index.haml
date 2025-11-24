@@ -10,11 +10,14 @@
 
 - if @featured_article.present?
   - featured_translations = @featured_article['translations'] || []
-  - featured_current_lang = DIRECTUS_LANGUAGE_MAPPING[I18n.locale.to_sym] || DIRECTUS_DEFAULT_LANGUAGE
+  - featured_current_lang = DIRECTUS_LANGUAGE_MAPPING.call[I18n.locale.to_sym] || DIRECTUS_DEFAULT_LANGUAGE.call
   - featured_requested_translation = featured_translations.find { |t| t['languages_code'] == featured_current_lang }
-  - featured_fallback_translation = featured_translations.find { |t| t['languages_code'] == DIRECTUS_DEFAULT_LANGUAGE }
-  - featured_translation = featured_requested_translation || featured_fallback_translation || {}
-  - featured_using_fallback = featured_requested_translation.nil? && featured_fallback_translation.present?
+  - featured_fallback_translation = featured_translations.find { |t| t['languages_code'] == DIRECTUS_DEFAULT_LANGUAGE.call }
+  -# Always try English as final fallback, even if default language is different
+  - featured_english_translation = featured_translations.find { |t| t['languages_code'] == 'en-GB' }
+  - featured_translation = featured_requested_translation || featured_fallback_translation || featured_english_translation || {}
+  - featured_using_fallback = featured_requested_translation.nil? && (featured_fallback_translation.present? || featured_english_translation.present?)
+
 
   %section.featured-article-hero
     .featured-strap FEATURED
@@ -24,9 +27,9 @@
     .hero-overlay
       .container-xl
         .hero-content
-          %h1.hero-title= featured_translation['title'] || 'Featured Article'
+          %h1.hero-title= featured_translation['title'] || @featured_article['slug']&.gsub('-', ' ')&.titleize || 'Featured Article'
           - if featured_using_fallback
-            %small.text-warning.mb-3 (#{DIRECTUS_DEFAULT_LANGUAGE})
+            %small.text-warning.mb-3 (en-GB)
           .hero-meta
             - if @featured_article['author'] && @featured_article['author']['first_name']
               - author_name = [@featured_article['author']['first_name'], @featured_article['author']['last_name']].compact.join(' ')
@@ -60,11 +63,14 @@
       - @articles.each do |article|
         -# Get the translation for the current language or fallback
         - translations = article['translations'] || []
-        - current_lang_code = DIRECTUS_LANGUAGE_MAPPING[I18n.locale.to_sym] || DIRECTUS_DEFAULT_LANGUAGE
+        - current_lang_code = DIRECTUS_LANGUAGE_MAPPING.call[I18n.locale.to_sym] || DIRECTUS_DEFAULT_LANGUAGE.call
         - requested_translation = translations.find { |t| t['languages_code'] == current_lang_code }
-        - fallback_translation = translations.find { |t| t['languages_code'] == DIRECTUS_DEFAULT_LANGUAGE }
-        - translation = requested_translation || fallback_translation || {}
-        - using_fallback = requested_translation.nil? && fallback_translation.present?
+        - fallback_translation = translations.find { |t| t['languages_code'] == DIRECTUS_DEFAULT_LANGUAGE.call }
+        -# Always try English as final fallback, even if default language is different
+        - english_translation = translations.find { |t| t['languages_code'] == 'en-GB' }
+        - translation = requested_translation || fallback_translation || english_translation || {}
+        - using_fallback = requested_translation.nil? && (fallback_translation.present? || english_translation.present?)
+
         -# Responsive grid: 6 articles per row on mobile (col-6), 3 per row on desktop (col-md-4)
         .col-6.col-md-4.mb-4
           .card.h-100.news-article-card
@@ -75,7 +81,7 @@
               %h3.card-title{:style => "font-weight: 600"}
                 = translation['title'] || 'Article Title'
                 - if using_fallback
-                  %small.text-warning (#{DIRECTUS_DEFAULT_LANGUAGE})
+                  %small.text-warning (en-GB)
               %p.card-text.text-muted
                 - if article['author'] && article['author']['first_name']
                   - author_name = [article['author']['first_name'], article['author']['last_name']].compact.join(' ')
