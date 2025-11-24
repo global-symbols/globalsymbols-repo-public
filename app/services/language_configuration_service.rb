@@ -91,6 +91,9 @@ class LanguageConfigurationService
       invalidate_cache!
       language_config = fetch_fresh_config
 
+      # Write the fresh config to cache so future calls to config() will use it
+      Rails.cache.write(CACHE_KEY, language_config, expires_in: 90.minutes)
+
       # Update LanguageConfig module if available
       if defined?(LanguageConfig)
         LanguageConfig.available_locales = language_config['available_locales']
