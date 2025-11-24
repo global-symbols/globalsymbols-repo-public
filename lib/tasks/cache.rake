@@ -270,23 +270,23 @@ def show_sample_cache_entries
     when ActiveSupport::Cache::RedisCacheStore
       # Redis-based cache
       all_keys = cache_store.redis.keys("*")
-      directus_keys = all_keys.select { |k| k.include?('directus') }
+    directus_keys = all_keys.select { |k| k.include?('directus') }
 
-      puts "  Total Redis keys in DB: #{all_keys.length}"
-      puts "  Directus-related keys: #{directus_keys.length}"
+    puts "  Total Redis keys in DB: #{all_keys.length}"
+    puts "  Directus-related keys: #{directus_keys.length}"
 
-      if directus_keys.any?
-        puts "  Sample cache entries:"
-        directus_keys.first(5).each do |key|
-          puts "    - #{key}"
-        end
-        puts "    ... and #{directus_keys.length - 5} more" if directus_keys.length > 5
-      else
-        puts "  No directus keys found. All keys in DB:"
-        all_keys.first(10).each do |key|
-          puts "    - #{key}"
-        end
-        puts "    ... and #{all_keys.length - 10} more" if all_keys.length > 10
+    if directus_keys.any?
+      puts "  Sample cache entries:"
+      directus_keys.first(5).each do |key|
+        puts "    - #{key}"
+      end
+      puts "    ... and #{directus_keys.length - 5} more" if directus_keys.length > 5
+    else
+      puts "  No directus keys found. All keys in DB:"
+      all_keys.first(10).each do |key|
+        puts "    - #{key}"
+      end
+      puts "    ... and #{all_keys.length - 10} more" if all_keys.length > 10
       end
 
     when ActiveSupport::Cache::FileStore

@@ -32,8 +32,22 @@ puts "\n✅ Directus Connection:"
 begin
   languages = DirectusService.fetch_collection('languages')
   puts "Found #{languages.size} languages in Directus"
+
+  puts "\n📋 Language Details:"
+  languages.each do |lang|
+    puts "  #{lang['name'] || 'unnamed'}: code=#{lang['code']}, rails_code=#{lang['rails_code']}, default=#{lang['default']}"
+  end
+
+  # Test fetch_fresh_config directly
+  puts "\n🔄 Testing fetch_fresh_config:"
+  fresh_config = LanguageConfigurationService.send(:fetch_fresh_config)
+  puts "Fresh config available_locales: #{fresh_config['available_locales'].inspect}"
+  puts "Fresh config directus_mapping: #{fresh_config['directus_mapping'].inspect}"
+  puts "Fresh config default_language: #{fresh_config['default_language'].inspect}"
+
 rescue => e
   puts "❌ Directus connection failed: #{e.message}"
+  puts "Error details: #{e.backtrace.first}"
 end
 
 puts "\n🎯 Conclusion:"

@@ -37,7 +37,7 @@ class PictosController < ApplicationController
 
         # Check if file exists before sending to prevent 502 errors
         if File.exist?(path)
-          send_file path, filename: "#{@picto.best_label_for(locale).text}_#{@picto.id}.png", disposition: disposition
+        send_file path, filename: "#{@picto.best_label_for(locale).text}_#{@picto.id}.png", disposition: disposition
         else
           raise ActiveRecord::RecordNotFound
         end
@@ -48,7 +48,7 @@ class PictosController < ApplicationController
         raise ActiveRecord::RecordNotFound unless imagefile.file.extension.downcase == 'svg'
         # Check if file exists before sending to prevent 502 errors
         if File.exist?(imagefile.path)
-          send_file imagefile.path, filename: "#{@picto.best_label_for(locale).text}_#{@picto.id}.svg", disposition: disposition
+        send_file imagefile.path, filename: "#{@picto.best_label_for(locale).text}_#{@picto.id}.svg", disposition: disposition
         else
           raise ActiveRecord::RecordNotFound
         end
@@ -59,7 +59,7 @@ class PictosController < ApplicationController
         raise ActiveRecord::RecordNotFound unless imagefile.file.extension.downcase == 'jpg'
         # Check if file exists before sending to prevent 502 errors
         if File.exist?(imagefile.path)
-          send_file imagefile.path, filename: "#{@picto.best_label_for(locale).text}_#{@picto.id}.jpg", disposition: disposition
+        send_file imagefile.path, filename: "#{@picto.best_label_for(locale).text}_#{@picto.id}.jpg", disposition: disposition
         else
           raise ActiveRecord::RecordNotFound
         end

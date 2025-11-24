@@ -100,7 +100,7 @@ class LanguageConfigurationService
         Rails.logger.warn("Language config: LanguageConfig module not defined!")
       end
 
-      # Update Rails I18n
+        # Update Rails I18n
       if defined?(LanguageConfig)
         I18n.available_locales = LanguageConfig.available_locales
       else
