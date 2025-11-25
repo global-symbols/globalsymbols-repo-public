@@ -27,10 +27,14 @@ while true
     puts "  check ID        # Check if article ID is cached"
     puts "  health          # Full cache health check"
     puts "  perf [ID]       # Performance test (default ID=4)"
+    puts "  check ID        # Check if specific article is cached"
+    puts "  check_lang CODE # Check if specific language is cached"
     puts "  clear ID        # Clear specific article from cache"
     puts "  debug ID        # Debug cache key for specific article"
     puts "  fetch ID        # Fetch and cache specific article"
+    puts "  fetch_lang CODE # Fetch and cache specific language"
     puts "  articles        # Show only individual cached articles"
+    puts "  languages       # Show cached languages"
     puts "  cleanup         # Remove empty/corrupted cache entries"
     puts "  collections     # Show all cached collections"
     puts "  help            # Show this help"
@@ -46,6 +50,10 @@ while true
   when /^check (\d+)$/
     id = $1.to_i
     CacheInspector.article_cached?(id, 'en-GB')
+
+  when /^check_lang ([a-zA-Z_-]+)$/
+    code = $1
+    CacheInspector.language_cached?(code)
 
   when /^health$/
     CacheInspector.cache_health_check
@@ -69,8 +77,15 @@ while true
     id = $1.to_i
     CacheInspector.fetch_and_cache_article(id, 'en-GB')
 
+  when /^fetch_lang ([a-zA-Z_-]+)$/
+    code = $1
+    CacheInspector.fetch_and_cache_language(code)
+
   when /^articles$/
     CacheInspector.inspect_article_cache
+
+  when /^languages$/
+    CacheInspector.inspect_cached_languages
 
   when /^collections$/
     DirectusCachedCollection.all.each do |collection|

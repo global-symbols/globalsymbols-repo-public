@@ -117,6 +117,93 @@ module CacheInspector
     puts "  Rails.cache.clear              # Clear all cache"
   end
 
+  # Check if language is cached
+  def language_cached?(code)
+    # Build the same key that fetch_item would use for languages
+    cache_key = DirectusService.send(:build_cache_key, :get, "items/languages/#{code}", {})
+
+    cached_data = Rails.cache.read(cache_key)
+    status = cached_data.present? ? '✅ CACHED' : '❌ NOT CACHED'
+
+    puts "Language #{code}: #{status}"
+    if Rails.env.development?
+      puts "Cache key: #{cache_key}"
+
+      if cached_data
+        puts "Cached data type: #{cached_data.class}"
+        if cached_data.is_a?(Hash)
+          puts "Language name: #{cached_data['name']}"
+          puts "Language code: #{cached_data['code']}"
+        end
+      end
+    end
+  end
+
+  # Fetch and cache a specific language
+  def fetch_and_cache_language(code)
+    puts "🔄 Fetching and caching language #{code}..."
+
+    begin
+      language = DirectusService.fetch_item('languages', code)
+      if language
+        puts "✅ Language #{code} fetched and cached"
+        puts "   Name: #{language['name']}"
+        puts "   Code: #{language['code']}"
+
+        # Verify it's now cached
+        sleep 0.1 # Small delay to ensure caching
+        cached = language_cached?(code)
+        puts "   Verification: #{cached ? '✅ Now cached' : '❌ Still not cached'}"
+      else
+        puts "❌ Language #{code} not found in Directus"
+      end
+    rescue => e
+      puts "❌ Error fetching language #{code}: #{e.message}"
+    end
+  end
+
+  # Inspect cached languages
+  def inspect_cached_languages
+    redis = Rails.cache.redis
+    keys = redis.keys('globalsymbols_cache:directus/languages:*')
+
+    puts "=== CACHED LANGUAGES ==="
+    puts "Total cached languages: #{keys.length}"
+    puts "Redis namespace: globalsymbols_cache"
+    puts "Collection: languages"
+    puts ""
+
+    if keys.empty?
+      puts "❌ No languages cached"
+      puts "💡 Try: DirectusService.fetch_item('languages', 'en-GB')"
+      return
+    end
+
+    keys.each do |key|
+      clean_key = key.sub('globalsymbols_cache:', '')
+      puts "📄 #{clean_key}"
+
+      # Try to read the cached data
+      begin
+        cached_data = Rails.cache.read(clean_key)
+        if cached_data.is_a?(Hash) && cached_data['code']
+          name = cached_data['name']
+          code = cached_data['code']
+          puts "   Code: #{code}, Name: #{name}"
+        else
+          puts "   Cached data type: #{cached_data.class}"
+        end
+      rescue => e
+        puts "   Error reading cache: #{e.message}"
+      end
+    end
+
+    puts ""
+    puts "🎯 Usage:"
+    puts "  language_cached?('CODE')  # Check specific language"
+    puts "  Rails.cache.clear          # Clear all cache"
+  end
+
   # Inspect all Directus cache entries (collections + individual items)
   def inspect_all_directus_cache
     redis = Rails.cache.redis
@@ -335,6 +422,8 @@ module CacheInspector
   # Clean up corrupted/empty cache entries
   def cleanup_empty_cache_entries
     puts "=== CLEANUP EMPTY CACHE ENTRIES ==="
+    puts "This removes only truly empty/corrupted Redis entries"
+    puts ""
 
     redis = Rails.cache.redis
     pattern = "globalsymbols_cache:directus/*"
@@ -345,22 +434,40 @@ module CacheInspector
 
     empty_keys = []
     valid_keys = []
+    sample_valid = nil
 
     keys.each do |key|
-      data = redis.get(key)
-      if data.nil? || data.empty?
+      raw_data = redis.get(key)
+      if raw_data.nil? || raw_data.empty?
         empty_keys << key
       else
         valid_keys << key
+        # Store one sample for verification
+        sample_valid ||= [key, raw_data]
       end
     end
 
+    puts ""
+    puts "📊 Analysis Results:"
     puts "Empty/corrupted keys: #{empty_keys.length}"
     puts "Valid keys: #{valid_keys.length}"
+
+    # Verify sample valid entry can be read by Rails
+    if sample_valid
+      sample_key, sample_data = sample_valid
+      cache_key = sample_key.sub('globalsymbols_cache:', '')
+      begin
+        rails_data = Rails.cache.read(cache_key)
+        puts "✅ Sample valid entry readable by Rails: #{rails_data ? 'YES' : 'NO'}"
+      rescue => e
+        puts "⚠️  Sample valid entry has Rails read error: #{e.message}"
+      end
+    end
 
     if empty_keys.any?
       puts ""
       puts "🗑️  Removing empty cache entries..."
+      puts "These are entries with nil/empty data at Redis level"
       removed = 0
 
       empty_keys.each do |key|
@@ -373,8 +480,11 @@ module CacheInspector
 
       puts ""
       puts "✅ Removed #{removed} empty cache entries"
+      puts "Note: These were truly empty - not different data formats"
     else
+      puts ""
       puts "✅ No empty cache entries found"
+      puts "All cache entries contain valid data (may have different formats)"
     end
 
     puts ""

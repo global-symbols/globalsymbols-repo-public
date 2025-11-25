@@ -40,6 +40,9 @@ rails runner "require 'cache_inspector'; CacheInspector.article_cached?(4, 'en-G
 - `clear_article_cache(id, language)` - Remove specific article from cache
 - `debug_article_cache_key(id, language)` - Debug cache key generation and lookup
 - `fetch_and_cache_article(id, language)` - Fetch specific article from Directus and cache it
+- `language_cached?(code)` - Check if specific language is cached
+- `fetch_and_cache_language(code)` - Fetch specific language from Directus and cache it
+- `inspect_cached_languages` - Show all cached languages
 - `cleanup_empty_cache_entries` - Remove corrupted/empty cache entries
 
 ## 🎮 Interactive Mode Commands
@@ -52,10 +55,14 @@ cache> inspect         # Show all cached articles
 cache> check 4         # Check if article 4 is cached
 cache> health          # Run health check
 cache> perf 4          # Performance test for article 4
+cache> check 4         # Check if article 4 is cached
+cache> check_lang en-GB # Check if English language is cached
 cache> clear 4         # Clear article 4 from cache
 cache> debug 4         # Debug cache key for article 4
 cache> fetch 4         # Fetch and cache article 4
+cache> fetch_lang fr-FR # Fetch and cache French language
 cache> articles        # Show only individual cached articles
+cache> languages       # Show cached languages
 cache> cleanup         # Remove empty/corrupted cache entries
 cache> collections     # Show configured collections
 cache> help            # Show all commands
