@@ -95,6 +95,13 @@ class WebhooksController < ApplicationController
       payload.each do |key, value|
         Rails.logger.info("  #{key}: #{value.class} - #{value.inspect}")
       end
+
+      # Check if this looks like a Directus Flow payload
+      if payload.key?('data') && payload['data'].to_s.include?('trigger.payload')
+        Rails.logger.warn("⚠️  Detected Directus Flow payload with malformed template: #{payload['data']}")
+        Rails.logger.warn("This suggests the HTTP Request operation in your Directus Flow is using incorrect template syntax")
+      end
+
     rescue JSON::ParserError => e
       Rails.logger.error("❌ Directus webhook received invalid JSON: #{e.message}")
       Rails.logger.error("Raw body that failed to parse: #{raw_body}")
@@ -111,14 +118,25 @@ class WebhooksController < ApplicationController
     Rails.logger.info("Collection present? #{collection.present?}")
     Rails.logger.info("Collection blank? #{collection.blank?}")
 
+    # If collection is missing, try alternative locations (for Flow payloads)
     if collection.blank?
-      Rails.logger.warn("❌ Directus webhook received without collection")
-      Rails.logger.warn("Available payload keys: #{payload.keys.inspect}")
-      Rails.logger.warn("Full payload for debugging: #{payload.inspect}")
-      Rails.logger.warn("📤 Response: 400 Bad Request")
-      Rails.logger.warn("=== DIRECTUS WEBHOOK FAILED ===")
-      head :bad_request
-      return
+      Rails.logger.warn("❌ Directus webhook received without collection field")
+      Rails.logger.warn("Checking alternative payload structures...")
+
+      # Check if collection might be in trigger data
+      trigger_data = payload.dig('payload', 'collection') || payload.dig('data', 'collection')
+      if trigger_data.present?
+        collection = trigger_data
+        Rails.logger.info("✅ Found collection in alternative location: #{collection}")
+      else
+        Rails.logger.warn("❌ No collection found in payload")
+        Rails.logger.warn("Available payload keys: #{payload.keys.inspect}")
+        Rails.logger.warn("Full payload for debugging: #{payload.inspect}")
+        Rails.logger.warn("📤 Response: 400 Bad Request")
+        Rails.logger.warn("=== DIRECTUS WEBHOOK FAILED ===")
+        head :bad_request
+        return
+      end
     end
 
     # Check cached collections
@@ -161,8 +179,15 @@ class WebhooksController < ApplicationController
 
     # Extract affected locales from nested translations in payload['payload']
     Rails.logger.info("Extracting affected locales from payload...")
-    affected_locales = extract_affected_locales(payload)
-    Rails.logger.info("Extracted affected locales: #{affected_locales.inspect}")
+    begin
+      affected_locales = extract_affected_locales(payload)
+      Rails.logger.info("Extracted affected locales: #{affected_locales.inspect}")
+    rescue => e
+      Rails.logger.error("❌ Error extracting locales: #{e.message}")
+      Rails.logger.error("This might indicate malformed payload structure from Directus Flow")
+      Rails.logger.error("Full payload: #{payload.inspect}")
+      affected_locales = []  # Default to empty array
+    end
 
     Rails.logger.info("🔄 Directus webhook received for collection #{collection}, invalidating cache and warming with #{affected_locales.length} locales")
 
@@ -224,22 +249,37 @@ class WebhooksController < ApplicationController
     translations = item_data['translations'] || []
     Rails.logger.info("📝 Found #{translations.length} translation entries")
     Rails.logger.info("Translation details: #{translations.inspect}")
+    Rails.logger.info("Translations type: #{translations.class}")
 
-    if translations.any?
-      Rails.logger.info("Processing translations...")
+    # Handle case where translations might be malformed
+    if translations.is_a?(Array)
+      Rails.logger.info("Processing translations array...")
       locales = translations.map { |t|
-        lang_code = t['languages_code']
-        Rails.logger.debug("Translation entry: #{t.inspect}, languages_code: #{lang_code.inspect}")
-        lang_code
+        Rails.logger.debug("Processing translation entry: #{t.inspect} (type: #{t.class})")
+        if t.is_a?(Hash)
+          lang_code = t['languages_code'] || t['code'] || t['locale']
+          Rails.logger.debug("Found languages_code: #{lang_code.inspect}")
+          lang_code
+        elsif t.is_a?(String)
+          Rails.logger.debug("Translation entry is a string: #{t}")
+          t  # Use the string directly as locale code
+        else
+          Rails.logger.warn("Unexpected translation entry type: #{t.class}")
+          nil
+        end
       }.compact.uniq
     else
-      Rails.logger.warn("⚠️  No translations found in payload!")
+      Rails.logger.warn("⚠️  Translations is not an array! Type: #{translations.class}")
       locales = []
     end
 
     Rails.logger.info("🎯 Extracted locales: #{locales.inspect}")
 
     locales
+  rescue => e
+    Rails.logger.error("❌ Error extracting locales: #{e.message}")
+    Rails.logger.error("Error backtrace: #{e.backtrace.first(5).join("\n")}")
+    []
   end
 
   # Build a realistic Directus webhook payload for simulation
