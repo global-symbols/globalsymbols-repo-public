@@ -137,6 +137,35 @@ cd /your/rails/app
 # Interactive mode
 ./bin/cache_inspector
 
+## Language Commands
+
+Languages in this system are stored as **configuration metadata**, not individual cached objects. The language config includes:
+
+- **Available locales**: Rails locale symbols (e.g., `[:en, :fr]`)
+- **Directus mapping**: Maps Rails codes to Directus codes (e.g., `{en: 'en-GB'}`)
+- **Default language**: The default Directus language code
+
+### Commands
+
+- `languages` - Show cached language configuration from `directus/language_config`
+- `check_lang CODE` - Check if Rails locale is configured (e.g., `check_lang en`)
+- `fetch_lang CODE` - Refresh entire language configuration from Directus
+
+### Examples
+
+```bash
+cache> languages
+# Shows: Available locales, Directus mapping, default language, and locale list
+
+cache> check_lang en
+# Shows: Whether 'en' locale is configured and its Directus mapping
+
+cache> fetch_lang en
+# Refreshes the entire language configuration from Directus
+```
+
+# Rails Console Usage
+
 # Or in Rails console
 rails console
 require 'cache_inspector'

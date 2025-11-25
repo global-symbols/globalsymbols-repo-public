@@ -212,18 +212,22 @@ module CacheInspector
             end
           end
         elsif cached_data.is_a?(Hash)
-          puts "   📄 Language config object:"
-          if cached_data['data'] && cached_data['data'].is_a?(Array)
-            puts "      📋 Contains array of #{cached_data['data'].length} languages:"
-            cached_data['data'].each do |lang|
-              if lang.is_a?(Hash)
-                code = lang['code'] || lang['languages_code']
-                name = lang['name'] || lang['display_name']
-                puts "         • #{code}: #{name}"
-              end
+          puts "   📄 Language configuration object:"
+          puts "      🔧 Available locales: #{cached_data['available_locales']&.inspect || 'none'}"
+          puts "      🗺️  Directus mapping: #{cached_data['directus_mapping']&.inspect || 'none'}"
+          puts "      🎯 Default language: #{cached_data['default_language'] || 'none'}"
+          puts ""
+
+          # Show how many locales are configured
+          available_locales = cached_data['available_locales']
+          if available_locales.is_a?(Array) && available_locales.any?
+            puts "   🌍 #{available_locales.length} locales configured:"
+            available_locales.each do |locale|
+              directus_code = cached_data['directus_mapping']&.[](locale.to_sym) || cached_data['directus_mapping']&.[](locale.to_s)
+              puts "      • #{locale} → #{directus_code || 'no mapping'}"
             end
           else
-            puts "      Keys: #{cached_data.keys.inspect}"
+            puts "   ⚠️  No locales configured in cache"
           end
         else
           puts "   Cached data type: #{cached_data.class}"
@@ -679,26 +683,35 @@ if __FILE__ == $0
   puts "  require 'cache_inspector'"
   puts "  inspect_article_cache"
 
-  # Fetch and cache a specific language
+  # Fetch and cache language configuration from Directus
   def fetch_and_cache_language(language_code)
-    puts "=== FETCH AND CACHE LANGUAGE #{language_code.upcase} ==="
-    puts "Fetching from Directus..."
+    puts "=== FETCH LANGUAGE CONFIG FROM DIRECTUS ==="
+    puts "Refreshing language configuration cache..."
 
     begin
-      # Try to fetch the language from Directus
-      language_data = DirectusService.fetch_item('languages', language_code)
-      if language_data
-        puts "✅ Successfully fetched language #{language_code}"
-        puts "Name: #{language_data['name'] || language_data['display_name']}"
-        puts "Code: #{language_data['code'] || language_data['languages_code']}"
+      # Use LanguageConfigurationService to refresh the config
+      success = LanguageConfigurationService.update_live_config
 
-        # Cache it (assuming DirectusService handles caching)
-        puts "Language cached successfully"
+      if success
+        puts "✅ Language configuration refreshed successfully"
+
+        # Now check if the specific language is configured
+        config = Rails.cache.read('directus/language_config')
+        if config && config['available_locales']
+          if config['available_locales'].include?(language_code.to_sym)
+            puts "✅ Language #{language_code} is now configured"
+            directus_code = config['directus_mapping']&.[](language_code.to_sym)
+            puts "   Rails: #{language_code} → Directus: #{directus_code}"
+          else
+            puts "⚠️  Language #{language_code} not found in refreshed configuration"
+            puts "   Available: #{config['available_locales'].inspect}"
+          end
+        end
       else
-        puts "❌ Language #{language_code} not found in Directus"
+        puts "❌ Failed to refresh language configuration"
       end
     rescue => e
-      puts "❌ Error fetching language: #{e.message}"
+      puts "❌ Error refreshing language config: #{e.message}"
     end
   end
 
@@ -706,43 +719,27 @@ if __FILE__ == $0
   def check_language_cache(language_code)
     puts "=== CHECK LANGUAGE CACHE FOR #{language_code.upcase} ==="
 
-    # First check the language config
+    # Check the language config for mapping
     language_config = Rails.cache.read('directus/language_config')
 
-    if language_config
-      if language_config.is_a?(Array)
-        # Array of language objects
-        language = language_config.find { |lang| lang['code'] == language_code || lang['languages_code'] == language_code }
-        if language
-          name = language['name'] || language['display_name']
-          code = language['code'] || language['languages_code']
-          puts "Language #{language_code}: ✅ CACHED"
-          puts "  Name: #{name}"
-          puts "  Code: #{code}"
-          return
-        end
-      elsif language_config.is_a?(Hash) && language_config['data'] && language_config['data'].is_a?(Array)
-        # Wrapped in data object
-        language = language_config['data'].find { |lang| lang['code'] == language_code || lang['languages_code'] == language_code }
-        if language
-          name = language['name'] || language['display_name']
-          code = language['code'] || language['languages_code']
-          puts "Language #{language_code}: ✅ CACHED"
-          puts "  Name: #{name}"
-          puts "  Code: #{code}"
-          return
-        end
+    if language_config.is_a?(Hash)
+      available_locales = language_config['available_locales'] || []
+      directus_mapping = language_config['directus_mapping'] || {}
+
+      # Check if this Rails locale is configured
+      if available_locales.include?(language_code.to_sym) || available_locales.include?(language_code.to_s)
+        directus_code = directus_mapping[language_code.to_sym] || directus_mapping[language_code.to_s]
+        puts "Language #{language_code}: ✅ CONFIGURED"
+        puts "  Rails locale: #{language_code}"
+        puts "  Directus code: #{directus_code || 'no mapping'}"
+        puts "  Default language: #{language_config['default_language'] == directus_code ? 'YES' : 'NO'}"
+        return
       end
     end
 
-    # Fallback: check individual language keys
-    cache_key = "directus/languages/#{language_code}"
-    cached_data = Rails.cache.read(cache_key)
-    status = cached_data.present? ? '✅ CACHED' : '❌ NOT CACHED'
-    puts "Language #{language_code}: #{status}"
-    if cached_data && cached_data.is_a?(Hash)
-      puts "  Name: #{cached_data['name']}"
-      puts "  Code: #{cached_data['code']}"
-    end
+    # Not found in configuration
+    puts "Language #{language_code}: ❌ NOT CONFIGURED"
+    puts "  This locale is not in the language configuration cache"
+    puts "  💡 Try: fetch_lang #{language_code}"
   end
 end
