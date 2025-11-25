@@ -40,6 +40,16 @@ Source.create(name: 'Public Suggestion', slug: 'public-suggestion', authoritativ
 # Languages
 ImportLanguagesJob.perform_now
 
+# Directus Cached Collections
+DirectusCachedCollection.find_or_create_by!(name: 'articles') do |collection|
+  collection.parameter_sets = [
+    { 'limit' => 1000 },  # Used by articles index for pagination/filtering
+    { 'limit' => 9 }      # Used for featured articles or small lists
+  ]
+  collection.priority = 10
+  collection.description = 'News articles and blog posts'
+end
+
 if Rails.env == 'development'
   require 'factory_bot_rails'
   

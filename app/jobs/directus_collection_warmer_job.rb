@@ -3,15 +3,6 @@
 class DirectusCollectionWarmerJob < ApplicationJob
   queue_as :default
 
-  # Map of collections to their parameter sets used in the application
-  # Each collection contains an array of parameter hashes that the app actually uses
-  COLLECTION_PARAMS_MAP = {
-    'articles' => [
-      { limit: 1000 },  # Used by articles index for pagination/filtering
-      { limit: 9 }      # Used for featured articles or small lists
-    ]
-  }.freeze
-
   # All supported Directus language codes (from config/initializers/locale.rb)
   ALL_LOCALES = %w[
     en-GB bg-BG ca-ES de-DE el-GR es-ES fr-FR hr-HR hy-AM it-IT
@@ -23,8 +14,8 @@ class DirectusCollectionWarmerJob < ApplicationJob
 
     Rails.logger.info("Starting Directus collection warmer for #{collection} with #{locales.length} locales")
 
-    # Get parameter sets for this collection
-    param_sets = COLLECTION_PARAMS_MAP[collection]
+    # Get parameter sets for this collection from database
+    param_sets = DirectusCachedCollection.collection_params_map[collection]
     if param_sets.blank?
       Rails.logger.warn("No parameter sets found for collection #{collection}, skipping")
       return

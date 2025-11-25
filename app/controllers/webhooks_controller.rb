@@ -4,9 +4,6 @@ class WebhooksController < ApplicationController
   # Webhooks should not require authentication
   skip_before_action :authenticate_user!
 
-  # Collections that we cache and should respond to webhooks for
-  CACHED_COLLECTIONS = %w[articles].freeze
-
   # Collections that affect language configuration
   LANGUAGE_CONFIG_COLLECTIONS = %w[languages].freeze
 
@@ -99,7 +96,7 @@ class WebhooksController < ApplicationController
       return
     end
 
-    unless CACHED_COLLECTIONS.include?(collection)
+    unless DirectusCachedCollection.cached_collection_names.include?(collection)
       Rails.logger.info("Directus webhook received for uncached collection #{collection}, ignoring")
       head :ok
       return
@@ -180,11 +177,11 @@ class WebhooksController < ApplicationController
     end
 
     # Check if collection is cached
-    unless CACHED_COLLECTIONS.include?(collection)
+    unless DirectusCachedCollection.cached_collection_names.include?(collection)
       return {
         skipped: true,
         reason: "Collection #{collection} not in cached collections list",
-        cached_collections: CACHED_COLLECTIONS
+        cached_collections: DirectusCachedCollection.cached_collection_names
       }
     end
 

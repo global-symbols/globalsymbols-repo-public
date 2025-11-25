@@ -62,11 +62,13 @@ namespace :cache do
     total_expected_entries = 0
     total_actual_entries = 0
 
-    DirectusCollectionWarmerJob::COLLECTION_PARAMS_MAP.each_key do |collection|
+    collections = DirectusCachedCollection.active.ordered_by_priority
+    collections.each do |collection_record|
+      collection = collection_record.name
       puts ""
-      puts "🔄 Warming collection: #{collection}"
+      puts "🔄 Warming collection: #{collection} (#{collection_record.description})"
 
-      param_sets = DirectusCollectionWarmerJob::COLLECTION_PARAMS_MAP[collection]
+      param_sets = collection_record.parameter_sets.map(&:symbolize_keys)
       locales = DirectusCollectionWarmerJob::ALL_LOCALES
       expected_for_collection = param_sets.length  # 1 cache entry per unique API request
 
