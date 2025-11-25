@@ -221,7 +221,17 @@ module CacheInspector
       raw_redis_data = redis.get(full_redis_key)
       puts "Raw Redis data length: #{raw_redis_data&.length || 0} bytes"
       puts "Raw Redis data type: #{raw_redis_data.class}"
-      puts "Raw Redis data preview: #{raw_redis_data&.first(200)}..." if raw_redis_data
+
+      if raw_redis_data.nil? || raw_redis_data.empty?
+        puts "❌ PROBLEM FOUND: Redis key exists but contains no data!"
+        puts "This is a corrupted/expired cache entry."
+        puts ""
+        puts "🛠️  SOLUTION: Clear this corrupted cache entry"
+        puts "Run: CacheInspector.clear_article_cache(#{id}, '#{language}')"
+        return
+      end
+
+      puts "Raw Redis data preview: #{raw_redis_data.first(200)}..." if raw_redis_data
     end
 
     # Try to read it via Rails cache
@@ -236,30 +246,62 @@ module CacheInspector
       end
     else
       puts "Cached data is nil/empty"
-      # Try to understand why Rails can't read it
-      if exists && raw_redis_data
-        puts "🔍 Investigating why Rails can't read existing Redis data..."
-
-        # Check if it's a serialization issue
-        begin
-          # Try to manually deserialize (Rails uses Marshal by default)
-          if raw_redis_data.start_with?("\x04\x08") # Marshal signature
-            manual_data = Marshal.load(raw_redis_data)
-            puts "✅ Manual Marshal deserialization: SUCCESS"
-            puts "Manual data type: #{manual_data.class}"
-            puts "Manual data preview: #{manual_data.inspect.first(200)}..." if manual_data
-          else
-            puts "❌ Data doesn't look like Marshal format"
-          end
-        rescue => e
-          puts "❌ Manual deserialization failed: #{e.message}"
-        end
-      end
     end
 
     puts ""
     puts "🎯 Summary:"
     puts "  Article #{id} (#{language}) is #{cached_data.present? ? 'CACHED' : 'NOT CACHED'}"
+  end
+
+  # Clean up corrupted/empty cache entries
+  def cleanup_empty_cache_entries
+    puts "=== CLEANUP EMPTY CACHE ENTRIES ==="
+
+    redis = Rails.cache.redis
+    pattern = "globalsymbols_cache:directus/*"
+
+    puts "Scanning for Directus cache keys..."
+    keys = redis.keys(pattern)
+    puts "Found #{keys.length} Directus cache keys"
+
+    empty_keys = []
+    valid_keys = []
+
+    keys.each do |key|
+      data = redis.get(key)
+      if data.nil? || data.empty?
+        empty_keys << key
+      else
+        valid_keys << key
+      end
+    end
+
+    puts "Empty/corrupted keys: #{empty_keys.length}"
+    puts "Valid keys: #{valid_keys.length}"
+
+    if empty_keys.any?
+      puts ""
+      puts "🗑️  Removing empty cache entries..."
+      removed = 0
+
+      empty_keys.each do |key|
+        # Remove the namespace prefix for Rails cache delete
+        cache_key = key.sub('globalsymbols_cache:', '')
+        Rails.cache.delete(cache_key)
+        removed += 1
+        print "."
+      end
+
+      puts ""
+      puts "✅ Removed #{removed} empty cache entries"
+    else
+      puts "✅ No empty cache entries found"
+    end
+
+    puts ""
+    puts "📊 After cleanup:"
+    remaining_keys = redis.keys(pattern)
+    puts "Remaining Directus keys: #{remaining_keys.length}"
   end
 
   # Quick status
