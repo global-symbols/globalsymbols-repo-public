@@ -30,6 +30,7 @@ while true
     puts "  clear ID        # Clear specific article from cache"
     puts "  debug ID        # Debug cache key for specific article"
     puts "  fetch ID        # Fetch and cache specific article"
+    puts "  articles        # Show only individual cached articles"
     puts "  cleanup         # Remove empty/corrupted cache entries"
     puts "  collections     # Show all cached collections"
     puts "  help            # Show this help"
@@ -40,7 +41,7 @@ while true
     CacheInspector.cache_status
 
   when /^inspect$/
-    CacheInspector.inspect_article_cache
+    CacheInspector.inspect_all_directus_cache
 
   when /^check (\d+)$/
     id = $1.to_i
@@ -67,6 +68,9 @@ while true
   when /^fetch (\d+)$/
     id = $1.to_i
     CacheInspector.fetch_and_cache_article(id, 'en-GB')
+
+  when /^articles$/
+    CacheInspector.inspect_article_cache
 
   when /^collections$/
     DirectusCachedCollection.all.each do |collection|

@@ -79,7 +79,46 @@ module CacheInspector
     puts "  Rails.cache.clear              # Clear all cache"
   end
 
-  # Check cache for any collection
+  # Inspect all Directus cache entries (collections + individual items)
+  def inspect_all_directus_cache
+    redis = Rails.cache.redis
+    all_directus_keys = redis.keys('globalsymbols_cache:directus/*')
+
+    puts "=== ALL DIRECTUS CACHE ENTRIES ==="
+    puts "Total Directus cache entries: #{all_directus_keys.length}"
+    puts ""
+
+    if all_directus_keys.empty?
+      puts "❌ No Directus data cached"
+      return
+    end
+
+    # Group by type
+    collections = {}
+    all_directus_keys.each do |key|
+      # Remove namespace
+      clean_key = key.sub('globalsymbols_cache:directus/', '')
+
+      # Extract collection/type
+      parts = clean_key.split(':')
+      collection = parts.first
+
+      collections[collection] ||= []
+      collections[collection] << clean_key
+    end
+
+    # Show summary by collection
+    collections.each do |collection, keys|
+      puts "📁 #{collection}: #{keys.length} entries"
+      keys.first(3).each do |key|
+        puts "   📄 #{key}"
+      end
+      puts "   ... and #{keys.length - 3} more" if keys.length > 3
+      puts ""
+    end
+  end
+
+  # Check cache for any collection (individual items only)
   def inspect_collection_cache(collection = 'articles')
     redis = Rails.cache.redis
     pattern = "globalsymbols_cache:directus/#{collection}:*"

@@ -55,6 +55,7 @@ cache> perf 4          # Performance test for article 4
 cache> clear 4         # Clear article 4 from cache
 cache> debug 4         # Debug cache key for article 4
 cache> fetch 4         # Fetch and cache article 4
+cache> articles        # Show only individual cached articles
 cache> cleanup         # Remove empty/corrupted cache entries
 cache> collections     # Show configured collections
 cache> help            # Show all commands
