@@ -39,6 +39,7 @@ rails runner "require 'cache_inspector'; CacheInspector.article_cached?(4, 'en-G
 ### Management
 - `clear_article_cache(id, language)` - Remove specific article from cache
 - `debug_article_cache_key(id, language)` - Debug cache key generation and lookup
+- `fetch_and_cache_article(id, language)` - Fetch specific article from Directus and cache it
 - `cleanup_empty_cache_entries` - Remove corrupted/empty cache entries
 
 ## 🎮 Interactive Mode Commands
@@ -53,6 +54,7 @@ cache> health          # Run health check
 cache> perf 4          # Performance test for article 4
 cache> clear 4         # Clear article 4 from cache
 cache> debug 4         # Debug cache key for article 4
+cache> fetch 4         # Fetch and cache article 4
 cache> cleanup         # Remove empty/corrupted cache entries
 cache> collections     # Show configured collections
 cache> help            # Show all commands

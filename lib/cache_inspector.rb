@@ -63,8 +63,10 @@ module CacheInspector
           title = cached_data.dig('translations', 0, 'title')
           status = cached_data['status']
           puts "   ID: #{cached_data['id']}, Status: #{status}, Title: #{title&.truncate(50)}"
+        elsif cached_data.is_a?(Hash)
+          puts "   Hash data (keys: #{cached_data.keys.inspect})"
         else
-          puts "   Cached data type: #{cached_data.class}"
+          puts "   Cached data type: #{cached_data.class}, value: #{cached_data.inspect}"
         end
       rescue => e
         puts "   Error reading cache: #{e.message}"
@@ -315,6 +317,47 @@ module CacheInspector
     puts "  Directus items: #{directus_keys.length}"
     puts "  Articles cached: #{directus_keys.grep(/articles/).length}"
     puts "  Redis DB: #{redis.connection[:db]}"
+
+    # Show what article IDs are cached
+    cached_article_ids = []
+    directus_keys.select { |k| k.include?('articles') }.each do |key|
+      begin
+        clean_key = key.sub('globalsymbols_cache:', '')
+        data = Rails.cache.read(clean_key)
+        if data.is_a?(Hash) && data['id']
+          cached_article_ids << data['id']
+        end
+      rescue => e
+        # Skip corrupted entries
+      end
+    end
+
+    unless cached_article_ids.empty?
+      puts "  Cached article IDs: #{cached_article_ids.sort.inspect}"
+    end
+  end
+
+  # Fetch and cache a specific article
+  def fetch_and_cache_article(id, language = 'en-GB')
+    puts "🔄 Fetching and caching article #{id} (#{language})..."
+
+    begin
+      article = DirectusService.fetch_item_with_translations('articles', id, language)
+      if article
+        puts "✅ Article #{id} fetched and cached"
+        puts "   Title: #{article.dig('translations', 0, 'title')}"
+        puts "   Status: #{article['status']}"
+
+        # Verify it's now cached
+        sleep 0.1 # Small delay to ensure caching
+        cached = article_cached?(id, language)
+        puts "   Verification: #{cached ? '✅ Now cached' : '❌ Still not cached'}"
+      else
+        puts "❌ Article #{id} not found in Directus"
+      end
+    rescue => e
+      puts "❌ Error fetching article #{id}: #{e.message}"
+    end
   end
 end
 
