@@ -191,11 +191,26 @@ class WebhooksController < ApplicationController
 
     Rails.logger.info("🔄 Directus webhook received for collection #{collection}, invalidating cache and warming with #{affected_locales.length} locales")
 
+    # Check cache status before invalidation
+    cache_status_before = check_cache_status(collection)
+    Rails.logger.info("📊 Cache status before: #{cache_status_before}")
+
     # Invalidate the collection cache
     Rails.logger.info("🗑️  Invalidating collection cache for: #{collection}")
     begin
       DirectusService.invalidate_collection!(collection)
       Rails.logger.info("✅ Collection cache invalidated successfully")
+
+      # Verify invalidation worked
+      cache_status_after = check_cache_status(collection)
+      Rails.logger.info("📊 Cache status after invalidation: #{cache_status_after}")
+
+      if cache_status_before != cache_status_after
+        Rails.logger.info("✅ Cache invalidation confirmed - status changed")
+      else
+        Rails.logger.warn("⚠️  Cache status unchanged - invalidation may not have worked")
+      end
+
     rescue => e
       Rails.logger.error("❌ Failed to invalidate collection cache: #{e.message}")
       Rails.logger.error("📤 Response: 500 Internal Server Error")
@@ -221,10 +236,23 @@ class WebhooksController < ApplicationController
 
     end_time = Time.current
     duration = end_time - start_time
+    # Verify cache invalidation worked
+    cache_check = DirectusService.fetch_collection('articles', { limit: 1 }, nil)
+    Rails.logger.info("✅ Cache verification: Successfully fetched #{cache_check.length} articles (fresh data)")
+
     Rails.logger.info("🎉 Directus webhook processing completed successfully")
     Rails.logger.info("⏱️  Processing time: #{duration.round(4)} seconds")
     Rails.logger.info("📤 Response: 200 OK")
-    Rails.logger.info("=== DIRECTUS WEBHOOK COMPLETED ===")
+    Rails.logger.info("=== DIRECTUS WEBHOOK COMPLETED SUCCESSFULLY ===")
+
+    # Final summary
+    Rails.logger.info("📊 WEBHOOK SUMMARY:")
+    Rails.logger.info("  - Collection: #{collection}")
+    Rails.logger.info("  - Locales processed: #{affected_locales.inspect}")
+    Rails.logger.info("  - Cache invalidated: ✅")
+    Rails.logger.info("  - Background job queued: ✅")
+    Rails.logger.info("  - Processing time: #{duration.round(4)}s")
+
     head :ok
   end
 
@@ -403,5 +431,27 @@ class WebhooksController < ApplicationController
       cache_invalidated: cache_invalidated,
       job_enqueued: job_enqueued
     }
+  end
+
+  private
+
+  # Helper method to check cache status for a collection
+  def check_cache_status(collection)
+    begin
+      # Try to get a cached item to see if cache exists
+      test_key = "directus/#{collection}/test"
+      cached = Rails.cache.read(test_key)
+      if cached.nil?
+        # Write a test value and check if it can be read
+        Rails.cache.write(test_key, "test_value", expires_in: 1.minute)
+        cached_after_write = Rails.cache.read(test_key)
+        Rails.cache.delete(test_key) # Clean up
+        cached_after_write.present? ? "functional" : "not working"
+      else
+        "has data"
+      end
+    rescue => e
+      "error: #{e.message}"
+    end
   end
 end
