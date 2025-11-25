@@ -35,6 +35,7 @@ while true
     puts "  fetch_lang CODE # Fetch and cache specific language"
     puts "  articles        # Show only individual cached articles"
     puts "  languages       # Show cached languages"
+    puts "  all             # Show ALL Directus cached data"
     puts "  cleanup         # Remove empty/corrupted cache entries"
     puts "  collections     # Show all cached collections"
     puts "  help            # Show this help"
@@ -86,6 +87,9 @@ while true
 
   when /^languages$/
     CacheInspector.inspect_cached_languages
+
+  when /^all$/
+    CacheInspector.inspect_all_directus_cache
 
   when /^collections$/
     DirectusCachedCollection.all.each do |collection|

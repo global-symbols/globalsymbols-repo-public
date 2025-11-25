@@ -165,21 +165,53 @@ module CacheInspector
   # Inspect cached languages
   def inspect_cached_languages
     redis = Rails.cache.redis
-    keys = redis.keys('globalsymbols_cache:directus/languages:*')
+
+    # Try multiple patterns since languages might be cached differently
+    patterns = [
+      'globalsymbols_cache:directus/languages:*',
+      'globalsymbols_cache:directus/*languages*',
+      'globalsymbols_cache:*languages*'
+    ]
+
+    all_language_keys = []
+    patterns.each do |pattern|
+      keys = redis.keys(pattern)
+      all_language_keys.concat(keys) unless keys.empty?
+    end
+
+    # Remove duplicates
+    all_language_keys.uniq!
 
     puts "=== CACHED LANGUAGES ==="
-    puts "Total cached languages: #{keys.length}"
+    puts "Total cached languages: #{all_language_keys.length}"
     puts "Redis namespace: globalsymbols_cache"
-    puts "Collection: languages"
+    puts "Checked patterns: #{patterns.join(', ')}"
     puts ""
 
-    if keys.empty?
-      puts "❌ No languages cached"
-      puts "💡 Try: DirectusService.fetch_item('languages', 'en-GB')"
+    if all_language_keys.empty?
+      puts "❌ No languages cached with expected patterns"
+      puts "🔍 Investigating further..."
+
+      # Show ALL Directus cache keys to see what's actually cached
+      all_directus = redis.keys('globalsymbols_cache:directus/*')
+      puts ""
+      puts "📊 ALL Directus cache keys (first 20):"
+      all_directus.first(20).each do |key|
+        clean_key = key.sub('globalsymbols_cache:', '')
+        puts "   📄 #{clean_key}"
+      end
+
+      if all_directus.length > 20
+        puts "   ... and #{all_directus.length - 20} more"
+      end
+
+      puts ""
+      puts "💡 Languages might be cached as collection lists, not individual items"
+      puts "💡 Try: DirectusService.fetch_collection('languages')"
       return
     end
 
-    keys.each do |key|
+    all_language_keys.each do |key|
       clean_key = key.sub('globalsymbols_cache:', '')
       puts "📄 #{clean_key}"
 
@@ -190,6 +222,16 @@ module CacheInspector
           name = cached_data['name']
           code = cached_data['code']
           puts "   Code: #{code}, Name: #{name}"
+        elsif cached_data.is_a?(Hash) && cached_data['data'].is_a?(Array)
+          # Collection list of languages
+          lang_count = cached_data['data'].length
+          puts "   📋 Collection list: #{lang_count} languages"
+          cached_data['data'].first(3).each do |lang|
+            if lang.is_a?(Hash)
+              puts "      • #{lang['code']}: #{lang['name']}"
+            end
+          end
+          puts "      ... and #{lang_count - 3} more" if lang_count > 3
         else
           puts "   Cached data type: #{cached_data.class}"
         end

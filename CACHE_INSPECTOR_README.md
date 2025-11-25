@@ -63,6 +63,7 @@ cache> fetch 4         # Fetch and cache article 4
 cache> fetch_lang fr-FR # Fetch and cache French language
 cache> articles        # Show only individual cached articles
 cache> languages       # Show cached languages
+cache> all             # Show ALL Directus cached data
 cache> cleanup         # Remove empty/corrupted cache entries
 cache> collections     # Show configured collections
 cache> help            # Show all commands
