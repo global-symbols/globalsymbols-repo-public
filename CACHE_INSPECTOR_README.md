@@ -38,6 +38,7 @@ rails runner "require 'cache_inspector'; CacheInspector.article_cached?(4, 'en-G
 
 ### Management
 - `clear_article_cache(id, language)` - Remove specific article from cache
+- `debug_article_cache_key(id, language)` - Debug cache key generation and lookup
 
 ## 🎮 Interactive Mode Commands
 
@@ -50,6 +51,7 @@ cache> check 4         # Check if article 4 is cached
 cache> health          # Run health check
 cache> perf 4          # Performance test for article 4
 cache> clear 4         # Clear article 4 from cache
+cache> debug 4         # Debug cache key for article 4
 cache> collections     # Show configured collections
 cache> help            # Show all commands
 cache> exit            # Quit

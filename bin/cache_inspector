@@ -28,6 +28,7 @@ while true
     puts "  health          # Full cache health check"
     puts "  perf [ID]       # Performance test (default ID=4)"
     puts "  clear ID        # Clear specific article from cache"
+    puts "  debug ID        # Debug cache key for specific article"
     puts "  collections     # Show all cached collections"
     puts "  help            # Show this help"
     puts "  exit            # Exit inspector"
@@ -53,6 +54,10 @@ while true
   when /^clear (\d+)$/
     id = $1.to_i
     CacheInspector.clear_article_cache(id, 'en-GB')
+
+  when /^debug (\d+)$/
+    id = $1.to_i
+    CacheInspector.debug_article_cache_key(id, 'en-GB')
 
   when /^collections$/
     DirectusCachedCollection.all.each do |collection|

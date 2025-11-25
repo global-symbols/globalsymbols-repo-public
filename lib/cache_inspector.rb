@@ -13,14 +13,24 @@ module CacheInspector
 
   # Check if a specific article is cached
   def article_cached?(id, language = 'en-GB')
+    # Build the same key that fetch_item_with_translations would use
     translation_params = DirectusService.send(:build_translation_params, language, {})
     cache_key = DirectusService.send(:build_cache_key, :get, "items/articles/#{id}", translation_params)
 
+    # Rails.cache.read automatically adds the namespace (globalsymbols_cache:)
     cached_data = Rails.cache.read(cache_key)
     status = cached_data.present? ? '✅ CACHED' : '❌ NOT CACHED'
 
     puts "Article #{id} (#{language}): #{status}"
-    puts "Cache key: #{cache_key}" if Rails.env.development?
+    if Rails.env.development?
+      puts "Cache key: #{cache_key}"
+
+      # Also show what Rails cache actually stores it as
+      redis = Rails.cache.redis
+      full_key = "globalsymbols_cache:#{cache_key}"
+      redis_exists = redis.exists(full_key)
+      puts "Redis key exists: #{redis_exists ? 'YES' : 'NO'} (#{full_key})"
+    end
 
     cached_data.present?
   end
@@ -53,6 +63,8 @@ module CacheInspector
           title = cached_data.dig('translations', 0, 'title')
           status = cached_data['status']
           puts "   ID: #{cached_data['id']}, Status: #{status}, Title: #{title&.truncate(50)}"
+        else
+          puts "   Cached data type: #{cached_data.class}"
         end
       rescue => e
         puts "   Error reading cache: #{e.message}"
@@ -181,6 +193,43 @@ module CacheInspector
     result = Rails.cache.delete(cache_key)
     puts "🗑️  Cleared article #{id} (#{language}) from cache: #{result ? '✅ Success' : '❌ Not found'}"
     result
+  end
+
+  # Debug cache key generation for specific article
+  def debug_article_cache_key(id, language = 'en-GB')
+    puts "=== CACHE KEY DEBUG FOR ARTICLE #{id} (#{language}) ==="
+
+    # Build translation params
+    translation_params = DirectusService.send(:build_translation_params, language, {})
+    puts "Translation params: #{translation_params.inspect}"
+
+    # Build cache key
+    cache_key = DirectusService.send(:build_cache_key, :get, "items/articles/#{id}", translation_params)
+    puts "Generated cache key: #{cache_key}"
+
+    # Check what Rails cache stores it as
+    full_redis_key = "globalsymbols_cache:#{cache_key}"
+    puts "Full Redis key: #{full_redis_key}"
+
+    # Check if it exists
+    redis = Rails.cache.redis
+    exists = redis.exists(full_redis_key)
+    puts "Key exists in Redis: #{exists ? 'YES' : 'NO'}"
+
+    # Try to read it
+    cached_data = Rails.cache.read(cache_key)
+    puts "Rails.cache.read result: #{cached_data.present? ? 'FOUND' : 'NOT FOUND'}"
+
+    if cached_data
+      puts "Cached data type: #{cached_data.class}"
+      if cached_data.is_a?(Hash)
+        puts "Cached article ID: #{cached_data['id']}"
+      end
+    end
+
+    puts ""
+    puts "🎯 Summary:"
+    puts "  Article #{id} (#{language}) is #{cached_data.present? ? 'CACHED' : 'NOT CACHED'}"
   end
 
   # Quick status
