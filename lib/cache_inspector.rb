@@ -69,7 +69,8 @@ module CacheInspector
           article_count = cached_data['data'].length
 
           # Handle both formats: full objects or just IDs
-          if cached_data['data'].first.is_a?(Hash)
+          first_item = cached_data['data'].first
+          if first_item.is_a?(Hash)
             # Full article objects
             ids = cached_data['data'].map { |a| a['id'] }.compact
             puts "   📋 Collection list: #{article_count} articles (IDs: #{ids.inspect})"
@@ -81,14 +82,14 @@ module CacheInspector
               puts "      • ID #{article['id']}: #{title&.truncate(40)} (#{status})"
             end
             puts "      ... and #{article_count - 3} more articles" if article_count > 3
-          elsif cached_data['data'].first.is_a?(Integer)
+          elsif first_item.is_a?(Integer)
             # Just IDs array
             ids = cached_data['data']
             puts "   📋 Collection list: #{article_count} article IDs (#{ids.inspect})"
             puts "      💡 These are just IDs - fetch individual articles for full data"
           else
-            # Unknown format
-            puts "   📋 Collection list: #{article_count} items (unknown format)"
+            # Unknown format or empty array
+            puts "   📋 Collection list: #{article_count} items (unknown format: #{first_item&.class})"
           end
         elsif cached_data.is_a?(Hash)
           puts "   Hash data (keys: #{cached_data.keys.inspect})"
@@ -399,9 +400,10 @@ module CacheInspector
           collection_lists << list_size
 
           # Extract IDs from collection list
-          if data['data'].first.is_a?(Hash)
+          first_item = data['data'].first
+          if first_item.is_a?(Hash)
             data['data'].each { |article| total_unique_articles.add(article['id']) if article['id'] }
-          elsif data['data'].first.is_a?(Integer)
+          elsif first_item.is_a?(Integer)
             data['data'].each { |id| total_unique_articles.add(id) }
           end
         elsif data.is_a?(Hash) && data['id']
