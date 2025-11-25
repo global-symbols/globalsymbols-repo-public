@@ -1,0 +1,216 @@
+# frozen_string_literal: true
+
+# Cache Inspector for Directus Cached Collections
+# Load this in Rails console with: require 'cache_inspector'
+#
+# Usage:
+#   require 'cache_inspector'
+#   inspect_article_cache
+#   article_cached?(4, 'en-GB')
+
+module CacheInspector
+  extend self
+
+  # Check if a specific article is cached
+  def article_cached?(id, language = 'en-GB')
+    translation_params = DirectusService.send(:build_translation_params, language, {})
+    cache_key = DirectusService.send(:build_cache_key, :get, "items/articles/#{id}", translation_params)
+
+    cached_data = Rails.cache.read(cache_key)
+    status = cached_data.present? ? '✅ CACHED' : '❌ NOT CACHED'
+
+    puts "Article #{id} (#{language}): #{status}"
+    puts "Cache key: #{cache_key}" if Rails.env.development?
+
+    cached_data.present?
+  end
+
+  # Inspect all cached articles
+  def inspect_article_cache
+    redis = Rails.cache.redis
+    keys = redis.keys('globalsymbols_cache:directus/articles:*')
+
+    puts "=== ARTICLE CACHE INSPECTOR ==="
+    puts "Total cached articles: #{keys.length}"
+    puts "Redis namespace: globalsymbols_cache"
+    puts "Collection: articles"
+    puts ""
+
+    if keys.empty?
+      puts "❌ No articles cached"
+      puts "💡 Try: DirectusService.fetch_item_with_translations('articles', 4, 'en-GB')"
+      return
+    end
+
+    keys.each do |key|
+      clean_key = key.sub('globalsymbols_cache:', '')
+      puts "📄 #{clean_key}"
+
+      # Try to read the cached data
+      begin
+        cached_data = Rails.cache.read(clean_key)
+        if cached_data.is_a?(Hash) && cached_data['id']
+          title = cached_data.dig('translations', 0, 'title')
+          status = cached_data['status']
+          puts "   ID: #{cached_data['id']}, Status: #{status}, Title: #{title&.truncate(50)}"
+        end
+      rescue => e
+        puts "   Error reading cache: #{e.message}"
+      end
+    end
+
+    puts ""
+    puts "🎯 Usage:"
+    puts "  article_cached?(ID, 'en-GB')  # Check specific article"
+    puts "  Rails.cache.clear              # Clear all cache"
+  end
+
+  # Check cache for any collection
+  def inspect_collection_cache(collection = 'articles')
+    redis = Rails.cache.redis
+    pattern = "globalsymbols_cache:directus/#{collection}:*"
+    keys = redis.keys(pattern)
+
+    puts "=== #{collection.upcase} CACHE INSPECTOR ==="
+    puts "Total cached #{collection}: #{keys.length}"
+    puts "Pattern: #{pattern}"
+    puts ""
+
+    if keys.empty?
+      puts "❌ No #{collection} cached"
+      return
+    end
+
+    keys.first(10).each do |key|  # Limit to first 10
+      clean_key = key.sub('globalsymbols_cache:', '')
+      puts "📄 #{clean_key}"
+    end
+
+    puts " ... and #{keys.length - 10} more" if keys.length > 10
+  end
+
+  # Check overall cache health
+  def cache_health_check
+    puts "=== CACHE HEALTH CHECK ==="
+
+    # Test basic cache operations
+    test_key = "health_check_#{Time.now.to_i}"
+    test_value = "working_#{SecureRandom.hex(4)}"
+
+    begin
+      # Write test
+      Rails.cache.write(test_key, test_value, expires_in: 5.minutes)
+      puts "✅ Cache write: OK"
+
+      # Read test
+      read_value = Rails.cache.read(test_key)
+      if read_value == test_value
+        puts "✅ Cache read: OK"
+      else
+        puts "❌ Cache read: FAILED"
+        return
+      end
+
+      # Delete test
+      Rails.cache.delete(test_key)
+      puts "✅ Cache delete: OK"
+
+      # Redis connectivity
+      redis = Rails.cache.redis
+      info = redis.info rescue nil
+      if info
+        puts "✅ Redis connection: OK (DB #{redis.connection[:db]})"
+        puts "📊 Redis keys: #{redis.dbsize}"
+      else
+        puts "❌ Redis connection: FAILED"
+      end
+
+      # Directus cache count
+      directus_keys = redis.keys('globalsymbols_cache:directus/*')
+      puts "📦 Directus cached items: #{directus_keys.length}"
+
+      puts ""
+      puts "🎉 Cache is healthy!"
+
+    rescue => e
+      puts "❌ Cache health check failed: #{e.message}"
+    end
+  end
+
+  # Performance test
+  def cache_performance_test(article_id = 4, language = 'en-GB')
+    require 'benchmark'
+
+    puts "=== CACHE PERFORMANCE TEST ==="
+    puts "Article ID: #{article_id}, Language: #{language}"
+    puts ""
+
+    # Check if cached first
+    cached_before = article_cached?(article_id, language)
+    puts ""
+
+    times = []
+
+    Benchmark.bm do |x|
+      x.report("API Call:") do
+        article = DirectusService.fetch_item_with_translations('articles', article_id, language)
+        times << [:api, article]
+      end
+
+      x.report("Cache Hit:") do
+        article = DirectusService.fetch_item_with_translations('articles', article_id, language)
+        times << [:cache, article]
+      end
+    end
+
+    puts ""
+    api_time, cache_time = times
+
+    if api_time[1] && cache_time[1]
+      speedup = (api_time[0] / cache_time[0]).round(1)
+      puts "🚀 Cache speedup: #{speedup}x faster"
+      puts "📊 API: #{api_time[0].round(4)}s, Cache: #{cache_time[0].round(4)}s"
+    end
+  end
+
+  # Clear specific article from cache
+  def clear_article_cache(id, language = 'en-GB')
+    translation_params = DirectusService.send(:build_translation_params, language, {})
+    cache_key = DirectusService.send(:build_cache_key, :get, "items/articles/#{id}", translation_params)
+
+    result = Rails.cache.delete(cache_key)
+    puts "🗑️  Cleared article #{id} (#{language}) from cache: #{result ? '✅ Success' : '❌ Not found'}"
+    result
+  end
+
+  # Quick status
+  def cache_status
+    redis = Rails.cache.redis
+    directus_keys = redis.keys('globalsymbols_cache:directus/*')
+    total_keys = redis.keys('globalsymbols_cache:*').length
+
+    puts "📊 Cache Status:"
+    puts "  Total keys: #{total_keys}"
+    puts "  Directus items: #{directus_keys.length}"
+    puts "  Articles cached: #{directus_keys.grep(/articles/).length}"
+    puts "  Redis DB: #{redis.connection[:db]}"
+  end
+end
+
+# Auto-display help when loaded
+if __FILE__ == $0
+  puts "=== Directus Cache Inspector Loaded ==="
+  puts ""
+  puts "Available methods:"
+  puts "  CacheInspector.inspect_article_cache          # Show all cached articles"
+  puts "  CacheInspector.article_cached?(4, 'en-GB')   # Check specific article"
+  puts "  CacheInspector.cache_health_check             # Test cache functionality"
+  puts "  CacheInspector.cache_performance_test         # Benchmark cache vs API"
+  puts "  CacheInspector.clear_article_cache(4)         # Clear specific article"
+  puts "  CacheInspector.cache_status                    # Quick status summary"
+  puts "  CacheInspector.inspect_collection_cache('articles') # Check any collection"
+  puts ""
+  puts "Usage in Rails console:"
+  puts "  require 'cache_inspector'"
+  puts "  inspect_article_cache"
+end

@@ -156,44 +156,6 @@ namespace :cache do
     end
   end
 
-  desc "Check webhook success by verifying cache status for articles"
-  task webhook_test: :environment do
-    puts "🔍 Testing webhook success by checking articles cache..."
-
-    # Check if articles collection is cached
-    collections = DirectusCachedCollection.cached_collection_names
-    if collections.include?('articles')
-      puts "✅ Articles collection is configured for caching"
-    else
-      puts "❌ Articles collection is not configured for caching"
-      exit 1
-    end
-
-    # Try to fetch articles from cache
-    begin
-      articles = DirectusService.fetch_collection('articles', { limit: 1 }, nil)
-      puts "✅ Successfully fetched #{articles.length} articles from cache"
-
-      if articles.length > 0
-        puts "📄 Sample article: #{articles.first.except('translations')}" # Don't show full translations
-        puts "🎉 Webhook appears to be working - cache has fresh data!"
-      else
-        puts "⚠️  Cache is empty - this might indicate an issue"
-      end
-    rescue => e
-      puts "❌ Failed to fetch articles from cache: #{e.message}"
-      puts "This could indicate cache or Directus connectivity issues"
-    end
-
-    # Check if background jobs are running
-    begin
-      job_count = DirectusCollectionWarmerJob.job_count
-      puts "📋 Background jobs in queue: #{job_count}"
-    rescue => e
-      puts "⚠️  Could not check job queue: #{e.message}"
-    end
-  end
-
   desc "Check cache status and Directus connectivity"
   task status: :environment do
     puts "Cache Status Check for #{Rails.env}"
