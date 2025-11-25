@@ -214,9 +214,17 @@ module CacheInspector
     # Check if it exists
     redis = Rails.cache.redis
     exists = redis.exists(full_redis_key)
-    puts "Key exists in Redis: #{exists ? 'YES' : 'NO'}"
+    puts "Key exists in Redis: #{exists ? 'YES' : 'NO'} (#{full_redis_key})"
 
-    # Try to read it
+    # Get raw Redis data if key exists
+    if exists
+      raw_redis_data = redis.get(full_redis_key)
+      puts "Raw Redis data length: #{raw_redis_data&.length || 0} bytes"
+      puts "Raw Redis data type: #{raw_redis_data.class}"
+      puts "Raw Redis data preview: #{raw_redis_data&.first(200)}..." if raw_redis_data
+    end
+
+    # Try to read it via Rails cache
     cached_data = Rails.cache.read(cache_key)
     puts "Rails.cache.read result: #{cached_data.present? ? 'FOUND' : 'NOT FOUND'}"
 
@@ -224,6 +232,28 @@ module CacheInspector
       puts "Cached data type: #{cached_data.class}"
       if cached_data.is_a?(Hash)
         puts "Cached article ID: #{cached_data['id']}"
+        puts "Cached data keys: #{cached_data.keys.inspect}"
+      end
+    else
+      puts "Cached data is nil/empty"
+      # Try to understand why Rails can't read it
+      if exists && raw_redis_data
+        puts "🔍 Investigating why Rails can't read existing Redis data..."
+
+        # Check if it's a serialization issue
+        begin
+          # Try to manually deserialize (Rails uses Marshal by default)
+          if raw_redis_data.start_with?("\x04\x08") # Marshal signature
+            manual_data = Marshal.load(raw_redis_data)
+            puts "✅ Manual Marshal deserialization: SUCCESS"
+            puts "Manual data type: #{manual_data.class}"
+            puts "Manual data preview: #{manual_data.inspect.first(200)}..." if manual_data
+          else
+            puts "❌ Data doesn't look like Marshal format"
+          end
+        rescue => e
+          puts "❌ Manual deserialization failed: #{e.message}"
+        end
       end
     end
 
