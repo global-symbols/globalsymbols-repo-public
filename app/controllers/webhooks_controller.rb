@@ -247,17 +247,16 @@ class WebhooksController < ApplicationController
     Rails.logger.info("Payload['payload'] keys: #{item_data.keys.inspect}")
 
     translations = item_data['translations'] || []
-    Rails.logger.info("📝 Found #{translations.length} translation entries")
-    Rails.logger.info("Translation details: #{translations.inspect}")
+    Rails.logger.info("📝 Raw translations value: #{translations.inspect}")
     Rails.logger.info("Translations type: #{translations.class}")
 
-    # Handle case where translations might be malformed
+    # Handle different payload structures
     if translations.is_a?(Array)
-      Rails.logger.info("Processing translations array...")
+      Rails.logger.info("Processing translations array with #{translations.length} entries...")
       locales = translations.map { |t|
         Rails.logger.debug("Processing translation entry: #{t.inspect} (type: #{t.class})")
         if t.is_a?(Hash)
-          lang_code = t['languages_code'] || t['code'] || t['locale']
+          lang_code = t['languages_code'] || t['code'] || t['locale'] || t['language']
           Rails.logger.debug("Found languages_code: #{lang_code.inspect}")
           lang_code
         elsif t.is_a?(String)
@@ -268,18 +267,51 @@ class WebhooksController < ApplicationController
           nil
         end
       }.compact.uniq
+    elsif translations.is_a?(Hash)
+      Rails.logger.info("Translations is a Hash, extracting keys as locales...")
+      # If translations is a hash like {"en-GB": {...}, "fr-FR": {...}}, use the keys
+      locales = translations.keys
+      Rails.logger.info("Extracted locales from hash keys: #{locales.inspect}")
     else
-      Rails.logger.warn("⚠️  Translations is not an array! Type: #{translations.class}")
+      Rails.logger.warn("⚠️  Translations is neither array nor hash! Type: #{translations.class}, value: #{translations.inspect}")
       locales = []
     end
 
-    Rails.logger.info("🎯 Extracted locales: #{locales.inspect}")
+    # If no locales found, try alternative extraction methods
+    if locales.empty?
+      Rails.logger.info("No locales found in translations, trying alternative extraction...")
+
+      # Try to extract from the entire payload
+      all_text = payload.inspect
+      potential_locales = []
+
+      # Look for common locale patterns in the payload
+      ['en-GB', 'fr-FR', 'de-DE', 'es-ES', 'it-IT', 'nl-NL', 'pt-BR', 'zh-CN', 'ja-JP', 'ko-KR'].each do |locale|
+        if all_text.include?(locale)
+          potential_locales << locale
+          Rails.logger.info("Found potential locale in payload: #{locale}")
+        end
+      end
+
+      if potential_locales.any?
+        locales = potential_locales.uniq
+        Rails.logger.info("Using fallback locales: #{locales.inspect}")
+      else
+        Rails.logger.warn("No locales found anywhere in payload, defaulting to all supported locales")
+        # Default to all supported locales if we can't determine which ones changed
+        locales = ['en-GB', 'fr-FR', 'de-DE', 'es-ES', 'it-IT', 'nl-NL', 'pt-BR', 'zh-CN', 'ja-JP', 'ko-KR']
+      end
+    end
+
+    Rails.logger.info("🎯 Final extracted locales: #{locales.inspect}")
 
     locales
   rescue => e
     Rails.logger.error("❌ Error extracting locales: #{e.message}")
     Rails.logger.error("Error backtrace: #{e.backtrace.first(5).join("\n")}")
-    []
+    # Return default locales on error to ensure cache warming happens
+    Rails.logger.warn("Using default locales due to extraction error")
+    ['en-GB', 'fr-FR']  # Minimal fallback
   end
 
   # Build a realistic Directus webhook payload for simulation
