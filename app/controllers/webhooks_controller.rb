@@ -4,6 +4,9 @@ class WebhooksController < ApplicationController
   # Webhooks should not require authentication
   skip_before_action :authenticate_user!
 
+  # Skip CSRF token verification for webhook endpoints (external API calls)
+  skip_before_action :verify_authenticity_token, only: [:directus]
+
   # Collections that affect language configuration
   LANGUAGE_CONFIG_COLLECTIONS = %w[languages].freeze
 
@@ -57,6 +60,7 @@ class WebhooksController < ApplicationController
     start_time = Time.current
     Rails.logger.info("=== DIRECTUS WEBHOOK RECEIVED ===")
     Rails.logger.info("Timestamp: #{start_time}")
+    Rails.logger.info("CSRF verification skipped for webhook endpoint")
     Rails.logger.info("Headers: #{request.headers.to_h.select { |k,v| k.start_with?('HTTP_') || ['CONTENT_TYPE', 'CONTENT_LENGTH'].include?(k) }.inspect}")
     Rails.logger.info("Method: #{request.method}")
     Rails.logger.info("URL: #{request.url}")
