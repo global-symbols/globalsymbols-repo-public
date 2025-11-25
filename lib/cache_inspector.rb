@@ -166,7 +166,11 @@ module CacheInspector
   def inspect_cached_languages
     redis = Rails.cache.redis
 
-    # Try multiple patterns since languages might be cached differently
+    # Check the known language config key first
+    language_config_key = 'globalsymbols_cache:directus/language_config'
+    has_language_config = redis.exists(language_config_key)
+
+    # Try multiple patterns for individual languages
     patterns = [
       'globalsymbols_cache:directus/languages:*',
       'globalsymbols_cache:directus/*languages*',
@@ -185,11 +189,55 @@ module CacheInspector
     puts "=== CACHED LANGUAGES ==="
     puts "Total cached languages: #{all_language_keys.length}"
     puts "Redis namespace: globalsymbols_cache"
+    puts "Language config cached: #{has_language_config ? '✅ YES' : '❌ NO'}"
     puts "Checked patterns: #{patterns.join(', ')}"
     puts ""
 
+    # Check the language config first
+    if has_language_config
+      puts "🎯 FOUND: Language configuration cached!"
+      puts "📄 directus/language_config"
+
+      begin
+        cached_data = Rails.cache.read('directus/language_config')
+        if cached_data.is_a?(Array)
+          puts "   📋 Array of #{cached_data.length} languages:"
+          cached_data.each do |lang|
+            if lang.is_a?(Hash)
+              code = lang['code'] || lang['languages_code']
+              name = lang['name'] || lang['display_name']
+              puts "      • #{code}: #{name}"
+            else
+              puts "      • #{lang.inspect}"
+            end
+          end
+        elsif cached_data.is_a?(Hash)
+          puts "   📄 Language config object:"
+          if cached_data['data'] && cached_data['data'].is_a?(Array)
+            puts "      📋 Contains array of #{cached_data['data'].length} languages:"
+            cached_data['data'].each do |lang|
+              if lang.is_a?(Hash)
+                code = lang['code'] || lang['languages_code']
+                name = lang['name'] || lang['display_name']
+                puts "         • #{code}: #{name}"
+              end
+            end
+          else
+            puts "      Keys: #{cached_data.keys.inspect}"
+          end
+        else
+          puts "   Cached data type: #{cached_data.class}"
+          puts "   Content: #{cached_data.inspect[0..200]}..."
+        end
+      rescue => e
+        puts "   Error reading language config: #{e.message}"
+      end
+      puts ""
+    end
+
     if all_language_keys.empty?
-      puts "❌ No languages cached with expected patterns"
+      puts "❌ No individual language items cached with expected patterns"
+      puts ""
       puts "🔍 Investigating further..."
 
       # Show ALL Directus cache keys to see what's actually cached
@@ -206,8 +254,13 @@ module CacheInspector
       end
 
       puts ""
-      puts "💡 Languages might be cached as collection lists, not individual items"
-      puts "💡 Try: DirectusService.fetch_collection('languages')"
+      if has_language_config
+        puts "💡 Languages are cached as a configuration object, not individual items"
+        puts "💡 The website is reading from 'directus/language_config'"
+      else
+        puts "💡 Languages might be cached as collection lists, not individual items"
+        puts "💡 Try: DirectusService.fetch_collection('languages')"
+      end
       return
     end
 
@@ -625,4 +678,71 @@ if __FILE__ == $0
   puts "Usage in Rails console:"
   puts "  require 'cache_inspector'"
   puts "  inspect_article_cache"
+
+  # Fetch and cache a specific language
+  def fetch_and_cache_language(language_code)
+    puts "=== FETCH AND CACHE LANGUAGE #{language_code.upcase} ==="
+    puts "Fetching from Directus..."
+
+    begin
+      # Try to fetch the language from Directus
+      language_data = DirectusService.fetch_item('languages', language_code)
+      if language_data
+        puts "✅ Successfully fetched language #{language_code}"
+        puts "Name: #{language_data['name'] || language_data['display_name']}"
+        puts "Code: #{language_data['code'] || language_data['languages_code']}"
+
+        # Cache it (assuming DirectusService handles caching)
+        puts "Language cached successfully"
+      else
+        puts "❌ Language #{language_code} not found in Directus"
+      end
+    rescue => e
+      puts "❌ Error fetching language: #{e.message}"
+    end
+  end
+
+  # Check if a specific language is cached
+  def check_language_cache(language_code)
+    puts "=== CHECK LANGUAGE CACHE FOR #{language_code.upcase} ==="
+
+    # First check the language config
+    language_config = Rails.cache.read('directus/language_config')
+
+    if language_config
+      if language_config.is_a?(Array)
+        # Array of language objects
+        language = language_config.find { |lang| lang['code'] == language_code || lang['languages_code'] == language_code }
+        if language
+          name = language['name'] || language['display_name']
+          code = language['code'] || language['languages_code']
+          puts "Language #{language_code}: ✅ CACHED"
+          puts "  Name: #{name}"
+          puts "  Code: #{code}"
+          return
+        end
+      elsif language_config.is_a?(Hash) && language_config['data'] && language_config['data'].is_a?(Array)
+        # Wrapped in data object
+        language = language_config['data'].find { |lang| lang['code'] == language_code || lang['languages_code'] == language_code }
+        if language
+          name = language['name'] || language['display_name']
+          code = language['code'] || language['languages_code']
+          puts "Language #{language_code}: ✅ CACHED"
+          puts "  Name: #{name}"
+          puts "  Code: #{code}"
+          return
+        end
+      end
+    end
+
+    # Fallback: check individual language keys
+    cache_key = "directus/languages/#{language_code}"
+    cached_data = Rails.cache.read(cache_key)
+    status = cached_data.present? ? '✅ CACHED' : '❌ NOT CACHED'
+    puts "Language #{language_code}: #{status}"
+    if cached_data && cached_data.is_a?(Hash)
+      puts "  Name: #{cached_data['name']}"
+      puts "  Code: #{cached_data['code']}"
+    end
+  end
 end
