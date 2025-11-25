@@ -84,10 +84,17 @@ class WebhooksController < ApplicationController
     # Parse JSON payload
     raw_body = request.body.read
     Rails.logger.info("Raw request body: #{raw_body}")
+    Rails.logger.info("Raw body length: #{raw_body.length} characters")
 
     begin
       payload = JSON.parse(raw_body)
-      Rails.logger.info("Parsed JSON payload: #{payload.inspect}")
+      Rails.logger.info("=== PARSED PAYLOAD STRUCTURE ===")
+      Rails.logger.info("Full payload: #{payload.inspect}")
+      Rails.logger.info("Payload keys: #{payload.keys.inspect}")
+      Rails.logger.info("Payload class types:")
+      payload.each do |key, value|
+        Rails.logger.info("  #{key}: #{value.class} - #{value.inspect}")
+      end
     rescue JSON::ParserError => e
       Rails.logger.error("❌ Directus webhook received invalid JSON: #{e.message}")
       Rails.logger.error("Raw body that failed to parse: #{raw_body}")
@@ -99,9 +106,15 @@ class WebhooksController < ApplicationController
 
     # Extract collection from payload
     collection = payload.dig('collection')
-    Rails.logger.info("Extracted collection: #{collection}")
+    Rails.logger.info("=== COLLECTION EXTRACTION ===")
+    Rails.logger.info("Extracted collection: #{collection.inspect}")
+    Rails.logger.info("Collection present? #{collection.present?}")
+    Rails.logger.info("Collection blank? #{collection.blank?}")
+
     if collection.blank?
       Rails.logger.warn("❌ Directus webhook received without collection")
+      Rails.logger.warn("Available payload keys: #{payload.keys.inspect}")
+      Rails.logger.warn("Full payload for debugging: #{payload.inspect}")
       Rails.logger.warn("📤 Response: 400 Bad Request")
       Rails.logger.warn("=== DIRECTUS WEBHOOK FAILED ===")
       head :bad_request
@@ -200,15 +213,30 @@ class WebhooksController < ApplicationController
 
     item_data = payload.dig('payload')
     Rails.logger.info("Payload['payload'] type: #{item_data.class}")
+    Rails.logger.info("Payload['payload'] present? #{item_data.present?}")
     Rails.logger.info("Payload['payload'] content: #{item_data.inspect if item_data}")
 
     return [] unless item_data.is_a?(Hash)
+
+    Rails.logger.info("Payload['payload'] is a Hash, checking for translations...")
+    Rails.logger.info("Payload['payload'] keys: #{item_data.keys.inspect}")
 
     translations = item_data['translations'] || []
     Rails.logger.info("📝 Found #{translations.length} translation entries")
     Rails.logger.info("Translation details: #{translations.inspect}")
 
-    locales = translations.map { |t| t['languages_code'] }.compact.uniq
+    if translations.any?
+      Rails.logger.info("Processing translations...")
+      locales = translations.map { |t|
+        lang_code = t['languages_code']
+        Rails.logger.debug("Translation entry: #{t.inspect}, languages_code: #{lang_code.inspect}")
+        lang_code
+      }.compact.uniq
+    else
+      Rails.logger.warn("⚠️  No translations found in payload!")
+      locales = []
+    end
+
     Rails.logger.info("🎯 Extracted locales: #{locales.inspect}")
 
     locales
