@@ -59,6 +59,8 @@ module CacheInspector
       # Try to read the cached data
       begin
         cached_data = Rails.cache.read(clean_key)
+        puts "   🔍 DEBUG: cached_data type: #{cached_data.class}"
+
         if cached_data.is_a?(Hash) && cached_data['id']
           # Individual article cache
           title = cached_data.dig('translations', 0, 'title')
@@ -67,9 +69,12 @@ module CacheInspector
         elsif cached_data.is_a?(Hash) && cached_data['data'].is_a?(Array)
           # Collection list cache
           article_count = cached_data['data'].length
+          puts "   🔍 DEBUG: data array length: #{article_count}"
 
           # Handle both formats: full objects or just IDs
           first_item = cached_data['data'].first
+          puts "   🔍 DEBUG: first_item type: #{first_item&.class}, value: #{first_item.inspect}"
+
           if first_item.is_a?(Hash)
             # Full article objects
             ids = cached_data['data'].map { |a| a['id'] }.compact
@@ -77,6 +82,7 @@ module CacheInspector
 
             # Show first few article titles
             cached_data['data'].first(3).each do |article|
+              puts "   🔍 DEBUG: processing article: #{article.class}"
               title = article.dig('translations', 0, 'title')
               status = article['status']
               puts "      • ID #{article['id']}: #{title&.truncate(40)} (#{status})"
@@ -97,7 +103,9 @@ module CacheInspector
           puts "   Cached data type: #{cached_data.class}, value: #{cached_data.inspect}"
         end
       rescue => e
-        puts "   Error reading cache: #{e.message}"
+        puts "   ❌ Error reading cache: #{e.message}"
+        puts "   ❌ Error class: #{e.class}"
+        puts "   ❌ Backtrace: #{e.backtrace.first(3).join("\n                ")}"
       end
     end
 
