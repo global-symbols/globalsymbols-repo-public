@@ -84,6 +84,22 @@ else
 end
 ```
 
+### Understanding Cache Check Results
+**Important:** The `check` command (`article_cached?`) searches **collection caches**, not individual article caches:
+
+- ✅ **"CACHED (in collections)"** - Article exists in cached collection results + **shows full article details**
+- ✅ **"CACHED (individual)"** - Article cached as individual item (rare) + shows details
+- ❌ **"NOT CACHED"** - Article not found in any cache
+
+**When cached, it displays:**
+- Article ID, status, featured status
+- Creation/update dates
+- Author name, slug, categories
+- Title, content preview, language
+- Image information
+
+Articles are typically cached as part of collections (like "get articles with limit 1000"), not individually. The check command finds articles within these collection caches and shows their complete details.
+
 ### Monitor Cache Changes
 ```ruby
 require 'cache_inspector'
