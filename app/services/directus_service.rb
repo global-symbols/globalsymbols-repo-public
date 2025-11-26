@@ -200,7 +200,7 @@ class DirectusService
     # @return [void]
     def invalidate_collection!(collection)
       Rails.logger.info("Cache invalidation: clearing Directus cache for collection '#{collection}'")
-      Rails.cache.delete_matched("directus:#{collection}:*")
+      Rails.cache.delete_matched("#{CACHE_NAMESPACE}#{collection}:*")
       Rails.logger.info("Cache invalidation completed for collection '#{collection}'")
       true
     end
