@@ -13,26 +13,134 @@ module CacheInspector
 
   # Check if a specific article is cached
   def article_cached?(id, language = 'en-GB')
-    # Build the same key that fetch_item_with_translations would use
+    # First check if individually cached (though unlikely)
     translation_params = DirectusService.send(:build_translation_params, language, {})
-    cache_key = DirectusService.send(:build_cache_key, :get, "items/articles/#{id}", translation_params)
+    individual_cache_key = DirectusService.send(:build_cache_key, :get, "items/articles/#{id}", translation_params)
+    individual_cached = Rails.cache.read(individual_cache_key)
 
-    # Rails.cache.read automatically adds the namespace (globalsymbols_cache:)
-    cached_data = Rails.cache.read(cache_key)
-    status = cached_data.present? ? '✅ CACHED' : '❌ NOT CACHED'
+    # Check if article exists in any collection caches
+    redis = Rails.cache.redis
+    collection_keys = redis.keys('globalsymbols_cache:directus/articles:*')
+    found_in_collections = []
+    article_details = nil
 
-    puts "Article #{id} (#{language}): #{status}"
-    if Rails.env.development?
-      puts "Cache key: #{cache_key}"
-
-      # Also show what Rails cache actually stores it as
-      redis = Rails.cache.redis
-      full_key = "globalsymbols_cache:#{cache_key}"
-      redis_exists = redis.exists(full_key)
-      puts "Redis key exists: #{redis_exists ? 'YES' : 'NO'} (#{full_key})"
+    collection_keys.each do |full_key|
+      clean_key = full_key.sub('globalsymbols_cache:', '')
+      begin
+        cached_data = Rails.cache.read(clean_key)
+        if cached_data.is_a?(Hash) && cached_data['data'].is_a?(Array)
+          # Check if article ID exists in this collection and extract details
+          article_item = cached_data['data'].find { |item| item.is_a?(Hash) && item['id'] == id }
+          if article_item
+            found_in_collections << clean_key
+            article_details ||= article_item # Keep the first found article details
+          elsif cached_data['data'].include?(id)
+            found_in_collections << clean_key
+            # If only ID is cached, we can't get details
+          end
+        end
+      rescue => e
+        # Skip problematic cache entries
+      end
     end
 
-    cached_data.present?
+    # Determine overall status
+    individually_cached = individual_cached.present?
+    in_collections = found_in_collections.any?
+
+    if individually_cached
+      status = '✅ CACHED (individual)'
+    elsif in_collections
+      status = '✅ CACHED (in collections)'
+    else
+      status = '❌ NOT CACHED'
+    end
+
+    puts "Article #{id} (#{language}): #{status}"
+
+    # Show article details if available
+    if article_details
+      display_article_details(article_details)
+    end
+
+    if Rails.env.development?
+      puts "Individual cache key: #{individual_cache_key}"
+      redis = Rails.cache.redis
+      full_individual_key = "globalsymbols_cache:#{individual_cache_key}"
+      redis_exists = redis.exists(full_individual_key)
+      puts "Individual Redis key exists: #{redis_exists ? 'YES' : 'NO'} (#{full_individual_key})"
+
+      if in_collections
+        puts "Found in #{found_in_collections.length} collection(s):"
+        found_in_collections.each { |key| puts "  - #{key}" }
+      end
+    end
+
+    individually_cached || in_collections
+  end
+
+  # Display article details from cache
+  def display_article_details(article)
+    puts "📄 Article Details:"
+
+    # Basic info
+    puts "   ID: #{article['id']}"
+    puts "   Status: #{article['status']}"
+    puts "   Featured: #{article['featured']}"
+
+    # Dates
+    if article['date_created']
+      puts "   Created: #{Time.parse(article['date_created']).strftime('%Y-%m-%d %H:%M')}"
+    end
+    if article['date_updated']
+      puts "   Updated: #{Time.parse(article['date_updated']).strftime('%Y-%m-%d %H:%M')}"
+    end
+
+    # Author
+    if article['author'].is_a?(Hash)
+      author_name = [article.dig('author', 'first_name'), article.dig('author', 'last_name')].compact.join(' ')
+      puts "   Author: #{author_name.presence || 'Unknown'}"
+    end
+
+    # Slug
+    if article['slug']
+      puts "   Slug: #{article['slug']}"
+    end
+
+    # Categories
+    if article['categories'].is_a?(Array) && article['categories'].any?
+      category_names = article['categories'].map do |cat|
+        if cat.is_a?(Hash) && cat.dig('article_categories_id', 'name')
+          cat.dig('article_categories_id', 'name')
+        elsif cat.is_a?(Hash)
+          cat['name']
+        else
+          cat.to_s
+        end
+      end.compact
+      puts "   Categories: #{category_names.join(', ')}" if category_names.any?
+    end
+
+    # Translations
+    if article['translations'].is_a?(Array) && article['translations'].any?
+      if article['translations'].first.is_a?(Hash)
+        translation = article['translations'].first
+        title = translation['title']
+        content_preview = translation['content']&.truncate(100)&.gsub(/\s+/, ' ')
+        puts "   Title: #{title&.truncate(60)}" if title
+        puts "   Content: #{content_preview}" if content_preview
+        puts "   Language: #{translation['languages_code']}" if translation['languages_code']
+      elsif article['translations'].first.is_a?(Integer)
+        puts "   Translations: #{article['translations'].length} language IDs available"
+      end
+    end
+
+    # Image
+    if article['image']
+      puts "   Image: #{article['image']}"
+    end
+  rescue => e
+    puts "   Error displaying article details: #{e.message}"
   end
 
   # Inspect all cached articles
