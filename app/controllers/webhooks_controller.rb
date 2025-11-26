@@ -94,12 +94,8 @@ class WebhooksController < ApplicationController
     cached_collections = DirectusCachedCollection.cached_collection_names
 
     # Handle special collections
-    if LANGUAGE_CONFIG_COLLECTIONS.include?(collection) || collection == 'languages'
-      if LANGUAGE_CONFIG_COLLECTIONS.include?(collection)
-        LanguageConfigurationService.invalidate_cache!
-      else
-        update_live_language_config
-      end
+    if LANGUAGE_CONFIG_COLLECTIONS.include?(collection)
+      update_live_language_config
       Rails.logger.info("Directus webhook processed for special collection: #{collection}")
       head :ok
       return
