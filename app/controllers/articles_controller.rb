@@ -98,7 +98,6 @@ class ArticlesController < ApplicationController
     # Get the Directus language code from the current Rails locale
     language_code = directus_language_code
 
-
     # Fetch article from Directus CMS by slug with language-specific translation filtering
     begin
       # Fetch articles filtered by slug
@@ -107,6 +106,11 @@ class ArticlesController < ApplicationController
       }, nil, true, { skip_translation_filter: true }) # Skip translation filtering to allow English-only articles
 
       @article = articles.first
+
+      # Debug logging for cache inspection
+      Rails.logger.info("Article show - slug: #{params[:slug]}, language: #{language_code}")
+      Rails.logger.info("Article fetched: ID #{@article['id']}, title: #{@article.dig('translations', 0, 'title') rescue 'N/A'}")
+      Rails.logger.info("Article content length: #{@article.dig('translations', 0, 'content')&.length rescue 'N/A'}")
 
       # If article is nil, it means the article doesn't exist, isn't published,
       # or has no translations in the requested, default, or English language

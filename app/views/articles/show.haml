@@ -5,12 +5,14 @@
   description = translation['excerpt'] || translation['title'] || 'Article from Global Symbols'
 
   # Debug logging for article show
-  if @article && @article['id'] == 4
-    Rails.logger.info("  - Article ID: #{@article['id']}")
-    Rails.logger.info("  - Using fallback: #{@using_fallback}")
-    Rails.logger.info("  - Translation used: #{translation['languages_code']}")
-    Rails.logger.info("  - Title: '#{title}'")
-    Rails.logger.info("  - Translation title: '#{translation['title']}'")
+  Rails.logger.info("Article show view - Article ID: #{@article['id']}, slug: #{@article['slug']}")
+  Rails.logger.info("Using fallback: #{@using_fallback}")
+  Rails.logger.info("Translation used: #{translation['languages_code']}")
+  Rails.logger.info("Title: '#{title}'")
+  Rails.logger.info("Translation title: '#{translation['title']}'")
+  Rails.logger.info("Content length: #{translation['content']&.length}")
+  if translation['content']
+    Rails.logger.info("Content preview: #{translation['content'][0..100]}...")
   end
 
   set_meta_tags({
