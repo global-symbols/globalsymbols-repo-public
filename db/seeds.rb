@@ -45,13 +45,13 @@ DirectusCachedCollection.find_or_create_by!(name: 'articles') do |collection|
   collection.parameter_sets = [
     # Used by articles index - matches build_translation_params + limit: 1000
     {
-      'fields' => 'id,status,featured,slug,author.first_name,author.last_name,date_created,date_updated,image,categories.article_categories_id.name,categories.article_categories_id.id,translations.title,translations.content,translations.body,translations.languages_code',
+      'fields' => 'id,status,featured,slug,author.first_name,author.last_name,date_created,date_updated,image,categories.article_categories_id.name,categories.article_categories_id.id,translations.title,translations.content,translations.languages_code',
       'filter' => { 'status' => { '_eq' => 'published' } },
       'limit' => 1000
     },
     # Used for smaller article lists - matches build_translation_params + limit: 9
     {
-      'fields' => 'id,status,featured,slug,author.first_name,author.last_name,date_created,date_updated,image,categories.article_categories_id.name,categories.article_categories_id.id,translations.title,translations.content,translations.body,translations.languages_code',
+      'fields' => 'id,status,featured,slug,author.first_name,author.last_name,date_created,date_updated,image,categories.article_categories_id.name,categories.article_categories_id.id,translations.title,translations.content,translations.languages_code',
       'filter' => { 'status' => { '_eq' => 'published' } },
       'limit' => 9
     }
