@@ -29,6 +29,7 @@ rails runner "require 'cache_inspector'; CacheInspector.article_cached?(4, 'en-G
 ### Core Inspection
 - `inspect_article_cache` - Show all cached articles with details
 - `article_cached?(id, language)` - Check if specific article is cached
+- `article_cached_full?(id, language)` - Check article with FULL details (no truncation)
 - `inspect_collection_cache(collection)` - Inspect any cached collection
 - `cache_status` - Quick overview of cache state
 
@@ -53,9 +54,9 @@ When running `./bin/cache_inspector`:
 cache> status          # Show cache overview
 cache> inspect         # Show all cached articles
 cache> check 4         # Check if article 4 is cached
+cache> checkfull 4     # Check article 4 with FULL details (no truncation)
 cache> health          # Run health check
 cache> perf 4          # Performance test for article 4
-cache> check 4         # Check if article 4 is cached
 cache> check_lang en-GB # Check if English language is cached
 cache> clear 4         # Clear article 4 from cache
 cache> debug 4         # Debug cache key for article 4
@@ -186,4 +187,5 @@ cache> fetch_lang en
 rails console
 require 'cache_inspector'
 inspect_article_cache
+article_cached_full?(10, 'en-GB')  # Full article details, no truncation
 ```

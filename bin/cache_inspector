@@ -25,6 +25,7 @@ while true
     puts "  status          # Quick cache status"
     puts "  inspect         # Inspect all cached articles"
     puts "  check ID        # Check if article ID is cached"
+    puts "  checkfull ID    # Check article with FULL details (no truncation)"
     puts "  health          # Full cache health check"
     puts "  perf [ID]       # Performance test (default ID=4)"
     puts "  check ID        # Check if specific article is cached"
@@ -51,6 +52,10 @@ while true
   when /^check (\d+)$/
     id = $1.to_i
     CacheInspector.article_cached?(id, 'en-GB')
+
+  when /^checkfull (\d+)$/
+    id = $1.to_i
+    CacheInspector.article_cached_full?(id, 'en-GB')
 
   when /^check_lang ([a-zA-Z_-]+)$/
     code = $1
