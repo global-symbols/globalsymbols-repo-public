@@ -89,9 +89,9 @@
           - image_url = "https://cms.gs-test.co.uk/assets/#{@article['image']}"
           - set_meta_tags({image_src: image_url, twitter: { image: image_url }})
           %img.mb-5.img-fluid{src: image_url, alt: translation['title'] || 'Article image'}
-        - if translation['body']
-          = redcarpet(NewsArticleRenderer).render(translation['body']).html_safe
-        - elsif translation['content']
+        - if translation['content']
           = redcarpet(NewsArticleRenderer).render(translation['content']).html_safe
+        - elsif translation['body']
+          = redcarpet(NewsArticleRenderer).render(translation['body']).html_safe
 = render 'rich_data', data: rich_data_base.merge({'@type': 'NewsArticle'}), cache: true
 = render 'rich_data', data: rich_data_base.merge({'@type': 'BlogPosting'}), cache: true
