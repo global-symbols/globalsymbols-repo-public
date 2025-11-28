@@ -27,7 +27,8 @@
     .hero-overlay
       .container-xl
         .hero-content
-          %h1.hero-title= featured_translation['title'] || @featured_article['slug']&.gsub('-', ' ')&.titleize || 'Featured Article'
+          %h1.hero-title
+            %a{href: article_path(@featured_article['slug']), style: "color: white; text-decoration: none;"}= featured_translation['title'] || @featured_article['slug']&.gsub('-', ' ')&.titleize || 'Featured Article'
           - if featured_using_fallback
             %small.text-warning.mb-3 (en-GB)
           .hero-meta
@@ -38,7 +39,7 @@
             - if @featured_article['date_created']
               %span.hero-date= " • #{Date.parse(@featured_article['date_created']).strftime('%B %d, %Y')}"
           .hero-actions.mt-4
-            %a.btn.btn-primary.btn-lg{href: article_path(@featured_article['slug'])} Read More
+            %a.btn.btn-primary.btn-lg{href: article_path(@featured_article['slug']), 'aria-hidden' => 'true'} Read More
 
 %main.container-xl
   %section.mt-5
@@ -79,7 +80,7 @@
               %img.card-img-top{src: image_url, alt: translation['title'] || 'Article image', style: "max-width: 100%; height: auto;"}
             .card-body.d-flex.flex-column
               %h3.card-title{:style => "font-weight: 600"}
-                = translation['title'] || 'Article Title'
+                %a{href: article_path(article['slug'])}= translation['title'] || 'Article Title'
                 - if using_fallback
                   %small.text-warning (en-GB)
               %p.card-text.text-muted
@@ -90,7 +91,7 @@
                 - if article['date_created']
                   = " On #{Date.parse(article['date_created']).strftime('%B %d, %Y')}"
               .mt-auto
-                %a.btn.btn-primary{href: article_path(article['slug'])} Read More
+                %a.btn.btn-primary{href: article_path(article['slug']), 'aria-hidden' => 'true'} Read More
 
       - if @articles.empty? && !@directus_error
         .col-12
