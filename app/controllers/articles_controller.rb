@@ -107,11 +107,6 @@ class ArticlesController < ApplicationController
 
       @article = articles.first
 
-      # Debug logging for cache inspection
-      Rails.logger.info("Article show - slug: #{params[:slug]}, language: #{language_code}")
-      Rails.logger.info("Article fetched: ID #{@article['id']}, title: #{@article.dig('translations', 0, 'title') rescue 'N/A'}")
-      Rails.logger.info("Article content length: #{@article.dig('translations', 0, 'content')&.length rescue 'N/A'}")
-
       # If article is nil, it means the article doesn't exist, isn't published,
       # or has no translations in the requested, default, or English language
       if @article.nil? || @article.empty?

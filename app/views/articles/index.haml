@@ -22,7 +22,7 @@
   %section.featured-article-hero
     .featured-strap FEATURED
     - if @featured_article['image'] && !@featured_article['image'].empty?
-      - hero_image_url = "https://cms.gs-test.co.uk/assets/#{@featured_article['image']}"
+      - hero_image_url = "#{DIRECTUS_URL}/assets/#{@featured_article['image']}"
       .hero-background{style: "background-image: url('#{hero_image_url}');"}
     .hero-overlay
       .container-xl
@@ -76,20 +76,19 @@
         .col-6.col-md-4.mb-4
           .card.h-100.news-article-card
             - if article['image'] && !article['image'].empty?
-              - image_url = "https://cms.gs-test.co.uk/assets/#{article['image']}"
+              - image_url = "#{DIRECTUS_URL}/assets/#{article['image']}"
               %img.card-img-top{src: image_url, alt: translation['title'] || 'Article image', style: "max-width: 100%; height: auto;"}
             .card-body.d-flex.flex-column
               %h3.card-title{:style => "font-weight: 600"}
                 %a{href: article_path(article['slug'])}= translation['title'] || 'Article Title'
                 - if using_fallback
                   %small.text-warning (en-GB)
+              - if translation['short_description'].present?
+                %p.card-text.mb-2
+                  = translation['short_description']
               %p.card-text.text-muted
-                - if article['author'] && article['author']['first_name']
-                  - author_name = [article['author']['first_name'], article['author']['last_name']].compact.join(' ')
-                  - if author_name.present?
-                    = "By #{author_name},"
                 - if article['date_created']
-                  = " On #{Date.parse(article['date_created']).strftime('%B %d, %Y')}"
+                  = Date.parse(article['date_created']).strftime('%B %d, %Y')
               .mt-auto
                 %a.btn.btn-primary{href: article_path(article['slug']), 'aria-hidden' => 'true'} Read More
 
