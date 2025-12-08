@@ -8,7 +8,7 @@ class WebhooksController < ApplicationController
   skip_before_action :verify_authenticity_token, only: [:directus]
 
   # Collections that affect language configuration
-  LANGUAGE_CONFIG_COLLECTIONS = %w[languages].freeze
+  LANGUAGE_CONFIG_COLLECTIONS = %w[gs_languages].freeze
 
   def update_live_language_config
     LanguageConfigurationService.update_live_config

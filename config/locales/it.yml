@@ -633,13 +633,13 @@ it:
         add_concept_button: Aggiungi un concetto
         no_concepts: Questo simbolo non ha concetti per definirlo.
         concept_defined_in: Definito in %{coding_framework_name}
-        _title: '%{survey_name} in %{symbolset_name}'
+        _title: '%{picto_label} in %{symbolset_name}'
       new:
         heading: Aggiungi simbolo
         _title: Aggiungi simbolo in %{symbolset_name}
       edit:
         heading: Modifica simbolo
-        _title: Modifica %{survey_name} in %{symbolset_name}
+        _title: Modifica %{picto_label} in %{symbolset_name}
       _topbar:
         not_publicly_visible: Non visibile pubblicamente
         download_button: Scarica %{file_type}
