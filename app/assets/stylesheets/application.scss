@@ -334,3 +334,208 @@ ul.nav.gs-tree {
   padding-left: 40px;
   background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
 }
+
+// Featured article hero styling
+.featured-article-hero {
+  position: relative;
+  height: 70vh;
+  min-height: 500px;
+  width: 100%;
+  overflow: hidden;
+  margin-bottom: 3rem;
+
+  .featured-strap {
+    position: absolute;
+    top: 70px;
+    right: -60px;
+    min-width: 300px;
+    text-align: center;
+    background: $primary;
+    color: white;
+    padding: 0.75rem 3rem;
+    font-weight: bold;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    z-index: 3;
+    transform: translateX(2rem) translateY(-2rem) rotate(45deg);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 1;
+  }
+
+  .hero-overlay {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      135deg,
+      rgba(0, 0, 0, 0.7) 0%,
+      rgba(0, 0, 0, 0.4) 50%,
+      rgba(0, 0, 0, 0.2) 100%
+    );
+    z-index: 2;
+    display: flex;
+    align-items: center;
+
+    .hero-content {
+      text-align: center;
+      color: white;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 2rem;
+
+      .hero-title {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        line-height: 1.2;
+
+        @media (max-width: 768px) {
+          font-size: 2rem;
+        }
+      }
+
+      .hero-meta {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-top: 1.5rem;
+
+        .hero-author,
+        .hero-date {
+          display: inline-block;
+          margin: 0 0.5rem;
+        }
+      }
+
+      .hero-actions {
+        .btn {
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          padding: 0.75rem 2rem;
+          border-radius: 50px;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+          transition: all 0.3s ease;
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+          }
+        }
+      }
+    }
+  }
+}
+
+// News article cards styling
+.news-article-card {
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.15s ease-in-out, transform 0.15s ease-in-out;
+
+  .card-img-top {
+    border-radius: 10px 10px 0 0;
+  }
+
+  &:hover {
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+  }
+}
+
+// News article responsive grid adjustments
+@media (max-width: 767.98px) {
+  .news-article-card {
+    margin-bottom: 1rem;
+
+    .card-title {
+      font-size: 1.1rem;
+    }
+
+    .card-text {
+      font-size: 0.9rem;
+    }
+  }
+}
+
+// Category filter responsive styling
+.category-filter {
+  .btn {
+    white-space: nowrap;
+  }
+
+  @media (max-width: 576px) {
+    .btn {
+      font-size: 0.85rem;
+      padding: 0.25rem 0.5rem;
+    }
+  }
+}
+
+// Pagination responsive styling
+@media (max-width: 576px) {
+  .pagination {
+    .page-link {
+      padding: 0.375rem 0.5rem;
+      font-size: 0.875rem;
+    }
+
+    .page-item:not(.active) .page-link {
+      display: none;
+    }
+
+    // Show only current page, prev, and next on mobile
+    .page-item:nth-child(2),
+    .page-item:nth-last-child(2) {
+      display: inline-block;
+    }
+  }
+}
+
+// Read More buttons styling for articles page
+main.container-xl .btn-primary {
+  border-radius: 30px !important;
+}
+
+// Horizontal breadcrumb styling
+.breadcrumb-horizontal {
+  .breadcrumb-link {
+    color: #6c757d;
+
+    a {
+      color: #6c757d;
+      text-decoration: none;
+
+      &:hover {
+        color: #495057;
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .breadcrumb-separator {
+    margin: 0 2px;
+    color: #6c757d;
+
+    &:before {
+      content: "/";
+    }
+  }
+
+  .breadcrumb-current {
+    color: #495057;
+    font-weight: 500;
+  }
+}

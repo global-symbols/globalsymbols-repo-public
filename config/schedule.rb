@@ -20,9 +20,15 @@
 # Learn more: http://github.com/javan/whenever
 
 
-#commented out during AWS migration as job has been failing and needs 
+#commented out during AWS migration as job has been failing and needs
 re-designing
- 
+
 #every 1.day, at: '4:30 am' do
 #  runner "SymbolsetSync::ArasaacJob.perform_now"
 #end
+
+# Daily safety warmer for Directus cached collections
+# Runs at 4:30 am to ensure no cache can be stale for more than ~24 hours
+every 1.day, at: '4:30 am' do
+  runner "DirectusDailyWarmerJob.perform_now"
+end

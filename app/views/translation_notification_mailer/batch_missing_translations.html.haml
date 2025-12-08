@@ -1,0 +1,40 @@
+!!! 5
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %title Multiple Missing Translations Notification
+  %body{:style => "font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4;"}
+    .container{:style => "max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"}
+      %h1{:style => "color: #d32f2f; margin-bottom: 20px;"} Multiple Missing Translations Alert
+
+      %p{:style => "color: #333; font-size: 16px; line-height: 1.5; margin-bottom: 20px;"}
+        Multiple translations are missing across #{@items_by_collection.keys.length} collections. Total items affected: #{@total_count}
+
+      - @items_by_collection.each do |collection, items|
+        .collection-section{:style => "margin-bottom: 25px;"}
+          %h3{:style => "color: #1976d2; margin-bottom: 10px;"}= collection.titleize
+          .items-list{:style => "background-color: #f9f9f9; padding: 15px; border-radius: 4px;"}
+            %table{:style => "width: 100%; border-collapse: collapse;"}
+              %thead
+                %tr{:style => "border-bottom: 1px solid #ddd;"}
+                  %th{:style => "padding: 8px; text-align: left; font-weight: bold; color: #555;"} Item ID
+                  %th{:style => "padding: 8px; text-align: left; font-weight: bold; color: #555;"} Language
+                  - if items.any? { |item| item[:item_title].present? }
+                    %th{:style => "padding: 8px; text-align: left; font-weight: bold; color: #555;"} Title
+              %tbody
+                - items.each do |item|
+                  %tr{:style => "border-bottom: 1px solid #eee;"}
+                    %td{:style => "padding: 8px; color: #333;"}= item[:item_id]
+                    %td{:style => "padding: 8px; color: #d32f2f; font-weight: bold;"}= item[:requested_language]
+                    - if items.any? { |item| item[:item_title].present? }
+                      %td{:style => "padding: 8px; color: #333;"}= item[:item_title] || '-'
+
+      %p{:style => "color: #666; font-size: 14px; line-height: 1.5; margin-bottom: 20px;"}
+        The system automatically fell back to default languages (#{DIRECTUS_DEFAULT_LANGUAGE}) for this content.
+        Please add the missing translations to ensure all users see content in their preferred languages.
+
+      .footer{:style => "border-top: 1px solid #eee; padding-top: 15px; margin-top: 30px; color: #999; font-size: 12px;"}
+        %p
+          This notification was generated on #{@timestamp.strftime('%B %d, %Y at %H:%M %Z')}
+          %br
+          Global Symbols Translation System

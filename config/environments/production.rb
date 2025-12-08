@@ -12,7 +12,6 @@ Rails.application.configure do
 
   # Full error reports are disabled and caching is turned on.
   config.consider_all_requests_local       = false
-  config.action_controller.perform_caching = true
 
   config.active_job.queue_adapter = :sidekiq
 
@@ -57,9 +56,39 @@ Rails.application.configure do
   # Prepend all log lines with the following tags.
   config.log_tags = [ :request_id ]
 
-  # Use a different cache store in production.
-  # config.cache_store = :mem_cache_store # For the Dalli gem.
-  config.cache_store = :memory_store, { size: 64.megabytes }
+  # Redis cache (db3) — ENV-driven, no fallbacks
+
+  redis_ip = ENV['REDIS_IP']
+  redis_password = ENV['REDIS_PASSWORD']
+  redis_cache_db = ENV['REDIS_CACHE_DB'] || '3'  # Allow fallback for DB only (per your plan)
+
+  missing = []
+  missing << 'REDIS_IP' if redis_ip.blank?
+  missing << 'REDIS_PASSWORD' if redis_password.blank?  # Allow blank if no pass, but check if needed
+
+  if missing.any?
+    raise <<~ERROR
+      Redis cache configuration incomplete in production.
+      Set:
+
+        REDIS_IP=172.31.13.8
+        REDIS_PASSWORD=your_password
+
+      Missing: #{missing.join(', ')}
+    ERROR
+  end
+
+  encoded_password = URI.encode_www_form_component(redis_password)
+  redis_url = "redis://:#{encoded_password}@#{redis_ip}:6379/#{redis_cache_db}"
+
+  config.cache_store = :redis_cache_store, {
+    url: redis_url,
+    namespace: 'globalsymbols_cache',
+    expires_in: 90.minutes,
+    reconnect_attempts: 3
+  }
+
+  config.action_controller.perform_caching = true
 
   # Use a real queuing backend for Active Job (and separate queues per environment).
   # config.active_job.queue_adapter     = :resque

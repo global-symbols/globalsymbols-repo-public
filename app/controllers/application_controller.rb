@@ -72,7 +72,8 @@ class ApplicationController < ActionController::Base
     
     def set_locale
       begin
-        I18n.locale = params[:locale] || I18n.default_locale
+        new_locale = params[:locale] || I18n.default_locale
+        I18n.locale = new_locale
       rescue I18n::InvalidLocale
         # If an invalid locale was chosen, redirect to the current page with no locale set.
         redirect_to request.path
@@ -115,4 +116,10 @@ class ApplicationController < ActionController::Base
     def allow_iframe
       response.headers.except! 'X-Frame-Options'
     end
-end
+
+    # Returns the Directus language code for the current Rails locale
+    # Falls back to DIRECTUS_DEFAULT_LANGUAGE if mapping not found
+    def directus_language_code
+      DIRECTUS_LANGUAGE_MAPPING.call[I18n.locale.to_sym] || DIRECTUS_DEFAULT_LANGUAGE.call
+    end
+  end

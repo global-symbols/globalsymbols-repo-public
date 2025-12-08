@@ -40,6 +40,26 @@ Source.create(name: 'Public Suggestion', slug: 'public-suggestion', authoritativ
 # Languages
 ImportLanguagesJob.perform_now
 
+# Directus Cached Collections
+DirectusCachedCollection.find_or_create_by!(name: 'articles') do |collection|
+  collection.parameter_sets = [
+    # Used by articles index - matches build_translation_params + limit: 1000
+    {
+      'fields' => 'id,status,featured,slug,author.first_name,author.last_name,date_created,date_updated,image,categories.article_categories_id.name,categories.article_categories_id.id,translations.title,translations.content,translations.short_description,translations.languages_code',
+      'filter' => { 'status' => { '_eq' => 'published' } },
+      'limit' => 1000
+    },
+    # Used for smaller article lists - matches build_translation_params + limit: 9
+    {
+      'fields' => 'id,status,featured,slug,author.first_name,author.last_name,date_created,date_updated,image,categories.article_categories_id.name,categories.article_categories_id.id,translations.title,translations.content,translations.short_description,translations.languages_code',
+      'filter' => { 'status' => { '_eq' => 'published' } },
+      'limit' => 9
+    }
+  ]
+  collection.priority = 10
+  collection.description = 'News articles and blog posts'
+end
+
 if Rails.env == 'development'
   require 'factory_bot_rails'
   

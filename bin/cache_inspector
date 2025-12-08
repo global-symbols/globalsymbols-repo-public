@@ -1,0 +1,116 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Cache Inspector Runner
+# Usage: ./bin/cache_inspector
+#
+# This loads the cache inspector and starts an interactive session
+
+require_relative '../config/environment'
+require_relative '../lib/cache_inspector'
+
+puts "=== Directus Cache Inspector ==="
+puts "Type 'help' for available commands or 'exit' to quit"
+puts ""
+
+# Start interactive session
+while true
+  print "cache> "
+  input = gets&.chomp
+
+  case input
+  when 'help', 'h', '?'
+    puts ""
+    puts "Available commands:"
+    puts "  status          # Quick cache status"
+    puts "  inspect         # Inspect all cached articles"
+    puts "  check ID        # Check if article ID is cached"
+    puts "  checkfull ID    # Check article with FULL details (no truncation)"
+    puts "  health          # Full cache health check"
+    puts "  perf [ID]       # Performance test (default ID=4)"
+    puts "  check ID        # Check if specific article is cached"
+    puts "  check_lang CODE # Check if specific language is cached"
+    puts "  clear ID        # Clear specific article from cache"
+    puts "  debug ID        # Debug cache key for specific article"
+    puts "  fetch ID        # Fetch and cache specific article"
+    puts "  fetch_lang CODE # Fetch and cache specific language"
+    puts "  articles        # Show only individual cached articles"
+    puts "  languages       # Show cached languages"
+    puts "  all             # Show ALL Directus cached data"
+    puts "  cleanup         # Remove empty/corrupted cache entries"
+    puts "  collections     # Show all cached collections"
+    puts "  help            # Show this help"
+    puts "  exit            # Exit inspector"
+    puts ""
+
+  when /^status$/
+    CacheInspector.cache_status
+
+  when /^inspect$/
+    CacheInspector.inspect_all_directus_cache
+
+  when /^check (\d+)$/
+    id = $1.to_i
+    CacheInspector.article_cached?(id, 'en-GB')
+
+  when /^checkfull (\d+)$/
+    id = $1.to_i
+    CacheInspector.article_cached_full?(id, 'en-GB')
+
+  when /^check_lang ([a-zA-Z_-]+)$/
+    code = $1
+    CacheInspector.language_cached?(code)
+
+  when /^health$/
+    CacheInspector.cache_health_check
+
+  when /^perf(\s+\d+)?$/
+    id = $1&.strip&.to_i || 4
+    CacheInspector.cache_performance_test(id, 'en-GB')
+
+  when /^clear (\d+)$/
+    id = $1.to_i
+    CacheInspector.clear_article_cache(id, 'en-GB')
+
+  when /^debug (\d+)$/
+    id = $1.to_i
+    CacheInspector.debug_article_cache_key(id, 'en-GB')
+
+  when 'cleanup'
+    CacheInspector.cleanup_empty_cache_entries
+
+  when /^fetch (\d+)$/
+    id = $1.to_i
+    CacheInspector.fetch_and_cache_article(id, 'en-GB')
+
+  when /^fetch_lang ([a-zA-Z_-]+)$/
+    code = $1
+    CacheInspector.fetch_and_cache_language(code)
+
+  when /^articles$/
+    CacheInspector.inspect_article_cache
+
+  when /^languages$/
+    CacheInspector.inspect_cached_languages
+
+  when /^all$/
+    CacheInspector.inspect_all_directus_cache
+
+  when /^collections$/
+    DirectusCachedCollection.all.each do |collection|
+      puts "#{collection.name}: #{collection.parameter_sets.length} parameter sets, priority #{collection.priority}"
+    end
+
+  when 'exit', 'quit', 'q'
+    puts "Goodbye! 👋"
+    exit 0
+
+  when nil, ''
+    # Empty input, just continue
+  else
+    puts "Unknown command: #{input}"
+    puts "Type 'help' for available commands"
+  end
+
+  puts "" unless input == 'help' || input&.start_with?('help')
+end
