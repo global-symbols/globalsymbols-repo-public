@@ -117,10 +117,10 @@ class ArticlesController < ApplicationController
 
       # Check if article has translation in requested language or fallback
       translations = @article['translations'] || []
-      requested_translation = translations.find { |t| t['languages_code'] == language_code }
-      fallback_translation = translations.find { |t| t['languages_code'] == DIRECTUS_DEFAULT_LANGUAGE }
+      requested_translation = translations.find { |t| t['gs_languages_code'] == language_code }
+      fallback_translation = translations.find { |t| t['gs_languages_code'] == DIRECTUS_DEFAULT_LANGUAGE }
       # Always try English as final fallback, even if default language is different
-      english_translation = translations.find { |t| t['languages_code'] == 'en-GB' }
+      english_translation = translations.find { |t| t['gs_languages_code'] == 'en-GB' }
 
       # Determine which translation to use
       @translation_used = requested_translation || fallback_translation || english_translation

@@ -38,7 +38,7 @@ module ArticlesHelper
 
     # Get the title from the default language translation
     translations = article['translations'] || []
-    default_translation = translations.find { |t| t['languages_code'] == 'en-GB' } # Assuming en-GB is default
+    default_translation = translations.find { |t| t['gs_languages_code'] == 'en-GB' } # Assuming en-GB is default
     title = default_translation&.dig('title') || article['title'] || 'untitled'
 
     # Slugify the title: lowercase, replace spaces/special chars with hyphens

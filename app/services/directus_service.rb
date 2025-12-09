@@ -81,8 +81,8 @@ class DirectusService
       # or fallback to default language (en-GB)
       filtered_items = items.select do |item|
         translations = item['translations'] || []
-        has_requested_language = translations.any? { |t| t['languages_code'] == language_code }
-        has_fallback_language = translations.any? { |t| t['languages_code'] == DIRECTUS_DEFAULT_LANGUAGE }
+        has_requested_language = translations.any? { |t| t['gs_languages_code'] == language_code }
+        has_fallback_language = translations.any? { |t| t['gs_languages_code'] == DIRECTUS_DEFAULT_LANGUAGE }
 
         has_requested_language || has_fallback_language
       end
@@ -117,10 +117,10 @@ class DirectusService
 
       # Check if item has the requested language translation
       translations = item['translations'] || []
-      requested_translation = translations.find { |t| t['languages_code'] == language_code }
-      fallback_translation = translations.find { |t| t['languages_code'] == DIRECTUS_DEFAULT_LANGUAGE }
+      requested_translation = translations.find { |t| t['gs_languages_code'] == language_code }
+      fallback_translation = translations.find { |t| t['gs_languages_code'] == DIRECTUS_DEFAULT_LANGUAGE }
       # Always try English as final fallback, even if default language is different
-      english_translation = translations.find { |t| t['languages_code'] == 'en-GB' }
+      english_translation = translations.find { |t| t['gs_languages_code'] == 'en-GB' }
 
       if requested_translation.nil? && fallback_translation.nil? && english_translation.nil?
         Rails.logger.warn("Item #{collection}/#{id} has no translations in #{language_code}, #{DIRECTUS_DEFAULT_LANGUAGE}, or en-GB")
@@ -401,7 +401,7 @@ class DirectusService
     def extract_item_title(item)
       # Try to find a title from the default language translation
       translations = item['translations'] || []
-      default_translation = translations.find { |t| t['languages_code'] == DIRECTUS_DEFAULT_LANGUAGE }
+      default_translation = translations.find { |t| t['gs_languages_code'] == DIRECTUS_DEFAULT_LANGUAGE }
       default_translation&.dig('title') || item['title']
     end
   end
