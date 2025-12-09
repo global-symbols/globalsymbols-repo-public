@@ -325,7 +325,7 @@ module CacheInspector
     puts "🔄 Fetching and caching language #{code}..."
 
     begin
-      language = DirectusService.fetch_item('languages', code)
+      language = DirectusService.fetch_item('gs_languages', code)
       if language
         puts "✅ Language #{code} fetched and cached"
         puts "   Name: #{language['name']}"
@@ -444,7 +444,7 @@ module CacheInspector
         puts "💡 The website is reading from 'directus/language_config'"
       else
         puts "💡 Languages might be cached as collection lists, not individual items"
-        puts "💡 Try: DirectusService.fetch_collection('languages')"
+        puts "💡 Try: DirectusService.fetch_collection('gs_languages')"
       end
       return
     end

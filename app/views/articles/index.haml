@@ -11,10 +11,10 @@
 - if @featured_article.present?
   - featured_translations = @featured_article['translations'] || []
   - featured_current_lang = DIRECTUS_LANGUAGE_MAPPING.call[I18n.locale.to_sym] || DIRECTUS_DEFAULT_LANGUAGE.call
-  - featured_requested_translation = featured_translations.find { |t| t['languages_code'] == featured_current_lang }
-  - featured_fallback_translation = featured_translations.find { |t| t['languages_code'] == DIRECTUS_DEFAULT_LANGUAGE.call }
+  - featured_requested_translation = featured_translations.find { |t| t['gs_languages_code'] == featured_current_lang }
+  - featured_fallback_translation = featured_translations.find { |t| t['gs_languages_code'] == DIRECTUS_DEFAULT_LANGUAGE.call }
   -# Always try English as final fallback, even if default language is different
-  - featured_english_translation = featured_translations.find { |t| t['languages_code'] == 'en-GB' }
+  - featured_english_translation = featured_translations.find { |t| t['gs_languages_code'] == 'en-GB' }
   - featured_translation = featured_requested_translation || featured_fallback_translation || featured_english_translation || {}
   - featured_using_fallback = featured_requested_translation.nil? && (featured_fallback_translation.present? || featured_english_translation.present?)
 
@@ -65,10 +65,10 @@
         -# Get the translation for the current language or fallback
         - translations = article['translations'] || []
         - current_lang_code = DIRECTUS_LANGUAGE_MAPPING.call[I18n.locale.to_sym] || DIRECTUS_DEFAULT_LANGUAGE.call
-        - requested_translation = translations.find { |t| t['languages_code'] == current_lang_code }
-        - fallback_translation = translations.find { |t| t['languages_code'] == DIRECTUS_DEFAULT_LANGUAGE.call }
+        - requested_translation = translations.find { |t| t['gs_languages_code'] == current_lang_code }
+        - fallback_translation = translations.find { |t| t['gs_languages_code'] == DIRECTUS_DEFAULT_LANGUAGE.call }
         -# Always try English as final fallback, even if default language is different
-        - english_translation = translations.find { |t| t['languages_code'] == 'en-GB' }
+        - english_translation = translations.find { |t| t['gs_languages_code'] == 'en-GB' }
         - translation = requested_translation || fallback_translation || english_translation || {}
         - using_fallback = requested_translation.nil? && (fallback_translation.present? || english_translation.present?)
 

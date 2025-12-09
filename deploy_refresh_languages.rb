@@ -10,7 +10,7 @@ puts "=" * 60
 begin
   # Check Directus connection
   puts "Checking Directus connection..."
-  languages = DirectusService.fetch_collection('languages')
+  languages = DirectusService.fetch_collection('gs_languages')
   puts "✅ Found #{languages.size} languages in Directus"
 
   # Refresh language configuration
