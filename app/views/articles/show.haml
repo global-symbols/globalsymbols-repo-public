@@ -50,7 +50,7 @@
 
   # If there's an image...
   if @article['image'] and !@article['image'].empty?
-    rich_data_base[:image] = "#{DIRECTUS_URL}/assets/#{@article['image']}"
+    rich_data_base[:image] = "#{DIRECTUS_URL}/assets/#{@article['image']['id']}/#{@article['image']['filename_disk']}"
   end
 
 %main.container-lg.mt-0
@@ -78,7 +78,7 @@
               - if @article['author']
                 %p.mt-1.font-weight-light= [@article['author']['first_name'], @article['author']['last_name']].compact.join(' ')
         - if @article['image'] && !@article['image'].empty?
-          - image_url = "#{DIRECTUS_URL}/assets/#{@article['image']}"
+          - image_url = "#{DIRECTUS_URL}/assets/#{@article['image']['id']}/#{@article['image']['filename_disk']}"
           - set_meta_tags({image_src: image_url, twitter: { image: image_url }})
           %img.mb-5.img-fluid{src: image_url, alt: translation['title'] || 'Article image'}
         - if translation['content']
