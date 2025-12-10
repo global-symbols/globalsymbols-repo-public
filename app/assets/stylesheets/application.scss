@@ -492,13 +492,14 @@ ul.nav.gs-tree {
       font-size: 0.875rem;
     }
 
+    // Hide page number links, keep current page visible
     .page-item:not(.active) .page-link {
       display: none;
     }
 
-    // Show only current page, prev, and next on mobile
-    .page-item:nth-child(2),
-    .page-item:nth-last-child(2) {
+    // Show previous and next navigation arrows on mobile
+    .page-item [aria-label="Previous"],
+    .page-item [aria-label="Next"] {
       display: inline-block;
     }
   }
