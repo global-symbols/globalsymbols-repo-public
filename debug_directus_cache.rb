@@ -24,8 +24,10 @@ puts "Parameter sets: #{param_sets.length}"
 puts ""
 
 # Monkey patch DirectusService to add debugging
-module DirectusService
-  alias_method :original_fetch_collection_with_translations, :fetch_collection_with_translations
+class DirectusService
+  class << self
+    alias_method :original_fetch_collection_with_translations, :fetch_collection_with_translations
+  end
 
   def self.fetch_collection_with_translations(collection, language_code, params = {}, cache_ttl = nil, notify_missing = true, options = {})
     puts "🎯 Testing: #{collection} / #{language_code}"
