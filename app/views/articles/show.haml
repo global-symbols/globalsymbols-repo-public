@@ -28,7 +28,7 @@
           '@id': article_url(@article['slug'])
       },
       headline:      translation['title'] || 'Article',
-      inLanguage:    @translation_used['languages_code'] || 'en-GB',
+      inLanguage:    @translation_used['gs_languages_code'] || 'en-GB',
       datePublished: @article['date_created'],
       dateModified:  @article['date_updated'] || @article['date_created'],
       author: {

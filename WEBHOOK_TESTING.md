@@ -68,8 +68,8 @@ payload = {
   'payload' => {
     'id' => SecureRandom.uuid,
     'translations' => [
-      { 'languages_code' => 'en-GB', 'title' => 'Test Article' },
-      { 'languages_code' => 'fr-FR', 'title' => 'Article Test' }
+      { 'gs_languages_code' => 'en-GB', 'title' => 'Test Article' },
+      { 'gs_languages_code' => 'fr-FR', 'title' => 'Article Test' }
     ]
   }
 }

@@ -30,7 +30,7 @@ namespace :webhook do
     translations = locales.map do |locale|
       {
         'id' => SecureRandom.uuid,
-        'languages_code' => locale,
+        'gs_languages_code' => locale,
         'title' => "Sample #{collection.singularize} title in #{locale}",
         'content' => "Sample content for #{collection.singularize} in #{locale} language.",
         'languages_id' => locale
