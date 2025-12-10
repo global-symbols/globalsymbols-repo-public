@@ -53,6 +53,7 @@ class DirectusService
 
   def self.request(method, path, params = {}, cache_ttl = nil)
     puts "   🔍 Request: #{method.upcase} #{path}"
+    puts "   🔍 Params: #{params.inspect[0..200]}..." if params.present?
 
     begin
       cache_key = build_cache_key(method, path, params)
@@ -76,6 +77,8 @@ class DirectusService
       result
     rescue => e
       puts "   💥 REQUEST ERROR: #{e.message} (#{e.class})"
+      puts "   Error backtrace:"
+      puts "   #{e.backtrace.first(3).join("\n   ")}"
       raise e
     end
   end
