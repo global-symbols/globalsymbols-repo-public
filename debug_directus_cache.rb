@@ -61,7 +61,7 @@ class DirectusService
       result = Rails.cache.fetch(cache_key, expires_in: cache_ttl) do
         puts "   🔍 Making API call..."
 
-        response = connection.send(method) do |req|
+        response = faraday_connection.send(method) do |req|
           req.url path
           req.params = params if params.present?
         end
