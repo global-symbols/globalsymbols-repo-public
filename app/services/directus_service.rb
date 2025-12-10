@@ -268,10 +268,17 @@ class DirectusService
 
         Rails.logger.info("Directus API Request: #{method.upcase} #{url}")
 
+        Rails.logger.error("🚨 DIRECTUS REQUEST DEBUG:")
+        Rails.logger.error("Method: #{method.upcase}")
+        Rails.logger.error("Path: #{path}")
+        Rails.logger.error("Params: #{params.inspect}")
+        Rails.logger.error("Full URL will be: #{DIRECTUS_URL}/#{path}?#{params.to_query}")
+
         begin
           response = faraday_connection.send(method) do |req|
             req.url path
             req.params.merge!(params) if params.present?
+            Rails.logger.error("Final request params: #{req.params.inspect}")
           end
 
       Rails.logger.info("Directus API Response: #{response.status}")
