@@ -22,7 +22,7 @@
   %section.featured-article-hero
     .featured-strap FEATURED
     - if @featured_article['image'] && !@featured_article['image'].empty?
-      - hero_image_url = "#{DIRECTUS_URL}/assets/#{@featured_article['image']['id']}/#{@featured_article['image']['filename_disk']}"
+      - hero_image_url = "#{DIRECTUS_URL}/assets/#{@featured_article['image']}"
       .hero-background{style: "background-image: url('#{hero_image_url}');"}
     .hero-overlay
       .container-xl
@@ -76,7 +76,7 @@
         .col-6.col-md-4.mb-4
           .card.h-100.news-article-card
             - if article['image'] && !article['image'].empty?
-              - image_url = "#{DIRECTUS_URL}/assets/#{article['image']['id']}/#{article['image']['filename_disk']}"
+              - image_url = "#{DIRECTUS_URL}/assets/#{article['image']}"
               %img.card-img-top{src: image_url, alt: translation['title'] || 'Article image', style: "max-width: 100%; height: auto;"}
             .card-body.d-flex.flex-column
               %h3.card-title{:style => "font-weight: 600"}
