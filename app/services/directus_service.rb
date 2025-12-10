@@ -341,8 +341,8 @@ class DirectusService
       # Base parameters for fetching translations - only request fields that exist and are permitted
       # categories is a M2M relationship, so we need categories.article_categories_id.name to get category names
       base_params = {
-        fields: 'id,status,featured,slug,author.first_name,author.last_name,date_created,date_updated,image.filename_disk,image,categories.article_categories_id.name,categories.article_categories_id.id,translations.title,translations.content,translations.short_description,translations.gs_languages_code',
-        filter: { status: { _eq: 'published' } }
+        'fields' => 'id,status,featured,slug,author.first_name,author.last_name,date_created,date_updated,image.filename_disk,image,categories.article_categories_id.name,categories.article_categories_id.id,translations.title,translations.content,translations.short_description,translations.gs_languages_code',
+        'filter' => { 'status' => { '_eq' => 'published' } }
       }
 
       # Merge with additional params
