@@ -27,6 +27,7 @@ puts ""
 class DirectusService
   class << self
     alias_method :original_fetch_collection_with_translations, :fetch_collection_with_translations
+    alias_method :original_request, :request
   end
 
   def self.fetch_collection_with_translations(collection, language_code, params = {}, cache_ttl = nil, notify_missing = true, options = {})
@@ -46,6 +47,35 @@ class DirectusService
       puts "\n🔍 DEBUGGING FAILURE..."
       debug_fetch_collection_with_translations(collection, language_code, params, cache_ttl, notify_missing, options)
 
+      raise e
+    end
+  end
+
+  def self.request(method, path, params = {}, cache_ttl = nil)
+    puts "   🔍 Request: #{method.upcase} #{path}"
+
+    begin
+      cache_key = build_cache_key(method, path, params)
+      puts "   🔍 Cache key: #{cache_key[0..50]}..."
+
+      result = Rails.cache.fetch(cache_key, expires_in: cache_ttl) do
+        puts "   🔍 Making API call..."
+
+        response = connection.send(method) do |req|
+          req.url path
+          req.params = params if params.present?
+        end
+
+        puts "   🔍 Response status: #{response.status}"
+        puts "   🔍 Response success: #{response.success?}"
+
+        handle_response(response)
+      end
+
+      puts "   🔍 Request completed successfully"
+      result
+    rescue => e
+      puts "   💥 REQUEST ERROR: #{e.message} (#{e.class})"
       raise e
     end
   end
