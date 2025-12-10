@@ -7,7 +7,7 @@ Multiple translations are missing across #{@items_by_collection.keys.length} col
   - items.each do |item|
     = "  - Item #{item[:item_id]} (#{item[:requested_language]})#{item[:item_title] ? " - #{item[:item_title]}" : ''}"
 
-The system automatically fell back to default languages (#{DIRECTUS_DEFAULT_LANGUAGE}) for this content.
+The system automatically fell back to default languages (#{DIRECTUS_DEFAULT_LANGUAGE.call}) for this content.
 Please add the missing translations to ensure all users see content in their preferred languages.
 
 This notification was generated on #{@timestamp.strftime('%B %d, %Y at %H:%M %Z')}

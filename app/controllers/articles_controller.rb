@@ -110,7 +110,7 @@ class ArticlesController < ApplicationController
       # If article is nil, it means the article doesn't exist, isn't published,
       # or has no translations in the requested, default, or English language
       if @article.nil? || @article.empty?
-        Rails.logger.warn("Article with slug #{params[:slug]} not found, not published, or has no translations in #{language_code}, #{DIRECTUS_DEFAULT_LANGUAGE}, or en-GB")
+        Rails.logger.warn("Article with slug #{params[:slug]} not found, not published, or has no translations in #{language_code}, #{DIRECTUS_DEFAULT_LANGUAGE.call}, or en-GB")
         redirect_to news_path, alert: "Article not found or not available in the requested language."
         return
       end
@@ -118,7 +118,7 @@ class ArticlesController < ApplicationController
       # Check if article has translation in requested language or fallback
       translations = @article['translations'] || []
       requested_translation = translations.find { |t| t['gs_languages_code'] == language_code }
-      fallback_translation = translations.find { |t| t['gs_languages_code'] == DIRECTUS_DEFAULT_LANGUAGE }
+      fallback_translation = translations.find { |t| t['gs_languages_code'] == DIRECTUS_DEFAULT_LANGUAGE.call }
       # Always try English as final fallback, even if default language is different
       english_translation = translations.find { |t| t['gs_languages_code'] == 'en-GB' }
 
@@ -127,7 +127,7 @@ class ArticlesController < ApplicationController
       @using_fallback = requested_translation.nil? && (fallback_translation.present? || english_translation.present?)
 
       if @translation_used.nil? || @translation_used['title'].blank?
-        Rails.logger.warn("Article with slug #{params[:slug]} has no valid translation in #{language_code}, #{DIRECTUS_DEFAULT_LANGUAGE}, or en-GB")
+        Rails.logger.warn("Article with slug #{params[:slug]} has no valid translation in #{language_code}, #{DIRECTUS_DEFAULT_LANGUAGE.call}, or en-GB")
         redirect_to news_path, alert: 'Article not found or not available in the requested language.'
         return
       end
