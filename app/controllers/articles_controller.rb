@@ -57,8 +57,8 @@ class ArticlesController < ApplicationController
         end
       end
 
-      # Sort articles by date (newest first)
-      translated_articles = translated_articles.sort_by { |article| article['date_created'] ? Date.parse(article['date_created']) : Date.new(1900) }.reverse
+      # Sort articles by publish_date (newest first)
+      translated_articles = translated_articles.sort_by { |article| article['publish_date'] ? Date.parse(article['publish_date']) : Date.new(1900) }.reverse
 
       # Separate featured articles and select the most recent one for the hero
       featured_articles = translated_articles.select { |article| article['featured'] == true }
