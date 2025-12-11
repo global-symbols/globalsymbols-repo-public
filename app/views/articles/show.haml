@@ -8,7 +8,7 @@
   set_meta_tags({
     site: 'Global Symbols News',
     article: {
-      published_time: @article['date_created'],
+      published_time: @article['publish_date'] || @article['date_created'],
       modified_time: @article['date_updated'] || @article['date_created'],
       publisher: 'https://globalsymbols.com'
     },
@@ -29,7 +29,7 @@
       },
       headline:      translation['title'] || 'Article',
       inLanguage:    @translation_used['gs_languages_code'] || 'en-GB',
-      datePublished: @article['date_created'],
+      datePublished: @article['publish_date'] || @article['date_created'],
       dateModified:  @article['date_updated'] || @article['date_created'],
       author: {
         '@type': 'Person',
@@ -73,8 +73,9 @@
                   %small.text-warning.ml-2 (Displayed in en-GB)
           .row.justify-content-center.mt-3
             .col-auto.text-center.text-muted
-              - if @article['date_created']
-                %time{datetime: Date.parse(@article['date_created']).strftime('%Y-%m-%d'), pubdate: true}= Date.parse(@article['date_created']).strftime('%B %d, %Y')
+              - if @article['publish_date'] || @article['date_created']
+                - display_date = @article['publish_date'] || @article['date_created']
+                %time{datetime: Date.parse(display_date).strftime('%Y-%m-%d'), pubdate: true}= Date.parse(display_date).strftime('%B %d, %Y')
               - if @article['author']
                 %p.mt-1.font-weight-light= [@article['author']['first_name'], @article['author']['last_name']].compact.join(' ')
         - if @article['image'] && !@article['image'].empty?
