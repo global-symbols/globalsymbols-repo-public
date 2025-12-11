@@ -36,8 +36,8 @@
               - author_name = [@featured_article['author']['first_name'], @featured_article['author']['last_name']].compact.join(' ')
               - if author_name.present?
                 %span.hero-author By #{author_name}
-            - if @featured_article['date_created']
-              %span.hero-date= " • #{Date.parse(@featured_article['date_created']).strftime('%B %d, %Y')}"
+            - if @featured_article['publish_date']
+              %span.hero-date= " • #{Date.parse(@featured_article['publish_date']).strftime('%B %d, %Y')}"
           .hero-actions.mt-4
             %a.btn.btn-primary.btn-lg{href: article_path(@featured_article['slug']), 'aria-hidden' => 'true'} Read More
 
@@ -87,8 +87,8 @@
                 %p.card-text.mb-2
                   = translation['short_description']
               %p.card-text.text-muted
-                - if article['date_created']
-                  = Date.parse(article['date_created']).strftime('%B %d, %Y')
+                - if article['publish_date']
+                  = Date.parse(article['publish_date']).strftime('%B %d, %Y')
               .mt-auto
                 %a.btn.btn-primary{href: article_path(article['slug']), 'aria-hidden' => 'true'} Read More
 
