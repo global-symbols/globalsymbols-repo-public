@@ -53,7 +53,7 @@ module BoardBuilder
         # Helper method for Directus CMS integration
         def directus_request(endpoint, body, method: :post, log_prefix: "AI Analytics")
           # Directus CMS configuration
-          directus_url = ENV['DIRECTUS_URL']
+          directus_url = Rails.env.production? ? 'https://cms.gs-test.co.uk' : ENV['DIRECTUS_URL']
           directus_token = ENV['DIRECTUS_TOKEN']
 
           if directus_token.blank?
