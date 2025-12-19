@@ -44,11 +44,10 @@ class LanguageConfigurationService
       config
     end
 
-    def fetch_fresh_config
-      # Force fresh data by clearing all cache and using cache_ttl=0 for Directus API
-      Rails.cache.clear
-      # Use a unique timestamp to ensure cache bypass
-      languages = DirectusService.fetch_collection('gs_languages', {}, 0)
+  def fetch_fresh_config
+    # Force fresh data by bypassing cache with cache_ttl=0 for Directus API
+    # Use a unique timestamp to ensure cache bypass
+    languages = DirectusService.fetch_collection('gs_languages', {}, 0)
       Rails.logger.info("Fetched #{languages.size} languages from Directus (cache completely bypassed)")
 
       # Build available locales from rails_code field
