@@ -1,0 +1,142 @@
+:ruby
+  title 'Tap Topics'
+  description 'Tap Topics boardsets'
+
+%main.container-xl
+  %section.mt-5
+    %header.mb-5
+      %h1.mb-4.text-center{:style => "font-weight: 600"} Tap Topics
+      %p.text-muted.mb-0.text-center
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+    - if @directus_error
+      .alert.alert-warning
+        %h4 Unable to Load Boardsets
+        %p We're currently experiencing issues connecting to our content management system. Please try again later.
+
+    -# Filters
+    .mb-4
+      -# Category filter links
+      - if @categories.present?
+        .mb-3.category-filter
+          .d-flex.flex-wrap.align-items-center.mb-2
+            %a.btn.btn-outline-primary.btn-sm.mb-1{href: tap_topics_path(language: @selected_language), class: @selected_category.blank? ? 'active' : '', style: "margin-right: 8px"}
+              All Categories
+            - @categories.each do |category|
+              %a.btn.btn-outline-primary.btn-sm.mb-1{href: tap_topics_path(category: category, language: @selected_language), class: @selected_category == category ? 'active' : '', style: "margin-right: 8px"}
+                = category.to_s.titleize
+
+      -# Language select (Directus codes like en-GB)
+      - if @languages.present?
+        %form{action: tap_topics_path, method: 'get', class: 'form-inline'}
+          -# Preserve current category filter
+          - if @selected_category.present?
+            %input{type: 'hidden', name: 'category', value: @selected_category}
+          %label.mr-2{for: 'tap_topics_language'} Language
+          %select.custom-select.custom-select-sm#tap_topics_language{name: 'language', onchange: 'this.form.submit()'}
+            %option{value: '', selected: @selected_language.blank?} All Languages
+            - @languages.each do |lang|
+              %option{value: lang, selected: @selected_language == lang}= lang
+
+    .row
+      - @boardsets.each do |boardset|
+        - translations = boardset['translations'] || []
+        -# Display language is driven by site locale (@language_code). The dropdown language is only a filter.
+        - requested_translation = translations.find { |t| t.is_a?(Hash) && t['gs_languages_code'] == @language_code }
+        - fallback_translation = translations.find { |t| t.is_a?(Hash) && t['gs_languages_code'] == DIRECTUS_DEFAULT_LANGUAGE.call }
+        - english_translation = translations.find { |t| t.is_a?(Hash) && t['gs_languages_code'] == 'en-GB' }
+        - translation = requested_translation || fallback_translation || english_translation || {}
+        - using_fallback = requested_translation.nil? && (fallback_translation.present? || english_translation.present?)
+
+        - low_id = boardset['board_low']
+        - high_id = boardset['board_high']
+        - low_url = low_id.present? ? "#{DIRECTUS_URL}/assets/#{low_id}" : nil
+        - high_url = high_id.present? ? "#{DIRECTUS_URL}/assets/#{high_id}" : nil
+        - modal_title = translation['title'].presence || "Boardset ##{boardset['id']}"
+
+        .col-6.col-md-4.col-lg-3.mb-4
+          %a.card.h-100.tap-topics-card{href: '#', role: 'button', 'data-toggle' => 'modal', 'data-target' => '#tapTopicsBoardsetModal', 'data-low-url' => low_url, 'data-high-url' => high_url, 'data-title' => modal_title}
+            - if low_url.present?
+              %img.card-img-top{src: low_url, alt: modal_title, style: "max-width: 100%; height: auto;"}
+            .card-body.d-flex.flex-column
+              %h3.card-title{:style => "font-weight: 600"}
+                = modal_title
+                - if using_fallback
+                  %small.text-warning (en-GB)
+
+      - if @boardsets.empty? && !@directus_error
+        .col-12
+          .text-center.mt-5
+            %h4 No Boardsets Found
+            %p
+              - if @selected_category.present? || @selected_language.present?
+                No boardsets match your current filters.
+                %br
+                %a{href: tap_topics_path} View all boardsets
+              - else
+                There are currently no boardsets to display.
+
+    -# Pagination controls
+    - if @total_pages.to_i > 1
+      .d-flex.justify-content-center.mt-5
+        %nav{"aria-label" => "Boardset pagination"}
+          %ul.pagination
+            - if @has_previous_page
+              %li.page-item
+                %a.page-link{href: tap_topics_path(category: @selected_category, language: @selected_language, page: @previous_page), "aria-label" => "Previous"}
+                  %span{"aria-hidden" => "true"} ‹
+                  %span.sr-only Previous
+            - else
+              %li.page-item.disabled
+                %span.page-link
+                  %span{"aria-hidden" => "true"} ‹
+                  %span.sr-only Previous
+
+            - start_page = [@current_page - 2, 1].max
+            - end_page = [@current_page + 2, @total_pages].min
+
+            - if start_page > 1
+              %li.page-item
+                %a.page-link{href: tap_topics_path(category: @selected_category, language: @selected_language, page: 1)} 1
+              - if start_page > 2
+                %li.page-item.disabled
+                  %span.page-link …
+
+            - (start_page..end_page).each do |page_num|
+              %li.page-item{class: page_num == @current_page ? 'active' : ''}
+                %a.page-link{href: tap_topics_path(category: @selected_category, language: @selected_language, page: page_num)}= page_num
+
+            - if end_page < @total_pages
+              - if end_page < @total_pages - 1
+                %li.page-item.disabled
+                  %span.page-link …
+              %li.page-item
+                %a.page-link{href: tap_topics_path(category: @selected_category, language: @selected_language, page: @total_pages)}= @total_pages
+
+            - if @has_next_page
+              %li.page-item
+                %a.page-link{href: tap_topics_path(category: @selected_category, language: @selected_language, page: @next_page), "aria-label" => "Next"}
+                  %span{"aria-hidden" => "true"} ›
+                  %span.sr-only Next
+            - else
+              %li.page-item.disabled
+                %span.page-link
+                  %span{"aria-hidden" => "true"} ›
+                  %span.sr-only Next
+
+-# Modal
+#tapTopicsBoardsetModal.modal.fade{tabindex: '-1', role: 'dialog', 'aria-labelledby' => 'tapTopicsBoardsetModalLabel', 'aria-hidden' => 'true'}
+  .modal-dialog.modal-lg{role: 'document'}
+    .modal-content
+      .modal-header
+        %h5.modal-title#tapTopicsBoardsetModalLabel Boardset
+        %button.close{type: 'button', 'data-dismiss' => 'modal', 'aria-label' => 'Close'}
+          %span{'aria-hidden' => 'true'} ×
+      .modal-body
+        %img.img-fluid#tapTopicsBoardsetModalImage{src: '', alt: 'Boardset image'}
+      .modal-footer
+        %button.btn.btn-outline-primary#tapTopicsPrintLow{type: 'button'} Print Low
+        %button.btn.btn-primary#tapTopicsPrintHigh{type: 'button'} Print High
+        %button.btn.btn-secondary{type: 'button', 'data-dismiss' => 'modal'} Close
+
+

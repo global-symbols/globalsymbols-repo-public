@@ -34,5 +34,19 @@ DirectusCachedCollection.find_or_create_by!(name: 'articles') do |collection|
   collection.active = true
 end
 
+# Boardsets collection - Tap Topics
+DirectusCachedCollection.find_or_create_by!(name: 'boardsets') do |collection|
+  collection.parameter_sets = [
+    {
+      'fields' => 'id,status,date_created,date_updated,board_low,board_high,categories.boardset_categories_id.name,categories.boardset_categories_id.id,translations.title,translations.gs_languages_code',
+      'filter' => { 'status' => { '_eq' => 'published' } },
+      'limit' => 1000
+    }
+  ]
+  collection.priority = 9
+  collection.description = 'Tap Topics boardsets'
+  collection.active = true
+end
+
 puts "✅ Directus cached collections seeded successfully!"
 puts "📊 Current collections: #{DirectusCachedCollection.cached_collection_names.inspect}"
