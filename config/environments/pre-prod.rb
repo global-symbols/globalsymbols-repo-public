@@ -82,7 +82,6 @@ Rails.application.configure do
   config.cache_store = :redis_cache_store, {
     url: redis_url,
     namespace: 'globalsymbols_cache',
-    expires_in: 90.minutes,
     reconnect_attempts: 3
   }
 
