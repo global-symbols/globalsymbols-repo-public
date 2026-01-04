@@ -50,8 +50,6 @@ module BoardBuilder
         default_background_colour: 'ffffff',
         caption_overflow: :shrink_to_fit,
         show_header: true,
-        show_footer: true,
-        footer_text_size: 8,
         debug: false
       }.merge options
 
@@ -115,11 +113,8 @@ module BoardBuilder
         header_height = 32    # Height of the inside of the header box
         header_spacing = 20   # Vertical spacing between the header and the cell grid
 
-        footer_height = 24    # Height of the inside of the footer box
-        footer_spacing = 20   # Vertical spacing between the footer and the cell grid
-
         cell_grid_y_pos = options[:show_header] ? bounds.height - header_height - header_spacing : bounds.height
-        cell_grid_height = cell_grid_y_pos - footer_height - footer_spacing
+        cell_grid_height = cell_grid_y_pos
 
         ordered_cells = board.cells.order(index: :asc, id: :asc)
 
@@ -399,50 +394,6 @@ module BoardBuilder
         
         # grid.show_all
 
-        if options[:show_footer]
-          bounding_box([0, footer_height], width: bounds.width, height: footer_height) do
-
-            define_grid(rows: 1, columns: 3, gutter: 20)
-
-            # grid.show_all
-
-            grid(0,0).bounding_box do
-              text_box "#{Date.today.strftime('%d/%m/%Y')}\n<color rgb='ABABAB'>S#{board.board_set.id}B#{board.id} P#{options[:page_size]}#{options[:page_layout].to_s[0].upcase} T#{options[:font_size]}S#{options[:cell_spacing]}P#{options[:cell_padding]}ILS#{options[:image_text_spacing]}\n<color rgb='006aba'><link href='https://globalsymbols.com'>globalsymbols.com</link></color>",
-                    valign: :center,
-                    overflow: :shrink_to_fit,
-                    inline_format: true,
-                    size: options[:footer_text_size]
-            end
-
-            grid(0,1).bounding_box do
-
-              licences = []
-
-              grouped_pictos = board.pictos.group(:symbolset_id).joins(:symbolset).order('symbolsets.name').includes(symbolset: :licence)
-              symbolset_picto_counts = grouped_pictos.count
-
-              grouped_pictos.each { |picto|
-                count = symbolset_picto_counts[picto.symbolset_id]
-                licences << "<link href='#{picto.symbolset.publisher_url}'>#{picto.symbolset.name}</link> symbol#{count > 1 ? 's' : ''} #{picto.symbolset.licence.name}"
-              }
-
-              text_box "<color rgb='ABABAB'>#{licences.join("\n")}",
-                   valign: :center,
-                   align: :center,
-                   overflow: :shrink_to_fit,
-                   inline_format: true,
-                   size: options[:footer_text_size]
-            end
-
-            grid(0,2).bounding_box do
-              svg IO.read(logo_svg_path),
-                  height: footer_height,
-                  position: :right
-            end
-
-
-          end
-        end
 
       end
 
