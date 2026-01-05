@@ -96,6 +96,9 @@ module BoardBuilder
           },
           'NotoSansBengali' => {
             normal: Rails.root.join('app/assets/fonts/NotoSansBengali-Regular.ttf')
+          },
+          'NotoSansDevanagari' => {
+            normal: Rails.root.join('app/assets/fonts/NotoSansDevanagari-Regular.ttf')
           }
         }
 
