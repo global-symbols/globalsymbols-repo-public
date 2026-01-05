@@ -249,6 +249,14 @@ module BoardBuilder
                   caption_y = cell_inner_height + options[:cell_padding]
                 end
 
+                # If there's no image in this cell, center the text in the entire cell
+                if !cell.image_url and cell.caption
+                  caption_x = options[:cell_padding]
+                  caption_y = bounds.height - options[:cell_padding]
+                  caption_width = cell_inner_width
+                  caption_height = cell_inner_height
+                end
+
                 if options[:debug]
                   p "caption            #{cell.caption}"
                   p "image_y            #{image_y}"
@@ -303,7 +311,7 @@ module BoardBuilder
 
                   fill_color cell.pdf_colours.text || options[:default_text_colour]
 
-                  c = text_box cell.caption, at: [caption_x, caption_y],
+                  text_box cell.caption, at: [caption_x, caption_y],
                                width: caption_width,
                                height: caption_height,
                                size: options[:font_size],
