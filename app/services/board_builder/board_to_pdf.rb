@@ -41,6 +41,7 @@ module BoardBuilder
         page_size: 'A4',
         page_layout: (board.rows > board.columns ? :portrait : :landscape),
         draw_cell_borders: true,
+        cell_border_width: 1,
         cell_padding: 10,
         cell_spacing: 10,
         image_text_spacing: -1, # -1 means 'auto'
@@ -99,6 +100,9 @@ module BoardBuilder
           },
           'NotoSansDevanagari' => {
             normal: Rails.root.join('app/assets/fonts/NotoSansDevanagari-Regular.ttf')
+          },
+          'NotoSansLao' => {
+            normal: Rails.root.join('app/assets/fonts/NotoSansLao-Regular.ttf')
           }
         }
 
@@ -301,7 +305,7 @@ module BoardBuilder
                 # Draw Cell borders
                 if options[:draw_cell_borders]
                   stroke_color cell.pdf_colours.border || options[:default_border_colour]
-                  self.line_width = 2
+                  self.line_width = options[:cell_border_width]
                   stroke_bounds
                   stroke_color options[:default_border_colour]
                 end
