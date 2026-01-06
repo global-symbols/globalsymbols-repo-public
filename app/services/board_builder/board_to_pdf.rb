@@ -22,7 +22,7 @@ module BoardBuilder
     SVG_CLEANER_PLUGINS = [
       AddFillOpacityToImages,
       SvgOptimizer::Plugins::RemoveUnusedNamespace,
-      SvgOptimizer::Plugins::RemoveEditorNamespace
+      # SvgOptimizer::Plugins::RemoveEditorNamespace  # Removed - causes namespace parsing errors
     ]
     # SVG_CLEANER_PLUGINS = SvgOptimizer::DEFAULT_PLUGINS + [AddFillOpacityToImages]
 
