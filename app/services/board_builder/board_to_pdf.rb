@@ -77,7 +77,9 @@ module BoardBuilder
 
       prawn_doc = Prawn::Document.new page_size: options[:page_size],
                                       page_layout: options[:page_layout],
-                                      compress: false,
+                                      # Compression materially reduces output size and often improves render/transfer time.
+                                      # Keep it off only when debugging to make PDFs easier to inspect.
+                                      compress: options[:debug] ? false : true,
                                       info: metadata,
                                       print_scaling: :none do
 

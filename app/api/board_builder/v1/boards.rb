@@ -182,6 +182,9 @@ module BoardBuilder::V1
           # pp declared(params)
 
           board = Boardbuilder::Board.accessible_by(current_ability).find(params[:id])
+          request_id = (env['action_dispatch.request_id'] rescue nil)
+          started_at = Time.now
+          Rails.logger.warn("[PDF] api_start board_id=#{board.id} request_id=#{request_id}")
 
           options = {
             page_size: declared(params)[:pageSize][:name],
@@ -208,13 +211,22 @@ module BoardBuilder::V1
                    }, 406)
           end
 
+          Rails.logger.warn("[PDF] api_after_generate board_id=#{board.id} request_id=#{request_id} elapsed_s=#{(Time.now - started_at).round(2)}")
 
           content_type 'application/pdf'
   
-          header['Content-Disposition'] = declared(params)[:download] ? "attachment; filename=#{board.name}.pdf" : "inline"
+          filename = "#{board.name}.pdf"
+          header['Content-Disposition'] = declared(params)[:download] ? "attachment; filename=#{filename}" : "inline; filename=#{filename}"
   
           env['api.format'] = :binary
-          body pdf.render
+          render_started_at = Time.now
+          Rails.logger.warn("[PDF] api_render_start board_id=#{board.id} request_id=#{request_id}")
+          rendered = pdf.render
+          render_elapsed = (Time.now - render_started_at).round(2)
+          Rails.logger.warn("[PDF] api_render_done board_id=#{board.id} request_id=#{request_id} render_s=#{render_elapsed} bytes=#{rendered.bytesize}")
+
+          Rails.logger.warn("[PDF] api_response_start board_id=#{board.id} request_id=#{request_id} total_s=#{(Time.now - started_at).round(2)}")
+          body rendered
         end
 
 
