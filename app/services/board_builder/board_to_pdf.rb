@@ -138,6 +138,16 @@ module BoardBuilder
           Rails.logger.warn("Board #{board.id} has #{cells_with_images} cells with images - this may cause performance issues")
         end
 
+        # Debug: Log asset host and first few image URLs
+        asset_host = Rails.application.config.try(:uploader_asset_host)
+        Rails.logger.info("Asset host: #{asset_host || 'none'}")
+
+        sample_cells = ordered_cells.select { |cell| cell.image_url.present? }.first(3)
+        sample_cells.each do |cell|
+          resolved = BoardBuilder::BoardToPdf.resolve_image_url(cell.image_url)
+          Rails.logger.info("Sample image resolution: #{cell.image_url} -> #{resolved}")
+        end
+
         if options[:show_header]
           bounding_box([0, bounds.height], width: bounds.width, height: header_height) do
             define_grid(rows: 1, columns: 3, gutter: 20)
@@ -212,6 +222,7 @@ module BoardBuilder
           end
         end
 
+        Rails.logger.info("Starting main PDF rendering loop for board #{board.id}")
         bounding_box([0, cell_grid_y_pos], width: bounds.width, height: cell_grid_height) do
 
           define_grid(columns: board.columns, rows: board.rows, gutter: options[:cell_spacing])
