@@ -31,7 +31,12 @@ module BoardBuilder
     end
     
     def self.generate(board, options = {})
-      
+
+      start_time = Time.now
+      image_load_count = 0
+      image_error_count = 0
+      Rails.logger.info("Starting PDF generation for board #{board.id} (#{board.name}) with #{board.cells.count} cells, #{board.rows}x#{board.columns} grid")
+
       allowed_svg_mime_types = ['image/svg+xml']
       allowed_raster_mime_types = ['image/jpeg', 'image/png']
 
@@ -51,7 +56,8 @@ module BoardBuilder
         default_background_colour: 'ffffff',
         caption_overflow: :shrink_to_fit,
         show_header: true,
-        debug: false
+        debug: false,
+        skip_images: false  # For debugging: skip all image loading to test PDF structure
       }.merge options
 
       # Auto image/text spacing is half the specified cell padding.
@@ -125,6 +131,13 @@ module BoardBuilder
 
         ordered_cells = board.cells.order(index: :asc, id: :asc)
 
+        # Circuit breaker: if too many cells have images and we're dealing with a large board,
+        # log a warning about potential performance issues
+        cells_with_images = ordered_cells.select { |cell| cell.image_url.present? }.count
+        if cells_with_images > 20
+          Rails.logger.warn("Board #{board.id} has #{cells_with_images} cells with images - this may cause performance issues")
+        end
+
         if options[:show_header]
           bounding_box([0, bounds.height], width: bounds.width, height: header_height) do
             define_grid(rows: 1, columns: 3, gutter: 20)
@@ -135,7 +148,16 @@ module BoardBuilder
 
               if board.header_media
                 begin
-                  header_image = Faraday.get(URI.encode(board.header_media.file.url))
+                  Rails.logger.debug("Loading header image for board #{board.id}")
+                  header_image_start = Time.now
+                  header_image = Faraday.get(URI.encode(board.header_media.file.url)) do |req|
+                    req.options.timeout = 15        # 15 second timeout
+                    req.options.open_timeout = 5    # 5 second connection timeout
+                  end
+                  header_image_load_time = Time.now - header_image_start
+                  image_load_count += 1
+                  Rails.logger.debug("Header image loaded in #{header_image_load_time.round(2)}s for board #{board.id}")
+
                   header_image_type = header_image.headers['content-type']
 
                   if header_image_type.in? allowed_svg_mime_types
@@ -157,6 +179,8 @@ module BoardBuilder
                   end
 
                 rescue Faraday::Error => e
+                  image_error_count += 1
+                  Rails.logger.warn("Failed to load header image for board #{board.id}: #{e.message}")
                   text 'Could not load header image'
                 end
 
@@ -326,7 +350,7 @@ module BoardBuilder
                 end
 
                 # If there's an image, draw it
-                if cell.image_url
+                if cell.image_url && !options[:skip_images]
 
                   begin
 
@@ -335,7 +359,16 @@ module BoardBuilder
                       # Move the cursor, so we can draw the image or a failure message.
                       move_cursor_to image_y
 
-                      image = Faraday.get(URI.encode(cell.image_url))
+                      Rails.logger.debug("Loading cell image for board #{board.id}, cell #{cell.id}: #{cell.image_url}")
+                      cell_image_start = Time.now
+                      image = Faraday.get(URI.encode(cell.image_url)) do |req|
+                        req.options.timeout = 10        # 10 second timeout for cell images
+                        req.options.open_timeout = 3    # 3 second connection timeout
+                      end
+                      cell_image_load_time = Time.now - cell_image_start
+                      image_load_count += 1
+                      Rails.logger.debug("Cell image loaded in #{cell_image_load_time.round(2)}s for board #{board.id}, cell #{cell.id}")
+
                       image_type = image.headers['content-type']
 
 
@@ -397,6 +430,8 @@ module BoardBuilder
 
 
                   rescue Faraday::Error => e
+                    image_error_count += 1
+                    Rails.logger.warn("Failed to load image for board #{board.id}, cell #{cell.id}: #{e.message}")
                     text 'Failed to load this image', align: :center
                   end
 
@@ -414,7 +449,11 @@ module BoardBuilder
 
       # pp prawn_doc.warnings
 
-      # prawn_doc
+      end_time = Time.now
+      duration = (end_time - start_time).round(2)
+      Rails.logger.info("Completed PDF generation for board #{board.id} in #{duration} seconds - loaded #{image_load_count} images, #{image_error_count} failed")
+
+      prawn_doc
     end
 
     # Copied and adapted from Prawn's own calc_image_dimensions

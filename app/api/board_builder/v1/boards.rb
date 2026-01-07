@@ -174,6 +174,7 @@ module BoardBuilder::V1
           optional :drawCellBorders, type: Boolean, desc: 'Enables or disables drawing of cell boundaries.', coerce: Boolean
           optional :showHeader, type: Boolean, desc: 'Enables or disables showing the header on the PDF.', coerce: Boolean
           optional :imageTextSpacing, type: Integer, desc: 'Spacing between image and text cells. Recommended values 0-50'
+          optional :skipImages, type: Boolean, desc: 'For debugging: skips loading all images to test PDF structure generation.', coerce: Boolean
         end
         post :pdf do
 
@@ -193,6 +194,7 @@ module BoardBuilder::V1
           options[:draw_cell_borders]  = declared(params)[:drawCellBorders]     if declared(params).has_key? :drawCellBorders
           options[:show_header]        = declared(params)[:showHeader]          if declared(params).has_key? :showHeader
           options[:image_text_spacing] = declared(params)[:imageTextSpacing]    if declared(params).has_key? :imageTextSpacing
+          options[:skip_images]        = declared(params)[:skipImages]          if declared(params).has_key? :skipImages
 
           # pp options
 
