@@ -234,6 +234,9 @@ module BoardBuilder::V1
           Rails.logger.warn("[PDF] api_headers board_id=#{board.id} request_id=#{request_id} content_disposition=#{header['Content-Disposition'].inspect} content_length=#{header['Content-Length']} cache_control=#{header['Cache-Control'].inspect}")
 
           Rails.logger.warn("[PDF] api_response_start board_id=#{board.id} request_id=#{request_id} total_s=#{(Time.now - started_at).round(2)}")
+          # Grape defaults POST responses to 201; for "generate + return PDF" we want 200
+          # so clients (Angular/fetch) don't treat it as a "created resource" response.
+          status 200
           body rendered
         end
 
