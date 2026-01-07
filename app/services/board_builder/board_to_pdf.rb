@@ -145,7 +145,9 @@ module BoardBuilder
         Rails.logger.info("Found #{cells_with_images} cells with images out of #{ordered_cells.count} total cells")
 
         if cells_with_images > 20
+          puts "EMERGENCY: About to call Rails.logger.warn for board #{board.id}"
           Rails.logger.warn("Board #{board.id} has #{cells_with_images} cells with images - this may cause performance issues!!!")
+          puts "EMERGENCY: Rails.logger.warn completed for board #{board.id}"
           puts "EMERGENCY DEBUG: Warning logged, about to continue for board #{board.id}"
         end
 
@@ -219,13 +221,21 @@ module BoardBuilder
                   header_image_url = BoardBuilder::BoardToPdf.resolve_image_url(board.header_media.file.url)
                   Rails.logger.debug("Loading header image for board #{board.id}: #{header_image_url}")
                   header_image_start = Time.now
+                  header_image = nil
                   Rails.logger.debug("Making HTTP request for header image: #{header_image_url}")
-                  header_image = Faraday.get(URI.encode(header_image_url)) do |req|
-                    req.options.timeout = 15        # 15 second timeout
-                    req.options.open_timeout = 5    # 5 second connection timeout
-                    Rails.logger.debug("Set header timeouts: total=15s, open=5s")
+                  begin
+                    Timeout.timeout(12) do  # Wrap Faraday call in additional timeout
+                      header_image = Faraday.get(URI.encode(header_image_url)) do |req|
+                        req.options.timeout = 8        # 8 second timeout for header images
+                        req.options.open_timeout = 3    # 3 second connection timeout
+                        Rails.logger.debug("Set header timeouts: total=8s, open=3s")
+                      end
+                    end
+                    Rails.logger.debug("Header image HTTP request completed successfully")
+                  rescue Timeout::Error => e
+                    Rails.logger.warn("Timeout error loading header image for board #{board.id}: #{e.message}")
+                    raise Faraday::TimeoutError.new(e.message)
                   end
-                  Rails.logger.debug("Header image HTTP request completed successfully")
                   header_image_load_time = Time.now - header_image_start
                   image_load_count += 1
                   Rails.logger.debug("Header image loaded in #{header_image_load_time.round(2)}s for board #{board.id}")
@@ -250,7 +260,7 @@ module BoardBuilder
                           fit: [bounds.width, header_height]
                   end
 
-                rescue Faraday::Error => e
+                rescue Faraday::TimeoutError, Faraday::ConnectionFailed, Faraday::ResourceNotFound, Faraday::Error => e
                   image_error_count += 1
                   Rails.logger.warn("Failed to load header image for board #{board.id}: #{e.message}")
                   text 'Could not load header image'
@@ -436,13 +446,37 @@ module BoardBuilder
                       resolved_image_url = BoardBuilder::BoardToPdf.resolve_image_url(cell.image_url)
                       Rails.logger.debug("Loading cell image for board #{board.id}, cell #{cell.id}: #{resolved_image_url}")
                       cell_image_start = Time.now
+                      image = nil
                       Rails.logger.debug("Making HTTP request to: #{resolved_image_url}")
-                      image = Faraday.get(URI.encode(resolved_image_url)) do |req|
-                        req.options.timeout = 10        # 10 second timeout for cell images
-                        req.options.open_timeout = 3    # 3 second connection timeout
-                        Rails.logger.debug("Set timeouts: total=10s, open=3s")
+                      begin
+                        # Pre-flight check: HEAD request to verify image exists
+                        Rails.logger.debug("Pre-flight check for: #{resolved_image_url}")
+                        head_response = nil
+                        Timeout.timeout(3) do
+                          head_response = Faraday.head(URI.encode(resolved_image_url)) do |req|
+                            req.options.timeout = 2
+                            req.options.open_timeout = 1
+                          end
+                        end
+
+                        if head_response.status >= 400
+                          Rails.logger.warn("Image not found (#{head_response.status}): #{resolved_image_url}")
+                          raise Faraday::ResourceNotFound.new("HTTP #{head_response.status}")
+                        end
+
+                        Rails.logger.debug("Pre-flight check passed, downloading image")
+                        Timeout.timeout(8) do  # Wrap Faraday call in additional timeout
+                          image = Faraday.get(URI.encode(resolved_image_url)) do |req|
+                            req.options.timeout = 5        # 5 second timeout for cell images
+                            req.options.open_timeout = 2    # 2 second connection timeout
+                            Rails.logger.debug("Set timeouts: total=5s, open=2s")
+                          end
+                        end
+                        Rails.logger.debug("HTTP request completed successfully")
+                      rescue Timeout::Error => e
+                        Rails.logger.warn("Timeout error loading image for cell #{cell.id}: #{e.message}")
+                        raise Faraday::TimeoutError.new(e.message)
                       end
-                      Rails.logger.debug("HTTP request completed successfully")
                       cell_image_load_time = Time.now - cell_image_start
                       image_load_count += 1
                       Rails.logger.debug("Cell image loaded in #{cell_image_load_time.round(2)}s for board #{board.id}, cell #{cell.id}")
@@ -507,7 +541,7 @@ module BoardBuilder
                     end
 
 
-                  rescue Faraday::Error => e
+                  rescue Faraday::TimeoutError, Faraday::ConnectionFailed, Faraday::ResourceNotFound, Faraday::Error => e
                     image_error_count += 1
                     Rails.logger.warn("Failed to load image for board #{board.id}, cell #{cell.id}: #{e.message}")
                     text 'Failed to load this image', align: :center
