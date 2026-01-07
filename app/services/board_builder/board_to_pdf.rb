@@ -32,7 +32,7 @@ module BoardBuilder
     
     def self.generate(board, options = {})
 
-      puts "CRITICAL DEBUG: generate() method called for board #{board.id}"
+      puts "🚨🚨🚨 CRITICAL DEBUG: generate() method called for board #{board.id} 🚨🚨🚨"
       start_time = Time.now
       image_load_count = 0
       image_error_count = 0
@@ -145,10 +145,10 @@ module BoardBuilder
         Rails.logger.info("Found #{cells_with_images} cells with images out of #{ordered_cells.count} total cells")
 
         if cells_with_images > 20
-          puts "EMERGENCY: About to call Rails.logger.warn for board #{board.id}"
+          puts "🚨 EMERGENCY: About to call Rails.logger.warn for board #{board.id}"
           Rails.logger.warn("Board #{board.id} has #{cells_with_images} cells with images - this may cause performance issues!!!")
-          puts "EMERGENCY: Rails.logger.warn completed for board #{board.id}"
-          puts "EMERGENCY DEBUG: Warning logged, about to continue for board #{board.id}"
+          puts "🚨 EMERGENCY: Rails.logger.warn completed for board #{board.id}"
+          puts "🚨🚨🚨 EMERGENCY DEBUG: Warning logged, about to continue for board #{board.id} 🚨🚨🚨"
         end
 
         # Emergency debug - most basic logging possible
