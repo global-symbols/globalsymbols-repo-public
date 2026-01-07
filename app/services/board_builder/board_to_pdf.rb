@@ -37,6 +37,10 @@ module BoardBuilder
       image_error_count = 0
       Rails.logger.info("Starting PDF generation for board #{board.id} (#{board.name}) with #{board.cells.count} cells, #{board.rows}x#{board.columns} grid")
 
+      # Add overall timeout to prevent indefinite hangs
+      Timeout.timeout(300) do  # 5 minute overall timeout
+        Rails.logger.info("Entered timeout block for board #{board.id}")
+
       allowed_svg_mime_types = ['image/svg+xml']
       allowed_raster_mime_types = ['image/jpeg', 'image/png']
 
@@ -134,18 +138,41 @@ module BoardBuilder
         # Circuit breaker: if too many cells have images and we're dealing with a large board,
         # log a warning about potential performance issues
         cells_with_images = ordered_cells.select { |cell| cell.image_url.present? }.count
+        Rails.logger.info("Found #{cells_with_images} cells with images out of #{ordered_cells.count} total cells")
+
         if cells_with_images > 20
           Rails.logger.warn("Board #{board.id} has #{cells_with_images} cells with images - this may cause performance issues")
         end
 
         # Debug: Log asset host and first few image URLs
+        Rails.logger.info("About to check asset host configuration...")
         asset_host = Rails.application.config.try(:uploader_asset_host)
         Rails.logger.info("Asset host: #{asset_host || 'none'}")
 
-        sample_cells = ordered_cells.select { |cell| cell.image_url.present? }.first(3)
-        sample_cells.each do |cell|
-          resolved = BoardBuilder::BoardToPdf.resolve_image_url(cell.image_url)
-          Rails.logger.info("Sample image resolution: #{cell.image_url} -> #{resolved}")
+        if cells_with_images > 0
+          Rails.logger.info("About to resolve sample image URLs...")
+          sample_cells = ordered_cells.select { |cell| cell.image_url.present? }.first(3)
+          sample_cells.each do |cell|
+            Rails.logger.info("Resolving URL for cell #{cell.id}...")
+            resolved = BoardBuilder::BoardToPdf.resolve_image_url(cell.image_url)
+            Rails.logger.info("Sample image resolution: #{cell.image_url} -> #{resolved}")
+          end
+
+          # Test connectivity to asset host
+          if asset_host
+            Rails.logger.info("Testing connectivity to asset host: #{asset_host}")
+            begin
+              test_response = Faraday.get(asset_host) do |req|
+                req.options.timeout = 5
+                req.options.open_timeout = 2
+              end
+              Rails.logger.info("Asset host connectivity test: HTTP #{test_response.status}")
+            rescue => e
+              Rails.logger.warn("Asset host connectivity test failed: #{e.message}")
+            end
+          end
+        else
+          Rails.logger.info("No cells with images found - PDF should generate quickly")
         end
 
         if options[:show_header]
@@ -161,10 +188,13 @@ module BoardBuilder
                   header_image_url = BoardBuilder::BoardToPdf.resolve_image_url(board.header_media.file.url)
                   Rails.logger.debug("Loading header image for board #{board.id}: #{header_image_url}")
                   header_image_start = Time.now
+                  Rails.logger.debug("Making HTTP request for header image: #{header_image_url}")
                   header_image = Faraday.get(URI.encode(header_image_url)) do |req|
                     req.options.timeout = 15        # 15 second timeout
                     req.options.open_timeout = 5    # 5 second connection timeout
+                    Rails.logger.debug("Set header timeouts: total=15s, open=5s")
                   end
+                  Rails.logger.debug("Header image HTTP request completed successfully")
                   header_image_load_time = Time.now - header_image_start
                   image_load_count += 1
                   Rails.logger.debug("Header image loaded in #{header_image_load_time.round(2)}s for board #{board.id}")
@@ -375,10 +405,13 @@ module BoardBuilder
                       resolved_image_url = BoardBuilder::BoardToPdf.resolve_image_url(cell.image_url)
                       Rails.logger.debug("Loading cell image for board #{board.id}, cell #{cell.id}: #{resolved_image_url}")
                       cell_image_start = Time.now
+                      Rails.logger.debug("Making HTTP request to: #{resolved_image_url}")
                       image = Faraday.get(URI.encode(resolved_image_url)) do |req|
                         req.options.timeout = 10        # 10 second timeout for cell images
                         req.options.open_timeout = 3    # 3 second connection timeout
+                        Rails.logger.debug("Set timeouts: total=10s, open=3s")
                       end
+                      Rails.logger.debug("HTTP request completed successfully")
                       cell_image_load_time = Time.now - cell_image_start
                       image_load_count += 1
                       Rails.logger.debug("Cell image loaded in #{cell_image_load_time.round(2)}s for board #{board.id}, cell #{cell.id}")
@@ -463,11 +496,19 @@ module BoardBuilder
 
       # pp prawn_doc.warnings
 
-      end_time = Time.now
-      duration = (end_time - start_time).round(2)
-      Rails.logger.info("Completed PDF generation for board #{board.id} in #{duration} seconds - loaded #{image_load_count} images, #{image_error_count} failed")
+        end_time = Time.now
+        duration = (end_time - start_time).round(2)
+        Rails.logger.info("Completed PDF generation for board #{board.id} in #{duration} seconds - loaded #{image_load_count} images, #{image_error_count} failed")
 
-      prawn_doc
+        prawn_doc
+      end
+    rescue Timeout::Error => e
+      Rails.logger.error("PDF generation timed out for board #{board.id} after 5 minutes: #{e.message}")
+      raise PdfGenerationException.new(
+        message: "PDF generation timed out after 5 minutes",
+        category: 'timeout',
+        overflow: 300
+      )
     end
 
     # Resolve image URLs to work in different environments
