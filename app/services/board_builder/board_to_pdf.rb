@@ -145,7 +145,7 @@ module BoardBuilder
         Rails.logger.info("Found #{cells_with_images} cells with images out of #{ordered_cells.count} total cells")
 
         if cells_with_images > 20
-          Rails.logger.warn("Board #{board.id} has #{cells_with_images} cells with images - this may cause performance issues")
+          Rails.logger.warn("Board #{board.id} has #{cells_with_images} cells with images - this may cause performance issues!!!")
           puts "EMERGENCY DEBUG: Warning logged, about to continue for board #{board.id}"
         end
 
