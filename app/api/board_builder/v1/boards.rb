@@ -225,6 +225,14 @@ module BoardBuilder::V1
           render_elapsed = (Time.now - render_started_at).round(2)
           Rails.logger.warn("[PDF] api_render_done board_id=#{board.id} request_id=#{request_id} render_s=#{render_elapsed} bytes=#{rendered.bytesize}")
 
+          # Help proxies/browsers handle the binary response reliably.
+          header['Content-Length'] = rendered.bytesize.to_s
+          header['Cache-Control'] = 'no-store'
+          header['Pragma'] = 'no-cache'
+          header['Expires'] = '0'
+
+          Rails.logger.warn("[PDF] api_headers board_id=#{board.id} request_id=#{request_id} content_disposition=#{header['Content-Disposition'].inspect} content_length=#{header['Content-Length']} cache_control=#{header['Cache-Control'].inspect}")
+
           Rails.logger.warn("[PDF] api_response_start board_id=#{board.id} request_id=#{request_id} total_s=#{(Time.now - started_at).round(2)}")
           body rendered
         end
