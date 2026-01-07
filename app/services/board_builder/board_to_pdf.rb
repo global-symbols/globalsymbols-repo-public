@@ -148,9 +148,10 @@ module BoardBuilder
 
               if board.header_media
                 begin
-                  Rails.logger.debug("Loading header image for board #{board.id}")
+                  header_image_url = BoardBuilder::BoardToPdf.resolve_image_url(board.header_media.file.url)
+                  Rails.logger.debug("Loading header image for board #{board.id}: #{header_image_url}")
                   header_image_start = Time.now
-                  header_image = Faraday.get(URI.encode(board.header_media.file.url)) do |req|
+                  header_image = Faraday.get(URI.encode(header_image_url)) do |req|
                     req.options.timeout = 15        # 15 second timeout
                     req.options.open_timeout = 5    # 5 second connection timeout
                   end
@@ -359,9 +360,11 @@ module BoardBuilder
                       # Move the cursor, so we can draw the image or a failure message.
                       move_cursor_to image_y
 
-                      Rails.logger.debug("Loading cell image for board #{board.id}, cell #{cell.id}: #{cell.image_url}")
+                      # Resolve the image URL dynamically based on current environment
+                      resolved_image_url = BoardBuilder::BoardToPdf.resolve_image_url(cell.image_url)
+                      Rails.logger.debug("Loading cell image for board #{board.id}, cell #{cell.id}: #{resolved_image_url}")
                       cell_image_start = Time.now
-                      image = Faraday.get(URI.encode(cell.image_url)) do |req|
+                      image = Faraday.get(URI.encode(resolved_image_url)) do |req|
                         req.options.timeout = 10        # 10 second timeout for cell images
                         req.options.open_timeout = 3    # 3 second connection timeout
                       end
@@ -454,6 +457,51 @@ module BoardBuilder
       Rails.logger.info("Completed PDF generation for board #{board.id} in #{duration} seconds - loaded #{image_load_count} images, #{image_error_count} failed")
 
       prawn_doc
+    end
+
+    # Resolve image URLs to work in different environments
+    def self.resolve_image_url(image_url)
+      return image_url unless image_url
+
+      begin
+        uri = URI.parse(image_url)
+      rescue URI::InvalidURIError
+        return image_url
+      end
+
+      # If it's already using the correct asset host, return as-is
+      asset_host = Rails.application.config.try(:uploader_asset_host)
+      if asset_host && image_url.start_with?(asset_host)
+        return image_url
+      end
+
+      # If it's a localhost URL from development, replace with current environment host
+      if uri.host == 'localhost' || uri.host&.include?('127.0.0.1')
+        if asset_host
+          # Use the configured asset host (for AWS/staging)
+          resolved_url = image_url.sub(uri.scheme + '://' + uri.host + (uri.port ? ':' + uri.port.to_s : ''), asset_host)
+        else
+          # Use the action mailer host (for local development)
+          mailer_options = Rails.application.config.action_mailer.default_url_options || {}
+          mailer_host = mailer_options[:host]
+          mailer_protocol = mailer_options[:protocol] || 'http'
+          mailer_port = mailer_options[:port]
+
+          if mailer_host
+            host_part = "#{mailer_protocol}://#{mailer_host}"
+            host_part += ":#{mailer_port}" if mailer_port && mailer_port != 80 && mailer_port != 443
+            resolved_url = image_url.sub(uri.scheme + '://' + uri.host + (uri.port ? ':' + uri.port.to_s : ''), host_part)
+          else
+            resolved_url = image_url
+          end
+        end
+
+        Rails.logger.debug("Resolved image URL from #{image_url} to #{resolved_url}")
+        return resolved_url
+      end
+
+      # Return original URL if it doesn't match our patterns
+      image_url
     end
 
     # Copied and adapted from Prawn's own calc_image_dimensions
