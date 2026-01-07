@@ -32,13 +32,18 @@ module BoardBuilder
     
     def self.generate(board, options = {})
 
+      puts "CRITICAL DEBUG: generate() method called for board #{board.id}"
       start_time = Time.now
       image_load_count = 0
       image_error_count = 0
+
+      puts "CRITICAL DEBUG: About to log start message for board #{board.id}"
       Rails.logger.info("Starting PDF generation for board #{board.id} (#{board.name}) with #{board.cells.count} cells, #{board.rows}x#{board.columns} grid")
 
+      puts "CRITICAL DEBUG: About to enter generation block for board #{board.id}"
       # Temporarily removed timeout to debug hanging issue
       Rails.logger.info("Entered generation block for board #{board.id}")
+      puts "CRITICAL DEBUG: Entered generation block successfully"
 
       allowed_svg_mime_types = ['image/svg+xml']
       allowed_raster_mime_types = ['image/jpeg', 'image/png']
@@ -141,6 +146,7 @@ module BoardBuilder
 
         if cells_with_images > 20
           Rails.logger.warn("Board #{board.id} has #{cells_with_images} cells with images - this may cause performance issues")
+          puts "EMERGENCY DEBUG: Warning logged, about to continue for board #{board.id}"
         end
 
         # Emergency debug - most basic logging possible
@@ -149,12 +155,27 @@ module BoardBuilder
         Rails.logger.info("About to check asset host configuration...")
 
         begin
-          puts "DEBUG: About to access Rails.application.config"
-          asset_host = Rails.application.config.try(:uploader_asset_host)
-          puts "DEBUG: Got asset host: #{asset_host.inspect}"
+          puts "DEBUG: Rails defined: #{defined?(Rails).inspect}"
+          puts "DEBUG: Rails.application defined: #{defined?(Rails.application).inspect}"
+          if Rails.application
+            puts "DEBUG: Rails.application class: #{Rails.application.class}"
+            puts "DEBUG: Rails.application.config defined: #{defined?(Rails.application.config).inspect}"
+            if Rails.application.config
+              puts "DEBUG: About to access uploader_asset_host"
+              asset_host = Rails.application.config.try(:uploader_asset_host)
+              puts "DEBUG: Got asset host: #{asset_host.inspect}"
+            else
+              puts "DEBUG: Rails.application.config is nil!"
+              asset_host = nil
+            end
+          else
+            puts "DEBUG: Rails.application is nil!"
+            asset_host = nil
+          end
         rescue => e
           puts "DEBUG: Exception getting asset host: #{e.message}"
           puts "DEBUG: Exception class: #{e.class}"
+          puts "DEBUG: Backtrace: #{e.backtrace.first(3).join("\n")}"
           asset_host = nil
         end
         Rails.logger.info("Asset host: #{asset_host || 'none'}")
