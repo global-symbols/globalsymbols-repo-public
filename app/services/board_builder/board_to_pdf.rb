@@ -31,19 +31,10 @@ module BoardBuilder
     end
     
     def self.generate(board, options = {})
-
-      puts "🚨🚨🚨 CRITICAL DEBUG: generate() method called for board #{board.id} 🚨🚨🚨"
       start_time = Time.now
       image_load_count = 0
       image_error_count = 0
-
-      puts "CRITICAL DEBUG: About to log start message for board #{board.id}"
-      Rails.logger.info("Starting PDF generation for board #{board.id} (#{board.name}) with #{board.cells.count} cells, #{board.rows}x#{board.columns} grid")
-
-      puts "CRITICAL DEBUG: About to enter generation block for board #{board.id}"
-      # Temporarily removed timeout to debug hanging issue
-      Rails.logger.info("Entered generation block for board #{board.id}")
-      puts "CRITICAL DEBUG: Entered generation block successfully"
+      Rails.logger.warn("[PDF] start board_id=#{board.id} name=#{board.name.inspect} grid=#{board.rows}x#{board.columns} cells=#{board.cells.count}")
 
       allowed_svg_mime_types = ['image/svg+xml']
       allowed_raster_mime_types = ['image/jpeg', 'image/png']
@@ -142,72 +133,16 @@ module BoardBuilder
         # Circuit breaker: if too many cells have images and we're dealing with a large board,
         # log a warning about potential performance issues
         cells_with_images = ordered_cells.select { |cell| cell.image_url.present? }.count
-        Rails.logger.info("Found #{cells_with_images} cells with images out of #{ordered_cells.count} total cells")
+        Rails.logger.warn("[PDF] board_id=#{board.id} ordered_cells=#{ordered_cells.count} cells_with_images=#{cells_with_images}")
 
         if cells_with_images > 20
-          puts "🚨 EMERGENCY: About to call Rails.logger.warn for board #{board.id}"
           Rails.logger.warn("Board #{board.id} has #{cells_with_images} cells with images - this may cause performance issues!!!")
-          puts "🚨 EMERGENCY: Rails.logger.warn completed for board #{board.id}"
-          puts "🚨🚨🚨 EMERGENCY DEBUG: Warning logged, about to continue for board #{board.id} 🚨🚨🚨"
         end
 
-        # Emergency debug - most basic logging possible
-        puts "DEBUG: About to check asset host configuration for board #{board.id}"
-        puts "DEBUG: Rails.application present: #{Rails.application.inspect}"
-        Rails.logger.info("About to check asset host configuration...")
+        asset_host = Rails.application.config.try(:uploader_asset_host)
+        Rails.logger.warn("[PDF] board_id=#{board.id} uploader_asset_host=#{asset_host.inspect}")
 
-        begin
-          puts "DEBUG: Rails defined: #{defined?(Rails).inspect}"
-          puts "DEBUG: Rails.application defined: #{defined?(Rails.application).inspect}"
-          if Rails.application
-            puts "DEBUG: Rails.application class: #{Rails.application.class}"
-            puts "DEBUG: Rails.application.config defined: #{defined?(Rails.application.config).inspect}"
-            if Rails.application.config
-              puts "DEBUG: About to access uploader_asset_host"
-              asset_host = Rails.application.config.try(:uploader_asset_host)
-              puts "DEBUG: Got asset host: #{asset_host.inspect}"
-            else
-              puts "DEBUG: Rails.application.config is nil!"
-              asset_host = nil
-            end
-          else
-            puts "DEBUG: Rails.application is nil!"
-            asset_host = nil
-          end
-        rescue => e
-          puts "DEBUG: Exception getting asset host: #{e.message}"
-          puts "DEBUG: Exception class: #{e.class}"
-          puts "DEBUG: Backtrace: #{e.backtrace.first(3).join("\n")}"
-          asset_host = nil
-        end
-        Rails.logger.info("Asset host: #{asset_host || 'none'}")
-
-        if cells_with_images > 0
-          Rails.logger.info("About to resolve sample image URLs...")
-          sample_cells = ordered_cells.select { |cell| cell.image_url.present? }.first(3)
-          sample_cells.each do |cell|
-            Rails.logger.info("Resolving URL for cell #{cell.id}...")
-            resolved = BoardBuilder::BoardToPdf.resolve_image_url(cell.image_url)
-            Rails.logger.info("Sample image resolution: #{cell.image_url} -> #{resolved}")
-          end
-
-          # Test connectivity to asset host
-          if asset_host
-            Rails.logger.info("Testing connectivity to asset host: #{asset_host}")
-            begin
-              test_response = Faraday.get(asset_host) do |req|
-                req.options.timeout = 5
-                req.options.open_timeout = 2
-              end
-              Rails.logger.info("Asset host connectivity test: HTTP #{test_response.status}")
-            rescue => e
-              Rails.logger.warn("Asset host connectivity test failed: #{e.message}")
-            end
-          end
-        else
-          Rails.logger.info("No cells with images found - PDF should generate quickly")
-        end
-
+        Rails.logger.warn("[PDF] board_id=#{board.id} starting render (show_header=#{options[:show_header]} skip_images=#{options[:skip_images]})")
         if options[:show_header]
           bounding_box([0, bounds.height], width: bounds.width, height: header_height) do
             define_grid(rows: 1, columns: 3, gutter: 20)
@@ -293,7 +228,7 @@ module BoardBuilder
           end
         end
 
-        Rails.logger.info("Starting main PDF rendering loop for board #{board.id}")
+        Rails.logger.warn("[PDF] board_id=#{board.id} entering main grid render loop")
         bounding_box([0, cell_grid_y_pos], width: bounds.width, height: cell_grid_height) do
 
           define_grid(columns: board.columns, rows: board.rows, gutter: options[:cell_spacing])
@@ -563,7 +498,7 @@ module BoardBuilder
 
       end_time = Time.now
       duration = (end_time - start_time).round(2)
-      Rails.logger.info("Completed PDF generation for board #{board.id} in #{duration} seconds - loaded #{image_load_count} images, #{image_error_count} failed")
+      Rails.logger.warn("[PDF] done board_id=#{board.id} duration_s=#{duration} images_loaded=#{image_load_count} images_failed=#{image_error_count}")
 
       prawn_doc
     end
