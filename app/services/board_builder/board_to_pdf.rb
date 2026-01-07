@@ -37,9 +37,8 @@ module BoardBuilder
       image_error_count = 0
       Rails.logger.info("Starting PDF generation for board #{board.id} (#{board.name}) with #{board.cells.count} cells, #{board.rows}x#{board.columns} grid")
 
-      # Add overall timeout to prevent indefinite hangs
-      Timeout.timeout(300) do  # 5 minute overall timeout
-        Rails.logger.info("Entered timeout block for board #{board.id}")
+      # Temporarily removed timeout to debug hanging issue
+      Rails.logger.info("Entered generation block for board #{board.id}")
 
       allowed_svg_mime_types = ['image/svg+xml']
       allowed_raster_mime_types = ['image/jpeg', 'image/png']
@@ -144,9 +143,20 @@ module BoardBuilder
           Rails.logger.warn("Board #{board.id} has #{cells_with_images} cells with images - this may cause performance issues")
         end
 
-        # Debug: Log asset host and first few image URLs
+        # Emergency debug - most basic logging possible
+        puts "DEBUG: About to check asset host configuration for board #{board.id}"
+        puts "DEBUG: Rails.application present: #{Rails.application.inspect}"
         Rails.logger.info("About to check asset host configuration...")
-        asset_host = Rails.application.config.try(:uploader_asset_host)
+
+        begin
+          puts "DEBUG: About to access Rails.application.config"
+          asset_host = Rails.application.config.try(:uploader_asset_host)
+          puts "DEBUG: Got asset host: #{asset_host.inspect}"
+        rescue => e
+          puts "DEBUG: Exception getting asset host: #{e.message}"
+          puts "DEBUG: Exception class: #{e.class}"
+          asset_host = nil
+        end
         Rails.logger.info("Asset host: #{asset_host || 'none'}")
 
         if cells_with_images > 0
@@ -496,19 +506,11 @@ module BoardBuilder
 
       # pp prawn_doc.warnings
 
-        end_time = Time.now
-        duration = (end_time - start_time).round(2)
-        Rails.logger.info("Completed PDF generation for board #{board.id} in #{duration} seconds - loaded #{image_load_count} images, #{image_error_count} failed")
+      end_time = Time.now
+      duration = (end_time - start_time).round(2)
+      Rails.logger.info("Completed PDF generation for board #{board.id} in #{duration} seconds - loaded #{image_load_count} images, #{image_error_count} failed")
 
-        prawn_doc
-      end
-    rescue Timeout::Error => e
-      Rails.logger.error("PDF generation timed out for board #{board.id} after 5 minutes: #{e.message}")
-      raise PdfGenerationException.new(
-        message: "PDF generation timed out after 5 minutes",
-        category: 'timeout',
-        overflow: 300
-      )
+      prawn_doc
     end
 
     # Resolve image URLs to work in different environments
