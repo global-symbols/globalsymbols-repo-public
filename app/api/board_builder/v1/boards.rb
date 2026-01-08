@@ -184,7 +184,6 @@ module BoardBuilder::V1
           board = Boardbuilder::Board.accessible_by(current_ability).find(params[:id])
           request_id = (env['action_dispatch.request_id'] rescue nil)
           started_at = Time.now
-          Rails.logger.warn("[PDF] api_start board_id=#{board.id} request_id=#{request_id}")
 
           options = {
             page_size: declared(params)[:pageSize][:name],
@@ -220,7 +219,6 @@ module BoardBuilder::V1
   
           env['api.format'] = :binary
           render_started_at = Time.now
-          Rails.logger.warn("[PDF] api_render_start board_id=#{board.id} request_id=#{request_id}")
           rendered = pdf.render
           render_elapsed = (Time.now - render_started_at).round(2)
           Rails.logger.warn("[PDF] api_render_done board_id=#{board.id} request_id=#{request_id} render_s=#{render_elapsed} bytes=#{rendered.bytesize}")
@@ -230,10 +228,6 @@ module BoardBuilder::V1
           header['Cache-Control'] = 'no-store'
           header['Pragma'] = 'no-cache'
           header['Expires'] = '0'
-
-          Rails.logger.warn("[PDF] api_headers board_id=#{board.id} request_id=#{request_id} content_disposition=#{header['Content-Disposition'].inspect} content_length=#{header['Content-Length']} cache_control=#{header['Cache-Control'].inspect}")
-
-          Rails.logger.warn("[PDF] api_response_start board_id=#{board.id} request_id=#{request_id} total_s=#{(Time.now - started_at).round(2)}")
           # Grape defaults POST responses to 201; for "generate + return PDF" we want 200
           # so clients (Angular/fetch) don't treat it as a "created resource" response.
           status 200

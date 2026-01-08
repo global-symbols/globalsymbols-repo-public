@@ -34,7 +34,6 @@ module BoardBuilder
       start_time = Time.now
       image_load_count = 0
       image_error_count = 0
-      Rails.logger.warn("[PDF] start board_id=#{board.id} name=#{board.name.inspect} grid=#{board.rows}x#{board.columns} cells=#{board.cells.count}")
 
       allowed_svg_mime_types = ['image/svg+xml']
       allowed_raster_mime_types = ['image/jpeg', 'image/png']
@@ -135,16 +134,12 @@ module BoardBuilder
         # Circuit breaker: if too many cells have images and we're dealing with a large board,
         # log a warning about potential performance issues
         cells_with_images = ordered_cells.select { |cell| cell.image_url.present? }.count
-        Rails.logger.warn("[PDF] board_id=#{board.id} ordered_cells=#{ordered_cells.count} cells_with_images=#{cells_with_images}")
 
         if cells_with_images > 20
           Rails.logger.warn("Board #{board.id} has #{cells_with_images} cells with images - this may cause performance issues!!!")
         end
 
         asset_host = Rails.application.config.try(:uploader_asset_host)
-        Rails.logger.warn("[PDF] board_id=#{board.id} uploader_asset_host=#{asset_host.inspect}")
-
-        Rails.logger.warn("[PDF] board_id=#{board.id} starting render (show_header=#{options[:show_header]} skip_images=#{options[:skip_images]})")
         if options[:show_header]
           bounding_box([0, bounds.height], width: bounds.width, height: header_height) do
             define_grid(rows: 1, columns: 3, gutter: 20)
@@ -156,26 +151,21 @@ module BoardBuilder
               if board.header_media
                 begin
                   header_image_url = BoardBuilder::BoardToPdf.resolve_image_url(board.header_media.file.url)
-                  Rails.logger.debug("Loading header image for board #{board.id}: #{header_image_url}")
                   header_image_start = Time.now
                   header_image = nil
-                  Rails.logger.debug("Making HTTP request for header image: #{header_image_url}")
                   begin
                     Timeout.timeout(12) do  # Wrap Faraday call in additional timeout
                       header_image = Faraday.get(URI.encode(header_image_url)) do |req|
                         req.options.timeout = 8        # 8 second timeout for header images
                         req.options.open_timeout = 3    # 3 second connection timeout
-                        Rails.logger.debug("Set header timeouts: total=8s, open=3s")
                       end
                     end
-                    Rails.logger.debug("Header image HTTP request completed successfully")
                   rescue Timeout::Error => e
                     Rails.logger.warn("Timeout error loading header image for board #{board.id}: #{e.message}")
                     raise Faraday::TimeoutError.new(e.message)
                   end
                   header_image_load_time = Time.now - header_image_start
                   image_load_count += 1
-                  Rails.logger.debug("Header image loaded in #{header_image_load_time.round(2)}s for board #{board.id}")
 
                   header_image_type = header_image.headers['content-type']
 
@@ -230,7 +220,6 @@ module BoardBuilder
           end
         end
 
-        Rails.logger.warn("[PDF] board_id=#{board.id} entering main grid render loop")
         bounding_box([0, cell_grid_y_pos], width: bounds.width, height: cell_grid_height) do
 
           define_grid(columns: board.columns, rows: board.rows, gutter: options[:cell_spacing])
@@ -381,13 +370,10 @@ module BoardBuilder
 
                       # Resolve the image URL dynamically based on current environment
                       resolved_image_url = BoardBuilder::BoardToPdf.resolve_image_url(cell.image_url)
-                      Rails.logger.debug("Loading cell image for board #{board.id}, cell #{cell.id}: #{resolved_image_url}")
                       cell_image_start = Time.now
                       image = nil
-                      Rails.logger.debug("Making HTTP request to: #{resolved_image_url}")
                       begin
                         # Pre-flight check: HEAD request to verify image exists
-                        Rails.logger.debug("Pre-flight check for: #{resolved_image_url}")
                         head_response = nil
                         Timeout.timeout(3) do
                           head_response = Faraday.head(URI.encode(resolved_image_url)) do |req|
@@ -401,22 +387,18 @@ module BoardBuilder
                           raise Faraday::ResourceNotFound.new("HTTP #{head_response.status}")
                         end
 
-                        Rails.logger.debug("Pre-flight check passed, downloading image")
                         Timeout.timeout(8) do  # Wrap Faraday call in additional timeout
                           image = Faraday.get(URI.encode(resolved_image_url)) do |req|
                             req.options.timeout = 5        # 5 second timeout for cell images
                             req.options.open_timeout = 2    # 2 second connection timeout
-                            Rails.logger.debug("Set timeouts: total=5s, open=2s")
                           end
                         end
-                        Rails.logger.debug("HTTP request completed successfully")
                       rescue Timeout::Error => e
                         Rails.logger.warn("Timeout error loading image for cell #{cell.id}: #{e.message}")
                         raise Faraday::TimeoutError.new(e.message)
                       end
                       cell_image_load_time = Time.now - cell_image_start
                       image_load_count += 1
-                      Rails.logger.debug("Cell image loaded in #{cell_image_load_time.round(2)}s for board #{board.id}, cell #{cell.id}")
 
                       image_type = image.headers['content-type']
 
@@ -542,7 +524,6 @@ module BoardBuilder
           end
         end
 
-        Rails.logger.debug("Resolved image URL from #{image_url} to #{resolved_url}")
         return resolved_url
       end
 
