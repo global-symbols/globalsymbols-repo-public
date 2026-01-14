@@ -16,6 +16,7 @@
 # Ignore uploaded files in development
 /storage/*
 /public/uploads/*
+/public/public/uploads/development/boardbuilder/media/*
 
 /node_modules
 /yarn-error.log

@@ -11,6 +11,11 @@
 module CacheInspector
   extend self
 
+  # Inspect cached boardsets (Tap Topics)
+  def inspect_boardsets_cache
+    inspect_collection_cache('boardsets')
+  end
+
   # Check if a specific article is cached
   def article_cached?(id, language = 'en-GB')
     # First check if individually cached (though unlikely)

@@ -172,7 +172,9 @@ module BoardBuilder::V1
           optional :cellSpacing, type: Integer, desc: 'Spacing between cells. Recommended values 0-50'
           optional :cellPadding, type: Integer, desc: 'Spacing inside cells. Recommended values 0-50'
           optional :drawCellBorders, type: Boolean, desc: 'Enables or disables drawing of cell boundaries.', coerce: Boolean
+          optional :showHeader, type: Boolean, desc: 'Enables or disables showing the header on the PDF.', coerce: Boolean
           optional :imageTextSpacing, type: Integer, desc: 'Spacing between image and text cells. Recommended values 0-50'
+          optional :skipImages, type: Boolean, desc: 'For debugging: skips loading all images to test PDF structure generation.', coerce: Boolean
         end
         post :pdf do
 
@@ -180,6 +182,8 @@ module BoardBuilder::V1
           # pp declared(params)
 
           board = Boardbuilder::Board.accessible_by(current_ability).find(params[:id])
+          request_id = (env['action_dispatch.request_id'] rescue nil)
+          started_at = Time.now
 
           options = {
             page_size: declared(params)[:pageSize][:name],
@@ -190,7 +194,9 @@ module BoardBuilder::V1
           options[:cell_padding]       = declared(params)[:cellPadding]         if declared(params).has_key? :cellPadding
           options[:cell_spacing]       = declared(params)[:cellSpacing]         if declared(params).has_key? :cellSpacing
           options[:draw_cell_borders]  = declared(params)[:drawCellBorders]     if declared(params).has_key? :drawCellBorders
+          options[:show_header]        = declared(params)[:showHeader]          if declared(params).has_key? :showHeader
           options[:image_text_spacing] = declared(params)[:imageTextSpacing]    if declared(params).has_key? :imageTextSpacing
+          options[:skip_images]        = declared(params)[:skipImages]          if declared(params).has_key? :skipImages
 
           # pp options
 
@@ -204,13 +210,28 @@ module BoardBuilder::V1
                    }, 406)
           end
 
+          Rails.logger.warn("[PDF] api_after_generate board_id=#{board.id} request_id=#{request_id} elapsed_s=#{(Time.now - started_at).round(2)}")
 
           content_type 'application/pdf'
   
-          header['Content-Disposition'] = declared(params)[:download] ? "attachment; filename=#{board.name}.pdf" : "inline"
+          filename = "#{board.name}.pdf"
+          header['Content-Disposition'] = declared(params)[:download] ? "attachment; filename=#{filename}" : "inline; filename=#{filename}"
   
           env['api.format'] = :binary
-          body pdf.render
+          render_started_at = Time.now
+          rendered = pdf.render
+          render_elapsed = (Time.now - render_started_at).round(2)
+          Rails.logger.warn("[PDF] api_render_done board_id=#{board.id} request_id=#{request_id} render_s=#{render_elapsed} bytes=#{rendered.bytesize}")
+
+          # Help proxies/browsers handle the binary response reliably.
+          header['Content-Length'] = rendered.bytesize.to_s
+          header['Cache-Control'] = 'no-store'
+          header['Pragma'] = 'no-cache'
+          header['Expires'] = '0'
+          # Grape defaults POST responses to 201; for "generate + return PDF" we want 200
+          # so clients (Angular/fetch) don't treat it as a "created resource" response.
+          status 200
+          body rendered
         end
 
 

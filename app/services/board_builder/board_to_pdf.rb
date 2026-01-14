@@ -22,7 +22,7 @@ module BoardBuilder
     SVG_CLEANER_PLUGINS = [
       AddFillOpacityToImages,
       SvgOptimizer::Plugins::RemoveUnusedNamespace,
-      SvgOptimizer::Plugins::RemoveEditorNamespace
+      # SvgOptimizer::Plugins::RemoveEditorNamespace  # Removed - causes namespace parsing errors
     ]
     # SVG_CLEANER_PLUGINS = SvgOptimizer::DEFAULT_PLUGINS + [AddFillOpacityToImages]
 
@@ -31,7 +31,10 @@ module BoardBuilder
     end
     
     def self.generate(board, options = {})
-      
+      start_time = Time.now
+      image_load_count = 0
+      image_error_count = 0
+
       allowed_svg_mime_types = ['image/svg+xml']
       allowed_raster_mime_types = ['image/jpeg', 'image/png']
 
@@ -41,6 +44,7 @@ module BoardBuilder
         page_size: 'A4',
         page_layout: (board.rows > board.columns ? :portrait : :landscape),
         draw_cell_borders: true,
+        cell_border_width: 1,
         cell_padding: 10,
         cell_spacing: 10,
         image_text_spacing: -1, # -1 means 'auto'
@@ -50,9 +54,8 @@ module BoardBuilder
         default_background_colour: 'ffffff',
         caption_overflow: :shrink_to_fit,
         show_header: true,
-        show_footer: true,
-        footer_text_size: 8,
-        debug: false
+        debug: false,
+        skip_images: false  # For debugging: skip all image loading to test PDF structure
       }.merge options
 
       # Auto image/text spacing is half the specified cell padding.
@@ -73,7 +76,9 @@ module BoardBuilder
 
       prawn_doc = Prawn::Document.new page_size: options[:page_size],
                                       page_layout: options[:page_layout],
-                                      compress: false,
+                                      # Compression materially reduces output size and often improves render/transfer time.
+                                      # Keep it off only when debugging to make PDFs easier to inspect.
+                                      compress: options[:debug] ? false : true,
                                       info: metadata,
                                       print_scaling: :none do
 
@@ -98,6 +103,12 @@ module BoardBuilder
           },
           'NotoSansBengali' => {
             normal: Rails.root.join('app/assets/fonts/NotoSansBengali-Regular.ttf')
+          },
+          'NotoSansDevanagari' => {
+            normal: Rails.root.join('app/assets/fonts/NotoSansDevanagari-Regular.ttf')
+          },
+          'NotoSansLao' => {
+            normal: Rails.root.join('app/assets/fonts/NotoSansLao-Regular.ttf')
           }
         }
 
@@ -115,14 +126,20 @@ module BoardBuilder
         header_height = 32    # Height of the inside of the header box
         header_spacing = 20   # Vertical spacing between the header and the cell grid
 
-        footer_height = 24    # Height of the inside of the footer box
-        footer_spacing = 20   # Vertical spacing between the footer and the cell grid
-
         cell_grid_y_pos = options[:show_header] ? bounds.height - header_height - header_spacing : bounds.height
-        cell_grid_height = cell_grid_y_pos - footer_height - footer_spacing
+        cell_grid_height = cell_grid_y_pos
 
         ordered_cells = board.cells.order(index: :asc, id: :asc)
 
+        # Circuit breaker: if too many cells have images and we're dealing with a large board,
+        # log a warning about potential performance issues
+        cells_with_images = ordered_cells.select { |cell| cell.image_url.present? }.count
+
+        if cells_with_images > 20
+          Rails.logger.warn("Board #{board.id} has #{cells_with_images} cells with images - this may cause performance issues!!!")
+        end
+
+        asset_host = Rails.application.config.try(:uploader_asset_host)
         if options[:show_header]
           bounding_box([0, bounds.height], width: bounds.width, height: header_height) do
             define_grid(rows: 1, columns: 3, gutter: 20)
@@ -133,7 +150,23 @@ module BoardBuilder
 
               if board.header_media
                 begin
-                  header_image = Faraday.get(URI.encode(board.header_media.file.url))
+                  header_image_url = BoardBuilder::BoardToPdf.resolve_image_url(board.header_media.file.url)
+                  header_image_start = Time.now
+                  header_image = nil
+                  begin
+                    Timeout.timeout(12) do  # Wrap Faraday call in additional timeout
+                      header_image = Faraday.get(URI.encode(header_image_url)) do |req|
+                        req.options.timeout = 8        # 8 second timeout for header images
+                        req.options.open_timeout = 3    # 3 second connection timeout
+                      end
+                    end
+                  rescue Timeout::Error => e
+                    Rails.logger.warn("Timeout error loading header image for board #{board.id}: #{e.message}")
+                    raise Faraday::TimeoutError.new(e.message)
+                  end
+                  header_image_load_time = Time.now - header_image_start
+                  image_load_count += 1
+
                   header_image_type = header_image.headers['content-type']
 
                   if header_image_type.in? allowed_svg_mime_types
@@ -154,7 +187,9 @@ module BoardBuilder
                           fit: [bounds.width, header_height]
                   end
 
-                rescue Faraday::Error => e
+                rescue Faraday::TimeoutError, Faraday::ConnectionFailed, Faraday::ResourceNotFound, Faraday::Error => e
+                  image_error_count += 1
+                  Rails.logger.warn("Failed to load header image for board #{board.id}: #{e.message}")
                   text 'Could not load header image'
                 end
 
@@ -251,6 +286,14 @@ module BoardBuilder
                   caption_y = cell_inner_height + options[:cell_padding]
                 end
 
+                # If there's no image in this cell, center the text in the entire cell
+                if !cell.image_url and cell.caption
+                  caption_x = options[:cell_padding]
+                  caption_y = bounds.height - options[:cell_padding]
+                  caption_width = cell_inner_width
+                  caption_height = cell_inner_height
+                end
+
                 if options[:debug]
                   p "caption            #{cell.caption}"
                   p "image_y            #{image_y}"
@@ -295,7 +338,7 @@ module BoardBuilder
                 # Draw Cell borders
                 if options[:draw_cell_borders]
                   stroke_color cell.pdf_colours.border || options[:default_border_colour]
-                  self.line_width = 2
+                  self.line_width = options[:cell_border_width]
                   stroke_bounds
                   stroke_color options[:default_border_colour]
                 end
@@ -305,7 +348,7 @@ module BoardBuilder
 
                   fill_color cell.pdf_colours.text || options[:default_text_colour]
 
-                  c = text_box cell.caption, at: [caption_x, caption_y],
+                  text_box cell.caption, at: [caption_x, caption_y],
                                width: caption_width,
                                height: caption_height,
                                size: options[:font_size],
@@ -316,7 +359,7 @@ module BoardBuilder
                 end
 
                 # If there's an image, draw it
-                if cell.image_url
+                if cell.image_url && !options[:skip_images]
 
                   begin
 
@@ -325,7 +368,38 @@ module BoardBuilder
                       # Move the cursor, so we can draw the image or a failure message.
                       move_cursor_to image_y
 
-                      image = Faraday.get(URI.encode(cell.image_url))
+                      # Resolve the image URL dynamically based on current environment
+                      resolved_image_url = BoardBuilder::BoardToPdf.resolve_image_url(cell.image_url)
+                      cell_image_start = Time.now
+                      image = nil
+                      begin
+                        # Pre-flight check: HEAD request to verify image exists
+                        head_response = nil
+                        Timeout.timeout(3) do
+                          head_response = Faraday.head(URI.encode(resolved_image_url)) do |req|
+                            req.options.timeout = 2
+                            req.options.open_timeout = 1
+                          end
+                        end
+
+                        if head_response.status >= 400
+                          Rails.logger.warn("Image not found (#{head_response.status}): #{resolved_image_url}")
+                          raise Faraday::ResourceNotFound.new("HTTP #{head_response.status}")
+                        end
+
+                        Timeout.timeout(8) do  # Wrap Faraday call in additional timeout
+                          image = Faraday.get(URI.encode(resolved_image_url)) do |req|
+                            req.options.timeout = 5        # 5 second timeout for cell images
+                            req.options.open_timeout = 2    # 2 second connection timeout
+                          end
+                        end
+                      rescue Timeout::Error => e
+                        Rails.logger.warn("Timeout error loading image for cell #{cell.id}: #{e.message}")
+                        raise Faraday::TimeoutError.new(e.message)
+                      end
+                      cell_image_load_time = Time.now - cell_image_start
+                      image_load_count += 1
+
                       image_type = image.headers['content-type']
 
 
@@ -386,7 +460,9 @@ module BoardBuilder
                     end
 
 
-                  rescue Faraday::Error => e
+                  rescue Faraday::TimeoutError, Faraday::ConnectionFailed, Faraday::ResourceNotFound, Faraday::Error => e
+                    image_error_count += 1
+                    Rails.logger.warn("Failed to load image for board #{board.id}, cell #{cell.id}: #{e.message}")
                     text 'Failed to load this image', align: :center
                   end
 
@@ -399,56 +475,60 @@ module BoardBuilder
         
         # grid.show_all
 
-        if options[:show_footer]
-          bounding_box([0, footer_height], width: bounds.width, height: footer_height) do
-
-            define_grid(rows: 1, columns: 3, gutter: 20)
-
-            # grid.show_all
-
-            grid(0,0).bounding_box do
-              text_box "#{Date.today.strftime('%d/%m/%Y')}\n<color rgb='ABABAB'>S#{board.board_set.id}B#{board.id} P#{options[:page_size]}#{options[:page_layout].to_s[0].upcase} T#{options[:font_size]}S#{options[:cell_spacing]}P#{options[:cell_padding]}ILS#{options[:image_text_spacing]}\n<color rgb='006aba'><link href='https://globalsymbols.com'>globalsymbols.com</link></color>",
-                    valign: :center,
-                    overflow: :shrink_to_fit,
-                    inline_format: true,
-                    size: options[:footer_text_size]
-            end
-
-            grid(0,1).bounding_box do
-
-              licences = []
-
-              grouped_pictos = board.pictos.group(:symbolset_id).joins(:symbolset).order('symbolsets.name').includes(symbolset: :licence)
-              symbolset_picto_counts = grouped_pictos.count
-
-              grouped_pictos.each { |picto|
-                count = symbolset_picto_counts[picto.symbolset_id]
-                licences << "<link href='#{picto.symbolset.publisher_url}'>#{picto.symbolset.name}</link> symbol#{count > 1 ? 's' : ''} #{picto.symbolset.licence.name}"
-              }
-
-              text_box "<color rgb='ABABAB'>#{licences.join("\n")}",
-                   valign: :center,
-                   align: :center,
-                   overflow: :shrink_to_fit,
-                   inline_format: true,
-                   size: options[:footer_text_size]
-            end
-
-            grid(0,2).bounding_box do
-              svg IO.read(logo_svg_path),
-                  height: footer_height,
-                  position: :right
-            end
-
-
-          end
-        end
 
       end
 
       # pp prawn_doc.warnings
 
-      # prawn_doc
+      end_time = Time.now
+      duration = (end_time - start_time).round(2)
+      Rails.logger.warn("[PDF] done board_id=#{board.id} duration_s=#{duration} images_loaded=#{image_load_count} images_failed=#{image_error_count}")
+
+      prawn_doc
+    end
+
+    # Resolve image URLs to work in different environments
+    def self.resolve_image_url(image_url)
+      return image_url unless image_url
+
+      begin
+        uri = URI.parse(image_url)
+      rescue URI::InvalidURIError
+        return image_url
+      end
+
+      # If it's already using the correct asset host, return as-is
+      asset_host = Rails.application.config.try(:uploader_asset_host)
+      if asset_host && image_url.start_with?(asset_host)
+        return image_url
+      end
+
+      # If it's a localhost URL from development, replace with current environment host
+      if uri.host == 'localhost' || uri.host&.include?('127.0.0.1')
+        if asset_host
+          # Use the configured asset host (for AWS/staging)
+          resolved_url = image_url.sub(uri.scheme + '://' + uri.host + (uri.port ? ':' + uri.port.to_s : ''), asset_host)
+        else
+          # Use the action mailer host (for local development)
+          mailer_options = Rails.application.config.action_mailer.default_url_options || {}
+          mailer_host = mailer_options[:host]
+          mailer_protocol = mailer_options[:protocol] || 'http'
+          mailer_port = mailer_options[:port]
+
+          if mailer_host
+            host_part = "#{mailer_protocol}://#{mailer_host}"
+            host_part += ":#{mailer_port}" if mailer_port && mailer_port != 80 && mailer_port != 443
+            resolved_url = image_url.sub(uri.scheme + '://' + uri.host + (uri.port ? ':' + uri.port.to_s : ''), host_part)
+          else
+            resolved_url = image_url
+          end
+        end
+
+        return resolved_url
+      end
+
+      # Return original URL if it doesn't match our patterns
+      image_url
     end
 
     # Copied and adapted from Prawn's own calc_image_dimensions

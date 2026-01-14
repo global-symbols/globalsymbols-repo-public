@@ -22,6 +22,7 @@
 #= require bootstrap/dropdown
 #= require bootstrap/tab
 #= require bootstrap/tooltip
+#= require bootstrap/modal
 
 #= require clipboard
 
