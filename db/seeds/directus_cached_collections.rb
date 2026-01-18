@@ -38,7 +38,7 @@ end
 DirectusCachedCollection.find_or_create_by!(name: 'boardsets') do |collection|
   collection.parameter_sets = [
     {
-      'fields' => 'id,status,date_created,date_updated,board_low,board_high,categories.boardset_categories_id.name,categories.boardset_categories_id.id,translations.title,translations.gs_languages_code',
+      'fields' => 'id,status,date_created,date_updated,board_low,board_high,thumbnail,categories.boardset_categories_id.name,categories.boardset_categories_id.id,translations.title,translations.gs_languages_code',
       'filter' => { 'status' => { '_eq' => 'published' } },
       'limit' => 1000
     }

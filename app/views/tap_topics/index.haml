@@ -50,14 +50,22 @@
 
         - low_id = boardset['board_low']
         - high_id = boardset['board_high']
+        - thumbnail_id = boardset['thumbnail']
         - low_url = low_id.present? ? "#{DIRECTUS_URL}/assets/#{low_id}" : nil
         - high_url = high_id.present? ? "#{DIRECTUS_URL}/assets/#{high_id}" : nil
+        - thumbnail_url = thumbnail_id.present? ? "#{DIRECTUS_URL}/assets/#{thumbnail_id}" : nil
         - modal_title = translation['title'].presence || "Boardset ##{boardset['id']}"
 
         .col-6.col-md-4.col-lg-3.mb-4
           %a.card.h-100.tap-topics-card{href: '#', role: 'button', 'data-toggle' => 'modal', 'data-target' => '#tapTopicsBoardsetModal', 'data-low-url' => low_url, 'data-high-url' => high_url, 'data-title' => modal_title}
-            - if low_url.present?
-              %img.card-img-top{src: low_url, alt: modal_title, style: "max-width: 100%; height: auto;"}
+            - if thumbnail_url.present?
+              %img.card-img-top{src: thumbnail_url, alt: modal_title, style: "width: 100%; height: auto; display: block;"}
+            - elsif low_url.present?
+              %object.card-img-top{data: low_url, type: "application/pdf", style: "width: 100%; aspect-ratio: 3 / 4; background: #fff; display: block;"}
+                %p.p-2.mb-0
+                  PDF preview not available.
+                  %a{href: low_url, target: "_blank", rel: "noopener"} Open PDF
+              %small.text-muted.p-2.d-block Preview unavailable (no thumbnail)
             .card-body.d-flex.flex-column
               %h3.card-title{:style => "font-weight: 600"}
                 = modal_title
@@ -129,14 +137,24 @@
   .modal-dialog.modal-lg{role: 'document'}
     .modal-content
       .modal-header
-        %h5.modal-title#tapTopicsBoardsetModalLabel Boardset
+        %h3.modal-title#tapTopicsBoardsetModalLabel{style: "font-weight: 400;"} Boardset
         %button.close{type: 'button', 'data-dismiss' => 'modal', 'aria-label' => 'Close'}
           %span{'aria-hidden' => 'true'} ×
-      .modal-body
-        %img.img-fluid#tapTopicsBoardsetModalImage{src: '', alt: 'Boardset image'}
-      .modal-footer
-        %button.btn.btn-outline-primary#tapTopicsPrintLow{type: 'button'} Print Low
-        %button.btn.btn-primary#tapTopicsPrintHigh{type: 'button'} Print High
+      .modal-body{style: "min-height: 70vh;"}
+        %object#tapTopicsBoardsetModalPdf.img-fluid{data: '', type: "application/pdf", style: "width: 100%; height: 70vh;"}
+          %p.mb-0
+            PDF preview not available.
+            %a#tapTopicsBoardsetModalPdfLink{href: '#', target: "_blank", rel: "noopener"} Open PDF
+      .modal-footer.d-flex.align-items-center.justify-content-between
+        .tap-topics-quality-toggle
+          .btn-group.btn-group-toggle{"data-toggle" => "buttons"}
+            %label.btn.btn-outline-primary.btn-sm#tapTopicsQualityLowLabel
+              %input#tapTopicsQualityLow{type: "radio", name: "tapTopicsQuality", autocomplete: "off", value: "low"}
+              Low
+            %label.btn.btn-outline-primary.btn-sm#tapTopicsQualityHighLabel
+              %input#tapTopicsQualityHigh{type: "radio", name: "tapTopicsQuality", autocomplete: "off", value: "high"}
+              High
+          %small.text-muted.d-block.mt-1#tapTopicsQualityHint
         %button.btn.btn-secondary{type: 'button', 'data-dismiss' => 'modal'} Close
 
 
