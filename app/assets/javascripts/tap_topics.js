@@ -9,6 +9,21 @@
   $(document).on("turbolinks:load", function () {
     if (!isTapTopicsPage()) return;
 
+    // If a filter selection triggered a reload, smoothly scroll back to filters.
+    try {
+      if (window.sessionStorage && window.sessionStorage.getItem("tapTopicsScrollToFilters") === "1") {
+        window.sessionStorage.removeItem("tapTopicsScrollToFilters");
+        var el = document.getElementById("tap-topics-filters");
+        if (el && el.scrollIntoView) {
+          setTimeout(function () {
+            el.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 50);
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+
     var $modal = $("#tapTopicsBoardsetModal");
     if ($modal.length === 0) return;
 
