@@ -39,6 +39,10 @@
 /config/credentials/development.key
 
 /config/credentials/test.key
+
+# Ignore environment configuration files
+/.env.rb
+
 /.idea/remote-mappings.xml
 /.idea/dataSources.xml
 

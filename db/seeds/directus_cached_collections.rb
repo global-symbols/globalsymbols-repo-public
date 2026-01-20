@@ -38,13 +38,28 @@ end
 DirectusCachedCollection.find_or_create_by!(name: 'boardsets') do |collection|
   collection.parameter_sets = [
     {
-      'fields' => 'id,status,date_created,date_updated,board_low,board_high,categories.boardset_categories_id.name,categories.boardset_categories_id.id,translations.title,translations.gs_languages_code',
+      'fields' => 'id,status,date_created,date_updated,board_low,board_high,thumbnail,categories.boardset_categories_id.name,categories.boardset_categories_id.id,translations.title,translations.gs_languages_code',
       'filter' => { 'status' => { '_eq' => 'published' } },
       'limit' => 1000
     }
   ]
   collection.priority = 9
   collection.description = 'Tap Topics boardsets'
+  collection.active = true
+end
+
+# Pages collection - static pages (About now, more later)
+DirectusCachedCollection.find_or_create_by!(name: 'pages') do |collection|
+  collection.parameter_sets = [
+    # Used by About page - fetch all published pages, then select by slug in Rails
+    {
+      'fields' => 'id,status,slug,translations.*',
+      'filter' => { 'status' => { '_eq' => 'published' } },
+      'limit' => 1000
+    }
+  ]
+  collection.priority = 8
+  collection.description = 'Static pages (about, terms, etc.)'
   collection.active = true
 end
 

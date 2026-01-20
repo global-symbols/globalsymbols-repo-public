@@ -5,9 +5,39 @@
 %main.container-xl
   %section.mt-5
     %header.mb-5
-      %h1.mb-4.text-center{:style => "font-weight: 600"} Tap Topics
-      %p.text-muted.mb-0.text-center
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+      %h1.mb-5.text-center{:style => "font-weight: 600"} WHO TAP Communication Resources
+      .text-center
+        = image_tag 'pages/who_tap.png', alt: 'WHO TAP', style: "max-width: 220px; height: auto;"
+      %p.text-muted.mb-0.text-center.pt-4
+        In collaboration with the World Health Organisation Training in Assistive Products project.
+
+      .mt-4
+        %p.lead.text-center.mb-4
+          %a{href: "https://www.gate-tap.org", target: "_blank", rel: "noopener"} Find out more about the WHO TAP project here
+          \.
+
+        %hr.my-4.mx-auto{:style => "max-width: 60rem; border-top: 1px solid rgba(0,0,0,.12);"}
+
+        .mx-auto{:style => "max-width: 60rem;"}
+          %p.mb-3
+            Global Symbols is working alongside WHO to support nation states and local communities to create communication boards tailored for their own culture. Use the form below to download communication boards in your language.
+          %p.mb-3
+            Not all topics are available in every language, but more will be added as they are submitted by local teams. If you would like to translate or create new boards please contact us.
+          %p.mb-3
+            Note that these boards can be downloaded as PDF files and printed as communication books. In the future we will add Open Board Format (OBF) versions of these boards which can then be customised and used in apps such as Cboard, PiCom, AsTeRICS Grid and CoughDrop.
+          %p.mb-3
+            Boards are available in both low density (12 symbols per page) and high density formats (36 symbols per page). You should usually choose the high-density unless the AAC user has difficulties seeing or pointing to the smaller symbols. High density symbol sets have much more language to use and to learn than lower density alternatives.
+
+          %h2.h5.mt-4.mb-2{:style => "text-decoration: underline;"} How to
+          %ol.mb-0
+            %li Start by selecting your language.
+            %li
+              Choose which density you prefer:
+              %ul.mb-0
+                %li Low Density has 12 symbols per page.
+                %li High Density has 36 symbols per page.
+            %li Then choose a topic category (e.g. Play).
+            %li You can download each top page individually for printing.
 
     - if @directus_error
       .alert.alert-warning
@@ -15,28 +45,35 @@
         %p We're currently experiencing issues connecting to our content management system. Please try again later.
 
     -# Filters
-    .mb-4
-      -# Category filter links
-      - if @categories.present?
-        .mb-3.category-filter
-          .d-flex.flex-wrap.align-items-center.mb-2
-            %a.btn.btn-outline-primary.btn-sm.mb-1{href: tap_topics_path(language: @selected_language), class: @selected_category.blank? ? 'active' : '', style: "margin-right: 8px"}
-              All Categories
-            - @categories.each do |category|
-              %a.btn.btn-outline-primary.btn-sm.mb-1{href: tap_topics_path(category: category, language: @selected_language), class: @selected_category == category ? 'active' : '', style: "margin-right: 8px"}
-                = category.to_s.titleize
-
+    #tap-topics-filters.mb-4
       -# Language select (Directus codes like en-GB)
       - if @languages.present?
-        %form{action: tap_topics_path, method: 'get', class: 'form-inline'}
+        %form{action: tap_topics_path, method: 'get', class: 'form-inline mb-3'}
           -# Preserve current category filter
           - if @selected_category.present?
             %input{type: 'hidden', name: 'category', value: @selected_category}
           %label.mr-2{for: 'tap_topics_language'} Language
-          %select.custom-select.custom-select-sm#tap_topics_language{name: 'language', onchange: 'this.form.submit()'}
+          %select.custom-select.custom-select-sm#tap_topics_language{name: 'language', onchange: 'sessionStorage.setItem("tapTopicsScrollToFilters","1"); this.form.submit();'}
             %option{value: '', selected: @selected_language.blank?} All Languages
             - @languages.each do |lang|
-              %option{value: lang, selected: @selected_language == lang}= lang
+              - display_name = @language_name_by_code[lang].presence || lang
+              %option{value: lang, selected: @selected_language == lang}= display_name
+
+          %label.mr-2.ml-md-3{for: 'tap_topics_density'} Density
+          %select.custom-select.custom-select-sm#tap_topics_density{name: 'density', onchange: 'sessionStorage.setItem("tapTopicsScrollToFilters","1"); this.form.submit();'}
+            %option{value: '', selected: @selected_density.blank?} All
+            %option{value: 'low', selected: @selected_density == 'low'} Low density
+            %option{value: 'high', selected: @selected_density == 'high'} High density
+
+      -# Category filter links
+      - if @categories.present?
+        .mb-3.category-filter
+          .d-flex.flex-wrap.align-items-center.mb-2
+            %a.btn.btn-outline-primary.btn-sm.mb-1{href: tap_topics_path(language: @selected_language, density: @selected_density), class: @selected_category.blank? ? 'active' : '', style: "margin-right: 8px"}
+              All Categories
+            - @categories.each do |category|
+              %a.btn.btn-outline-primary.btn-sm.mb-1{href: tap_topics_path(category: category, language: @selected_language, density: @selected_density), class: @selected_category == category ? 'active' : '', style: "margin-right: 8px"}
+                = category.to_s.titleize
 
     .row
       - @boardsets.each do |boardset|
@@ -50,14 +87,22 @@
 
         - low_id = boardset['board_low']
         - high_id = boardset['board_high']
+        - thumbnail_id = boardset['thumbnail']
         - low_url = low_id.present? ? "#{DIRECTUS_URL}/assets/#{low_id}" : nil
         - high_url = high_id.present? ? "#{DIRECTUS_URL}/assets/#{high_id}" : nil
+        - thumbnail_url = thumbnail_id.present? ? "#{DIRECTUS_URL}/assets/#{thumbnail_id}" : nil
         - modal_title = translation['title'].presence || "Boardset ##{boardset['id']}"
 
         .col-6.col-md-4.col-lg-3.mb-4
           %a.card.h-100.tap-topics-card{href: '#', role: 'button', 'data-toggle' => 'modal', 'data-target' => '#tapTopicsBoardsetModal', 'data-low-url' => low_url, 'data-high-url' => high_url, 'data-title' => modal_title}
-            - if low_url.present?
-              %img.card-img-top{src: low_url, alt: modal_title, style: "max-width: 100%; height: auto;"}
+            - if thumbnail_url.present?
+              %img.card-img-top{src: thumbnail_url, alt: modal_title, style: "width: 100%; height: auto; display: block;"}
+            - elsif low_url.present?
+              %object.card-img-top{data: low_url, type: "application/pdf", style: "width: 100%; aspect-ratio: 3 / 4; background: #fff; display: block;"}
+                %p.p-2.mb-0
+                  PDF preview not available.
+                  %a{href: low_url, target: "_blank", rel: "noopener"} Open PDF
+              %small.text-muted.p-2.d-block Preview unavailable (no thumbnail)
             .card-body.d-flex.flex-column
               %h3.card-title{:style => "font-weight: 600"}
                 = modal_title
@@ -69,7 +114,7 @@
           .text-center.mt-5
             %h4 No Boardsets Found
             %p
-              - if @selected_category.present? || @selected_language.present?
+              - if @selected_category.present? || @selected_language.present? || @selected_density.present?
                 No boardsets match your current filters.
                 %br
                 %a{href: tap_topics_path} View all boardsets
@@ -83,7 +128,7 @@
           %ul.pagination
             - if @has_previous_page
               %li.page-item
-                %a.page-link{href: tap_topics_path(category: @selected_category, language: @selected_language, page: @previous_page), "aria-label" => "Previous"}
+                %a.page-link{href: tap_topics_path(category: @selected_category, language: @selected_language, density: @selected_density, page: @previous_page), "aria-label" => "Previous"}
                   %span{"aria-hidden" => "true"} ‹
                   %span.sr-only Previous
             - else
@@ -97,25 +142,25 @@
 
             - if start_page > 1
               %li.page-item
-                %a.page-link{href: tap_topics_path(category: @selected_category, language: @selected_language, page: 1)} 1
+                %a.page-link{href: tap_topics_path(category: @selected_category, language: @selected_language, density: @selected_density, page: 1)} 1
               - if start_page > 2
                 %li.page-item.disabled
                   %span.page-link …
 
             - (start_page..end_page).each do |page_num|
               %li.page-item{class: page_num == @current_page ? 'active' : ''}
-                %a.page-link{href: tap_topics_path(category: @selected_category, language: @selected_language, page: page_num)}= page_num
+                %a.page-link{href: tap_topics_path(category: @selected_category, language: @selected_language, density: @selected_density, page: page_num)}= page_num
 
             - if end_page < @total_pages
               - if end_page < @total_pages - 1
                 %li.page-item.disabled
                   %span.page-link …
               %li.page-item
-                %a.page-link{href: tap_topics_path(category: @selected_category, language: @selected_language, page: @total_pages)}= @total_pages
+                %a.page-link{href: tap_topics_path(category: @selected_category, language: @selected_language, density: @selected_density, page: @total_pages)}= @total_pages
 
             - if @has_next_page
               %li.page-item
-                %a.page-link{href: tap_topics_path(category: @selected_category, language: @selected_language, page: @next_page), "aria-label" => "Next"}
+                %a.page-link{href: tap_topics_path(category: @selected_category, language: @selected_language, density: @selected_density, page: @next_page), "aria-label" => "Next"}
                   %span{"aria-hidden" => "true"} ›
                   %span.sr-only Next
             - else
@@ -129,14 +174,24 @@
   .modal-dialog.modal-lg{role: 'document'}
     .modal-content
       .modal-header
-        %h5.modal-title#tapTopicsBoardsetModalLabel Boardset
+        %h3.modal-title#tapTopicsBoardsetModalLabel{style: "font-weight: 400;"} Boardset
         %button.close{type: 'button', 'data-dismiss' => 'modal', 'aria-label' => 'Close'}
           %span{'aria-hidden' => 'true'} ×
-      .modal-body
-        %img.img-fluid#tapTopicsBoardsetModalImage{src: '', alt: 'Boardset image'}
-      .modal-footer
-        %button.btn.btn-outline-primary#tapTopicsPrintLow{type: 'button'} Print Low
-        %button.btn.btn-primary#tapTopicsPrintHigh{type: 'button'} Print High
+      .modal-body{style: "min-height: 70vh;"}
+        %object#tapTopicsBoardsetModalPdf.img-fluid{data: '', type: "application/pdf", style: "width: 100%; height: 70vh;"}
+          %p.mb-0
+            PDF preview not available.
+            %a#tapTopicsBoardsetModalPdfLink{href: '#', target: "_blank", rel: "noopener"} Open PDF
+      .modal-footer.d-flex.align-items-center.justify-content-between
+        .tap-topics-quality-toggle
+          .btn-group.btn-group-toggle{"data-toggle" => "buttons"}
+            %label.btn.btn-outline-primary.btn-sm#tapTopicsQualityLowLabel
+              %input#tapTopicsQualityLow{type: "radio", name: "tapTopicsQuality", autocomplete: "off", value: "low"}
+              Low
+            %label.btn.btn-outline-primary.btn-sm#tapTopicsQualityHighLabel
+              %input#tapTopicsQualityHigh{type: "radio", name: "tapTopicsQuality", autocomplete: "off", value: "high"}
+              High
+          %small.text-muted.d-block.mt-1#tapTopicsQualityHint
         %button.btn.btn-secondary{type: 'button', 'data-dismiss' => 'modal'} Close
 
 

@@ -1,5 +1,6 @@
 :ruby
-  title @page.title
+  translation = @translation_used || {}
+  title translation['title'] || @page['slug']&.to_s&.tr('-', ' ')&.titleize || 'Page'
   # description t('views.pages.contact._description')
 
   set_meta_tags og: {
@@ -9,8 +10,15 @@
 %main.mt-0
   %article
     = render 'topbar' do
-      = @page.title
+      = translation['title'] || @page['slug']&.to_s&.tr('-', ' ')&.titleize || 'Page'
     .container-xl.mt-4
       .row.justify-content-center
         .col-md-8
-          = RichTextRenderer::Renderer.new({'embedded-asset-block' => ContentfulAssetBlockRenderer}).render(@page.content).html_safe
+          - if @using_fallback
+            %small.text-warning.mb-3.d-block (Displayed in en-GB)
+          - if translation['content'].present?
+            - content = translation['content'].to_s
+            - if content.lstrip.start_with?('<')
+              = sanitize(content)
+            - else
+              = redcarpet(NewsArticleRenderer).render(content).html_safe

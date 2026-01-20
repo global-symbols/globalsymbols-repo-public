@@ -9,7 +9,9 @@ class TapTopicsController < ApplicationController
     @selected_category = params[:category].presence
     # Language filter (Directus code like en-GB) – used ONLY to filter which boardsets appear
     @selected_language = params[:language].presence
+    @selected_density = params[:density].presence
     @boardsets_per_page = 12
+    @language_name_by_code = {}
 
     # Display language code (driven by site locale mapping) – used for which title we show
     @language_code = directus_language_code
@@ -21,7 +23,7 @@ class TapTopicsController < ApplicationController
         {
           # IMPORTANT: DirectusService has article-centric default fields;
           # override them here for boardsets.
-          'fields' => 'id,status,date_created,date_updated,board_low,board_high,categories.boardset_categories_id.name,categories.boardset_categories_id.id,translations.title,translations.gs_languages_code',
+          'fields' => 'id,status,date_created,date_updated,board_low,board_high,thumbnail,categories.boardset_categories_id.name,categories.boardset_categories_id.id,translations.title,translations.gs_languages_code',
           'filter' => { 'status' => { '_eq' => 'published' } },
           'limit' => 1000
         },
@@ -33,6 +35,10 @@ class TapTopicsController < ApplicationController
       # Derive categories and languages (before filtering)
       @categories = extract_categories(all_boardsets)
       @languages = extract_languages(all_boardsets)
+      @language_name_by_code = language_name_by_code(@languages)
+      @languages = @languages.sort_by do |code|
+        (@language_name_by_code[code].presence || code).to_s.downcase
+      end
 
       if Rails.env.development? && @categories.blank? && all_boardsets.present?
         sample = all_boardsets.first
@@ -49,6 +55,13 @@ class TapTopicsController < ApplicationController
       # Apply language filter (Directus language codes)
       if @selected_language.present?
         boardsets = boardsets.select { |bs| boardset_has_language?(bs, @selected_language) }
+      end
+
+      # Apply density filter (presence of low/high PDF assets)
+      if @selected_density == 'low'
+        boardsets = boardsets.select { |bs| bs['board_low'].present? }
+      elsif @selected_density == 'high'
+        boardsets = boardsets.select { |bs| bs['board_high'].present? }
       end
 
       # Sort by title in requested language (with fallback)
@@ -71,6 +84,7 @@ class TapTopicsController < ApplicationController
       @boardsets = []
       @categories = []
       @languages = []
+      @language_name_by_code = {}
       @total_pages = 0
       @directus_error = true
     end
@@ -116,6 +130,32 @@ class TapTopicsController < ApplicationController
     end
 
     raw.reject { |c| c.nil? || c.to_s.empty? }.map(&:to_s).uniq.sort
+  end
+
+  def language_name_by_code(codes)
+    return {} if codes.blank?
+
+    languages = DirectusService.fetch_collection(
+      'gs_languages',
+      {
+        'fields' => 'code,name',
+        'filter' => { 'code' => { '_in' => codes } },
+        'limit' => 1000
+      }
+    )
+
+    Array(languages).each_with_object({}) do |lang, acc|
+      next unless lang.is_a?(Hash)
+
+      code = lang['code'].to_s
+      name = lang['name'].to_s
+      next if code.blank? || name.blank?
+
+      acc[code] = name
+    end
+  rescue => e
+    Rails.logger.warn("TapTopics: failed to fetch gs_languages names: #{e.message}")
+    {}
   end
 
   def boardset_has_category?(boardset, category_name)
