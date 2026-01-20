@@ -48,5 +48,20 @@ DirectusCachedCollection.find_or_create_by!(name: 'boardsets') do |collection|
   collection.active = true
 end
 
+# Pages collection - static pages (About now, more later)
+DirectusCachedCollection.find_or_create_by!(name: 'pages') do |collection|
+  collection.parameter_sets = [
+    # Used by About page - fetch all published pages, then select by slug in Rails
+    {
+      'fields' => 'id,status,slug,translations.*',
+      'filter' => { 'status' => { '_eq' => 'published' } },
+      'limit' => 1000
+    }
+  ]
+  collection.priority = 8
+  collection.description = 'Static pages (about, terms, etc.)'
+  collection.active = true
+end
+
 puts "✅ Directus cached collections seeded successfully!"
 puts "📊 Current collections: #{DirectusCachedCollection.cached_collection_names.inspect}"

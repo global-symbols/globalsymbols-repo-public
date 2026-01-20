@@ -53,7 +53,7 @@ namespace :webhook do
   end
 
   def simulate_webhook_processing(payload)
-    cached_collections = %w[articles]
+    cached_collections = DirectusCachedCollection.cached_collection_names
     collection = payload.dig('collection')
 
     unless cached_collections.include?(collection)
@@ -102,6 +102,10 @@ namespace :webhook do
     return [] unless item_data.is_a?(Hash)
 
     translations = item_data['translations'] || []
-    translations.map { |t| t['languages_code'] }.compact.uniq
+    translations.map { |t|
+      next nil unless t.is_a?(Hash)
+
+      t['gs_languages_code'] || t['languages_code'] || t['code'] || t['locale'] || t['language']
+    }.compact.uniq
   end
 end

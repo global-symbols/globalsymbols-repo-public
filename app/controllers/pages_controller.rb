@@ -62,14 +62,54 @@ class PagesController < ApplicationController
   end
 
   def contentful_page
-    @page = contentful.entries({
-                                 content_type: 'page', include: 1,
-                                 'fields.slug': params[:id],
-                                 limit: 1
-                               }).first
+    # NOTE: This action name is historic; data now comes from Directus (collection: pages)
+    slug = (params[:id].presence || 'about').to_s
+    language_code = directus_language_code
+
+    # Fetch all published pages once per locale (cache-friendly), then select by slug.
+    pages = DirectusService.fetch_collection_with_translations(
+      'pages',
+      language_code,
+      {
+        # Use translations.* to support different translation schema variants
+        # (e.g. gs_languages_code vs languages_code) without breaking the request.
+        'fields' => 'id,status,slug,translations.*',
+        'filter' => { 'status' => { '_eq' => 'published' } },
+        'limit' => 1000
+      },
+      nil,
+      true,
+      { skip_translation_filter: true }
+    )
+
+    @page = Array(pages).find { |p| p.is_a?(Hash) && p['slug'].to_s == slug }
+
+    # Development fallback: allow viewing draft pages while content is being migrated.
+    # Production remains strictly "published" only.
+    if @page.nil? && Rails.env.development?
+      all_pages = DirectusService.fetch_collection(
+        'pages',
+        {
+          'fields' => 'id,status,slug,translations.*',
+          'limit' => 1000
+        }
+      )
+      @page = Array(all_pages).find { |p| p.is_a?(Hash) && p['slug'].to_s == slug }
+    end
 
     raise ActiveRecord::RecordNotFound if @page.nil?
 
+    translations = @page['translations'] || []
+    translation_code = ->(t) { t.is_a?(Hash) ? (t['gs_languages_code'] || t['languages_code'] || t['code'] || t['locale'] || t['language']) : nil }
+
+    requested_translation = translations.find { |t| translation_code.call(t) == language_code }
+    fallback_translation = translations.find { |t| translation_code.call(t) == DIRECTUS_DEFAULT_LANGUAGE.call }
+    english_translation = translations.find { |t| translation_code.call(t) == 'en-GB' }
+
+    @translation_used = requested_translation || fallback_translation || english_translation
+    raise ActiveRecord::RecordNotFound if @translation_used.nil?
+
+    @using_fallback = requested_translation.nil? && (fallback_translation.present? || english_translation.present?)
     @og_url = request.original_url
   end
   
