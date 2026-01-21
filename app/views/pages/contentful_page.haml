@@ -1,6 +1,8 @@
 :ruby
   translation = @translation_used || {}
-  title translation['title'] || @page['slug']&.to_s&.tr('-', ' ')&.titleize || 'Page'
+  page_title = translation['title'] || @page['slug']&.to_s&.tr('-', ' ')&.titleize || 'Page'
+  page_title = "#{page_title} (DRAFT)" if @is_draft
+  title page_title
   # description t('views.pages.contact._description')
 
   set_meta_tags og: {
@@ -10,7 +12,7 @@
 %main.mt-0
   %article
     = render 'topbar' do
-      = translation['title'] || @page['slug']&.to_s&.tr('-', ' ')&.titleize || 'Page'
+      = page_title
     .container-xl.mt-4
       .row.justify-content-center
         .col-md-8

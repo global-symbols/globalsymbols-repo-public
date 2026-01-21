@@ -99,6 +99,9 @@ class PagesController < ApplicationController
 
     raise ActiveRecord::RecordNotFound if @page.nil?
 
+    # Used by the view to indicate draft status in development.
+    @is_draft = Rails.env.development? && @page.is_a?(Hash) && @page['status'].to_s == 'draft'
+
     translations = @page['translations'] || []
     translation_code = ->(t) { t.is_a?(Hash) ? (t['gs_languages_code'] || t['languages_code'] || t['code'] || t['locale'] || t['language']) : nil }
 
