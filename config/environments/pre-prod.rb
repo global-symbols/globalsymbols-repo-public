@@ -96,6 +96,7 @@ Rails.application.configure do
       host: 'globalsymbols.com',
       protocol: 'https'
   }
+  config.action_mailer.delivery_method = :smtp
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
@@ -146,12 +147,12 @@ Rails.application.configure do
   # config.active_record.database_resolver_context = ActiveRecord::Middleware::DatabaseSelector::Resolver::Session
 
   ActionMailer::Base.smtp_settings = {
-      user_name:            'apikey',
-      password:             ENV['SENDGRID_API_KEY'], # Load from environment variable
+      user_name:            ENV['SES_SMTP_USERNAME'],
+      password:             ENV['SES_SMTP_PASSWORD'],
       domain:               'globalsymbols.com',
-      address:              'smtp.sendgrid.net',
+      address:              'email-smtp.us-west-2.amazonaws.com',
       port:                 587,
-      authentication:       :plain,
+      authentication:       :login,
       enable_starttls_auto: true
   }
 
