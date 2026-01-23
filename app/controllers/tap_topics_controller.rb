@@ -7,16 +7,60 @@ class TapTopicsController < ApplicationController
   def index
     @current_page = (params[:page] || 1).to_i
     @selected_category = params[:category].presence
-    # Language filter (Directus code like en-GB) – used ONLY to filter which boardsets appear
+    # Language filter (Directus code like en-GB) – filters which boardsets appear (and drives title language when set)
     @selected_language = params[:language].presence
     @selected_density = params[:density].presence
     @boardsets_per_page = 12
     @language_name_by_code = {}
 
-    # Display language code (driven by site locale mapping) – used for which title we show
-    @language_code = directus_language_code
+    # Title/display language code: if a language filter is selected, show titles in that language;
+    # otherwise fall back to the site locale mapping.
+    @language_code = @selected_language.presence || directus_language_code
 
     begin
+      # Tap Topics page content (Directus pages collection), driven by site locale (not the filter language).
+      page_language_code = directus_language_code
+
+      pages = DirectusService.fetch_collection_with_translations(
+        'pages',
+        page_language_code,
+        {
+          'fields' => 'id,status,slug,translations.*',
+          'filter' => { 'status' => { '_eq' => 'published' } },
+          'limit' => 1000
+        },
+        nil,
+        true,
+        { skip_translation_filter: true }
+      )
+
+      @tap_topics_page = Array(pages).find { |p| p.is_a?(Hash) && p['slug'].to_s == 'tap-topics' }
+
+      # Development fallback: allow viewing draft page content while migrating.
+      if @tap_topics_page.nil? && Rails.env.development?
+        all_pages = DirectusService.fetch_collection(
+          'pages',
+          {
+            'fields' => 'id,status,slug,translations.*',
+            'limit' => 1000
+          }
+        )
+        @tap_topics_page = Array(all_pages).find { |p| p.is_a?(Hash) && p['slug'].to_s == 'tap-topics' }
+      end
+
+      if @tap_topics_page.present?
+        translations = @tap_topics_page['translations'] || []
+        translation_code = ->(t) { t.is_a?(Hash) ? (t['gs_languages_code'] || t['languages_code'] || t['code'] || t['locale'] || t['language']) : nil }
+
+        requested_translation = translations.find { |t| translation_code.call(t) == page_language_code }
+        fallback_translation = translations.find { |t| translation_code.call(t) == DIRECTUS_DEFAULT_LANGUAGE.call }
+        english_translation = translations.find { |t| translation_code.call(t) == 'en-GB' }
+
+        @tap_topics_translation = requested_translation || fallback_translation || english_translation
+        @tap_topics_using_fallback = requested_translation.nil? && (fallback_translation.present? || english_translation.present?)
+        @tap_topics_is_draft = Rails.env.development? && @tap_topics_page['status'].to_s == 'draft'
+      end
+
       all_boardsets = DirectusService.fetch_collection_with_translations(
         'boardsets',
         @language_code,
@@ -197,8 +241,9 @@ class TapTopicsController < ApplicationController
     requested = translations.find { |t| t.is_a?(Hash) && t['gs_languages_code'] == language_code }
     fallback = translations.find { |t| t.is_a?(Hash) && t['gs_languages_code'] == DIRECTUS_DEFAULT_LANGUAGE.call }
     english = translations.find { |t| t.is_a?(Hash) && t['gs_languages_code'] == 'en-GB' }
+    any_with_title = translations.find { |t| t.is_a?(Hash) && t['title'].present? }
 
-    requested || fallback || english
+    requested || fallback || english || any_with_title
   end
 end
 

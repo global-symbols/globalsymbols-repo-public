@@ -1,43 +1,22 @@
 :ruby
-  title 'Tap Topics'
+  translation = @tap_topics_translation || {}
+  page_title = translation['title'].presence || 'Tap Topics'
+  page_title = "#{page_title} (DRAFT)" if @tap_topics_is_draft
+  title page_title
   description 'Tap Topics boardsets'
 
 %main.container-xl
   %section.mt-5
     %header.mb-5
-      %h1.mb-5.text-center{:style => "font-weight: 600"} WHO TAP Communication Resources
-      .text-center
-        = image_tag 'pages/who_tap.png', alt: 'WHO TAP', style: "max-width: 220px; height: auto;"
-      %p.text-muted.mb-0.text-center.pt-4
-        In collaboration with the World Health Organisation Training in Assistive Products project.
-
-      .mt-4
-        %p.lead.text-center.mb-4
-          %a{href: "https://www.gate-tap.org", target: "_blank", rel: "noopener"} Find out more about the WHO TAP project here
-          \.
-
-        %hr.my-4.mx-auto{:style => "max-width: 60rem; border-top: 1px solid rgba(0,0,0,.12);"}
-
-        .mx-auto{:style => "max-width: 60rem;"}
-          %p.mb-3
-            Global Symbols is working alongside WHO to support nation states and local communities to create communication boards tailored for their own culture. Use the form below to download communication boards in your language.
-          %p.mb-3
-            Not all topics are available in every language, but more will be added as they are submitted by local teams. If you would like to translate or create new boards please contact us.
-          %p.mb-3
-            Note that these boards can be downloaded as PDF files and printed as communication books. In the future we will add Open Board Format (OBF) versions of these boards which can then be customised and used in apps such as Cboard, PiCom, AsTeRICS Grid and CoughDrop.
-          %p.mb-3
-            Boards are available in both low density (12 symbols per page) and high density formats (36 symbols per page). You should usually choose the high-density unless the AAC user has difficulties seeing or pointing to the smaller symbols. High density symbol sets have much more language to use and to learn than lower density alternatives.
-
-          %h2.h5.mt-4.mb-2{:style => "text-decoration: underline;"} How to
-          %ol.mb-0
-            %li Start by selecting your language.
-            %li
-              Choose which density you prefer:
-              %ul.mb-0
-                %li Low Density has 12 symbols per page.
-                %li High Density has 36 symbols per page.
-            %li Then choose a topic category (e.g. Play).
-            %li You can download each top page individually for printing.
+      %h1.mb-4.text-center{:style => "font-weight: 600"}= page_title
+      - if @tap_topics_using_fallback
+        %small.text-warning.d-block.text-center.mb-3 (Displayed in en-GB)
+      - if translation['content'].present?
+        - content = translation['content'].to_s
+        - if content.lstrip.start_with?('<')
+          .mx-auto{:style => "max-width: 60rem;"}= sanitize(content)
+        - else
+          .mx-auto{:style => "max-width: 60rem;"}= redcarpet(NewsArticleRenderer).render(content).html_safe
 
     - if @directus_error
       .alert.alert-warning
@@ -78,12 +57,12 @@
     .row
       - @boardsets.each do |boardset|
         - translations = boardset['translations'] || []
-        -# Display language is driven by site locale (@language_code). The dropdown language is only a filter.
+        -# Display language is driven by @language_code (controller picks selected filter language, else site locale).
         - requested_translation = translations.find { |t| t.is_a?(Hash) && t['gs_languages_code'] == @language_code }
         - fallback_translation = translations.find { |t| t.is_a?(Hash) && t['gs_languages_code'] == DIRECTUS_DEFAULT_LANGUAGE.call }
         - english_translation = translations.find { |t| t.is_a?(Hash) && t['gs_languages_code'] == 'en-GB' }
-        - translation = requested_translation || fallback_translation || english_translation || {}
-        - using_fallback = requested_translation.nil? && (fallback_translation.present? || english_translation.present?)
+        - any_translation_with_title = translations.find { |t| t.is_a?(Hash) && t['title'].present? }
+        - translation = requested_translation || fallback_translation || english_translation || any_translation_with_title || {}
 
         - low_id = boardset['board_low']
         - high_id = boardset['board_high']
@@ -106,8 +85,6 @@
             .card-body.d-flex.flex-column
               %h3.card-title{:style => "font-weight: 600"}
                 = modal_title
-                - if using_fallback
-                  %small.text-warning (en-GB)
 
       - if @boardsets.empty? && !@directus_error
         .col-12
