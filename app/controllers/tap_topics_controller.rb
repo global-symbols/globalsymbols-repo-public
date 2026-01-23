@@ -7,14 +7,15 @@ class TapTopicsController < ApplicationController
   def index
     @current_page = (params[:page] || 1).to_i
     @selected_category = params[:category].presence
-    # Language filter (Directus code like en-GB) – used ONLY to filter which boardsets appear
+    # Language filter (Directus code like en-GB) – filters which boardsets appear (and drives title language when set)
     @selected_language = params[:language].presence
     @selected_density = params[:density].presence
     @boardsets_per_page = 12
     @language_name_by_code = {}
 
-    # Display language code (driven by site locale mapping) – used for which title we show
-    @language_code = directus_language_code
+    # Title/display language code: if a language filter is selected, show titles in that language;
+    # otherwise fall back to the site locale mapping.
+    @language_code = @selected_language.presence || directus_language_code
 
     begin
       all_boardsets = DirectusService.fetch_collection_with_translations(
@@ -197,8 +198,9 @@ class TapTopicsController < ApplicationController
     requested = translations.find { |t| t.is_a?(Hash) && t['gs_languages_code'] == language_code }
     fallback = translations.find { |t| t.is_a?(Hash) && t['gs_languages_code'] == DIRECTUS_DEFAULT_LANGUAGE.call }
     english = translations.find { |t| t.is_a?(Hash) && t['gs_languages_code'] == 'en-GB' }
+    any_with_title = translations.find { |t| t.is_a?(Hash) && t['title'].present? }
 
-    requested || fallback || english
+    requested || fallback || english || any_with_title
   end
 end
 
