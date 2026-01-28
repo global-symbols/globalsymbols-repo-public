@@ -1,0 +1,102 @@
+:ruby
+  translation = @translation_used || {}
+  page_title = translation['title'].presence || 'Project'
+  description = translation['short_description'].presence || page_title
+
+  gallery_items = @project.is_a?(Hash) ? (@project['gallery'] || []) : []
+  gallery_image_ids = Array(gallery_items).map do |gi|
+    if gi.is_a?(Hash)
+      df = gi['directus_files_id']
+      if df.is_a?(Hash)
+        df['id'] || df['directus_files_id'] || df['uuid']
+      else
+        df
+      end
+    else
+      gi
+    end
+  end.compact.uniq
+
+  og_image_id = gallery_image_ids.first.presence || (@project.is_a?(Hash) ? @project['thumbnail'] : nil)
+  og_image_url = og_image_id.present? ? "#{DIRECTUS_URL}/assets/#{og_image_id}" : nil
+
+  set_meta_tags({
+    site: 'Global Symbols',
+    og: {
+      url: project_url(@project['slug']),
+      type: 'article'
+    }
+  })
+
+  set_meta_tags({ image_src: og_image_url, twitter: { image: og_image_url } }) if og_image_url.present?
+
+%main.container-lg.mt-0
+  %nav.mt-4.breadcrumb-horizontal{"aria-label" => "breadcrumb"}
+    %span.breadcrumb-link
+      = link_to 'All Projects', projects_path
+    %span.breadcrumb-separator>
+    %span.breadcrumb-current
+      = @project['slug'] || 'project'
+
+  %section.row.justify-content-center
+    .col-md-8
+      %article.news_article
+        %header.mt-5
+          .row.justify-content-center
+            .col-auto
+              %h1.text-center{:style => "font-weight: 600; font-size: 3.5rem"}
+                = page_title
+                - if @using_fallback
+                  %small.text-warning.ml-2 (Displayed in en-GB)
+          .row.justify-content-center.mt-3
+            .col-auto.text-center.text-muted
+              - if @project['date_updated'] || @project['date_created']
+                - display_date = @project['date_updated'] || @project['date_created']
+                %time{datetime: Date.parse(display_date).strftime('%Y-%m-%d')}= Date.parse(display_date).strftime('%B %d, %Y')
+
+        - if gallery_items.present?
+          .my-4
+            .d-flex.flex-wrap
+              - gallery_items.each do |gi|
+                - file_obj = gi.is_a?(Hash) ? gi['directus_files_id'] : nil
+                - file_id = nil
+                - if file_obj.is_a?(Hash)
+                  - file_id = file_obj['id']
+                - elsif gi.is_a?(Hash)
+                  - file_id = gi['directus_files_id']
+                - else
+                  - file_id = gi
+                - next if file_id.blank?
+                - file_title = nil
+                - if file_obj.is_a?(Hash)
+                  - file_title = file_obj['title'].presence || file_obj['filename_download'].presence
+                - full_url = "#{DIRECTUS_URL}/assets/#{file_id}"
+                - thumb_url = "#{DIRECTUS_URL}/assets/#{file_id}?width=240&height=180&fit=cover"
+                %a.mr-2.mb-2{href: full_url, role: 'button', 'data-toggle' => 'modal', 'data-target' => '#projectGalleryModal', 'data-image-url' => full_url, 'data-title' => (file_title.presence || page_title)}
+                  %img.img-thumbnail{src: thumb_url, alt: file_title.presence || page_title, style: "width: 160px; height: 120px; object-fit: cover; display: block;"}
+        - elsif @project['thumbnail'].present?
+          - image_url = "#{DIRECTUS_URL}/assets/#{@project['thumbnail']}"
+          %img.mb-5.img-fluid{src: image_url, alt: page_title}
+
+        - if translation['project_details'].present?
+          - content = translation['project_details'].to_s
+          - if content.lstrip.start_with?('<')
+            = sanitize(content)
+          - else
+            = redcarpet(NewsArticleRenderer).render(content).html_safe
+        - elsif translation['short_description'].present?
+          %p= translation['short_description']
+
+-# Lightbox-style modal for gallery images
+#projectGalleryModal.modal.fade{tabindex: '-1', role: 'dialog', 'aria-labelledby' => 'projectGalleryModalLabel', 'aria-hidden' => 'true'}
+  .modal-dialog.modal-lg.modal-dialog-centered{role: 'document'}
+    .modal-content
+      .modal-header
+        %h3.modal-title#projectGalleryModalLabel{style: "font-weight: 400;"}= page_title
+        %button.close{type: 'button', 'data-dismiss' => 'modal', 'aria-label' => 'Close'}
+          %span{'aria-hidden' => 'true'} ×
+      .modal-body.p-0
+        %img#projectGalleryModalImage.img-fluid{src: '', alt: page_title, style: "width: 100%; height: auto; display: block;"}
+      .modal-footer
+        %button.btn.btn-secondary{type: 'button', 'data-dismiss' => 'modal'} Close
+

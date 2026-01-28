@@ -48,6 +48,25 @@ DirectusCachedCollection.find_or_create_by!(name: 'boardsets') do |collection|
   collection.active = true
 end
 
+# Projects collection
+DirectusCachedCollection.find_or_create_by!(name: 'projects') do |collection|
+  collection.parameter_sets = [
+    {
+      'fields' => 'id,status,sort,slug,date_created,date_updated,thumbnail,categories.project_categories_id.name,categories.project_categories_id.id,translations.title,translations.short_description,translations.project_details,translations.gs_languages_code',
+      'filter' => { 'status' => { '_eq' => 'published' } },
+      'limit' => 1000
+    },
+    {
+      'fields' => 'id,status,sort,slug,date_created,date_updated,thumbnail,gallery.directus_files_id.id,gallery.directus_files_id.title,gallery.directus_files_id.filename_download,gallery.directus_files_id.type,categories.project_categories_id.name,categories.project_categories_id.id,translations.title,translations.short_description,translations.project_details,translations.gs_languages_code',
+      'filter' => { 'status' => { '_eq' => 'published' } },
+      'limit' => 1000
+    }
+  ]
+  collection.priority = 9
+  collection.description = 'Projects'
+  collection.active = true
+end
+
 # Pages collection - static pages (About now, more later)
 DirectusCachedCollection.find_or_create_by!(name: 'pages') do |collection|
   collection.parameter_sets = [
