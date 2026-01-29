@@ -9,8 +9,8 @@ class ProjectsController < ApplicationController
 
   PROJECTS_PER_PAGE = 9
   PROJECTS_LIMIT = 1000
-  PROJECT_FIELDS_INDEX = 'id,status,sort,slug,date_created,date_updated,thumbnail,categories.project_categories_id.name,categories.project_categories_id.id,translations.title,translations.short_description,translations.project_details,translations.gs_languages_code'
-  PROJECT_FIELDS_SHOW = 'id,status,sort,slug,date_created,date_updated,thumbnail,gallery.directus_files_id.id,gallery.directus_files_id.title,gallery.directus_files_id.filename_download,gallery.directus_files_id.type,categories.project_categories_id.name,categories.project_categories_id.id,translations.title,translations.short_description,translations.project_details,translations.gs_languages_code'
+  PROJECT_FIELDS_INDEX = 'id,status,sort,slug,date_created,date_updated,thumbnail,categories.project_categories_id.name,categories.project_categories_id.id,translations.title,translations.short_description,translations.project_details,translations.status,translations.gs_languages_code'
+  PROJECT_FIELDS_SHOW = 'id,status,sort,slug,date_created,date_updated,thumbnail,gallery.directus_files_id.id,gallery.directus_files_id.title,gallery.directus_files_id.filename_download,gallery.directus_files_id.type,categories.project_categories_id.name,categories.project_categories_id.id,translations.title,translations.short_description,translations.project_details,translations.status,translations.gs_languages_code'
 
   def index
     language_code = directus_language_code

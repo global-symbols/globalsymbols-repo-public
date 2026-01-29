@@ -53,6 +53,9 @@
               - if @project['date_updated'] || @project['date_created']
                 - display_date = @project['date_updated'] || @project['date_created']
                 %time{datetime: Date.parse(display_date).strftime('%Y-%m-%d')}= Date.parse(display_date).strftime('%B %d, %Y')
+              - if translation['status'].present?
+                %div.mt-1
+                  %span.badge.badge-primary= translation['status']
 
         - if gallery_items.present?
           .my-4
