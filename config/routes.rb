@@ -41,6 +41,9 @@ Rails.application.routes.draw do
   get 'news/', controller: :articles, action: :index
   get 'news/:slug', controller: :articles, action: :show, as: :article
 
+  get 'projects/', controller: :projects, action: :index
+  get 'projects/:slug', controller: :projects, action: :show, as: :project
+
   get 'tap-topics', controller: :tap_topics, action: :index, as: :tap_topics
 
   resources :symbolsets do

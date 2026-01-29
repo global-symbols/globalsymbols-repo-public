@@ -1,0 +1,119 @@
+:ruby
+  title t('views.projects.index.title')
+  description t('views.projects.index.description')
+
+  set_meta_tags og: {
+    url: projects_url,
+    type: 'object'
+  }
+
+= render partial: 'topbar', cache: true
+
+%main.container-xl
+  %section.mt-5
+    - if @directus_error
+      .alert.alert-warning
+        %h4 Unable to Load Projects
+        %p We're currently experiencing issues connecting to our content management system. Please try again later.
+
+    -# Category filter links
+    - if @categories.present? && @categories.length > 1
+      .mb-5.category-filter
+        .d-flex.flex-wrap.align-items-center.mb-3
+          %a.btn.btn-outline-primary.btn-sm.mb-1{href: projects_path, class: @selected_category.blank? ? 'active' : '', style: "margin-right: 8px"}
+            All
+          - @categories.each do |category|
+            - category_param = { category: category }
+            - category_param[:page] = @current_page if @current_page.to_i > 1
+            %a.btn.btn-outline-primary.btn-sm.mb-1{href: projects_path(category_param), class: @selected_category == category ? 'active' : '', style: "margin-right: 8px"}
+              = category.to_s.titleize
+
+    .row
+      - @projects.each do |project|
+        - translations = project['translations'] || []
+        - current_lang_code = DIRECTUS_LANGUAGE_MAPPING.call[I18n.locale.to_sym] || DIRECTUS_DEFAULT_LANGUAGE.call
+        - requested_translation = translations.find { |t| t.is_a?(Hash) && t['gs_languages_code'] == current_lang_code }
+        - fallback_translation = translations.find { |t| t.is_a?(Hash) && t['gs_languages_code'] == DIRECTUS_DEFAULT_LANGUAGE.call }
+        - english_translation = translations.find { |t| t.is_a?(Hash) && t['gs_languages_code'] == 'en-GB' }
+        - translation = requested_translation || fallback_translation || english_translation || {}
+        - using_fallback = requested_translation.nil? && (fallback_translation.present? || english_translation.present?)
+
+        .col-6.col-md-4.mb-4
+          .card.h-100.news-article-card
+            - if project['thumbnail'].present?
+              - image_url = "#{DIRECTUS_URL}/assets/#{project['thumbnail']}"
+              %img.card-img-top{src: image_url, alt: translation['title'] || 'Project image', style: "max-width: 100%; height: auto;"}
+            .card-body.d-flex.flex-column
+              %h3.card-title{:style => "font-weight: 600"}
+                %a{href: project_path(project['slug'])}= translation['title'] || 'Project'
+                - if using_fallback
+                  %small.text-warning (en-GB)
+              - if translation['short_description'].present?
+                %p.card-text.mb-2
+                  = translation['short_description']
+              %p.card-text.text-muted
+                - if project['date_created']
+                  = Date.parse(project['date_created']).strftime('%B %d, %Y')
+              .mt-auto
+                %a.btn.btn-primary{href: project_path(project['slug']), 'aria-hidden' => 'true'} View Project
+
+      - if @projects.empty? && !@directus_error
+        .col-12
+          .text-center.mt-5
+            %h4 No Projects Found
+            %p
+              - if @selected_category.present?
+                = "No projects found in the '#{@selected_category.to_s.titleize}' category."
+                %br
+                %a{href: projects_path} View all projects
+              - else
+                There are currently no projects to display.
+
+    -# Pagination controls
+    - if @total_pages.to_i > 1
+      .d-flex.justify-content-center.mt-5
+        %nav{"aria-label" => "Project pagination"}
+          %ul.pagination
+            - if @has_previous_page
+              %li.page-item
+                %a.page-link{href: projects_path(category: @selected_category, page: @previous_page), "aria-label" => "Previous"}
+                  %span{"aria-hidden" => "true"} ‹
+                  %span.sr-only Previous
+            - else
+              %li.page-item.disabled
+                %span.page-link
+                  %span{"aria-hidden" => "true"} ‹
+                  %span.sr-only Previous
+
+            - start_page = [@current_page - 2, 1].max
+            - end_page = [@current_page + 2, @total_pages].min
+
+            - if start_page > 1
+              %li.page-item
+                %a.page-link{href: projects_path(category: @selected_category, page: 1)} 1
+              - if start_page > 2
+                %li.page-item.disabled
+                  %span.page-link …
+
+            - (start_page..end_page).each do |page_num|
+              %li.page-item{class: page_num == @current_page ? 'active' : ''}
+                %a.page-link{href: projects_path(category: @selected_category, page: page_num)}= page_num
+
+            - if end_page < @total_pages
+              - if end_page < @total_pages - 1
+                %li.page-item.disabled
+                  %span.page-link …
+              %li.page-item
+                %a.page-link{href: projects_path(category: @selected_category, page: @total_pages)}= @total_pages
+
+            - if @has_next_page
+              %li.page-item
+                %a.page-link{href: projects_path(category: @selected_category, page: @next_page), "aria-label" => "Next"}
+                  %span{"aria-hidden" => "true"} ›
+                  %span.sr-only Next
+            - else
+              %li.page-item.disabled
+                %span.page-link
+                  %span{"aria-hidden" => "true"} ›
+                  %span.sr-only Next
+

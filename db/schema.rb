@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_08_26_120946) do
+ActiveRecord::Schema.define(version: 2026_01_28_174500) do
 
   create_table "active_storage_attachments", charset: "utf8", force: :cascade do |t|
     t.string "name", null: false
@@ -44,8 +44,8 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.bigint "boardbuilder_board_set_id", null: false
     t.bigint "user_id", null: false
     t.integer "role", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["boardbuilder_board_set_id"], name: "index_boardbuilder_board_set_users_on_boardbuilder_board_set_id"
     t.index ["user_id"], name: "index_boardbuilder_board_set_users_on_user_id"
   end
@@ -55,8 +55,17 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.boolean "public"
     t.integer "featured_level"
     t.datetime "opened_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "download_count", default: 0
+    t.text "description"
+    t.text "tags"
+    t.string "lang"
+    t.string "author"
+    t.string "author_url"
+    t.boolean "self_contained", default: false
+    t.bigint "thumbnail_id"
+    t.index ["thumbnail_id"], name: "fk_rails_57fe97592a"
   end
 
   create_table "boardbuilder_boards", charset: "utf8", force: :cascade do |t|
@@ -67,8 +76,8 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.integer "columns", null: false
     t.integer "rows", null: false
     t.integer "captions_position", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.bigint "header_boardbuilder_media_id"
     t.index ["boardbuilder_board_set_id"], name: "index_boardbuilder_boards_on_boardbuilder_board_set_id"
     t.index ["header_boardbuilder_media_id"], name: "index_boardbuilder_boards_on_header_boardbuilder_media_id"
@@ -87,8 +96,8 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.string "hair_colour"
     t.string "skin_colour"
     t.string "image_url"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["boardbuilder_board_id"], name: "index_boardbuilder_cells_on_boardbuilder_board_id"
     t.index ["boardbuilder_media_id"], name: "index_boardbuilder_cells_on_boardbuilder_media_id"
     t.index ["linked_to_boardbuilder_board_id"], name: "index_boardbuilder_cells_on_linked_to_boardbuilder_board_id"
@@ -104,8 +113,9 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.integer "height"
     t.integer "width"
     t.string "canvas"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "file_hash"
     t.index ["user_id"], name: "index_boardbuilder_media_on_user_id"
   end
 
@@ -154,24 +164,27 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.index ["language_id"], name: "index_concepts_on_language_id"
   end
 
+  create_table "directus_cached_collections", charset: "utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.boolean "active", default: true, null: false
+    t.text "parameter_sets"
+    t.integer "priority", default: 0, null: false
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active", "priority"], name: "index_directus_cached_collections_active_priority"
+    t.index ["name"], name: "index_directus_cached_collections_on_name", unique: true
+  end
+
   create_table "images", charset: "utf8", force: :cascade do |t|
     t.bigint "picto_id", null: false
     t.boolean "adaptable", default: false, null: false
     t.string "imagefile"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "original_filename"
+    t.string "status", default: "pending"
     t.index ["picto_id"], name: "index_images_on_picto_id"
-  end
-
-  create_table "import_jobs", charset: "utf8", force: :cascade do |t|
-    t.bigint "symbolset_id"
-    t.integer "status"
-    t.string "message"
-    t.boolean "csv_valid"
-    t.boolean "symbols_valid"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["symbolset_id"], name: "index_import_jobs_on_symbolset_id"
   end
 
   create_table "labels", charset: "utf8", force: :cascade do |t|
@@ -261,8 +274,8 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.text "redirect_uri", null: false
     t.string "scopes", default: "", null: false
     t.boolean "confidential", default: true, null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
   end
 
@@ -307,8 +320,8 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
     t.boolean "authoritative", null: false
     t.boolean "suggestion", default: false, null: false
     t.text "description"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "survey_pictos", charset: "utf8", force: :cascade do |t|
@@ -406,6 +419,7 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "boardbuilder_board_set_users", "boardbuilder_board_sets"
   add_foreign_key "boardbuilder_board_set_users", "users"
+  add_foreign_key "boardbuilder_board_sets", "boardbuilder_media", column: "thumbnail_id"
   add_foreign_key "boardbuilder_boards", "boardbuilder_board_sets"
   add_foreign_key "boardbuilder_boards", "boardbuilder_media", column: "header_boardbuilder_media_id"
   add_foreign_key "boardbuilder_cells", "boardbuilder_boards"
@@ -420,7 +434,6 @@ ActiveRecord::Schema.define(version: 2021_08_26_120946) do
   add_foreign_key "concepts", "coding_frameworks"
   add_foreign_key "concepts", "languages"
   add_foreign_key "images", "pictos"
-  add_foreign_key "import_jobs", "symbolsets"
   add_foreign_key "labels", "languages"
   add_foreign_key "labels", "pictos"
   add_foreign_key "labels", "sources"

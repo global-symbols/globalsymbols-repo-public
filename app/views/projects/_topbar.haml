@@ -1,0 +1,16 @@
+:ruby
+  title t('views.projects.index.title')
+  description t('views.projects.index.description')
+
+  set_meta_tags og: {
+    url: projects_url,
+    type: 'object'
+  }
+
+%section.bg-light-1#projects-topbar
+  .container-xl
+    .row.py-4
+      .col.text-center.text-sm-left
+        %h1.my-2.text-center.text-primary
+          Our Projects
+

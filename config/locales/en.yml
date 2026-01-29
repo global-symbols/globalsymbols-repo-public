@@ -915,12 +915,20 @@ en:
         description: "The Global Symbols Blog - Updates, ideas, and inspiration to help you communicate with symbols."
         more_button: "More Articles"
 
+    projects:
+      _topbar:
+        header_projects: "Projects"
+      index:
+        title: "Projects"
+        description: "Projects from Global Symbols."
+
   layouts:
     application:
       menu:
         resources: "Resources"
         board_builder: "Board Builder"
         training: "Training"
+        projects: "Projects"
         news: "News"
         sign_out: "Sign Out"
         my_account: "My Account"
