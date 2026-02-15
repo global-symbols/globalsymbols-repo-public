@@ -31,4 +31,9 @@ module ApplicationHelper
       "https://app.#{request.host}/en"
     end
   end
+
+  # Boardbuilder URL for a path (no notify).
+  def bb_app_url(path = '')
+    path.present? ? "#{bb_url}#{path.start_with?('/') ? path : '/' + path}" : bb_url
+  end
 end

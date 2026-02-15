@@ -1,14 +1,14 @@
 class PagesController < ApplicationController
-  
+
   skip_before_action :authenticate_user!
   # Set @symbolsets according to User Abilities
   load_resource :symbolset, find_by: :slug, parent: false, only: [:home, :search]
-  
+
   def home
     # Return Symbolsets with a featured_level, ordered by featured_level.
     @symbolsets = @symbolsets.where.not(featured_level: nil).order(featured_level: :asc).order(name: :asc)
   end
-  
+
   def search
     # Trim the search query
     search_params[:query].try(:strip!)

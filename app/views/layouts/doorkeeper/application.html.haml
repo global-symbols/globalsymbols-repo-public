@@ -16,7 +16,8 @@
       %link{rel: :stylesheet, href: 'https://fonts.googleapis.com/css?family=Lato:300,400&display=swap'}
 
     = stylesheet_link_tag 'application'
-    = javascript_include_tag 'application'
+    %script{src: 'https://code.jquery.com/jquery-3.5.1.slim.min.js', integrity: 'sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=', crossorigin: :anonymous, defer: true}
+    = javascript_include_tag 'application', defer: true
     = csrf_meta_tags
   %body.bg-light-1.py-3.mh-100.d-table-cell.align-middle.auth-layout
     .container-sm{style: 'max-width: 570px'}

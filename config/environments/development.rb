@@ -67,6 +67,9 @@ Rails.application.configure do
   Rack::MiniProfiler.config.show_total_sql_count = true
 
 
+  # Allow OAuth silent refresh iframe from Angular on another port (e.g. localhost:4200).
+  config.action_dispatch.default_headers.delete('X-Frame-Options')
+
   # Allow cross-origin use of the API during development
   # (most likely from localhost:8000 to localhost:3000!)
   config.middleware.use Rack::Cors do
