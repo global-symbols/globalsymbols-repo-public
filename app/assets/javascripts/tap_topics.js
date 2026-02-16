@@ -35,6 +35,15 @@
     var $qualityLowLabel = $("#tapTopicsQualityLowLabel");
     var $qualityHighLabel = $("#tapTopicsQualityHighLabel");
     var $qualityHint = $("#tapTopicsQualityHint");
+    // Some browsers/plugins won't reliably reload a PDF when reusing the same <object>.
+    // Keep a template so we can replace the element and force a reload.
+    var pdfTemplateHtml = $pdf[0] ? $pdf[0].outerHTML : null;
+
+    function withCacheBuster(url) {
+      if (!url || !url.length) return url;
+      var sep = url.indexOf("?") === -1 ? "?" : "&";
+      return url + sep + "cb=" + new Date().getTime();
+    }
 
     function setQualityAvailability(lowUrl, highUrl) {
       var hasLow = !!(lowUrl && lowUrl.length);
@@ -68,9 +77,23 @@
 
     function setPreviewUrl(url) {
       var hasUrl = !!(url && url.length);
-      var displayUrl = hasUrl ? url : "about:blank";
-      $pdf.toggleClass("d-none", !hasUrl);
-      $pdf.attr("data", displayUrl);
+      var displayUrl = hasUrl ? withCacheBuster(url) : "about:blank";
+
+      if (pdfTemplateHtml) {
+        var $freshPdf = $(pdfTemplateHtml);
+        $freshPdf.attr("data", displayUrl);
+        $freshPdf.toggleClass("d-none", !hasUrl);
+
+        $pdf.replaceWith($freshPdf);
+        $pdf = $freshPdf;
+        // This link lives inside the <object> fallback content, so refresh the reference.
+        $pdfLink = $("#tapTopicsBoardsetModalPdfLink");
+      } else {
+        // Fallback: update in place if we don't have a template.
+        $pdf.toggleClass("d-none", !hasUrl);
+        $pdf.attr("data", displayUrl);
+      }
+
       $pdfLink.attr("href", hasUrl ? displayUrl : "#");
       $pdfLink.toggleClass("disabled", !hasUrl);
     }
