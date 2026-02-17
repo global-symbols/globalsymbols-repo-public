@@ -193,16 +193,17 @@ module BoardBuilder
               image: body[:image].present? ? "[base64: #{(body[:image].bytesize / 1024.0).round(1)}KB]" : nil,
               adapter_name: body[:adapter_name]
             }.compact
-            masked_headers = { 'x-api-key' => '[MASKED]', 'Content-Type' => 'application/json' }
+            masked_headers = { 'x-api-key' => '[MASKED]', 'Content-Type' => 'application/json', 'X-Response-Mode' => 'async' }
             Rails.logger.info("[AI] → Request url=#{azure_base}/generate-image headers=#{masked_headers} body=#{sanitized_body}")
 
             response = Faraday.post(
               "#{azure_base}/generate-image",
               body.to_json,
               'x-api-key' => azure_key,
-              'Content-Type' => 'application/json'
+              'Content-Type' => 'application/json',
+              'X-Response-Mode' => 'async'
             ) do |req|
-              req.options.timeout = 65
+              req.options.timeout = 10  # Short timeout for initial request
               req.options.open_timeout = 5
             end
 
@@ -210,13 +211,132 @@ module BoardBuilder
             Rails.logger.debug("[AI] ← Body preview: #{response.body.to_s[0, 500]}")
             if response.success?
               parsed = JSON.parse(response.body) rescue {}
-              image_urls = parsed['image_urls'] || (parsed['image_url'] ? [parsed['image_url']] : [])
-              # Testing helper: if API returns a single image, duplicate to match requested num_images
-              if image_urls.length == 1 && image_urls.first.present?
-                requested_count = params[:num_images] || 4
-                image_urls = Array.new(requested_count, image_urls.first)
+              
+              # Check if this is an async queue response (has job_id)
+              if parsed['job_id'].present?
+                job_id = parsed['job_id']
+                initial_status = parsed['status']
+                initial_queue_position = parsed['queue_position']
+                initial_wait_time = parsed['estimated_wait_time']
+                
+                Rails.logger.info("[AI] Received job_id=#{job_id}, status=#{initial_status}, queue_position=#{initial_queue_position}")
+                
+                # If initially pending, return queue info immediately so Angular can display it
+                if initial_status == 'pending'
+                  present({
+                    status: 'queued',
+                    job_id: job_id,
+                    queue_position: initial_queue_position,
+                    estimated_wait_time: initial_wait_time,
+                    image_urls: nil
+                  })
+                  # Note: Request ends here. Angular will poll Rails for completion using job_status endpoint.
+                  return
+                end
+                
+                # If initially completed (unlikely but possible if queue was empty), return immediately
+                if initial_status == 'completed'
+                  # Check if result is in the initial response
+                  result = parsed['result'] || {}
+                  image_urls = result['image_urls'] || []
+                  if image_urls.length == 1 && image_urls.first.present?
+                    requested_count = params[:num_images] || 4
+                    image_urls = Array.new(requested_count, image_urls.first)
+                  end
+                  present({ status: 'completed', job_id: job_id, image_urls: image_urls })
+                  return
+                end
+                
+                # Poll job-status endpoint until completed or failed
+                max_polls = 60  # ~3 minutes at 3s intervals
+                poll_interval = 3  # seconds
+                poll_count = 0
+                
+                loop do
+                  sleep(poll_interval)
+                  poll_count += 1
+                  
+                  job_status_response = Faraday.get(
+                    "#{azure_base}/job-status/#{job_id}",
+                    {},
+                    'x-api-key' => azure_key
+                  ) do |req|
+                    req.options.timeout = 5
+                    req.options.open_timeout = 2
+                  end
+                  
+                  if job_status_response.success?
+                    job_status = JSON.parse(job_status_response.body) rescue {}
+                    status = job_status['status']
+                    
+                    Rails.logger.debug("[AI] Job #{job_id} status=#{status}, poll=#{poll_count}/#{max_polls}")
+                    
+                    case status
+                    when 'pending'
+                      # Shouldn't happen if we already checked, but handle it
+                      # Return queue info if we haven't already
+                      if poll_count == 1
+                        present({
+                          status: 'queued',
+                          job_id: job_id,
+                          queue_position: job_status['queue_position'],
+                          estimated_wait_time: job_status['estimated_wait_time'],
+                          image_urls: nil
+                        })
+                        return
+                      end
+                      # Continue polling
+                    when 'processing'
+                      # Continue polling, status changed from pending to processing
+                      Rails.logger.info("[AI] Job #{job_id} now processing")
+                    when 'completed'
+                      # Extract image_urls and return
+                      result = job_status['result'] || {}
+                      image_urls = result['image_urls'] || []
+                      if image_urls.length == 1 && image_urls.first.present?
+                        requested_count = params[:num_images] || 4
+                        image_urls = Array.new(requested_count, image_urls.first)
+                      end
+                      Rails.logger.info("[AI] Job #{job_id} completed, returning #{image_urls.length} image URLs")
+                      present({ status: 'completed', job_id: job_id, image_urls: image_urls })
+                      return
+                    when 'failed'
+                      error_msg = job_status['error'] || 'Generation failed'
+                      Rails.logger.error("[AI] Job #{job_id} failed: #{error_msg}")
+                      # Map error to appropriate HTTP status
+                      if error_msg.downcase.include?('not ready') || error_msg.downcase.include?('not running')
+                        error!({ detail: error_msg }, 503)
+                      elsif error_msg.downcase.include?('busy') || error_msg.downcase.include?('try again')
+                        error!({ detail: error_msg }, 429)
+                      else
+                        error!({ detail: error_msg }, 500)
+                      end
+                      return
+                    end
+                  else
+                    Rails.logger.error("[AI] Failed to get job status for #{job_id}: #{job_status_response.status}")
+                    if poll_count >= max_polls
+                      error!({ detail: 'Job status check failed' }, 504)
+                      return
+                    end
+                  end
+                  
+                  if poll_count >= max_polls
+                    Rails.logger.error("[AI] Polling timeout for job #{job_id} after #{poll_count} attempts")
+                    error!({ detail: 'Request timed out waiting for result' }, 504)
+                    return
+                  end
+                end
+              else
+                # Legacy response format (direct image_urls)
+                image_urls = parsed['image_urls'] || (parsed['image_url'] ? [parsed['image_url']] : [])
+                # Testing helper: if API returns a single image, duplicate to match requested num_images
+                if image_urls.length == 1 && image_urls.first.present?
+                  requested_count = params[:num_images] || 4
+                  image_urls = Array.new(requested_count, image_urls.first)
+                end
+                present({ image_urls: image_urls })
               end
-              present({ image_urls: image_urls })
             else
               error_detail = JSON.parse(response.body)['detail'] rescue nil
               case response.status
@@ -236,6 +356,91 @@ module BoardBuilder
             error!({ detail: 'Flux server not running' }, 503)
           rescue => e
             Rails.logger.error("[AI] Unexpected error: #{e.class} - #{e.message}")
+            error!({ detail: 'Internal error' }, 500)
+          end
+        end
+
+        desc 'Poll job status for image generation', {
+          headers: {
+            'Authorization' => { description: 'OAuth2 Bearer token with ai:write scope', required: true }
+          }
+        }
+        params do
+          requires :job_id, type: String, desc: 'Job ID returned from generate_image'
+        end
+        get :job_status, protected: true, oauth2: ['ai:write'] do
+          Rails.logger.info("[AI] job_status request: job_id=#{params[:job_id]}")
+          
+          azure_base = ENV['AZURE_API_BASE']
+          azure_key = ENV['AZURE_API_KEY']
+          
+          if azure_base.blank? || azure_key.blank?
+            error!({ detail: 'Azure configuration missing' }, 500)
+          end
+          
+          begin
+            job_status_response = Faraday.get(
+              "#{azure_base}/job-status/#{params[:job_id]}",
+              {},
+              'x-api-key' => azure_key
+            ) do |req|
+              req.options.timeout = 5
+              req.options.open_timeout = 2
+            end
+            
+            if job_status_response.success?
+              job_status = JSON.parse(job_status_response.body) rescue {}
+              status = job_status['status']
+              
+              case status
+              when 'pending'
+                present({
+                  status: 'queued',
+                  job_id: params[:job_id],
+                  queue_position: job_status['queue_position'],
+                  estimated_wait_time: job_status['estimated_wait_time'],
+                  image_urls: nil
+                })
+              when 'processing'
+                present({
+                  status: 'processing',
+                  job_id: params[:job_id],
+                  queue_position: nil,
+                  estimated_wait_time: nil,
+                  image_urls: nil
+                })
+              when 'completed'
+                result = job_status['result'] || {}
+                image_urls = result['image_urls'] || []
+                present({
+                  status: 'completed',
+                  job_id: params[:job_id],
+                  image_urls: image_urls
+                })
+              when 'failed'
+                error_msg = job_status['error'] || 'Generation failed'
+                if error_msg.downcase.include?('not ready') || error_msg.downcase.include?('not running')
+                  error!({ detail: error_msg }, 503)
+                elsif error_msg.downcase.include?('busy') || error_msg.downcase.include?('try again')
+                  error!({ detail: error_msg }, 429)
+                else
+                  error!({ detail: error_msg }, 500)
+                end
+              else
+                error!({ detail: 'Unknown job status' }, 500)
+              end
+            else
+              if job_status_response.status == 404
+                error!({ detail: 'Job not found' }, 404)
+              else
+                error!({ detail: 'Failed to get job status' }, job_status_response.status)
+              end
+            end
+          rescue Faraday::Error => e
+            Rails.logger.error("[AI] Faraday error polling job status: #{e.class} - #{e.message}")
+            error!({ detail: 'Failed to connect to flux server' }, 503)
+          rescue => e
+            Rails.logger.error("[AI] Unexpected error polling job status: #{e.class} - #{e.message}")
             error!({ detail: 'Internal error' }, 500)
           end
         end
