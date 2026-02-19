@@ -34,6 +34,7 @@ module GlobalSymbols
     mount V1::Labels
     mount V1::Languages
     mount V1::Symbolsets
+    mount V1::Pictos
     mount V1::User
 
     add_swagger_documentation \
