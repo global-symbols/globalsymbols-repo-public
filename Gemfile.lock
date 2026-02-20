@@ -411,6 +411,8 @@ GEM
     rack (2.2.9)
     rack-accept (0.4.5)
       rack (>= 0.4)
+    rack-attack (6.8.0)
+      rack (>= 1.0, < 4)
     rack-cors (2.0.2)
       rack (>= 2.0.0)
     rack-mini-profiler (3.0.0)
@@ -630,6 +632,7 @@ DEPENDENCIES
   prawn-svg
   prawn-table
   puma (~> 5.2.2)
+  rack-attack
   rack-cors
   rack-mini-profiler
   rails (= 6.1.3.2)
