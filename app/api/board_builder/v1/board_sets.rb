@@ -101,6 +101,21 @@ module BoardBuilder::V1
           present boardset, with: Entities::BoardSet, expand: params[:expand], readonly: !(can? :manage, boardset), boards_with_cells: boardset.boards
         end
 
+        desc 'Returns a specific BoardSet belonging to the current user in OBZ format',
+             success: Entities::BoardSetObz,
+             is_array: false
+        params do
+          requires :id, type: Integer, desc: 'BoardSet ID'
+        end
+        oauth2 'boardset:read'
+        get :obz do
+          board_set = Boardbuilder::BoardSet.accessible_by(current_ability)
+                                            .includes(boards: :cells)
+                                            .find(params[:id])
+          board_set.download_count += 1
+          board_set.save!
+          present board_set, with: Entities::BoardSetObz
+        end
 
         desc 'Updates a BoardSet belonging to the current user',
              success: Entities::BoardSet,
@@ -199,6 +214,7 @@ module BoardBuilder::V1
         board_set = save_board_set(filtered_params)
         present board_set, with: Entities::BoardSet, expand: 'boards'
       end
+
     end
   end
 end
