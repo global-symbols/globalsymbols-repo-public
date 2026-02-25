@@ -97,6 +97,7 @@ Rails.application.routes.draw do
   get 'about/featured-board-sets', controller: :pages, action: :featured_board_sets
   get 'about/:id', controller: :pages, action: :contentful_page, as: :about_page
   get :about, controller: :pages, action: :contentful_page, id: :about
+  get :developer, controller: :pages, action: :contentful_page, id: :developer
 
   # TEMPORARILY DISABLED:
   # resources :knowledge_base, path: 'knowledge-base', only: [:index, :show] do

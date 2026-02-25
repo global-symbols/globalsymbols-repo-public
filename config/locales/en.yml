@@ -927,6 +927,7 @@ en:
       menu:
         resources: "Resources"
         board_builder: "Board Builder"
+        developer: "Developer"
         training: "Training"
         projects: "Projects"
         news: "News"
