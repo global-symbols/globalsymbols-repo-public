@@ -1,0 +1,25 @@
+.api-key-display.d-flex.align-items-center
+  %pre.api-key-value.mb-0.p-3.bg-light.rounded.flex-grow-1.mr-2{ data: { key: raw_key } }= raw_key
+  %button.btn.btn-outline-secondary.btn-sm.api-key-copy.flex-shrink-0{ type: 'button', title: t('developer.authentication.copy_to_clipboard'), 'aria-label': t('developer.authentication.copy_to_clipboard'), data: { key: raw_key } }
+    %i.fas.fa-copy
+  - # Inline script: copy key to clipboard and show brief feedback
+  :javascript
+    (function() {
+      var btn = document.querySelector('.api-key-copy');
+      if (!btn) return;
+      var key = btn.getAttribute('data-key');
+      var originalHtml = btn.innerHTML;
+      var originalTitle = btn.getAttribute('title');
+      btn.addEventListener('click', function() {
+        if (!key) return;
+        navigator.clipboard.writeText(key).then(function() {
+          // Show text feedback that does not rely on icon fonts
+          btn.innerHTML = '\u2713';
+          btn.setAttribute('title', 'Copied!');
+          setTimeout(function() {
+            btn.innerHTML = originalHtml;
+            btn.setAttribute('title', originalTitle || btn.getAttribute('aria-label') || 'Copy');
+          }, 2000);
+        });
+      });
+    })();

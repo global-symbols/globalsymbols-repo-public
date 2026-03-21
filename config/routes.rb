@@ -17,7 +17,8 @@ Rails.application.routes.draw do
   get :search, controller: :pages, action: :search
   get :contact, controller: :pages, action: :contact
 
-  mount GrapeSwaggerRails::Engine => '/api/docs'
+  # API and interactive documentation
+  get '/api/docs', to: 'api_docs#show'
   mount API, at: '/api'
 
   resources :concepts, only: [:index, :show]
@@ -97,6 +98,13 @@ Rails.application.routes.draw do
   get 'about/featured-board-sets', controller: :pages, action: :featured_board_sets
   get 'about/:id', controller: :pages, action: :contentful_page, as: :about_page
   get :about, controller: :pages, action: :contentful_page, id: :about
+  # Developer authentication (API key request) - more specific route first
+  get 'developer/authentication/re-request', to: 'developer/authentication#re_request', as: :developer_authentication_re_request
+  post 'developer/authentication/re-request', to: 'developer/authentication#re_request_create'
+  get 'developer/authentication/activate', to: 'developer/authentication#activate', as: :developer_authentication_activate
+  get 'developer/authentication', to: 'developer/authentication#show', as: :developer_authentication
+  post 'developer/authentication', to: 'developer/authentication#create'
+
   get :developer, controller: :pages, action: :contentful_page, id: :developer
 
   # TEMPORARILY DISABLED:

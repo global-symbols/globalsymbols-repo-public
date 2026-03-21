@@ -1,0 +1,27 @@
+- title t('developer.authentication.title')
+%main.mt-0
+  %article
+    = render 'pages/topbar' do
+      = t('developer.authentication.title')
+    .container-xl.mt-4
+      .row.justify-content-center
+        .col-md-8
+          - if @form_alert
+            .alert.alert-warning= @form_alert
+          = bootstrap_form_with model: @api_key, url: developer_authentication_path, method: :post, local: true, layout: :vertical do |f|
+            %fieldset.mb-3
+              %legend.col-form-label.pt-0= t('developer.authentication.user_type')
+              .form-check
+                = f.radio_button :user_type, 'personal', label: t('developer.authentication.user_type_personal')
+              .form-check
+                = f.radio_button :user_type, 'company', label: t('developer.authentication.user_type_company')
+            = f.text_field :name, label: t('developer.authentication.name'), required: true
+            = f.email_field :email, label: t('developer.authentication.email'), required: true
+            = f.text_area :purpose, label: t('developer.authentication.purpose'), rows: 3
+            .form-group
+              %p.small.text-muted= t('developer.authentication.note')
+            = f.form_group do
+              = f.submit t('developer.authentication.submit'), class: 'btn btn-primary'
+          .mt-4
+            %p.small
+              = t('developer.authentication.re_request_note_html', link: link_to('Re-request', developer_authentication_re_request_path)).html_safe

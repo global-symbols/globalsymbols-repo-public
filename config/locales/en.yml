@@ -253,6 +253,12 @@ en:
         password: "Password"
         current_password: "Current password"
         remember_me: "Remember me"
+    errors:
+      models:
+        api_key:
+          attributes:
+            email:
+              taken_active: "already has an active API key. Use 'Re-request a new key' below to get a new key."
   date:
     formats:
       # Use the strftime parameters for formats.
@@ -323,6 +329,44 @@ en:
       other_than: "must be other than %{count}"
       odd: "must be odd"
       even: "must be even"
+  developer:
+    authentication:
+      title: "Request an API key"
+      re_request_title: "Request a new API key"
+      user_type: "Type"
+      user_type_company: "Company"
+      user_type_personal: "Personal"
+      name: "Name"
+      email: "Email"
+      purpose: "Purpose or use case (optional)"
+      note: "The details you provide here are not tied to any Global Symbols account and will not be shared with any third party."
+      submit: "Request API key"
+      re_request_submit: "Request new key"
+      re_request_note: "Lost your API key? Re-request simply with your email. Your existing key will be de-activated."
+      re_request_note_html: "Lost your API key? %{link} simply with your email. Your existing key will be de-activated."
+      re_request_previous_invalidated: "When you request a new key, your previous key will be invalidated and can no longer be used."
+      success_title: "Your API key"
+      success_instructions: "We have emailed your API key and an activation link. The link is valid for 2 hours. After activation, use the key in the Authorization header as \"ApiKey <your_key>\" or in the X-Api-Key header when calling the Global Symbols API."
+      re_request_success_title: "Your new API key"
+      activation_email_subject: "Activate your Global Symbols API key"
+      activation_email_intro_html: "You recently requested an API key for the Global Symbols API."
+      activation_email_key_label: "Your API key"
+      activation_email_instructions_html: "To begin using this key, you need to activate it. Click the button below within 2 hours."
+      activation_email_button: "Activate API key"
+      activation_email_link_expiry_html: "For security, this activation link will work for 2 hours from when this email was sent. If it expires, you can request a new key using the same email address."
+      activation_success_html: "Your API key for %{email} has been activated. You can now use it with the Global Symbols API."
+      activation_invalid: "We could not find a key to activate with this link. It may be invalid or already used with a different email."
+      activation_expired_html: "This activation link has expired. Please request a new API key using %{email}."
+      already_activated: "This API key is already activated. You can begin using it with the Global Symbols API."
+      back_to_developer: "Back to Developer page"
+      get_key_link: "Get an API key"
+      invalid_user_type: "Please select Company or Personal."
+      email_required: "Email is required."
+      copy_to_clipboard: "Copy to clipboard"
+    page:
+      get_key_heading: "Getting an authentication key"
+      example_usage: "Example usage"
+
   dictionary:
     collaborator:
       one: Collaborator

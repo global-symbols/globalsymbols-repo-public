@@ -1,0 +1,12 @@
+- title t('developer.authentication.re_request_success_title')
+%main.mt-0
+  %article
+    = render 'pages/topbar' do
+      = t('developer.authentication.re_request_success_title')
+    .container-xl.mt-4
+      .row.justify-content-center
+        .col-md-8
+          .alert.alert-warning
+            %strong= t('developer.authentication.success_instructions')
+          %p.small.text-muted
+            = link_to t('developer.authentication.back_to_developer'), developer_path
