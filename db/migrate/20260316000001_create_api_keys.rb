@@ -1,4 +1,4 @@
-class CreateApiKeys < ActiveRecord::Migration[6.1]
+class CreateAPIKeys < ActiveRecord::Migration[6.1]
   def change
     create_table :api_keys do |t|
       t.string :key_digest, null: false
