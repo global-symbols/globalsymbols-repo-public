@@ -26,14 +26,22 @@ module Developer
       @api_key.name = @api_key.name.to_s.strip
       @api_key.purpose = @api_key.purpose.to_s.strip.presence
 
-      if @api_key.save
-        APIKeyMailer.activation_email(@api_key, raw_key).deliver_now
+      if @api_key.valid?
+        ActiveRecord::Base.transaction do
+          @api_key.save!
+          APIKeyMailer.activation_email(@api_key, raw_key).deliver_now
+        end
         render :create_success
       else
         @form_alert = @api_key.errors.full_messages.to_sentence
         flash.now[:alert] = nil
         render :show, status: :unprocessable_entity
       end
+    rescue StandardError => e
+      Rails.logger.error("API key activation email delivery failed for #{@api_key.email}: #{e.class}: #{e.message}")
+      @form_alert = t('developer.authentication.email_delivery_failed')
+      flash.now[:alert] = nil
+      render :show, status: :service_unavailable
     end
 
     def re_request
@@ -52,9 +60,6 @@ module Developer
       user_type = existing&.user_type || 'personal'
       name = existing&.name || email.split('@').first
 
-      # One active key per email: revoke any existing active keys before creating the new one
-      APIKey.revoke_by_email!(email)
-
       raw_key = SecureRandom.hex(32)
       key_digest = APIKey.build_key_digest(raw_key)
 
@@ -68,13 +73,22 @@ module Developer
         activation_sent_at: Time.current
       )
 
-      if @api_key.save
-        APIKeyMailer.activation_email(@api_key, raw_key).deliver_now
+      if @api_key.valid?
+        ActiveRecord::Base.transaction do
+          # One active key per email: revoke any existing active keys before creating the new one
+          APIKey.revoke_by_email!(email)
+          @api_key.save!
+          APIKeyMailer.activation_email(@api_key, raw_key).deliver_now
+        end
         render :re_request_success
       else
         flash.now[:alert] = @api_key.errors.full_messages.to_sentence
         render :re_request, status: :unprocessable_entity
       end
+    rescue StandardError => e
+      Rails.logger.error("API key re-request email delivery failed for #{email}: #{e.class}: #{e.message}")
+      flash.now[:alert] = t('developer.authentication.email_delivery_failed')
+      render :re_request, status: :service_unavailable
     end
 
     def activate

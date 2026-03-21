@@ -362,6 +362,7 @@ en:
       get_key_link: "Get an API key"
       invalid_user_type: "Please select Company or Personal."
       email_required: "Email is required."
+      email_delivery_failed: "We could not send your activation email right now. Please try again shortly."
       copy_to_clipboard: "Copy to clipboard"
     page:
       get_key_heading: "Getting an authentication key"
