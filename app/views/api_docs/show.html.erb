@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Global Symbols API documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Swagger UI CSS from CDN -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css"
+    />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      #swagger-ui {
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="swagger-ui"></div>
+
+    <!-- Swagger UI JS from CDN -->
+    <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-standalone-preset.js"></script>
+    <script>
+      window.onload = function () {
+        const ui = SwaggerUIBundle({
+          url: "<%= "#{request.protocol}#{request.host_with_port}" %>/api/v1/swagger_doc.json",
+          dom_id: "#swagger-ui",
+          deepLinking: true,
+          presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+          layout: "StandaloneLayout",
+          docExpansion: "list",
+          displayRequestDuration: true
+        });
+        window.ui = ui;
+      };
+    </script>
+  </body>
+</html>
+

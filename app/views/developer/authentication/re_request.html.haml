@@ -1,0 +1,21 @@
+- title t('developer.authentication.re_request_title')
+%main.mt-0
+  %article
+    = render 'pages/topbar' do
+      = t('developer.authentication.re_request_title')
+    .container-xl.mt-4
+      .row.justify-content-center
+        .col-md-8
+          - if alert
+            .alert.alert-warning= alert
+          .alert.alert-info
+            = t('developer.authentication.re_request_previous_invalidated')
+          %p.small.text-muted.mb-3= t('developer.authentication.re_request_note')
+          = bootstrap_form_with url: developer_authentication_re_request_path, method: :post, local: true, layout: :horizontal, label_col: 'col-md-3', control_col: 'col-md-9' do |f|
+            = f.email_field :email, value: params[:email], label: t('developer.authentication.email'), required: true
+            = f.form_group do
+              = f.submit t('developer.authentication.re_request_submit'), class: 'btn btn-primary'
+          .mt-4
+            %p.small
+              = link_to t('developer.authentication.title'), developer_authentication_path
+              to request a key for the first time.

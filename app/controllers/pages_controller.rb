@@ -115,7 +115,7 @@ class PagesController < ApplicationController
     @using_fallback = requested_translation.nil? && (fallback_translation.present? || english_translation.present?)
     @og_url = request.original_url
   end
-  
+
   def contact
   end
   

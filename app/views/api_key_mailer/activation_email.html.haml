@@ -1,0 +1,14 @@
+%p= t('developer.authentication.activation_email_intro_html')
+
+%p
+  %strong= t('developer.authentication.activation_email_key_label')
+%pre= @raw_key
+
+%p= t('developer.authentication.activation_email_instructions_html')
+
+%p
+  %a{ href: @activation_url, style: 'display:inline-block;padding:10px 16px;background-color:#007bff;color:#ffffff;text-decoration:none;border-radius:4px;' }
+    = t('developer.authentication.activation_email_button')
+
+%p.small= t('developer.authentication.activation_email_link_expiry_html')
+

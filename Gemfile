@@ -37,6 +37,7 @@ gem 'sidekiq', '~> 6.5'
 gem 'sidekiq-unique-jobs', '~> 7.1'
 
 gem 'rack-cors', require: 'rack/cors'
+gem 'rack-attack'
 
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.1.0', require: false
