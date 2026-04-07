@@ -3,51 +3,6 @@ module GlobalSymbols
     version 'v1', using: :path, vendor: 'globalsymbols'
     format :json
 
-    # Require valid API key for public v1 endpoints, but allow the legacy OAuth-backed
-    # user endpoint to continue accepting bearer tokens.
-    before do
-      next if skip_api_key_authentication?
-      authenticate!
-      current_api_key.touch(:last_used_at)
-    end
-
-    # Helpers are available to mounted endpoints
-    helpers do
-      def skip_api_key_authentication?
-        path = env['PATH_INFO'].to_s
-        path.include?('swagger_doc') || path.match?(%r{\A/api/v1/user/?\z})
-      end
-
-      def api_key_from_request
-        auth = env['HTTP_AUTHORIZATION'].to_s.strip
-        if auth.match(/\AApiKey\s+/i)
-          auth.sub(/\AApiKey\s+/i, '').strip.presence
-        elsif auth.present?
-          # Accept raw key in Authorization (e.g. from Swagger UI when user pastes key only)
-          auth.presence
-        else
-          env['HTTP_X_API_KEY'].to_s.strip.presence
-        end
-      end
-
-      def current_api_key
-        return @current_api_key if defined?(@current_api_key)
-        raw = api_key_from_request
-        @current_api_key = raw.present? ? APIKey.for_lookup(raw) : nil
-      end
-
-      def authenticate!
-        unless current_api_key
-          error!(
-            { error: 'A valid, active API key is required. Provide it in the Authorization header as "ApiKey <key>" or in the X-Api-Key header.',
-              code: 401,
-              with: V1::Entities::Error },
-            401
-          )
-        end
-      end
-    end
-    
     # Automatically present 404s when ActiveRecord cannot find records.
     rescue_from ActiveRecord::RecordNotFound do |e|
       # Prepare the error message.
@@ -72,16 +27,7 @@ module GlobalSymbols
       doc_version: version,
       info: {
         title: 'Global Symbols API Version 1',
-        description: 'All endpoints require a valid, active API key. Send it in the Authorization header as "ApiKey <your_key>" or in the X-Api-Key header. Returns 401 if missing or invalid.'
-      },
-      security_definitions: {
-        api_key: {
-          type: :apiKey,
-          in: :header,
-          name: 'Authorization',
-          description: 'API key. Example: "ApiKey your_key_here". Alternatively use header X-Api-Key.'
-        }
-      },
-      security: [{ api_key: [] }]
+        description: 'Public endpoints are available without an API key. Endpoints that use OAuth declare their own bearer-token requirements.'
+      }
   end
 end
