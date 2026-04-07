@@ -3,15 +3,21 @@ module GlobalSymbols
     version 'v1', using: :path, vendor: 'globalsymbols'
     format :json
 
-    # Require valid API key for all v1 endpoints (except Swagger doc so /api/docs can load)
+    # Require valid API key for public v1 endpoints, but allow the legacy OAuth-backed
+    # user endpoint to continue accepting bearer tokens.
     before do
-      next if env['PATH_INFO'].to_s.include?('swagger_doc')
+      next if skip_api_key_authentication?
       authenticate!
       current_api_key.touch(:last_used_at)
     end
 
     # Helpers are available to mounted endpoints
     helpers do
+      def skip_api_key_authentication?
+        path = env['PATH_INFO'].to_s
+        path.include?('swagger_doc') || path.match?(%r{\A/api/v1/user/?\z})
+      end
+
       def api_key_from_request
         auth = env['HTTP_AUTHORIZATION'].to_s.strip
         if auth.match(/\AApiKey\s+/i)
