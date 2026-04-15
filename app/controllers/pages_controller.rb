@@ -16,7 +16,8 @@ class PagesController < ApplicationController
     @search = search_params
     
     search_locale = locale.to_s.split('_').first # Serbian locales can be sr_Latn, so we take just the first letters
-    @language = Language.find_by(iso639_3: @search[:language]) || Language.find_by(iso639_1: search_locale)
+    search_languages = Language.unscoped.living_and_constructed
+    @language = search_languages.find_by(iso639_3: @search[:language]) || search_languages.find_by(iso639_1: search_locale)
     @search[:language] = @language.iso639_3
     
     # If a blank query was specified, stop here.
@@ -25,7 +26,8 @@ class PagesController < ApplicationController
       return
     end
     
-    @labels = Label.authoritative.accessible_by(current_ability)
+    @labels = Label.unscoped.authoritative.accessible_by(current_ability)
+                   .joins(:picto)
                    .includes(picto: [:images, :symbolset])
                    .where(
                      language_id: @language.id,
