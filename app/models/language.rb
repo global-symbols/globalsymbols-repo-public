@@ -9,6 +9,9 @@ class Language < ApplicationRecord
   validates_uniqueness_of :name, :iso639_3
   validates_presence_of :name, :iso639_3, :scope, :category
   
+  scope :living_and_constructed, -> { where(category: ['L', 'C']) }
+  scope :preferred_name_order, -> { order(Arel.sql('IF(FIELD(`name`,\'English\')=0,1,0)')).order(:name) }
+
   # Default scope is Living and Constructed Languages, ORDERing with English first, then alphabetically by name
   default_scope { where(category: ['L', 'C']).order(Arel.sql('IF(FIELD(`name`,\'English\')=0,1,0)')).order(:name) }
   

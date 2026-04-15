@@ -13,7 +13,7 @@ module GlobalSymbols
       params do
         requires :query, type: String, desc: 'Label name to search for.'
         optional :symbolset, type: String, desc: 'Slug of a Symbolset to search within, as it appears in URLs on globalsymbols.com. Leave blank to search all Symbolsets.', values: -> { Symbolset.published.pluck(:slug) }
-        optional :language, type: String, desc: 'ISO639 language code. Two-letter codes are ISO639-1. Use the Languages endpoint to find values.', default: 'eng', values: -> { Language.where(active: true).pluck(:iso639_3, :iso639_2b, :iso639_2t, :iso639_1).flatten.uniq.reject {|l| l.nil?}.sort }
+        optional :language, type: String, desc: 'ISO639 language code. Two-letter codes are ISO639-1. Use the Languages endpoint to find values.', default: 'eng', values: -> { Language.unscoped.living_and_constructed.where(active: true).pluck(:iso639_3, :iso639_2b, :iso639_2t, :iso639_1).flatten.uniq.reject {|l| l.nil?}.sort }
         optional :language_iso_format, type: String, desc: 'ISO639 format to use for the language parameter.', default: '639-3', values: ['639-1', '639-2b', '639-2t', '639-3']
         optional  :limit, type: Integer, desc: 'Limit the number of search results.', default: 10, values: (1..100).to_a
         use :expand
@@ -22,6 +22,7 @@ module GlobalSymbols
         query = params[:query].strip
         
         language_code_column = params[:language_iso_format].underscore
+        language = Language.unscoped.living_and_constructed.find_by!("iso#{language_code_column}": params[:language])
         
         # Using Arel to build the case/when for prioritisation of results.
         # This prioritises by whole word first, then beginning of word, then in-word.
@@ -37,9 +38,8 @@ module GlobalSymbols
          .when(label_text_field.matches("%#{query}"))   .then(50) # "fatcat"
          .else(60) # no match
         
-        labels = Label.authoritative.where("text LIKE ?", "%#{query}%")
-                      .joins(:language)
-                      .where(languages: { "iso#{language_code_column}": params[:language] })
+        labels = Label.unscoped.authoritative.where("text LIKE ?", "%#{query}%")
+                      .where(language_id: language.id)
                       .joins(picto: :symbolset)
                       .where(
                         pictos: {

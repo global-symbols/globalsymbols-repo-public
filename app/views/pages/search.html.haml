@@ -9,7 +9,7 @@
             .col-md-3
               = f.text_field :query, wrapper: { class: 'mb-0'}, label: t('views.pages.search.search_for'), value: @search[:query], required: true
             .col-md-3.col-6
-              = f.collection_select :language, Language.where(active: true), :iso639_3, Proc.new {|record| t("languages.#{record.iso639_1_or_3_code}") }, {selected: @search[:language], label: t('activerecord.models.language')}, {class: 'mr-2'}
+              = f.collection_select :language, Language.unscoped.living_and_constructed.preferred_name_order.where(active: true), :iso639_3, Proc.new {|record| t("languages.#{record.iso639_1_or_3_code}") }, {selected: @search[:language], label: t('activerecord.models.language')}, {class: 'mr-2'}
             .col-md-3.col-6
               = f.collection_select :symbolset, @symbolsets, :slug, :name, {selected: @search[:symbolset], include_blank: t('views.pages.search.symbolset_dropdown_any_symbol_set'), label: t('activerecord.models.symbolset')}
             .col-md-3.mt-2rem
