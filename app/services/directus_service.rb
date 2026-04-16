@@ -188,7 +188,11 @@ class DirectusService
     #
     # @return [void]
     def clear_cache!
+      language_config_present_before = Rails.cache.read(LanguageConfigurationService::CACHE_KEY).present?
+      Rails.logger.warn("Clearing all Directus cache entries under '#{CACHE_NAMESPACE}*' (language_config_present_before=#{language_config_present_before})")
       Rails.cache.delete_matched("#{CACHE_NAMESPACE}*")
+      language_config_present_after = Rails.cache.read(LanguageConfigurationService::CACHE_KEY).present?
+      Rails.logger.warn("Completed clearing Directus cache entries under '#{CACHE_NAMESPACE}*' (language_config_present_after=#{language_config_present_after})")
     end
 
     # Invalidates cached data for a specific collection.
