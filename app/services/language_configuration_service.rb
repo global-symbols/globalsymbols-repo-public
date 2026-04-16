@@ -26,7 +26,11 @@ class LanguageConfigurationService
       end
 
       Rails.cache.fetch(CACHE_KEY) do
-        self.fetch_from_directus
+        Rails.logger.warn("Language config cache miss for '#{CACHE_KEY}', fetching from Directus")
+        fetched_config = self.fetch_from_directus
+        locale_count = Array(fetched_config['available_locales']).length
+        Rails.logger.info("Language config cache populated for '#{CACHE_KEY}' with #{locale_count} locales")
+        fetched_config
       end
     rescue => e
       Rails.logger.error("Failed to fetch language configuration: #{e.message}")
@@ -34,9 +38,13 @@ class LanguageConfigurationService
     end
 
     def invalidate_cache!
+      cache_present_before = Rails.cache.read(CACHE_KEY).present?
+      Rails.logger.warn("Invalidating language configuration cache '#{CACHE_KEY}' (present_before=#{cache_present_before})")
       Rails.cache.delete(CACHE_KEY)
       # Also clear any Directus API caches that might be interfering
       Rails.cache.delete_matched("directus/*")
+      cache_present_after = Rails.cache.read(CACHE_KEY).present?
+      Rails.logger.warn("Language configuration cache invalidation finished for '#{CACHE_KEY}' (present_after=#{cache_present_after})")
     end
 
     def refresh!
@@ -86,12 +94,20 @@ class LanguageConfigurationService
         return false
       end
 
+      cache_present_before = Rails.cache.read(CACHE_KEY).present?
+      Rails.logger.info("Language config update starting with cache_present_before=#{cache_present_before}")
+
       # Invalidate cache and get fresh config by bypassing all caching
       invalidate_cache!
       language_config = fetch_fresh_config
+      locale_count = Array(language_config['available_locales']).length
+      mapping_count = language_config['directus_mapping'].to_h.length
+      Rails.logger.info("Fetched fresh language configuration with #{locale_count} locales and #{mapping_count} mappings")
 
       # Write the fresh config to cache so future calls to config() will use it
       Rails.cache.write(CACHE_KEY, language_config)
+      cache_present_after_write = Rails.cache.read(CACHE_KEY).present?
+      Rails.logger.info("Language configuration cache write completed for '#{CACHE_KEY}' (present_after_write=#{cache_present_after_write})")
 
       # Update LanguageConfig module if available
       if defined?(LanguageConfig)
@@ -169,6 +185,7 @@ class LanguageConfigurationService
       }
   rescue DirectusError => e
     Rails.logger.error("Failed to fetch language configuration from Directus: #{e.message}")
+    Rails.logger.warn("Returning default language configuration from Directus fetch")
     default_config
   end
 end

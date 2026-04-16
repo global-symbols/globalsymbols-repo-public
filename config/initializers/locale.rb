@@ -57,7 +57,7 @@ if Rails.env.development?
     Rails.logger.warn("Using minimal fallback language configuration")
   end
 else
-  # Production: Load from cache first, then refresh in background if needed
+  # Production: load from cache first, then self-heal on cache miss
   begin
     # Try to load from cache synchronously (fast)
     cached_config = Rails.cache.read(LanguageConfigurationService::CACHE_KEY)
@@ -69,7 +69,13 @@ else
       I18n.available_locales = LanguageConfig.available_locales
       Rails.logger.info("Language configuration loaded from cache: #{I18n.available_locales.inspect}")
     else
-      Rails.logger.warn("No cached language configuration found - using fallback. Run deployment script to populate cache.")
+      Rails.logger.warn("No cached language configuration found in production, attempting Directus refresh")
+
+      if LanguageConfigurationService.update_live_config
+        Rails.logger.info("Language configuration refreshed during boot: #{I18n.available_locales.inspect}")
+      else
+        Rails.logger.warn("Language refresh during boot failed, using minimal fallback language configuration")
+      end
     end
   rescue => e
     Rails.logger.error("Failed to load cached language configuration: #{e.message}")
