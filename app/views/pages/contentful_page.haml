@@ -21,6 +21,6 @@
           - if translation['content'].present?
             - content = translation['content'].to_s
             - if content.lstrip.start_with?('<')
-              = sanitize(content, tags: %w[section h1 h2 h3 h4 h5 h6 p br ul ol li a strong em code pre span div], attributes: %w[href target rel class style])
+              = sanitize(content, tags: %w[section h1 h2 h3 h4 h5 h6 p br ul ol li a strong em code pre span div img], attributes: %w[href target rel class style src alt width height loading decoding])
             - else
               = redcarpet(NewsArticleRenderer).render(content).html_safe
