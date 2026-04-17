@@ -107,18 +107,18 @@ Rails.application.routes.draw do
 
   get :developer, controller: :pages, action: :contentful_page, id: :developer
 
-  # TEMPORARILY DISABLED:
-  # resources :knowledge_base, path: 'knowledge-base', only: [:index, :show] do
-  #   collection do
-  #     get :search
-  #   end
-  # end
+  # CONTENTFUL KNOWLEDGE BASE (ACTIVE):
+  resources :knowledge_base, path: 'knowledge-base', only: [:index, :show] do
+    collection do
+      get :search
+    end
+  end
   #
-  # TEMPORARY "COMING SOON" PAGE:
-  get '/knowledge-base', to: 'coming_soon#knowledge_base', as: :knowledge_base_index
-  get '/knowledge-base/search', to: 'coming_soon#knowledge_base', as: :search_knowledge_base_index
-  get '/knowledge-base/:id', to: 'coming_soon#knowledge_base', as: :knowledge_base
-  get '/knowledge-base/*path', to: 'coming_soon#knowledge_base'
+  # TEMPORARY "COMING SOON" ROUTES (DISABLED, KEEP FOR QUICK ROLLBACK):
+  # get '/knowledge-base', to: 'coming_soon#knowledge_base', as: :knowledge_base_index
+  # get '/knowledge-base/search', to: 'coming_soon#knowledge_base', as: :search_knowledge_base_index
+  # get '/knowledge-base/:id', to: 'coming_soon#knowledge_base', as: :knowledge_base
+  # get '/knowledge-base/*path', to: 'coming_soon#knowledge_base'
 
   get 'uploads/:environment/image/imagefile/:id/:hash', controller: :images, action: :show
 
