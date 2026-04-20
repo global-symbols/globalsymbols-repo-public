@@ -15,6 +15,7 @@ module BoardBuilder
   end
 
   class BoardToPdf
+    REDIRECT_STATUSES = [301, 302, 303, 307, 308].freeze
 
     # AddFillOpacityToImages: Fixes images produced by FabricJS (Symbol Creator)
     # RemoveEditorNamespace:  Seems like a good idea. Not required.
@@ -155,10 +156,12 @@ module BoardBuilder
                   header_image = nil
                   begin
                     Timeout.timeout(12) do  # Wrap Faraday call in additional timeout
-                      header_image = Faraday.get(URI.encode(header_image_url)) do |req|
-                        req.options.timeout = 8        # 8 second timeout for header images
-                        req.options.open_timeout = 3    # 3 second connection timeout
-                      end
+                      header_image = fetch_response_with_redirects(
+                        :get,
+                        header_image_url,
+                        timeout: 8,
+                        open_timeout: 3
+                      )
                     end
                   rescue Timeout::Error => e
                     Rails.logger.warn("Timeout error loading header image for board #{board.id}: #{e.message}")
@@ -376,10 +379,12 @@ module BoardBuilder
                         # Pre-flight check: HEAD request to verify image exists
                         head_response = nil
                         Timeout.timeout(3) do
-                          head_response = Faraday.head(URI.encode(resolved_image_url)) do |req|
-                            req.options.timeout = 2
-                            req.options.open_timeout = 1
-                          end
+                          head_response = fetch_response_with_redirects(
+                            :head,
+                            resolved_image_url,
+                            timeout: 2,
+                            open_timeout: 1
+                          )
                         end
 
                         if head_response.status >= 400
@@ -388,10 +393,12 @@ module BoardBuilder
                         end
 
                         Timeout.timeout(8) do  # Wrap Faraday call in additional timeout
-                          image = Faraday.get(URI.encode(resolved_image_url)) do |req|
-                            req.options.timeout = 5        # 5 second timeout for cell images
-                            req.options.open_timeout = 2    # 2 second connection timeout
-                          end
+                          image = fetch_response_with_redirects(
+                            :get,
+                            resolved_image_url,
+                            timeout: 5,
+                            open_timeout: 2
+                          )
                         end
                       rescue Timeout::Error => e
                         Rails.logger.warn("Timeout error loading image for cell #{cell.id}: #{e.message}")
@@ -529,6 +536,34 @@ module BoardBuilder
 
       # Return original URL if it doesn't match our patterns
       image_url
+    end
+
+    def self.fetch_response_with_redirects(method, url, timeout:, open_timeout:, limit: 3)
+      raise Faraday::Error, "Too many redirects fetching #{url}" if limit.negative?
+
+      response = Faraday.run_request(method, URI.encode(url), nil, nil) do |req|
+        req.options.timeout = timeout
+        req.options.open_timeout = open_timeout
+      end
+
+      return response unless REDIRECT_STATUSES.include?(response.status)
+
+      location = response.headers['location']
+      raise Faraday::Error, "Redirect response missing location for #{url}" if location.blank?
+
+      fetch_response_with_redirects(
+        method,
+        resolve_redirect_url(url, location),
+        timeout: timeout,
+        open_timeout: open_timeout,
+        limit: limit - 1
+      )
+    end
+
+    def self.resolve_redirect_url(url, location)
+      URI.join(url, location).to_s
+    rescue URI::InvalidURIError
+      location
     end
 
     # Copied and adapted from Prawn's own calc_image_dimensions
