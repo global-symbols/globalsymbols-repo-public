@@ -269,8 +269,17 @@ class DirectusService
       Rails.cache.fetch(cache_key, expires_in: cache_ttl) do
         url = "#{DIRECTUS_URL}/#{path}"
         url = "#{url}?#{params.to_query}" if params.present?
+        started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
         Rails.logger.info("Directus API Request: #{method.upcase} #{url}")
+        log_outbound_http_event(
+          event: 'outbound_http_start',
+          service: 'directus',
+          method: method.to_s.upcase,
+          url: url,
+          path: path,
+          pid: Process.pid
+        )
 
         begin
           response = faraday_connection.send(method) do |req|
@@ -278,14 +287,50 @@ class DirectusService
             req.params.merge!(params) if params.present?
           end
 
-      Rails.logger.info("Directus API Response: #{response.status}")
-      handle_response(response)
+          duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000).round
+          log_outbound_http_event(
+            event: 'outbound_http_finish',
+            service: 'directus',
+            method: method.to_s.upcase,
+            url: url,
+            path: path,
+            status: response.status,
+            duration_ms: duration_ms,
+            pid: Process.pid
+          )
+
+          Rails.logger.info("Directus API Response: #{response.status}")
+          handle_response(response)
         rescue Faraday::ConnectionFailed => e
+          duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000).round
+          log_outbound_http_event(
+            event: 'outbound_http_error',
+            service: 'directus',
+            method: method.to_s.upcase,
+            url: url,
+            path: path,
+            duration_ms: duration_ms,
+            error_class: e.class.name,
+            error_message: e.message,
+            pid: Process.pid
+          )
           Rails.logger.error("Directus API Connection Failed: #{e.message}")
           Rails.logger.error("Directus URL: #{DIRECTUS_URL}")
           Rails.logger.error("Full error: #{e.backtrace.join("\n")}")
           raise DirectusError.new("Failed to connect to Directus API: #{e.message}")
         rescue => e
+          duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000).round
+          log_outbound_http_event(
+            event: 'outbound_http_error',
+            service: 'directus',
+            method: method.to_s.upcase,
+            url: url,
+            path: path,
+            duration_ms: duration_ms,
+            error_class: e.class.name,
+            error_message: e.message,
+            pid: Process.pid
+          )
           Rails.logger.error("Directus API Error: #{e.message}")
           raise DirectusError.new("Directus API request failed: #{e.message}")
         end
@@ -407,6 +452,16 @@ class DirectusService
       translations = item['translations'] || []
       default_translation = translations.find { |t| t['gs_languages_code'] == DIRECTUS_DEFAULT_LANGUAGE.call }
       default_translation&.dig('title') || item['title']
+    end
+
+    def log_outbound_http_event(payload)
+      outbound_http_logger.info(payload)
+    rescue => e
+      Rails.logger.warn("Failed to write outbound HTTP log: #{e.class} #{e.message}")
+    end
+
+    def outbound_http_logger
+      Rails.configuration.x.outbound_http_logger || Rails.logger
     end
   end
 end
