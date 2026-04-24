@@ -16,6 +16,44 @@ module BoardBuilder
       helpers do
         include SharedHelpers  # If needed, matching board_sets.rb
 
+        def outbound_http_logger
+          Rails.configuration.x.outbound_http_logger || Rails.logger
+        end
+
+        def log_outbound_http_event(payload)
+          outbound_http_logger.info(payload.merge(pid: Process.pid))
+        rescue => e
+          Rails.logger.warn("[AI] Failed to write outbound HTTP log: #{e.class} #{e.message}")
+        end
+
+        def with_outbound_http_logging(service:, method:, url:)
+          started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+          log_outbound_http_event(event: 'outbound_http_start', service: service, method: method, url: url)
+          response = yield
+          duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000).round
+          log_outbound_http_event(
+            event: 'outbound_http_finish',
+            service: service,
+            method: method,
+            url: url,
+            status: response.status,
+            duration_ms: duration_ms
+          )
+          response
+        rescue => e
+          duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000).round
+          log_outbound_http_event(
+            event: 'outbound_http_error',
+            service: service,
+            method: method,
+            url: url,
+            duration_ms: duration_ms,
+            error_class: e.class.name,
+            error_message: e.message
+          )
+          raise
+        end
+
         # Helper method for fetching IP country from ipapi.co
         def fetch_ip_country(client_ip = nil)
           return nil if client_ip.blank?
@@ -23,10 +61,13 @@ module BoardBuilder
           begin
             Rails.logger.info("[AI Analytics] Fetching country for IP: #{client_ip}")
 
-            response = Faraday.get("https://ipapi.co/#{client_ip}/json/") do |req|
-              req.headers['Accept'] = 'application/json'
-              req.options.timeout = 10        # Total timeout for the request
-              req.options.open_timeout = 6   # Timeout for establishing connection
+            ipapi_url = "https://ipapi.co/#{client_ip}/json/"
+            response = with_outbound_http_logging(service: 'ai_ipapi_country_lookup', method: 'GET', url: ipapi_url) do
+              Faraday.get(ipapi_url) do |req|
+                req.headers['Accept'] = 'application/json'
+                req.options.timeout = 10        # Total timeout for the request
+                req.options.open_timeout = 6   # Timeout for establishing connection
+              end
             end
 
             if response.success?
@@ -70,24 +111,30 @@ module BoardBuilder
             faraday.options.open_timeout = 10
           end
 
-          response = case method
-          when :post
-            conn.post do |req|
-              req.url "/items/#{endpoint}"
-              req.headers['Content-Type'] = 'application/json'
-              req.headers['Authorization'] = "Bearer #{directus_token}"
-              req.body = body.to_json
-            end
-          when :patch
-            conn.patch do |req|
-              req.url "/items/#{endpoint}"
-              req.headers['Content-Type'] = 'application/json'
-              req.headers['Authorization'] = "Bearer #{directus_token}"
-              req.body = body.to_json
-            end
-          else
-            raise "Unsupported HTTP method: #{method}"
-          end
+            directus_request_path = "/items/#{endpoint}"
+            directus_request_url = "#{directus_url}#{directus_request_path}"
+            response = case method
+                       when :post
+                         with_outbound_http_logging(service: 'ai_directus', method: 'POST', url: directus_request_url) do
+                           conn.post do |req|
+                             req.url directus_request_path
+                             req.headers['Content-Type'] = 'application/json'
+                             req.headers['Authorization'] = "Bearer #{directus_token}"
+                             req.body = body.to_json
+                           end
+                         end
+                       when :patch
+                         with_outbound_http_logging(service: 'ai_directus', method: 'PATCH', url: directus_request_url) do
+                           conn.patch do |req|
+                             req.url directus_request_path
+                             req.headers['Content-Type'] = 'application/json'
+                             req.headers['Authorization'] = "Bearer #{directus_token}"
+                             req.body = body.to_json
+                           end
+                         end
+                       else
+                         raise "Unsupported HTTP method: #{method}"
+                       end
 
           Rails.logger.info("[#{log_prefix}] Directus response status: #{response.status}")
 
@@ -196,15 +243,18 @@ module BoardBuilder
             masked_headers = { 'x-api-key' => '[MASKED]', 'Content-Type' => 'application/json', 'X-Response-Mode' => 'async' }
             Rails.logger.info("[AI] → Request url=#{azure_base}/generate-image headers=#{masked_headers} body=#{sanitized_body}")
 
-            response = Faraday.post(
-              "#{azure_base}/generate-image",
-              body.to_json,
-              'x-api-key' => azure_key,
-              'Content-Type' => 'application/json',
-              'X-Response-Mode' => 'async'
-            ) do |req|
-              req.options.timeout = 10  # Short timeout for initial request
-              req.options.open_timeout = 5
+            generate_image_url = "#{azure_base}/generate-image"
+            response = with_outbound_http_logging(service: 'ai_generate_image', method: 'POST', url: generate_image_url) do
+              Faraday.post(
+                generate_image_url,
+                body.to_json,
+                'x-api-key' => azure_key,
+                'Content-Type' => 'application/json',
+                'X-Response-Mode' => 'async'
+              ) do |req|
+                req.options.timeout = 10  # Short timeout for initial request
+                req.options.open_timeout = 5
+              end
             end
 
             Rails.logger.info("[AI] ← Response status=#{response.status} success=#{response.success?} content_type=#{response.headers['content-type']} body_len=#{response.body&.length}")
@@ -256,13 +306,16 @@ module BoardBuilder
                   sleep(poll_interval)
                   poll_count += 1
                   
-                  job_status_response = Faraday.get(
-                    "#{azure_base}/job-status/#{job_id}",
-                    {},
-                    'x-api-key' => azure_key
-                  ) do |req|
-                    req.options.timeout = 5
-                    req.options.open_timeout = 2
+                  job_status_url = "#{azure_base}/job-status/#{job_id}"
+                  job_status_response = with_outbound_http_logging(service: 'ai_job_status_poll', method: 'GET', url: job_status_url) do
+                    Faraday.get(
+                      job_status_url,
+                      {},
+                      'x-api-key' => azure_key
+                    ) do |req|
+                      req.options.timeout = 5
+                      req.options.open_timeout = 2
+                    end
                   end
                   
                   if job_status_response.success?
@@ -379,13 +432,16 @@ module BoardBuilder
           end
           
           begin
-            job_status_response = Faraday.get(
-              "#{azure_base}/job-status/#{params[:job_id]}",
-              {},
-              'x-api-key' => azure_key
-            ) do |req|
-              req.options.timeout = 5
-              req.options.open_timeout = 2
+            job_status_url = "#{azure_base}/job-status/#{params[:job_id]}"
+            job_status_response = with_outbound_http_logging(service: 'ai_job_status_endpoint', method: 'GET', url: job_status_url) do
+              Faraday.get(
+                job_status_url,
+                {},
+                'x-api-key' => azure_key
+              ) do |req|
+                req.options.timeout = 5
+                req.options.open_timeout = 2
+              end
             end
             
             if job_status_response.success?
@@ -480,14 +536,17 @@ module BoardBuilder
             masked_headers = { 'x-api-key' => '[MASKED]', 'Content-Type' => 'application/json' }
             Rails.logger.info("[AI] → Request url=#{azure_base}/remove-background headers=#{masked_headers} image_url=#{params[:image_url]}")
 
-            response = Faraday.post(
-              "#{azure_base}/remove-background",
-              payload,
-              'x-api-key' => azure_key,
-              'Content-Type' => 'application/json'
-            ) do |req|
-              req.options.timeout = 65
-              req.options.open_timeout = 5
+            remove_bg_url = "#{azure_base}/remove-background"
+            response = with_outbound_http_logging(service: 'ai_remove_background', method: 'POST', url: remove_bg_url) do
+              Faraday.post(
+                remove_bg_url,
+                payload,
+                'x-api-key' => azure_key,
+                'Content-Type' => 'application/json'
+              ) do |req|
+                req.options.timeout = 65
+                req.options.open_timeout = 5
+              end
             end
 
             Rails.logger.info("[AI] ← Response status=#{response.status} success=#{response.success?} content_type=#{response.headers['content-type']} body_len=#{response.body&.length}")

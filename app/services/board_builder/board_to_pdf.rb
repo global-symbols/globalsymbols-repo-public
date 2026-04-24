@@ -541,10 +541,33 @@ module BoardBuilder
     def self.fetch_response_with_redirects(method, url, timeout:, open_timeout:, limit: 3)
       raise Faraday::Error, "Too many redirects fetching #{url}" if limit.negative?
 
-      response = Faraday.run_request(method, URI.encode(url), nil, nil) do |req|
+      started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      encoded_url = URI.encode(url)
+      log_outbound_http_event(
+        event: 'outbound_http_start',
+        service: 'board_pdf',
+        method: method.to_s.upcase,
+        url: url,
+        timeout: timeout,
+        open_timeout: open_timeout,
+        pid: Process.pid
+      )
+
+      response = Faraday.run_request(method, encoded_url, nil, nil) do |req|
         req.options.timeout = timeout
         req.options.open_timeout = open_timeout
       end
+
+      duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000).round
+      log_outbound_http_event(
+        event: 'outbound_http_finish',
+        service: 'board_pdf',
+        method: method.to_s.upcase,
+        url: url,
+        status: response.status,
+        duration_ms: duration_ms,
+        pid: Process.pid
+      )
 
       return response unless REDIRECT_STATUSES.include?(response.status)
 
@@ -558,6 +581,19 @@ module BoardBuilder
         open_timeout: open_timeout,
         limit: limit - 1
       )
+    rescue => e
+      duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000).round
+      log_outbound_http_event(
+        event: 'outbound_http_error',
+        service: 'board_pdf',
+        method: method.to_s.upcase,
+        url: url,
+        duration_ms: duration_ms,
+        error_class: e.class.name,
+        error_message: e.message,
+        pid: Process.pid
+      )
+      raise
     end
 
     def self.resolve_redirect_url(url, location)
@@ -583,6 +619,16 @@ module BoardBuilder
       end
 
       [w, h]
+    end
+
+    def self.log_outbound_http_event(payload)
+      outbound_http_logger.info(payload)
+    rescue => e
+      Rails.logger.warn("Failed to write outbound HTTP log: #{e.class} #{e.message}")
+    end
+
+    def self.outbound_http_logger
+      Rails.configuration.x.outbound_http_logger || Rails.logger
     end
   end
 end
