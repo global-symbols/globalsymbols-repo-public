@@ -154,19 +154,12 @@ module BoardBuilder
                   header_image_url = BoardBuilder::BoardToPdf.resolve_image_url(board.header_media.file.url)
                   header_image_start = Time.now
                   header_image = nil
-                  begin
-                    Timeout.timeout(12) do  # Wrap Faraday call in additional timeout
-                      header_image = BoardBuilder::BoardToPdf.fetch_response_with_redirects(
-                        :get,
-                        header_image_url,
-                        timeout: 8,
-                        open_timeout: 3
-                      )
-                    end
-                  rescue Timeout::Error => e
-                    Rails.logger.warn("Timeout error loading header image for board #{board.id}: #{e.message}")
-                    raise Faraday::TimeoutError.new(e.message)
-                  end
+                  header_image = BoardBuilder::BoardToPdf.fetch_response_with_redirects(
+                    :get,
+                    header_image_url,
+                    timeout: 8,
+                    open_timeout: 3
+                  )
                   header_image_load_time = Time.now - header_image_start
                   image_load_count += 1
 
@@ -377,32 +370,24 @@ module BoardBuilder
                       image = nil
                       begin
                         # Pre-flight check: HEAD request to verify image exists
-                        head_response = nil
-                        Timeout.timeout(3) do
-                          head_response = BoardBuilder::BoardToPdf.fetch_response_with_redirects(
-                            :head,
-                            resolved_image_url,
-                            timeout: 2,
-                            open_timeout: 1
-                          )
-                        end
+                        head_response = BoardBuilder::BoardToPdf.fetch_response_with_redirects(
+                          :head,
+                          resolved_image_url,
+                          timeout: 2,
+                          open_timeout: 1
+                        )
 
                         if head_response.status >= 400
                           Rails.logger.warn("Image not found (#{head_response.status}): #{resolved_image_url}")
                           raise Faraday::ResourceNotFound.new("HTTP #{head_response.status}")
                         end
 
-                        Timeout.timeout(8) do  # Wrap Faraday call in additional timeout
-                          image = BoardBuilder::BoardToPdf.fetch_response_with_redirects(
-                            :get,
-                            resolved_image_url,
-                            timeout: 5,
-                            open_timeout: 2
-                          )
-                        end
-                      rescue Timeout::Error => e
-                        Rails.logger.warn("Timeout error loading image for cell #{cell.id}: #{e.message}")
-                        raise Faraday::TimeoutError.new(e.message)
+                        image = BoardBuilder::BoardToPdf.fetch_response_with_redirects(
+                          :get,
+                          resolved_image_url,
+                          timeout: 5,
+                          open_timeout: 2
+                        )
                       end
                       cell_image_load_time = Time.now - cell_image_start
                       image_load_count += 1
