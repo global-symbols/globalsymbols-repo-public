@@ -15,7 +15,7 @@ module BoardBuilder
         results = []
         if params[:source] === 'the-noun-project'
           consumer = OAuth::Consumer.new(NOUN_PROJECT_API_KEY, NOUN_PROJECT_API_SECRET, site: "https://api.thenounproject.com")
-          response = consumer.request(:get, "https://api.thenounproject.com/icons/#{URI.encode(params[:query])}", nil, {}, {})
+          response = consumer.request(:get, "https://api.thenounproject.com/icons/#{CGI.escape(params[:query])}", nil, {}, {})
 
           # TNP returns 404 when no symbols are found, instead of an empty set.
           # Only populate results if the response is 200

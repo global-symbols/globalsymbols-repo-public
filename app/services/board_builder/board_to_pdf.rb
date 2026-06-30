@@ -527,7 +527,7 @@ module BoardBuilder
       raise Faraday::Error, "Too many redirects fetching #{url}" if limit.negative?
 
       started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-      encoded_url = URI.encode(url)
+      encoded_url = URI::DEFAULT_PARSER.escape(url)
       log_outbound_http_event(
         event: 'outbound_http_start',
         service: 'board_pdf',

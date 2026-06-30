@@ -1,0 +1,12 @@
+.git
+.gitignore
+log/*
+tmp/*
+local_docs/*
+local_rails_upgrade/*
+public/uploads/*
+public/public/*
+node_modules
+.byebug_history
+*.md
+.idea

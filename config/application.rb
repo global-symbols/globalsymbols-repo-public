@@ -8,6 +8,18 @@ Bundler.require(*Rails.groups)
 
 module GlobalsymbolsRepo
   class Application < Rails::Application
+    # Ruby 3.1+ disables YAML aliases by default; Rails 6.1 database.yml uses anchors.
+    # Remove once on Rails 7.1+.
+    ActiveSupport::ConfigurationFile.class_eval do
+      def parse(context: nil, **options)
+        YAML.load(render(context), aliases: true, **options) || {}
+      rescue Psych::SyntaxError => error
+        raise "YAML syntax error occurred while parsing #{@content_path}. " \
+              "Please note that YAML must be consistently indented using spaces. Tabs are not allowed. " \
+              "Error: #{error.message}"
+      end
+    end
+
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 6.0
 
