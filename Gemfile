@@ -4,12 +4,12 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby '~> 3.2.0'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '6.1.3.2'
+gem 'rails', '~> 7.1.0'
 # Use mysql as the database for Active Record
 #gem 'mysql2', '>= 0.4.4', '< 0.6.0'
 gem 'mysql2', '~> 0.5.6'
 # Use Puma as the app server
-gem 'puma', '~> 5.2.2'
+gem 'puma', '~> 6.4'
 # Use SCSS for stylesheets
 gem 'sass-rails'
 # Use Uglifier as compressor for JavaScript assets
@@ -140,7 +140,7 @@ group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
 
-  gem 'factory_bot_rails', '~> 6.1.0', '>= 4.8.2', require: false
+  gem 'factory_bot_rails', '~> 6.4', require: false
 
   gem 'wdm', '>= 0.1.0' if Gem.win_platform?
 end
@@ -158,6 +158,9 @@ group :development do
 end
 
 group :test do
+  # Minitest 6 breaks Rails 7.1 test runner line filtering (ArgumentError).
+  gem 'minitest', '~> 5.25'
+
   # Adds support for Capybara system testing and selenium driver
   gem 'capybara', '>= 2.15', '< 4.0'
   gem 'selenium-webdriver'
