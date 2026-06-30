@@ -1,6 +1,6 @@
 
 # Ensure Directus configuration is loaded after env.rb in development
-if Rails.env.development? && (DIRECTUS_URL.nil? || DIRECTUS_TOKEN_CMS.nil?)
+if (Rails.env.development? || Rails.env.test?) && (DIRECTUS_URL.nil? || DIRECTUS_TOKEN_CMS.nil?)
   Rails.logger.info("Re-checking Directus configuration after env.rb load...")
 
   # Re-load Directus configuration in case env.rb set the variables

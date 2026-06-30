@@ -48,6 +48,10 @@
 
 /vendor
 
+# Local-only docs and upgrade notes (not committed)
+/local_docs/
+/local_rails_upgrade/
+
 # Ignore Docker-related files
 Dockerfile
 docker-compose.yml

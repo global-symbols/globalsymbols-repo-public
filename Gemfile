@@ -139,13 +139,7 @@ gem 'whenever', require: false
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
- # gem 'rspec-rails'
-gem 'rspec-core', '3.10.1'
-gem 'rspec-expectations', '3.10.1'
-gem 'rspec-mocks', '3.10.2'
-gem 'rspec-rails', '5.0.1'
 
- gem 'rails-controller-testing'
   gem 'factory_bot_rails', '~> 6.1.0', '>= 4.8.2', require: false
 
   gem 'wdm', '>= 0.1.0' if Gem.win_platform?

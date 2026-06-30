@@ -24,14 +24,17 @@ development:
   password: gs-repo-dev
   host: db
 
-# Warning: The database defined as "test" will be erased and
-# re-generated from your development database when you run "rake".
-# Do not set this db to the same as development or production.
+# Test environment uses the local dev database (gs-repo-dev).
+# Data changes roll back per test via transactions.
+# Do NOT run db:test:prepare, db:schema:load, or db:drop with RAILS_ENV=test.
+# Optional backup before a full suite: script/run_tests.sh --backup
 test: &test
   <<: *default
-  database: gs-repo-test
-  username: gs-repo-test
-  password: gs-repo-test
+  database: gs-repo-dev
+  username: gs-repo-dev
+  password: gs-repo-dev
+  host: <%= ENV.fetch('DATABASE_HOST', '127.0.0.1') %>
+  port: <%= ENV.fetch('DATABASE_PORT', '3306') %>
 
 # As with config/secrets.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is

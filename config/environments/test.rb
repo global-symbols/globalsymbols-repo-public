@@ -34,6 +34,11 @@ Rails.application.configure do
   config.active_storage.service = :test
 
   config.action_mailer.perform_caching = false
+  config.action_mailer.default_url_options = {
+    host: 'localhost',
+    port: 3000,
+    protocol: 'http'
+  }
 
   # Tell Action Mailer not to deliver emails to the real world.
   # The :test delivery method accumulates sent emails in the
@@ -45,4 +50,13 @@ Rails.application.configure do
 
   # Raises error for missing translations.
   # config.action_view.raise_on_missing_translations = true
+
+  # Run jobs inline so tests do not enqueue Sidekiq work against the dev database.
+  config.active_job.queue_adapter = :inline
+
+  # Shared dev database: do not purge/reload schema before tests (see database.yml).
+  config.active_record.maintain_test_schema = false
+
+  # Match development: local file storage for uploaders (Board Builder media, etc.).
+  config.uploader_storage = :file
 end

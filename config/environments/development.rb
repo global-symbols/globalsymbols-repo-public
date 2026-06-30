@@ -85,4 +85,7 @@ Rails.application.configure do
 
   config.x.openid_connect_issuer = 'http://localhost:3000'
 
+  # Allow requests from the Docker test container hitting host.docker.internal
+  config.hosts << "host.docker.internal"
+
 end

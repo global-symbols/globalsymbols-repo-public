@@ -31,6 +31,7 @@ class Boardbuilder::Media < ApplicationRecord
   attr_accessor :resize_width, :resize_height
 
   def initialize(attributes = {})
+    attributes ||= {}
     @resize_width = attributes.delete(:resize_width)
     @resize_height = attributes.delete(:resize_height)
     super(attributes)
