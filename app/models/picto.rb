@@ -15,9 +15,9 @@ class Picto < ApplicationRecord
   accepts_nested_attributes_for :images
   accepts_nested_attributes_for :labels
 
-  enum part_of_speech: [:noun, :verb, :adjective, :adverb, :pronoun, :preposition, :conjunction, :interjection, :article, :modifier]
+  enum :part_of_speech, [:noun, :verb, :adjective, :adverb, :pronoun, :preposition, :conjunction, :interjection, :article, :modifier]
 
-  enum visibility: { everybody: 0, collaborators: 1 }
+  enum :visibility, { everybody: 0, collaborators: 1 }
 
   after_initialize :set_defaults, :if => :new_record?
   

@@ -9,7 +9,7 @@ Bundler.require(*Rails.groups)
 module GlobalsymbolsRepo
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 7.1
+    config.load_defaults 8.0
 
     config.allowed_image_extensions = %w[jpg jpeg gif png svg webp].freeze
     config.allowed_image_mimetypes = [/image\/svg\+xml/, 'image/jpeg', 'image/png', 'image/gif', 'image/webp'].freeze

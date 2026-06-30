@@ -14,7 +14,7 @@ class Survey < ApplicationRecord
   validate :status_must_be_draft, on: :create
   validate :related_surveys_have_same_symbolset
   
-  enum status: [:planning, :collecting_feedback, :analysing_results, :archived]
+  enum :status, [:planning, :collecting_feedback, :analysing_results, :archived]
   
   after_initialize :set_defaults, if: :new_record?
 

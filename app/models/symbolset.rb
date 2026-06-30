@@ -21,7 +21,7 @@ class Symbolset < ApplicationRecord
   validate :status_must_be_draft, on: :create
   validate :slug_is_not_a_route
 
-  enum status: { published: 0, draft: 1, ingesting: 2 }
+  enum :status, { published: 0, draft: 1, ingesting: 2 }
   
   after_initialize :set_defaults, if: :new_record?
   

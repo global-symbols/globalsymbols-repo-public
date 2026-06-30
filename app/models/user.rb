@@ -20,7 +20,7 @@ class User < ApplicationRecord
            foreign_key: :resource_owner_id,
            dependent: :delete_all # or :destroy if you need callbacks
 
-  enum role: [:user, :admin]
+  enum :role, [:user, :admin]
   
   validates_presence_of :prename, :surname, :language
 

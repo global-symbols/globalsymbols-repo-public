@@ -8,7 +8,7 @@ class Image < ApplicationRecord
   after_initialize :set_defaults, if: :new_record?
   before_save :set_adaptable, if: :imagefile_changed?
 
-  enum status: { pending: 'pending', converting: 'converting', completed: 'completed', failed: 'failed' }
+  enum :status, { pending: 'pending', converting: 'converting', completed: 'completed', failed: 'failed' }
 
   private
     def set_defaults
