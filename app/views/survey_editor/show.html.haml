@@ -12,10 +12,13 @@
           %h1= t('views.survey_editor.show.symbols_heading')
           - if @survey.status == 'planning'
             %p= t('views.survey_editor.show.symbols_text')
-            = bootstrap_form_with url: search_path, local: true, method: :get, layout: :horizontal, label_col: 'col', control_col: 'col-sm-12', class: 'mt-3 mb-4' do |f|
-              = f.hidden_field :locale, value: I18n.locale
-              -#= f.hidden_field :symbolset, value: current_symbolset_id, id: :navbar_search_symbolset
-              = f.text_field :query, append: f.primary(t('dictionary.search')), wrapper: { class: 'mb-0'}, label_as_placeholder: true, label: t('views.survey_editor.show.symbols_search_helper'), id: :not_navbar_search_query, required: true
+            %form.mt-3.mb-4{action: search_path, method: :get, role: :search}
+              %input{type: :hidden, name: :locale, value: I18n.locale, autocomplete: :off}
+              %label.sr-only{for: :not_navbar_search_query}= t('views.survey_editor.show.symbols_search_helper')
+              .input-group
+                %input#not_navbar_search_query.form-control{type: :text, name: :query, placeholder: t('views.survey_editor.show.symbols_search_helper'), required: true}
+                .input-group-append
+                  %button.btn.btn-primary{type: :submit}= t('dictionary.search')
           .card-deck.gs-deck-5.text-center
             - @survey.survey_pictos.each do |sp|
               = render 'survey_editor/picto', survey_picto: sp
