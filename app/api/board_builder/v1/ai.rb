@@ -191,9 +191,10 @@ module BoardBuilder
           optional :num_images, type: Integer, desc: 'Number of images to generate', default: 4, values: 1..10
           optional :image, type: String, desc: 'Image data (base64 or URL) for image+text mode'
           optional :adapter_name, type: String, desc: 'Name of the LoRA adapter to use for style fine-tuning'
+          optional :adapter_weight, type: Float, desc: 'LoRA adapter strength (e.g. 0.0–1.0)', default: 1.0
         end
         post :generate_image, protected: true, oauth2: ['ai:write'] do
-          Rails.logger.info("[AI] generate_image start: prompt_len=#{params[:prompt].to_s.length}, steps=#{params[:steps]}, guidance_scale=#{params[:guidance_scale]}, num_images=#{params[:num_images]}, image_present=#{params[:image].present?}, adapter_name=#{params[:adapter_name]}, mock=#{MOCK_GENERATE_IMAGE}")
+          Rails.logger.info("[AI] generate_image start: prompt_len=#{params[:prompt].to_s.length}, steps=#{params[:steps]}, guidance_scale=#{params[:guidance_scale]}, num_images=#{params[:num_images]}, image_present=#{params[:image].present?}, adapter_name=#{params[:adapter_name]}, adapter_weight=#{params[:adapter_weight]}, mock=#{MOCK_GENERATE_IMAGE}")
           #authorize! :manage, :ai  # Use CanCan if needed, per application_controller.rb
 
           if MOCK_GENERATE_IMAGE
@@ -219,6 +220,7 @@ module BoardBuilder
           }
           body[:image] = params[:image] if params[:image].present?  # Handle image+text mode
           body[:adapter_name] = params[:adapter_name] if params[:adapter_name].present?  # Handle LoRA adapter
+          body[:adapter_weight] = params[:adapter_weight] if params[:adapter_name].present?  # LoRA strength only relevant when an adapter is set
 
           begin
                 azure_base = ENV['AZURE_API_BASE']
@@ -238,7 +240,8 @@ module BoardBuilder
               guidance_scale: body[:guidance_scale],
               num_images: body[:num_images],
               image: body[:image].present? ? "[base64: #{(body[:image].bytesize / 1024.0).round(1)}KB]" : nil,
-              adapter_name: body[:adapter_name]
+              adapter_name: body[:adapter_name],
+              adapter_weight: body[:adapter_weight]
             }.compact
             masked_headers = { 'x-api-key' => '[MASKED]', 'Content-Type' => 'application/json', 'X-Response-Mode' => 'async' }
             Rails.logger.info("[AI] → Request url=#{azure_base}/generate-image headers=#{masked_headers} body=#{sanitized_body}")
