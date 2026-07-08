@@ -19,4 +19,31 @@ module WebTestHelpers
     create(:symbolset_user, user: user, symbolset: symbolset, role: :admin)
     symbolset
   end
+
+  # Adds an authoritative label in an Azure-supported language so translate can load.
+  def add_translatable_label_to_symbolset(symbolset)
+    token = SecureRandom.hex(4)
+    code2 = format('%02d', SecureRandom.random_number(100))
+    source = create(
+      :source,
+      authoritative: true,
+      slug: "translate-test-#{token}",
+      name: "Translate Test Source #{token}"
+    )
+    source_language = create(
+      :language,
+      azure_translate_supported: true,
+      iso639_1: code2,
+      iso639_3: "z#{code2}",
+      iso639_2b: "b#{code2}",
+      iso639_2t: "t#{code2}",
+      name: "Translate Test #{token}",
+      active: true,
+      category: 'L',
+      scope: 'I'
+    )
+    picto = create(:picto, symbolset: symbolset, source: source)
+    picto.labels.first.update!(language: source_language, source: source, text: 'hello symbol')
+    source_language
+  end
 end

@@ -45,6 +45,16 @@ class SymbolsetManagerWebTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test 'manager can access symbolset translate page' do
+    source_language = add_translatable_label_to_symbolset(@symbolset)
+
+    get translate_symbolset_path(@symbolset), params: { locale: :en }
+
+    assert_response :success
+    assert_match I18n.t('views.symbolsets.translate.heading'), response.body
+    assert_match source_language.name, response.body
+  end
+
   test 'guest cannot access symbolset edit page' do
     sign_out @user
 

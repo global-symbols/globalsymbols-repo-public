@@ -99,7 +99,7 @@ class SymbolsetsController < ApplicationController
                                   labels: {
                                     pictos: {
                                       archived: false,
-                                      symbolsets: @symbolset
+                                      symbolset: @symbolset
                                     },
                                     sources: { authoritative: true }
                                   }
@@ -116,10 +116,7 @@ class SymbolsetsController < ApplicationController
     @pictos = @symbolset.pictos.where(archived: false).accessible_by(current_ability)
     @total_symbols = @pictos.count
 
-    @sources = Label.joins(:picto).where(pictos: @pictos).group(:language_id).includes(:language)
-    @sources_counts = @sources.count
-
-    @unapproved_suggestions = Label.unscoped.where(picto: @pictos, language: @destination_language)
+    @unapproved_suggestions = Label.unscoped.where(picto_id: @pictos.select(:id), language: @destination_language)
 
     @translated_labels = Label.unscoped.joins(:source, picto: :symbolset).where(pictos: { symbolset: @symbolset }, language: @destination_language, sources: {authoritative: true})
 

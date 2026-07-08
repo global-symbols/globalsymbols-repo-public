@@ -2,7 +2,7 @@ class Language < ApplicationRecord
   belongs_to :macrolanguage, -> { where active: true }, foreign_key: :language_id, class_name: 'Language', optional: true, inverse_of: :languages
   has_many :concepts, inverse_of: :language
   has_many :languages, inverse_of: :macrolanguage
-  has_many :labels, inverse_of: :picto
+  has_many :labels, inverse_of: :language
   has_many :surveys, inverse_of: :language
   has_many :users, inverse_of: :language
   
