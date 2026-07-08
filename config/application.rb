@@ -11,6 +11,8 @@ module GlobalsymbolsRepo
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.0
 
+    config.autoload_lib(ignore: %w[assets tasks])
+
     config.allowed_image_extensions = %w[jpg jpeg gif png svg webp].freeze
     config.allowed_image_mimetypes = [/image\/svg\+xml/, 'image/jpeg', 'image/png', 'image/gif', 'image/webp'].freeze
 
@@ -21,5 +23,7 @@ module GlobalsymbolsRepo
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    config.generators.system_tests = nil
   end
 end
