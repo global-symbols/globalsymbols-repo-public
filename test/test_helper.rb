@@ -43,6 +43,11 @@ class ActionDispatch::IntegrationTest
   self.use_transactional_tests = true
 
   setup do
+    # Rails 8 can leave Devise.mappings empty until a route is recognized.
+    # sign_in/sign_out in setup blocks fail with "Could not find a valid mapping"
+    # unless mappings are registered first.
+    Rails.application.reload_routes! if Devise.mappings.empty?
+
     stub_external_apis
   end
 end
