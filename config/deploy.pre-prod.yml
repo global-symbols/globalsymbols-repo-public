@@ -1,0 +1,69 @@
+# =============================================================================
+# Kamal destination: pre-prod
+# Usage:  kamal deploy -d pre-prod
+# Host:   t4g.small  private 172.31.30.149  public 18.130.29.168
+# SSH:    global-symbols-ec2-test-t4
+#
+# DO NOT run kamal setup/deploy until registry + secrets are filled and
+# you intentionally want to touch the server.
+# =============================================================================
+
+servers:
+  web:
+    hosts:
+      - 18.130.29.168
+  job:
+    hosts:
+      - 18.130.29.168
+    cmd: bundle exec sidekiq -C config/sidekiq.yml
+
+# kamal-proxy in front of Rails. TLS via Let's Encrypt only after DNS points here.
+# Until cutover, smoke via http://18.130.29.168/ (or Host header).
+# Later: host nginx can sit in front and reverse-proxy to kamal-proxy / Go.
+proxy:
+  host: gs-test.co.uk
+  app_port: 3000
+  ssl: false
+  # ssl: true   # enable after DNS cutover if kamal-proxy terminates TLS
+
+env:
+  clear:
+    RAILS_ENV: pre-prod
+    # Accessory DNS name on Kamal network: {service}-{accessory}
+    DATABASE_HOST: gs-repo-db
+    DATABASE_PORT: "3306"
+    GS_DATABASE_NAME: gs-production
+    GS_DATABASE_USERNAME: gs-production
+    REDIS_IP: "172.31.13.8"
+    REDIS_DB: "0"
+    REDIS_CACHE_DB: "2"
+    ASSET_HOST: https://gs-test.co.uk
+    DIRECTUS_URL: https://cms.gs-test.co.uk
+  secret:
+    - SECRET_KEY_BASE
+    - GS_DATABASE_PASSWORD
+    - REDIS_PASSWORD
+    - DIRECTUS_TOKEN_CMS
+    - DIRECTUS_WEBHOOK_SECRET
+
+# MySQL 8 on the same box (pre-prod only — prod uses host MySQL on m7g)
+accessories:
+  db:
+    image: mysql:8.0
+    host: 18.130.29.168
+    # Publish to host loopback so bare Go (and mysql client) can use 127.0.0.1:3306
+    port: "127.0.0.1:3306:3306"
+    env:
+      clear:
+        MYSQL_DATABASE: gs-production
+        MYSQL_USER: gs-production
+      secret:
+        - MYSQL_ROOT_PASSWORD
+        - MYSQL_PASSWORD
+    directories:
+      - mysql_data:/var/lib/mysql
+    # Match local Docker MySQL 8 flags used during Rails 8 upgrade
+    cmd: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --default-authentication-plugin=mysql_native_password

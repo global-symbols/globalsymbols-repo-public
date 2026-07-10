@@ -55,20 +55,28 @@ test: &test
 #   production:
 #     url: <%= ENV['DATABASE_URL'] %>
 #
+# Deployed envs: host/port from ENV so Kamal can point at accessory (pre-prod)
+# or host MySQL (prod). Defaults keep local-style 127.0.0.1 behaviour.
 production:
   <<: *default
-  database: gs-production
-  username: gs-production
+  database: <%= ENV.fetch('GS_DATABASE_NAME', 'gs-production') %>
+  username: <%= ENV.fetch('GS_DATABASE_USERNAME', 'gs-production') %>
   password: <%= ENV['GS_DATABASE_PASSWORD'] %>
+  host: <%= ENV.fetch('DATABASE_HOST', '127.0.0.1') %>
+  port: <%= ENV.fetch('DATABASE_PORT', '3306') %>
 
 pre-prod:
   <<: *default
-  database: gs-production
-  username: gs-production
+  database: <%= ENV.fetch('GS_DATABASE_NAME', 'gs-production') %>
+  username: <%= ENV.fetch('GS_DATABASE_USERNAME', 'gs-production') %>
   password: <%= ENV['GS_DATABASE_PASSWORD'] %>
+  host: <%= ENV.fetch('DATABASE_HOST', '127.0.0.1') %>
+  port: <%= ENV.fetch('DATABASE_PORT', '3306') %>
 
 stage:
   <<: *default
-  database: gs-production
-  username: gs-production
+  database: <%= ENV.fetch('GS_DATABASE_NAME', 'gs-production') %>
+  username: <%= ENV.fetch('GS_DATABASE_USERNAME', 'gs-production') %>
   password: <%= ENV['GS_DATABASE_PASSWORD'] %>
+  host: <%= ENV.fetch('DATABASE_HOST', '127.0.0.1') %>
+  port: <%= ENV.fetch('DATABASE_PORT', '3306') %>

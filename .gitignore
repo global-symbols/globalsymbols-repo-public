@@ -52,6 +52,13 @@
 /local_docs/
 /local_rails_upgrade/
 
-# Ignore Docker-related files
-Dockerfile
+# Local-only Docker (deploy Dockerfile is committed for Kamal / pre-prod / prod)
+Dockerfile.dev
 docker-compose.yml
+
+# Kamal secrets (examples are committed; real files are not)
+.kamal/secrets
+.kamal/secrets-common
+.kamal/secrets.*
+!.kamal/secrets.example
+!.kamal/README.md

@@ -155,6 +155,9 @@ group :development do
   gem 'rails_real_favicon'
 
   gem 'listen'
+
+  # Deploy tool (pre-prod / production). Not required at runtime.
+  gem 'kamal', '~> 2.5', require: false
 end
 
 group :test do

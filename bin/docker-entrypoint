@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+# Remove stale Puma/Rails PID if the container was restarted uncleanly.
+rm -f tmp/pids/server.pid
+
+# Optional: enable with Kamal when DB is ready (e.g. first deploy).
+# if [ "${RUN_MIGRATIONS:-false}" = "true" ]; then
+#   ./bin/rails db:migrate
+# fi
+
+exec "$@"
