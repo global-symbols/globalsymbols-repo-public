@@ -152,20 +152,22 @@ interactive_menu() {
     "1) wizard       — full guided path (recommended)" \
     "2) preflight    — check Docker, secrets, SSH, config" \
     "3) version      — show/resolve image tag only" \
-    "4) login        — docker login to GHCR" \
-    "5) config       — kamal config (read-only, no server change)" \
-    "6) deploy       — kamal deploy (TOUCHES SERVER)" \
-    "7) smoke        — HTTP smoke check" \
-    "8) hint-verify  — how to run deploy_verify on the server"
+    "4) login        — docker login to GHCR (auto-skips if already in)" \
+    "5) config       — kamal config (read-only)" \
+    "6) build-push   — Mac: build image + push to GHCR (no server change)" \
+    "7) rollout      — server: pull image + restart web/job (TOUCHES SERVER)" \
+    "8) smoke        — HTTP smoke check" \
+    "9) hint-verify  — how to run deploy_verify on the server"
   case "$pick" in
     1) COMMAND="wizard" ;;
     2) COMMAND="preflight" ;;
     3) COMMAND="version" ;;
     4) COMMAND="login" ;;
     5) COMMAND="config" ;;
-    6) COMMAND="deploy" ;;
-    7) COMMAND="smoke" ;;
-    8) COMMAND="hint-verify" ;;
+    6) COMMAND="build-push" ;;
+    7) COMMAND="rollout" ;;
+    8) COMMAND="smoke" ;;
+    9) COMMAND="hint-verify" ;;
   esac
 
   # Fail immediately after action choice (before Start now / any phase)
@@ -263,22 +265,37 @@ confirm() {
   esac
 }
 
-confirm_deploy() {
+confirm_build_push() {
   if [[ "$YES" -eq 1 ]]; then
-    echo "(--yes) deploy confirmation skipped"
+    echo "(--yes) build-push confirmation skipped"
+    return 0
+  fi
+  echo ""
+  echo "This builds the app image on this Mac and pushes it to GHCR."
+  echo "It does NOT change containers on the server yet (use rollout after)."
+  local token
+  read -r -p "Type 'push' to continue: " token
+  [[ "$token" == "push" ]] || die "Aborted (typed: ${token:-empty})"
+}
+
+confirm_rollout() {
+  if [[ "$YES" -eq 1 ]]; then
+    echo "(--yes) rollout confirmation skipped"
     return 0
   fi
   local token
   if [[ "$ENV_NAME" == "production" ]]; then
     echo ""
-    echo "⚠  PRODUCTION deploy — will replace web+job on the production host."
+    echo "⚠  PRODUCTION rollout — will replace web+job on the production host."
+    echo "  Uses the image already in GHCR for VERSION (must have been build-pushed)."
     read -r -p "Type 'production' to continue: " token
     [[ "$token" == "production" ]] || die "Aborted (typed: ${token:-empty})"
   else
     echo ""
     echo "⚠  Will SSH to ${PRE_PROD_HOST} and replace pre-prod web+job containers."
-    read -r -p "Type 'deploy' to continue: " token
-    [[ "$token" == "deploy" ]] || die "Aborted (typed: ${token:-empty})"
+    echo "  Uses the image already in GHCR for VERSION (must have been build-pushed)."
+    read -r -p "Type 'rollout' to continue: " token
+    [[ "$token" == "rollout" ]] || die "Aborted (typed: ${token:-empty})"
   fi
 }
 
@@ -432,7 +449,7 @@ git_is_dirty() {
 # Shipping / identity actions: must start from a clean tree (unless CLI override).
 command_requires_clean_tree() {
   case "${COMMAND:-}" in
-    wizard|preflight|version|config|deploy) return 0 ;;
+    wizard|preflight|version|config|build-push|rollout) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -521,21 +538,28 @@ setup_log() {
 }
 
 # Run kamal inside Docker (no bare-metal Ruby/Kamal on the Mac required).
-# Usage: run_kamal <kamal-subcommand> [extra kamal args…]
+# Usage: run_kamal <kamal args…>   e.g.  run_kamal build push
+#         run_kamal deploy --skip-push
 # Streams full stdout/stderr (via run_logged).
+# Mounts host Docker socket so build/push uses Docker Desktop on the Mac.
 run_kamal() {
-  local dest host kamal_cmd
+  local dest host
   dest="$(kamal_destination)"
   host="$(deploy_host)"
-  kamal_cmd="$1"
-  shift || true
 
   local ssh_key="${HOME}/.ssh/global-symbols.pem"
   [[ -f "$ssh_key" ]] || die "SSH key not found: $ssh_key"
 
+  local docker_sock="/var/run/docker.sock"
+  [[ -S "$docker_sock" ]] || die "Docker socket not found at $docker_sock (is Docker Desktop running?)"
+
+  # Log the exact kamal invocation (no secrets)
+  echo "+ kamal $* -d ${dest}  (VERSION=${VERSION:-auto})"
+
   run_logged docker run --rm -i \
     -v "$ROOT":/rails \
     -v "$ssh_key":/root/.ssh/global-symbols.pem:ro \
+    -v "$docker_sock":/var/run/docker.sock \
     -w /rails \
     -e KAMAL_REGISTRY_USERNAME \
     -e KAMAL_REGISTRY_PASSWORD \
@@ -547,7 +571,6 @@ run_kamal() {
     -e MYSQL_ROOT_PASSWORD \
     -e MYSQL_PASSWORD \
     -e VERSION \
-    -e "GS_KAMAL_CMD=${kamal_cmd}" \
     -e "GS_KAMAL_DEST=${dest}" \
     -e "GS_DEPLOY_HOST=${host}" \
     -e "GS_KAMAL_VERSION=${KAMAL_VERSION}" \
@@ -556,13 +579,13 @@ run_kamal() {
 set -euo pipefail
 mkdir -p /root/.ssh
 chmod 700 /root/.ssh
-# Avoid HostKeyMismatch inside the container
+# Avoid HostKeyMismatch inside the container (needed for rollout SSH)
 ssh-keyscan -H "$GS_DEPLOY_HOST" >> /root/.ssh/known_hosts 2>/dev/null || true
 chmod 600 /root/.ssh/known_hosts 2>/dev/null || true
 gem install kamal -v "$GS_KAMAL_VERSION" --no-document
-echo "+ kamal $GS_KAMAL_CMD -d $GS_KAMAL_DEST  (VERSION=${VERSION:-auto})"
-exec kamal "$GS_KAMAL_CMD" -d "$GS_KAMAL_DEST"
-'
+echo "+ kamal $* -d $GS_KAMAL_DEST  (VERSION=${VERSION:-auto})"
+exec kamal "$@" -d "$GS_KAMAL_DEST"
+' bash "$@"
 }
 
 # ─── phases ───────────────────────────────────────────────────────────────
@@ -722,24 +745,54 @@ cmd_config() {
   phase_ok "config"
 }
 
-cmd_deploy() {
-  phase_banner "deploy (kamal deploy -d $(kamal_destination); TOUCHES SERVER)"
+# (1) Mac only: build image + push to GHCR — does not change the server.
+cmd_build_push() {
+  phase_banner "build-push (Mac → GHCR; no server change)"
+  load_secrets
+  resolve_version
+  echo "Destination config: $(kamal_destination)  (used for image name / arch only)"
+  echo "Image:              $(absolute_image)"
+  echo "What this does:"
+  echo "  • Build Dockerfile on this Mac (Docker Desktop, arm64)"
+  echo "  • Push image to ${REGISTRY_HOST}"
+  echo "  • Does NOT SSH / restart containers on $(deploy_host)"
+  confirm_build_push
+  echo "Starting kamal build push — full stream below (not filtered)…"
+  set +e
+  run_kamal build push
+  local rc=$?
+  set -e
+  if [[ "$rc" -ne 0 ]]; then
+    phase_fail "build-push" "$rc"
+    return "$rc"
+  fi
+  phase_ok "build-push"
+  echo ""
+  echo "Image is in GHCR. Next: rollout (pull + restart on the server)."
+}
+
+# (2) Server: pull image already in GHCR + restart web/job.
+cmd_rollout() {
+  phase_banner "rollout (server $(deploy_host); TOUCHES SERVER)"
   load_secrets
   resolve_version
   echo "Destination: $(kamal_destination)"
   echo "Host:        $(deploy_host)"
   echo "Image:       $(absolute_image)"
-  confirm_deploy
-  echo "Starting kamal deploy — full stream below (not filtered)…"
+  echo "What this does:"
+  echo "  • kamal deploy --skip-push  (no rebuild on the Mac)"
+  echo "  • SSH to host, pull image, replace web + job, healthcheck proxy"
+  confirm_rollout
+  echo "Starting kamal deploy --skip-push — full stream below (not filtered)…"
   set +e
-  run_kamal deploy
+  run_kamal deploy --skip-push
   local rc=$?
   set -e
   if [[ "$rc" -ne 0 ]]; then
-    phase_fail "deploy" "$rc"
+    phase_fail "rollout" "$rc"
     return "$rc"
   fi
-  phase_ok "deploy"
+  phase_ok "rollout"
   echo ""
   echo "Next: smoke check, then verify on the server (hint-verify)."
 }
@@ -801,7 +854,7 @@ cmd_wizard() {
   echo "Quit anytime with q at a pause prompt. Re-run a single phase if one fails."
   echo ""
 
-  local phases=(preflight version login config deploy smoke hint-verify)
+  local phases=(preflight version login config build-push rollout smoke hint-verify)
   local p
   for p in "${phases[@]}"; do
     case "$p" in
@@ -819,20 +872,24 @@ cmd_wizard() {
         ;;
       config)
         cmd_config || return $?
-        pause_wizard "deploy (TOUCHES SERVER)"
+        pause_wizard "build-push (Mac → GHCR, no server change)"
         ;;
-      deploy)
-        cmd_deploy || return $?
+      build-push)
+        cmd_build_push || return $?
+        pause_wizard "rollout (TOUCHES SERVER)"
+        ;;
+      rollout)
+        cmd_rollout || return $?
         pause_wizard "smoke"
         ;;
       smoke)
-        # smoke failure should not hide success of deploy; warn but continue
+        # smoke failure should not hide success of rollout; warn but continue
         set +e
         cmd_smoke
         local src=$?
         set -e
         if [[ "$src" -ne 0 ]]; then
-          echo "WARN: smoke failed (exit $src). Deploy may still have succeeded — investigate."
+          echo "WARN: smoke failed (exit $src). Rollout may still have succeeded — investigate."
           if [[ "$YES" -eq 0 ]]; then
             pause_wizard "hint-verify (despite smoke failure)"
           fi
@@ -876,7 +933,8 @@ main() {
     version)     cmd_version ;;
     login)       cmd_login ;;
     config)      cmd_config ;;
-    deploy)      cmd_deploy ;;
+    build-push)  cmd_build_push ;;
+    rollout)     cmd_rollout ;;
     smoke)       cmd_smoke ;;
     hint-verify) cmd_hint_verify ;;
     *) die "internal: unhandled command $COMMAND" ;;

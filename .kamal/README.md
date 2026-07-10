@@ -23,13 +23,20 @@ script/gs-deploy
 That presents:
 
 1. **Environment** — pre-prod or production  
-2. **Action** — full wizard, or a single phase (preflight, deploy, smoke, …)  
+2. **Action** — full wizard, or a single phase  
 3. **Confirm** — summary, then start  
+
+Ship is split into two actions (wizard runs both, with a pause between):
+
+| Action | Where | Kamal | Server change? |
+|--------|--------|--------|----------------|
+| **build-push** | Mac | `kamal build push` | No — only build + push to GHCR |
+| **rollout** | pre-prod/prod host | `kamal deploy --skip-push` | Yes — pull image, restart web+job |
 
 Safe defaults: clean git SHA as image tag, log to `log/deploy/`, wizard pauses on.  
 GHCR **login is auto-skipped** when Docker already has `ghcr.io` credentials (use `--force-login` to re-auth, `--skip-login` to never login).
 
-**Hard rule (checked at the start):** shipping actions (`wizard`, `preflight`, `version`, `config`, `deploy`) need a **clean** git tree.
+**Hard rule (checked at the start):** shipping actions need a **clean** git tree.
 
 To try **uncommitted** changes on **pre-prod only** (not production):
 
