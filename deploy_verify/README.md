@@ -1,80 +1,92 @@
 # Deploy verification suites
 
-Black-box checks run **on the app server** after a Kamal deploy (not on your Mac).
+Ships **with the app image** at `/rails/deploy_verify/`.  
+Runs **only on the matching app server** (or inside its web container).  
+**Not for laptops** — runtime guard refuses non-allowlisted IPs.
 
-| Profile | Host | Writes? | Contents |
-|---------|------|---------|----------|
-| `pre_prod` | t4g (`global-symbols-ec2-test-t4`) | Optional CRUD | HTTP via local proxy, Directus, Redis DB 2, auth/CRUD |
-| `prod` | prod Rails host | **No** | HTTP via local proxy, API contracts, optional Directus GET |
+| Profile | Allowed host (private IP) | Writes |
+|---------|---------------------------|--------|
+| `pre_prod` | `172.31.30.149` (t4g) | Optional CRUD |
+| `prod` | `172.31.6.238` (+ update when m7g ships) | None |
 
-**On failure:** markdown report + exit 1. **No** auto-rollback/DNS — human decides.
+On fail: report + exit 1. No auto-remediation.
 
-## Why on the server?
+## Why it ships with the app
 
-| Check | On server | From Mac |
-|-------|-----------|----------|
-| Rails via kamal-proxy | `http://127.0.0.1` + Host header | Needs hosts/VPN |
-| Redis `172.31.13.8` | Reachable | Usually timed out |
-| Same path as real traffic | Yes (local edge) | Partial |
+`deploy_verify/` is **not** in `.dockerignore`, so every Kamal deploy includes:
 
-## How to run
-
-### A. From your laptop (syncs suite, runs on server)
-
-```bash
-# Pre-prod t4g
-script/run_deploy_verify_remote.sh pre_prod
-
-# With CRUD
-DEPLOY_VERIFY_USER_EMAIL='…' DEPLOY_VERIFY_USER_PASSWORD='…' \
-  script/run_deploy_verify_remote.sh pre_prod
-
-# Prod (update SSH host when m7g is live: DEPLOY_VERIFY_SSH=…)
-script/run_deploy_verify_remote.sh prod
+```text
+/rails/deploy_verify/runner.rb
+/rails/deploy_verify/bin/run
+/rails/deploy_verify/lib/*
+/rails/deploy_verify/suites/*
 ```
 
-### B. SSH to the server yourself
+No separate rsync from a laptop is required after the image that contains this code is deployed.
+
+(`script/` is dockerignored; the entrypoint that matters in production is **`deploy_verify/bin/run`** inside the image.)
+
+## How to run (on the server)
+
+### Pre-prod (t4g)
 
 ```bash
 ssh global-symbols-ec2-test-t4
-# after remote script has synced, or after image includes deploy_verify/:
-bash /opt/gs-deploy-verify/run_deploy_verify.sh pre_prod
+
+WEB=$(docker ps -q -f name=gs-repo-web-pre-prod | head -1)
+docker exec "$WEB" /rails/deploy_verify/bin/run pre_prod
 ```
 
-### C. Inside the web container (after image includes `deploy_verify/`)
+Or host wrapper (also IP-guarded):
 
 ```bash
-# on server
-WEB=$(docker ps -q -f name=gs-repo-web-pre-prod | head -1)
-docker exec -e DEPLOY_VERIFY_BASE_URL=http://kamal-proxy \
-  -e DEPLOY_VERIFY_HOST_HEADER=gs-test.co.uk \
-  -e REDIS_IP -e REDIS_PASSWORD -e REDIS_CACHE_DB=2 \
-  -e DIRECTUS_URL -e DIRECTUS_TOKEN_CMS \
-  "$WEB" ruby /rails/deploy_verify/runner.rb pre_prod
+# if you keep a checkout with script/ on the host:
+script/run_deploy_verify.sh pre_prod
 ```
 
-`script/run_deploy_verify.sh` prefers this path when the file exists in the image.
+### Prod
 
-## Defaults (on-server)
+```bash
+ssh <prod-rails-host>
+WEB=$(docker ps -q -f name=gs-repo-web-production | head -1)
+docker exec "$WEB" /rails/deploy_verify/bin/run prod
+```
 
-| Variable | Pre-prod default | Prod default |
-|----------|------------------|--------------|
-| `DEPLOY_VERIFY_BASE_URL` | `http://127.0.0.1` | `http://127.0.0.1` |
-| `DEPLOY_VERIFY_HOST_HEADER` | `gs-test.co.uk` | `globalsymbols.com` |
-| `REDIS_IP` | `172.31.13.8` | (Redis checks off) |
-| `REDIS_CACHE_DB` | `2` | `3` (unused) |
-| Directus URL | `https://cms.gs-test.co.uk` | `https://cms.globalsymbols.com` |
+### Optional CRUD (pre-prod only)
 
-Env is **imported from the running web container** when possible (`REDIS_*`, `DIRECTUS_*`, …).
+```bash
+docker exec \
+  -e DEPLOY_VERIFY_USER_EMAIL='…' \
+  -e DEPLOY_VERIFY_USER_PASSWORD='…' \
+  "$WEB" /rails/deploy_verify/bin/run pre_prod
+```
+
+Container already has `REDIS_*` / `DIRECTUS_*` from Kamal.
+
+## Defaults inside the container
+
+| Variable | Pre-prod | Prod |
+|----------|----------|------|
+| Base URL | `http://kamal-proxy` (set by host script) or set explicitly | same pattern |
+| Host header | `gs-test.co.uk` | `globalsymbols.com` |
+| Redis cache DB | `2` | not used |
+
+When using `docker exec` directly, set:
+
+```bash
+-e DEPLOY_VERIFY_BASE_URL=http://kamal-proxy \
+-e DEPLOY_VERIFY_HOST_HEADER=gs-test.co.uk \
+```
+
+(Host script sets these for you.)
+
+## Environment lock
+
+`lib/runtime_guard.rb` refuses to run unless the host private IP is allowlisted.  
+Override only for exceptional cases: `DEPLOY_VERIFY_ALLOWED_IPS=x.x.x.x`.
+
+Exit code **3** = wrong environment (not a check failure).
 
 ## Reports
 
-Written to **`/tmp/deploy_verify/`** on the server.
-
-## After each deploy (suggested)
-
-```text
-kamal deploy -d pre-prod --skip-push
-script/run_deploy_verify_remote.sh pre_prod    # from laptop
-# read report / NOTIFICATION lines — human decides next action
-```
+`/tmp/deploy_verify/` inside the container; host script copies to host `/tmp/deploy_verify/`.

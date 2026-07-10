@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Ships in image: /rails/deploy_verify/bin/run
+set -euo pipefail
+
+PROFILE="${1:-}"
+if [[ -z "$PROFILE" ]]; then
+  echo "Usage: deploy_verify/bin/run <pre_prod|prod>"
+  exit 2
+fi
+
+# Resolve repo root: .../deploy_verify/bin -> .../deploy_verify -> ROOT
+VERIFY_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT="$(cd "$VERIFY_DIR/.." && pwd)"
+cd "$ROOT"
+
+export DEPLOY_VERIFY_REPORT_DIR="${DEPLOY_VERIFY_REPORT_DIR:-/tmp/deploy_verify}"
+mkdir -p "$DEPLOY_VERIFY_REPORT_DIR"
+
+# Default on-server HTTP when unset (container on kamal network)
+if [[ -z "${DEPLOY_VERIFY_BASE_URL:-}" ]]; then
+  export DEPLOY_VERIFY_BASE_URL="http://kamal-proxy"
+fi
+if [[ -z "${DEPLOY_VERIFY_HOST_HEADER:-}" ]]; then
+  case "$PROFILE" in
+    pre_prod|pre-prod|preprod) export DEPLOY_VERIFY_HOST_HEADER="gs-test.co.uk" ;;
+    prod|production) export DEPLOY_VERIFY_HOST_HEADER="globalsymbols.com" ;;
+  esac
+fi
+
+exec ruby "$VERIFY_DIR/runner.rb" "$PROFILE"

@@ -1,17 +1,15 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# Deploy verification entrypoint (stdlib + suite files only).
+# Deploy verification — runs ON the app server / inside the web container.
+# Ships with the app image under /rails/deploy_verify/.
 #
 #   ruby deploy_verify/runner.rb pre_prod
 #   ruby deploy_verify/runner.rb prod
+#   /rails/deploy_verify/bin/run pre_prod
 #
-# Or via scripts:
-#   script/run_deploy_verify.sh pre_prod
-#   script/run_deploy_verify.sh prod
-#
-# Failure policy: print + write report (notification). Exit 1 if any check failed
-# so humans/CI can see it; no auto-remediation.
+# Refuses wrong hosts (see lib/runtime_guard.rb).
+# On failure: report + exit 1 (notify-only; no auto-remediation).
 
 require "json"
 require "net/http"
@@ -19,11 +17,14 @@ require "uri"
 require "socket"
 
 ROOT = File.expand_path("..", __dir__)
-$LOAD_PATH.unshift(File.join(ROOT, "deploy_verify"))
+# Support both repo layout (ROOT=repo) and container (/rails)
+VERIFY_ROOT = File.expand_path(__dir__)
+$LOAD_PATH.unshift(VERIFY_ROOT)
 
 require_relative "lib/config"
 require_relative "lib/http_client"
 require_relative "lib/reporter"
+require_relative "lib/runtime_guard"
 require_relative "suites/pre_prod"
 require_relative "suites/prod"
 
@@ -38,21 +39,20 @@ def load_env_file!(path)
     key, val = line.split("=", 2)
     key = key.strip
     val = val.strip
-    # do not override already-exported env
     ENV[key] = val if ENV[key].to_s.empty? && !key.empty?
   end
 end
 
 def load_env_files!(profile)
-  # Optional: load .kamal secrets if present (local operator convenience)
+  # Only load host secret files if present on server (optional).
+  # Prefer env already injected into the web container by Kamal.
   load_env_file!(File.join(ROOT, ".kamal", "secrets-common"))
   if profile == "pre_prod"
     load_env_file!(File.join(ROOT, ".kamal", "secrets.pre-prod"))
   else
     load_env_file!(File.join(ROOT, ".kamal", "secrets.production"))
   end
-  load_env_file!(File.join(ROOT, "deploy_verify", ".env"))
-  load_env_file!(File.join(ROOT, "deploy_verify", ".env.local"))
+  load_env_file!(File.join(VERIFY_ROOT, ".env"))
 end
 
 profile = ARGV[0].to_s.strip
@@ -65,19 +65,27 @@ unless %w[pre_prod prod].include?(profile)
   exit 2
 end
 
+begin
+  DeployVerify::RuntimeGuard.assert!(profile)
+rescue DeployVerify::RuntimeGuard::WrongEnvironment => e
+  warn e.message
+  exit 3
+end
+
 load_env_files!(profile)
 
 config = DeployVerify::Config.new(profile)
 reporter = DeployVerify::Reporter.new(config)
 http = DeployVerify::HttpClient.new(config)
 
-puts "Deploy verify starting (on-server)"
-puts "  hostname: #{Socket.gethostname rescue "unknown"}"
+puts "Deploy verify starting (server-only)"
+puts "  hostname: #{(Socket.gethostname rescue "unknown")}"
 puts "  profile:  #{config.profile}"
 puts "  base_url: #{config.base_url}"
 puts "  host_hdr: #{config.host_header.inspect}"
 puts "  writes:   #{config.allow_writes?}"
 puts "  notify-only on fail (no auto rollback/DNS)"
+
 begin
   suite =
     if config.pre_prod?
@@ -91,6 +99,4 @@ rescue StandardError => e
 end
 
 reporter.finish!
-
-# Exit 1 on failures so operators notice; still "notify-only" (no automated fix).
 exit(reporter.passed? ? 0 : 1)
