@@ -6,7 +6,7 @@
 # Phases are NOT callable as CLI subcommands.
 #
 # Ship is split:
-#   prepare     — image tag (VERSION) + GHCR login (combined)
+#   preflight   — checks + image tag + GHCR login
 #   build-push  — Mac: kamal build push (image → GHCR, no server change)
 #   rollout     — server: kamal deploy --skip-push (pull + restart web/job)
 #
@@ -154,22 +154,20 @@ interactive_menu() {
   # --- Action ---
   menu_pick pick "Action for ${ENV_NAME}:" \
     "1) wizard       — full guided path (recommended)" \
-    "2) preflight    — check Docker, secrets, SSH, config" \
-    "3) prepare      — image tag (VERSION) + GHCR login" \
-    "4) config       — kamal config (read-only)" \
-    "5) build-push   — Mac: build image + push to GHCR (no server change)" \
-    "6) rollout      — server: pull image + restart web/job (TOUCHES SERVER)" \
-    "7) smoke        — HTTP smoke check" \
-    "8) hint-verify  — how to run deploy_verify on the server"
+    "2) preflight    — checks + image tag + GHCR login" \
+    "3) config       — kamal config (read-only)" \
+    "4) build-push   — Mac: build image + push to GHCR (no server change)" \
+    "5) rollout      — server: pull image + restart web/job (TOUCHES SERVER)" \
+    "6) smoke        — HTTP smoke check" \
+    "7) hint-verify  — how to run deploy_verify on the server"
   case "$pick" in
     1) COMMAND="wizard" ;;
     2) COMMAND="preflight" ;;
-    3) COMMAND="prepare" ;;
-    4) COMMAND="config" ;;
-    5) COMMAND="build-push" ;;
-    6) COMMAND="rollout" ;;
-    7) COMMAND="smoke" ;;
-    8) COMMAND="hint-verify" ;;
+    3) COMMAND="config" ;;
+    4) COMMAND="build-push" ;;
+    5) COMMAND="rollout" ;;
+    6) COMMAND="smoke" ;;
+    7) COMMAND="hint-verify" ;;
   esac
 
   # Fail immediately after action choice (before Start now / any phase)
@@ -451,7 +449,7 @@ git_is_dirty() {
 # Shipping / identity actions: must start from a clean tree (unless CLI override).
 command_requires_clean_tree() {
   case "${COMMAND:-}" in
-    wizard|preflight|prepare|config|build-push|rollout) return 0 ;;
+    wizard|preflight|config|build-push|rollout) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -596,10 +594,21 @@ cmd_help() {
   usage 0
 }
 
+# True if Docker config already mentions ghcr.io (Desktop keychain / stored auth).
+# Not a network check — if push later fails with unauthorized, use --force-login.
+ghcr_session_looks_logged_in() {
+  local cfg="${DOCKER_CONFIG:-$HOME/.docker}/config.json"
+  [[ -f "$cfg" ]] || return 1
+  # Match "ghcr.io" as a registry host entry (auths / credHelpers)
+  grep -Eq '"ghcr\.io"[[:space:]]*:' "$cfg" 2>/dev/null
+}
+
+# Checks + image tag + GHCR login (first wizard step).
 cmd_preflight() {
-  phase_banner "preflight ($ENV_NAME)"
+  phase_banner "preflight ($ENV_NAME) — checks + tag + GHCR"
   local ok=1
 
+  echo "— Checks —"
   echo "• repo root: $ROOT"
   if ! command -v docker >/dev/null 2>&1; then
     echo "✗ docker not found on PATH"
@@ -673,22 +682,8 @@ cmd_preflight() {
     phase_fail "preflight" 1
     return 1
   fi
-  phase_ok "preflight"
-}
 
-# True if Docker config already mentions ghcr.io (Desktop keychain / stored auth).
-# Not a network check — if push later fails with unauthorized, use --force-login.
-ghcr_session_looks_logged_in() {
-  local cfg="${DOCKER_CONFIG:-$HOME/.docker}/config.json"
-  [[ -f "$cfg" ]] || return 1
-  # Match "ghcr.io" as a registry host entry (auths / credHelpers)
-  grep -Eq '"ghcr\.io"[[:space:]]*:' "$cfg" 2>/dev/null
-}
-
-# Combined: resolve image tag + GHCR login (wizard step after preflight).
-cmd_prepare() {
-  phase_banner "prepare (image tag + GHCR login)"
-
+  echo ""
   echo "— Image tag —"
   resolve_version
   echo "VERSION=$VERSION"
@@ -715,12 +710,12 @@ cmd_prepare() {
     local rc=$?
     set -e
     if [[ "$rc" -ne 0 ]]; then
-      phase_fail "prepare" "$rc"
+      phase_fail "preflight" "$rc"
       return "$rc"
     fi
   fi
 
-  phase_ok "prepare"
+  phase_ok "preflight"
 }
 
 cmd_config() {
@@ -849,16 +844,12 @@ cmd_wizard() {
   echo "Quit anytime with q at a pause prompt. Re-run a single phase if one fails."
   echo ""
 
-  local phases=(preflight prepare config build-push rollout smoke hint-verify)
+  local phases=(preflight config build-push rollout smoke hint-verify)
   local p
   for p in "${phases[@]}"; do
     case "$p" in
       preflight)
         cmd_preflight || return $?
-        pause_wizard "prepare (tag + GHCR login)"
-        ;;
-      prepare)
-        cmd_prepare || return $?
         pause_wizard "config (read-only kamal)"
         ;;
       config)
@@ -921,7 +912,6 @@ main() {
   case "$COMMAND" in
     wizard)      cmd_wizard ;;
     preflight)   cmd_preflight ;;
-    prepare)     cmd_prepare ;;
     config)      cmd_config ;;
     build-push)  cmd_build_push ;;
     rollout)     cmd_rollout ;;
