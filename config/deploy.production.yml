@@ -23,6 +23,12 @@ proxy:
   app_port: 3000
   ssl: false
   # ssl: true after DNS / edge plan is fixed
+  healthcheck:
+    path: /
+    interval: 2
+    timeout: 5
+
+deploy_timeout: 90
 
 env:
   clear:

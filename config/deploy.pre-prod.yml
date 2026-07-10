@@ -20,11 +20,21 @@ servers:
 # kamal-proxy in front of Rails. TLS via Let's Encrypt only after DNS points here.
 # Until cutover, smoke via http://18.130.29.168/ (or Host header).
 # Later: host nginx can sit in front and reverse-proxy to kamal-proxy / Go.
+#
+# Healthcheck: this app has no /up route; default Kamal path /up fails and aborts deploy
+# even though Puma is listening. Use /. deploy_timeout is top-level (not under proxy).
 proxy:
   host: gs-test.co.uk
   app_port: 3000
   ssl: false
   # ssl: true   # enable after DNS cutover if kamal-proxy terminates TLS
+  healthcheck:
+    path: /
+    interval: 2
+    timeout: 5
+
+# Seconds for kamal-proxy to wait for the app to become healthy (default 30)
+deploy_timeout: 90
 
 env:
   clear:

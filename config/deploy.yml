@@ -63,6 +63,9 @@ env:
     - DIRECTUS_TOKEN_CMS
     - DIRECTUS_WEBHOOK_SECRET
 
+# Default deploy health wait (destinations may override)
+deploy_timeout: 90
+
 # Aliases for convenience (optional)
 aliases:
   console: app exec --interactive --reuse "bin/rails console"
