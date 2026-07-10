@@ -375,22 +375,44 @@ secrets_files() {
   fi
 }
 
+# Load KEY=VALUE secrets (macOS ships Bash 3.2 — do NOT use `source <(...)`;
+# process substitution + source does not export vars there).
 load_secrets() {
-  local f
-  set -a
-  for f in $(secrets_files); do
+  local f line key val
+  local files
+  files="$(secrets_files)"
+  # shellcheck disable=SC2086
+  for f in $files; do
     if [[ ! -f "$f" ]]; then
-      set +a
       die "Missing secrets file: $f (see .kamal/secrets.example and .kamal/README.md)"
     fi
-    # Only KEY=VALUE lines (dotenv-style). set -a exports them.
-    # shellcheck disable=SC1090
-    source <(grep -E '^[A-Za-z_][A-Za-z0-9_]*=' "$f" | sed 's/\r$//')
+    while IFS= read -r line || [[ -n "$line" ]]; do
+      # strip CR (Windows / some editors)
+      line="${line%$'\r'}"
+      case "$line" in
+        ''|\#*) continue ;;
+      esac
+      case "$line" in
+        *=*) ;;
+        *) continue ;;
+      esac
+      key="${line%%=*}"
+      val="${line#*=}"
+      # valid env key only
+      case "$key" in
+        ''|*[!A-Za-z0-9_]*|[0-9]*) continue ;;
+      esac
+      # export without evaluating value as shell (no source/eval)
+      export "${key}=${val}"
+    done <"$f"
   done
-  set +a
 
-  : "${KAMAL_REGISTRY_USERNAME:?KAMAL_REGISTRY_USERNAME missing in secrets}"
-  : "${KAMAL_REGISTRY_PASSWORD:?KAMAL_REGISTRY_PASSWORD missing in secrets}"
+  if [[ -z "${KAMAL_REGISTRY_USERNAME:-}" ]]; then
+    die "KAMAL_REGISTRY_USERNAME missing or empty in secrets (check .kamal/secrets-common)"
+  fi
+  if [[ -z "${KAMAL_REGISTRY_PASSWORD:-}" ]]; then
+    die "KAMAL_REGISTRY_PASSWORD missing or empty in secrets (check .kamal/secrets-common)"
+  fi
 }
 
 git_is_dirty() {
