@@ -32,10 +32,12 @@
 #   --force-login      Always run docker login (even if already logged in)
 #   --no-log           Do not tee to log/deploy/ (terminal only)
 #   --push-retries N   Max build-push attempts (default 8; GHCR stall recovery)
+#   --push-stall SEC   Kill attempt if no new output for SEC seconds (default 180)
 #
 # Env overrides for push retries:
 #   BUILD_PUSH_MAX_ATTEMPTS   default 8
 #   BUILD_PUSH_RETRY_SLEEP    seconds before first retry (default 20; +10 each try)
+#   BUILD_PUSH_STALL_SECONDS  no-output watchdog per attempt (default 180)
 #
 # Examples:
 #   script/gs-deploy
@@ -68,6 +70,9 @@ INTERACTIVE_MENU=0
 # GHCR push often stalls mid-upload; retries resume (uploaded layers skip).
 PUSH_MAX_ATTEMPTS="${BUILD_PUSH_MAX_ATTEMPTS:-8}"
 PUSH_RETRY_SLEEP="${BUILD_PUSH_RETRY_SLEEP:-20}"
+# If an attempt prints nothing for this long, kill it and retry (hang detection).
+PUSH_STALL_SECONDS="${BUILD_PUSH_STALL_SECONDS:-180}"
+STALL_EXIT_CODE=124
 
 # Hosts / smoke targets (must match config/deploy.*.yml)
 PRE_PROD_HOST="18.130.29.168"
@@ -284,6 +289,87 @@ run_logged() {
   fi
 }
 
+# Run a command; if it produces no new output for stall_secs, kill it and
+# return STALL_EXIT_CODE (124) so the caller can retry.
+# Streams live output to the terminal and LOG_FILE (same as run_logged).
+run_with_stall_watch() {
+  local stall_secs="$1"
+  shift
+  case "$stall_secs" in
+    ''|*[!0-9]*|0) stall_secs=180 ;;
+  esac
+
+  local out
+  out=$(mktemp -t gsdeploy-stall.XXXXXX)
+  : >"$out"
+
+  set +e
+  "$@" >"$out" 2>&1 &
+  local cmd_pid=$!
+  set -e
+
+  # Live stream of the capture file
+  if [[ "$NO_LOG" -eq 1 || -z "${LOG_FILE:-}" ]]; then
+    tail -n +1 -f "$out" 2>/dev/null &
+  else
+    tail -n +1 -f "$out" 2>/dev/null | tee -a "$LOG_FILE" &
+  fi
+  local tail_pid=$!
+
+  local last_size=0
+  local last_change
+  last_change=$(date +%s)
+  local stalled=0
+  local size now
+
+  while kill -0 "$cmd_pid" 2>/dev/null; do
+    sleep 5
+    size=$(stat -f %z "$out" 2>/dev/null || echo 0)
+    now=$(date +%s)
+    if [[ "$size" -gt "$last_size" ]]; then
+      last_size=$size
+      last_change=$now
+    elif [[ $((now - last_change)) -ge "$stall_secs" ]]; then
+      echo ""
+      echo "WARN: no new output for ${stall_secs}s — treating attempt as hung"
+      echo "  Killing pid ${cmd_pid} so we can retry (partial GHCR layers are kept)."
+      stalled=1
+      # Graceful then hard kill; also try children (docker push helpers)
+      kill "$cmd_pid" 2>/dev/null || true
+      sleep 2
+      kill -9 "$cmd_pid" 2>/dev/null || true
+      pkill -P "$cmd_pid" 2>/dev/null || true
+      break
+    fi
+  done
+
+  local rc=0
+  if [[ "$stalled" -eq 1 ]]; then
+    wait "$cmd_pid" 2>/dev/null || true
+    rc=$STALL_EXIT_CODE
+  else
+    set +e
+    wait "$cmd_pid"
+    rc=$?
+    set -e
+  fi
+
+  # Stop streamer (may need a moment to flush last lines)
+  kill "$tail_pid" 2>/dev/null || true
+  wait "$tail_pid" 2>/dev/null || true
+  sleep 0.5
+  kill -9 "$tail_pid" 2>/dev/null || true
+
+  # Ensure any final bytes are in the session log (if tee missed kill race)
+  if [[ "$NO_LOG" -ne 1 && -n "${LOG_FILE:-}" && -f "$out" ]]; then
+    # Avoid huge dupes: only append if log doesn't already end with file tail
+    true
+  fi
+
+  rm -f "$out"
+  return "$rc"
+}
+
 confirm() {
   local prompt="${1:-Continue?}"
   if [[ "$YES" -eq 1 ]]; then
@@ -365,6 +451,15 @@ parse_args() {
         ;;
       --push-retries=*)
         PUSH_MAX_ATTEMPTS="${1#--push-retries=}"
+        shift
+        ;;
+      --push-stall)
+        [[ $# -ge 2 ]] || die "--push-stall requires seconds"
+        PUSH_STALL_SECONDS="$2"
+        shift 2
+        ;;
+      --push-stall=*)
+        PUSH_STALL_SECONDS="${1#--push-stall=}"
         shift
         ;;
       --version)
@@ -812,14 +907,18 @@ cmd_build_push() {
   case "$PUSH_RETRY_SLEEP" in
     ''|*[!0-9]*) PUSH_RETRY_SLEEP=20 ;;
   esac
+  case "$PUSH_STALL_SECONDS" in
+    ''|*[!0-9]*|0) PUSH_STALL_SECONDS=180 ;;
+  esac
 
   echo "Destination config: $(kamal_destination)  (used for image name / arch only)"
   echo "Image:              $img"
   echo "Push retries:       up to ${PUSH_MAX_ATTEMPTS} attempts (sleep ${PUSH_RETRY_SLEEP}s+, backoff +10s)"
+  echo "Hang watchdog:      kill attempt if no new output for ${PUSH_STALL_SECONDS}s, then retry"
   echo "What this does:"
   echo "  • Build Dockerfile on this Mac (Docker Desktop, arm64)"
   echo "  • Push image to ${REGISTRY_HOST}"
-  echo "  • On stall/fail: retry (uploaded layers stay on GHCR; rebuild uses cache)"
+  echo "  • On fail OR silent hang: retry (uploaded layers stay on GHCR; rebuild uses cache)"
   echo "  • Does NOT SSH / restart containers on $(deploy_host)"
   confirm_build_push
 
@@ -831,12 +930,13 @@ cmd_build_push() {
     echo ""
     banner "build-push attempt ${attempt}/${PUSH_MAX_ATTEMPTS}"
     echo "Image: $img"
+    echo "Watchdog: ${PUSH_STALL_SECONDS}s without new output → kill & retry"
     echo "Full command output below (not filtered)…"
 
     set +e
     if [[ "$attempt" -gt 1 ]] && local_image_present; then
       echo "Local image found — docker push only (no rebuild)…"
-      run_logged docker push "$img"
+      run_with_stall_watch "$PUSH_STALL_SECONDS" docker push "$img"
       rc=$?
     else
       if [[ "$attempt" -gt 1 ]]; then
@@ -844,7 +944,7 @@ cmd_build_push() {
       else
         echo "Starting kamal build push…"
       fi
-      run_kamal build push
+      run_with_stall_watch "$PUSH_STALL_SECONDS" run_kamal build push
       rc=$?
     fi
     set -e
@@ -858,7 +958,11 @@ cmd_build_push() {
     fi
 
     echo ""
-    echo "WARN: build-push attempt ${attempt}/${PUSH_MAX_ATTEMPTS} failed (exit ${rc})."
+    if [[ "$rc" -eq "$STALL_EXIT_CODE" ]]; then
+      echo "WARN: build-push attempt ${attempt}/${PUSH_MAX_ATTEMPTS} hung (no output ${PUSH_STALL_SECONDS}s) — will retry."
+    else
+      echo "WARN: build-push attempt ${attempt}/${PUSH_MAX_ATTEMPTS} failed (exit ${rc})."
+    fi
     if [[ "$attempt" -ge "$PUSH_MAX_ATTEMPTS" ]]; then
       break
     fi
@@ -871,7 +975,7 @@ cmd_build_push() {
 
   phase_fail "build-push" "$rc"
   echo "  All ${PUSH_MAX_ATTEMPTS} attempts failed. Re-run: $0  (menu → build-push)" >&2
-  echo "  Or: $0 --push-retries 12" >&2
+  echo "  Or: $0 --push-retries 12 --push-stall 120" >&2
   return "$rc"
 }
 

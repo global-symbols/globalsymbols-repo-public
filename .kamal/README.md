@@ -33,7 +33,7 @@ Ship is split into two actions (wizard runs both, with a pause between):
 | **build-push** | Mac | `kamal build push` (auto-retries on GHCR stall) | No — only build + push to GHCR |
 | **rollout** | pre-prod/prod host | `kamal deploy --skip-push` | Yes — pull image, restart web+job |
 
-**GHCR stalls:** `build-push` retries up to 8 times (configurable: `--push-retries N`, or `BUILD_PUSH_MAX_ATTEMPTS` / `BUILD_PUSH_RETRY_SLEEP`). Already-uploaded layers are skipped on retry; rebuilds use BuildKit cache. Keep `"max-concurrent-uploads": 1` in `~/.docker/daemon.json`.
+**GHCR stalls / silent hangs:** `build-push` retries up to 8 times. Each attempt has a **hang watchdog**: if there is **no new output for 180s**, that attempt is killed and the next retry starts (layers already on GHCR are kept). Configure with `--push-retries N`, `--push-stall SEC`, or `BUILD_PUSH_MAX_ATTEMPTS` / `BUILD_PUSH_RETRY_SLEEP` / `BUILD_PUSH_STALL_SECONDS`. Keep `"max-concurrent-uploads": 1` in `~/.docker/daemon.json`.
 
 Safe defaults: clean git SHA as image tag, log to `log/deploy/`, wizard pauses on.  
 GHCR **login is auto-skipped** when Docker already has `ghcr.io` credentials (use `--force-login` to re-auth, `--skip-login` to never login).
