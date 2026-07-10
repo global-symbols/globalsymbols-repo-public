@@ -3,7 +3,11 @@
 # Guided Kamal deploy CLI for Global Symbols (pre-prod / production).
 #
 # Entry point is always the interactive menu (pick env + action).
-# Phases (wizard, deploy, …) are NOT callable as subcommands.
+# Phases are NOT callable as CLI subcommands.
+#
+# Ship is split:
+#   build-push  — Mac: kamal build push (image → GHCR, no server change)
+#   rollout     — server: kamal deploy --skip-push (pull + restart web/job)
 #
 # Usage:
 #   script/gs-deploy                 # open menu (clean tree required for shipping)
@@ -16,9 +20,8 @@
 #   GHCR login: auto-skipped when Docker already has ghcr.io credentials
 #
 # Hard rule (early):
-#   wizard | preflight | version | config | deploy require a CLEAN git tree
-#   unless --version TAG, or --allow-dirty with environment pre-prod.
-#   --allow-dirty is IGNORED / refused for production.
+#   shipping actions require a CLEAN git tree unless --version TAG, or
+#   --allow-dirty with environment pre-prod (never production).
 #
 # Flags (only on the initial command, before the menu):
 #   --allow-dirty      Allow dirty tree for pre-prod only (not production)
