@@ -16,6 +16,7 @@
 require "json"
 require "net/http"
 require "uri"
+require "socket"
 
 ROOT = File.expand_path("..", __dir__)
 $LOAD_PATH.unshift(File.join(ROOT, "deploy_verify"))
@@ -70,12 +71,13 @@ config = DeployVerify::Config.new(profile)
 reporter = DeployVerify::Reporter.new(config)
 http = DeployVerify::HttpClient.new(config)
 
-puts "Deploy verify starting"
+puts "Deploy verify starting (on-server)"
+puts "  hostname: #{Socket.gethostname rescue "unknown"}"
 puts "  profile:  #{config.profile}"
 puts "  base_url: #{config.base_url}"
+puts "  host_hdr: #{config.host_header.inspect}"
 puts "  writes:   #{config.allow_writes?}"
 puts "  notify-only on fail (no auto rollback/DNS)"
-
 begin
   suite =
     if config.pre_prod?

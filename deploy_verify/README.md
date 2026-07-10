@@ -1,77 +1,80 @@
 # Deploy verification suites
 
-Black-box checks run **after** a Kamal deploy. They do **not** replace local Minitest.
+Black-box checks run **on the app server** after a Kamal deploy (not on your Mac).
 
-| Profile | When | Writes? | Contents |
+| Profile | Host | Writes? | Contents |
 |---------|------|---------|----------|
-| `pre_prod` | After pre-prod deploy | Yes (tagged test data only) | HTTP smoke, Directus, Redis cache probe, optional auth+CRUD |
-| `prod` | After prod deploy | **No** | HTTP smoke + API contracts; optional Directus GET |
+| `pre_prod` | t4g (`global-symbols-ec2-test-t4`) | Optional CRUD | HTTP via local proxy, Directus, Redis DB 2, auth/CRUD |
+| `prod` | prod Rails host | **No** | HTTP via local proxy, API contracts, optional Directus GET |
 
-**On failure:** print failures + write a markdown report under `tmp/deploy_verify/`.  
-**No** auto-rollback, DNS change, or redeploy — humans decide.
+**On failure:** markdown report + exit 1. **No** auto-rollback/DNS — human decides.
 
-## Quick start
+## Why on the server?
 
-```bash
-# Pre-prod (defaults BASE_URL=http://gs-test.co.uk — use hosts file or set URL)
-script/run_deploy_verify.sh pre_prod
+| Check | On server | From Mac |
+|-------|-----------|----------|
+| Rails via kamal-proxy | `http://127.0.0.1` + Host header | Needs hosts/VPN |
+| Redis `172.31.13.8` | Reachable | Usually timed out |
+| Same path as real traffic | Yes (local edge) | Partial |
 
-# Against t4g IP with Host header
-DEPLOY_VERIFY_BASE_URL=http://18.130.29.168 \
-DEPLOY_VERIFY_HOST_HEADER=gs-test.co.uk \
-script/run_deploy_verify.sh pre_prod
+## How to run
 
-# Prod (read-only)
-DEPLOY_VERIFY_BASE_URL=https://globalsymbols.com \
-script/run_deploy_verify.sh prod
-```
-
-Optional: load secrets automatically from `.kamal/secrets-common` and `.kamal/secrets.pre-prod` if those files exist and env vars are unset.
-
-### Pre-prod auth + CRUD
+### A. From your laptop (syncs suite, runs on server)
 
 ```bash
-export DEPLOY_VERIFY_USER_EMAIL='your-test-user@example.com'
-export DEPLOY_VERIFY_USER_PASSWORD='…'
-script/run_deploy_verify.sh pre_prod
+# Pre-prod t4g
+script/run_deploy_verify_remote.sh pre_prod
+
+# With CRUD
+DEPLOY_VERIFY_USER_EMAIL='…' DEPLOY_VERIFY_USER_PASSWORD='…' \
+  script/run_deploy_verify_remote.sh pre_prod
+
+# Prod (update SSH host when m7g is live: DEPLOY_VERIFY_SSH=…)
+script/run_deploy_verify_remote.sh prod
 ```
 
-CRUD creates a symbolset named `Deploy Test deploy-test-<run-id>`, updates it, then deletes it.
-
-### Directus
-
-Uses `DIRECTUS_URL` + `DIRECTUS_TOKEN_CMS` (or `DEPLOY_VERIFY_DIRECTUS_*`).  
-Checks `server/info` and `items/gs_languages`.
-
-### Redis cache (pre-prod)
-
-Uses `REDIS_IP`, `REDIS_PASSWORD`, `REDIS_CACHE_DB` (default **2**).  
-Needs network reachability to Redis (often only from VPC / t4g). If unreachable, that check **fails with a clear message** (not silent pass).
-
-Run from t4g if needed:
+### B. SSH to the server yourself
 
 ```bash
-# on t4g, with repo or a copy of deploy_verify + env
-REDIS_IP=172.31.13.8 REDIS_PASSWORD=… REDIS_CACHE_DB=2 \
-DEPLOY_VERIFY_BASE_URL=http://127.0.0.1:3000 \  # or via proxy
-  ruby deploy_verify/runner.rb pre_prod
+ssh global-symbols-ec2-test-t4
+# after remote script has synced, or after image includes deploy_verify/:
+bash /opt/gs-deploy-verify/run_deploy_verify.sh pre_prod
 ```
 
-## Exit codes
+### C. Inside the web container (after image includes `deploy_verify/`)
 
-| Code | Meaning |
-|------|---------|
-| 0 | All executed checks passed (skips ok) |
-| 1 | One or more failures (notification; human decides action) |
-| 2 | Bad usage |
+```bash
+# on server
+WEB=$(docker ps -q -f name=gs-repo-web-pre-prod | head -1)
+docker exec -e DEPLOY_VERIFY_BASE_URL=http://kamal-proxy \
+  -e DEPLOY_VERIFY_HOST_HEADER=gs-test.co.uk \
+  -e REDIS_IP -e REDIS_PASSWORD -e REDIS_CACHE_DB=2 \
+  -e DIRECTUS_URL -e DIRECTUS_TOKEN_CMS \
+  "$WEB" ruby /rails/deploy_verify/runner.rb pre_prod
+```
 
-## Layout
+`script/run_deploy_verify.sh` prefers this path when the file exists in the image.
+
+## Defaults (on-server)
+
+| Variable | Pre-prod default | Prod default |
+|----------|------------------|--------------|
+| `DEPLOY_VERIFY_BASE_URL` | `http://127.0.0.1` | `http://127.0.0.1` |
+| `DEPLOY_VERIFY_HOST_HEADER` | `gs-test.co.uk` | `globalsymbols.com` |
+| `REDIS_IP` | `172.31.13.8` | (Redis checks off) |
+| `REDIS_CACHE_DB` | `2` | `3` (unused) |
+| Directus URL | `https://cms.gs-test.co.uk` | `https://cms.globalsymbols.com` |
+
+Env is **imported from the running web container** when possible (`REDIS_*`, `DIRECTUS_*`, …).
+
+## Reports
+
+Written to **`/tmp/deploy_verify/`** on the server.
+
+## After each deploy (suggested)
 
 ```text
-deploy_verify/
-  runner.rb
-  lib/           # config, http, redis, reporter, csrf
-  suites/        # pre_prod.rb, prod.rb
-  README.md
-script/run_deploy_verify.sh
+kamal deploy -d pre-prod --skip-push
+script/run_deploy_verify_remote.sh pre_prod    # from laptop
+# read report / NOTIFICATION lines — human decides next action
 ```

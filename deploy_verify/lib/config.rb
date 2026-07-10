@@ -4,7 +4,9 @@ require "uri"
 
 module DeployVerify
   # Environment configuration for deploy verification suites.
-  # All values come from ENV (or optional dotenv-style files loaded by the runner).
+  #
+  # Intended to run ON the app server (pre-prod t4g / prod m7g), not from a laptop.
+  # Defaults hit local kamal-proxy (127.0.0.1) with the public Host header.
   class Config
     attr_reader :profile, :base_url, :host_header
 
@@ -12,12 +14,23 @@ module DeployVerify
       @profile = profile.to_s
       raise ArgumentError, "profile must be pre_prod or prod" unless %w[pre_prod prod].include?(@profile)
 
-      @base_url = required_or_default(
-        "DEPLOY_VERIFY_BASE_URL",
-        pre_prod? ? "http://gs-test.co.uk" : "https://globalsymbols.com"
-      ).sub(%r{/\z}, "")
+      # On-server defaults: talk to kamal-proxy on loopback with the real vhost Host header.
+      default_base =
+        if pre_prod?
+          "http://127.0.0.1"
+        else
+          "http://127.0.0.1"
+        end
+      default_host =
+        if pre_prod?
+          "gs-test.co.uk"
+        else
+          "globalsymbols.com"
+        end
 
-      @host_header = ENV["DEPLOY_VERIFY_HOST_HEADER"] # optional override (e.g. when using IP)
+      @base_url = required_or_default("DEPLOY_VERIFY_BASE_URL", default_base).sub(%r{/\z}, "")
+      @host_header = ENV.key?("DEPLOY_VERIFY_HOST_HEADER") ? ENV["DEPLOY_VERIFY_HOST_HEADER"] : default_host
+      @host_header = nil if @host_header.to_s.strip.empty?
     end
 
     def pre_prod?
@@ -37,7 +50,12 @@ module DeployVerify
     end
 
     def report_dir
-      ENV["DEPLOY_VERIFY_REPORT_DIR"] || File.expand_path("../../tmp/deploy_verify", __dir__)
+      ENV["DEPLOY_VERIFY_REPORT_DIR"] ||
+        if File.writable?("/tmp")
+          "/tmp/deploy_verify"
+        else
+          File.expand_path("../../tmp/deploy_verify", __dir__)
+        end
     end
 
     # Optional auth for CRUD / signed-in checks (pre-prod)
@@ -53,7 +71,7 @@ module DeployVerify
       test_email.to_s.strip != "" && test_password.to_s.strip != ""
     end
 
-    # Directus (optional — checks skipped with note if unset)
+    # Directus
     def directus_url
       raw = ENV["DEPLOY_VERIFY_DIRECTUS_URL"] || ENV["DIRECTUS_URL"]
       raw = "https://cms.gs-test.co.uk" if raw.to_s.strip.empty? && pre_prod?
@@ -73,10 +91,10 @@ module DeployVerify
       (ENV["DEPLOY_VERIFY_DIRECTUS_RECENT_DAYS"] || "90").to_i
     end
 
-    # Redis cache (pre-prod only; optional if unreachable from runner)
+    # Redis cache — on-server defaults match topology (reachable from t4g/m7g)
     def redis_ip
       raw = ENV["DEPLOY_VERIFY_REDIS_IP"] || ENV["REDIS_IP"]
-      raw = "172.31.13.8" if raw.to_s.strip.empty? && pre_prod? && redis_password.to_s != ""
+      raw = "172.31.13.8" if raw.to_s.strip.empty? && pre_prod?
       raw
     end
 
@@ -90,17 +108,16 @@ module DeployVerify
     end
 
     def redis_configured?
-      # Prod suite never opens Redis (read-only product checks only)
       return false if prod?
       redis_ip.to_s.strip != ""
     end
-    # Prod known public fixtures (optional)
+
     def prod_symbolset_path
       ENV["DEPLOY_VERIFY_PROD_SYMBOLSET_PATH"] || "/symbolsets"
     end
 
     def notify?
-      true # always report; never auto-remediate
+      true
     end
 
     def uri(path = "/")
