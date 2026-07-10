@@ -1,0 +1,833 @@
+#!/usr/bin/env bash
+# =============================================================================
+# Guided Kamal deploy CLI for Global Symbols (pre-prod / production).
+#
+# Entry point is always the interactive menu (pick env + action).
+# Phases (wizard, deploy, …) are NOT callable as subcommands.
+#
+# Usage:
+#   script/gs-deploy                 # open menu (clean tree required for shipping)
+#   script/gs-deploy --allow-dirty   # menu; dirty tree OK for pre-prod only
+#   script/gs-deploy --version TAG   # menu, force image tag
+#   script/gs-deploy --help
+#
+# Menu defaults:
+#   VERSION=git SHA if clean · login each run · log on · wizard pauses on
+#
+# Hard rule (early):
+#   wizard | preflight | version | config | deploy require a CLEAN git tree
+#   unless --version TAG, or --allow-dirty with environment pre-prod.
+#   --allow-dirty is IGNORED / refused for production.
+#
+# Flags (only on the initial command, before the menu):
+#   --allow-dirty      Allow dirty tree for pre-prod only (not production)
+#   --version TAG      Force image tag (also: export VERSION=...)
+#   --yes              Skip wizard pause prompts (still streams all output)
+#   --skip-login       Skip docker login (already authenticated)
+#   --no-log           Do not tee to log/deploy/ (terminal only)
+#
+# Examples:
+#   script/gs-deploy
+#   script/gs-deploy --allow-dirty    # then choose pre-prod in the menu
+# =============================================================================
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+
+KAMAL_VERSION="${KAMAL_DOCKER_KAMAL_VERSION:-2.12.0}"
+RUBY_IMAGE="${KAMAL_DOCKER_RUBY_IMAGE:-ruby:3.2.11-bookworm}"
+REGISTRY_HOST="ghcr.io"
+IMAGE_REPO="global-symbols/globalsymbols-repo-internal"
+
+# --- defaults / flags ---
+YES=0
+ALLOW_DIRTY=0
+SKIP_LOGIN=0
+NO_LOG=0
+VERSION_OVERRIDE="${VERSION:-}"
+ENV_NAME=""
+COMMAND=""
+LOG_FILE=""
+PHASE_FAILED=""
+INTERACTIVE_MENU=0
+
+# Hosts / smoke targets (must match config/deploy.*.yml)
+PRE_PROD_HOST="18.130.29.168"
+PRE_PROD_HTTP_HOST="gs-test.co.uk"
+PROD_HOST="" # filled from config if not placeholder
+PROD_HTTP_HOST="globalsymbols.com"
+
+usage() {
+  # Print leading comment block only (stop at first non-# line)
+  awk 'NR==1{next} /^#/{sub(/^# ?/,""); print; next} {exit}' "$0"
+  exit "${1:-0}"
+}
+
+# Read a single menu choice; prints prompt to stderr, returns selection on stdout via nameref-style
+# Usage: menu_pick VAR "Prompt" "1) label" "2) label" ...
+# Sets VAR to the number chosen (1-based).
+menu_pick() {
+  local __var="$1"
+  local __prompt="$2"
+  shift 2
+  local __options=("$@")
+  local __n=${#__options[@]}
+  local __choice=""
+  local __i
+
+  while true; do
+    echo "" >&2
+    echo "$__prompt" >&2
+    for ((__i = 0; __i < __n; __i++)); do
+      echo "  ${__options[$__i]}" >&2
+    done
+    echo "" >&2
+    read -r -p "Choice [1-${__n}] (q=quit): " __choice || true
+    case "${__choice:-}" in
+      q|Q|quit)
+        echo "Quit." >&2
+        exit 0
+        ;;
+    esac
+    if [[ "$__choice" =~ ^[0-9]+$ ]] && ((__choice >= 1 && __choice <= __n)); then
+      printf -v "$__var" '%s' "$__choice"
+      return 0
+    fi
+    echo "Invalid choice. Enter a number 1-${__n}, or q to quit." >&2
+  done
+}
+
+menu_yes_no() {
+  # $1 = prompt; default no. Sets global-style via return 0/1
+  local prompt="$1"
+  local reply
+  read -r -p "$prompt [y/N]: " reply || true
+  case "${reply:-}" in
+    y|Y|yes|YES) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+# Interactive front door: no CLI flags required
+interactive_menu() {
+  INTERACTIVE_MENU=1
+  local pick
+
+  banner "Global Symbols deploy"
+  echo "Repo: $ROOT"
+  echo "Pick environment and action (q quits at any prompt)."
+  echo "Hard rule: shipping needs a clean git tree."
+  echo "  Exception: --allow-dirty is valid for pre-prod only (never production)."
+  if [[ "$ALLOW_DIRTY" -eq 1 ]]; then
+    echo "Flag: --allow-dirty is ON (pre-prod only; production will still require clean git)."
+  fi
+  if [[ -n "$VERSION_OVERRIDE" ]]; then
+    echo "Flag: --version $VERSION_OVERRIDE"
+  fi
+  if git_is_dirty 2>/dev/null; then
+    echo ""
+    echo "Git: DIRTY — for pre-prod use --allow-dirty; production must be clean."
+  else
+    echo ""
+    echo "Git: clean @ $(git rev-parse --short HEAD 2>/dev/null || echo '?')"
+  fi
+
+  # --- Environment ---
+  menu_pick pick "Environment:" \
+    "1) pre-prod   — t4g ${PRE_PROD_HOST} (${PRE_PROD_HTTP_HOST})" \
+    "2) production — m7g (use only when ready)" \
+    "3) help       — print CLI reference and exit"
+  case "$pick" in
+    1) ENV_NAME="pre-prod" ;;
+    2) ENV_NAME="production" ;;
+    3) usage 0 ;;
+  esac
+
+  # --- Action ---
+  menu_pick pick "Action for ${ENV_NAME}:" \
+    "1) wizard       — full guided path (recommended)" \
+    "2) preflight    — check Docker, secrets, SSH, config" \
+    "3) version      — show/resolve image tag only" \
+    "4) login        — docker login to GHCR" \
+    "5) config       — kamal config (read-only, no server change)" \
+    "6) deploy       — kamal deploy (TOUCHES SERVER)" \
+    "7) smoke        — HTTP smoke check" \
+    "8) hint-verify  — how to run deploy_verify on the server"
+  case "$pick" in
+    1) COMMAND="wizard" ;;
+    2) COMMAND="preflight" ;;
+    3) COMMAND="version" ;;
+    4) COMMAND="login" ;;
+    5) COMMAND="config" ;;
+    6) COMMAND="deploy" ;;
+    7) COMMAND="smoke" ;;
+    8) COMMAND="hint-verify" ;;
+  esac
+
+  # Fail immediately after action choice (before Start now / any phase)
+  assert_clean_working_tree
+
+  # Summary before running
+  echo ""
+  banner "Ready"
+  echo "  Environment : $ENV_NAME  (host: $(deploy_host))"
+  echo "  Action      : $COMMAND"
+  echo "  Defaults    : VERSION=auto · login each run · log to log/deploy/ · wizard pauses on"
+  if [[ -n "$VERSION_OVERRIDE" || "$ALLOW_DIRTY" -eq 1 || "$SKIP_LOGIN" -eq 1 || "$NO_LOG" -eq 1 || "$YES" -eq 1 ]]; then
+    echo "  CLI overrides in effect:"
+    [[ -n "$VERSION_OVERRIDE" ]] && echo "    VERSION=$VERSION_OVERRIDE"
+    if [[ "$ALLOW_DIRTY" -eq 1 ]]; then
+      if allow_dirty_effective; then
+        echo "    --allow-dirty (effective for pre-prod)"
+      else
+        echo "    --allow-dirty (ignored — not allowed for production)"
+      fi
+    fi
+    [[ "$SKIP_LOGIN" -eq 1 ]] && echo "    --skip-login"
+    [[ "$NO_LOG" -eq 1 ]] && echo "    --no-log"
+    [[ "$YES" -eq 1 ]] && echo "    --yes (skip pauses)"
+  fi
+  echo ""
+  if ! menu_yes_no "Start now?"; then
+    echo "Aborted."
+    exit 0
+  fi
+}
+
+die() {
+  echo "ERROR: $*" >&2
+  exit 1
+}
+
+ts() { date +"%Y-%m-%dT%H-%M-%S"; }
+
+banner() {
+  echo ""
+  echo "════════════════════════════════════════════════════════════"
+  echo " $*"
+  echo "════════════════════════════════════════════════════════════"
+}
+
+phase_banner() {
+  echo ""
+  echo "── Phase: $* ──"
+}
+
+phase_ok() {
+  echo "── Phase OK: $* ──"
+}
+
+phase_fail() {
+  local name="$1" rc="$2"
+  PHASE_FAILED="$name"
+  echo "" >&2
+  echo "── Phase FAILED: $name (exit $rc) ──" >&2
+  echo "  Re-run:  $0${ALLOW_DIRTY:+ --allow-dirty}${VERSION_OVERRIDE:+ --version $VERSION_OVERRIDE}" >&2
+  echo "           then choose env + action '$name' (or wizard) in the menu" >&2
+  if [[ -n "${LOG_FILE:-}" && -f "$LOG_FILE" ]]; then
+    echo "  Log:     $LOG_FILE" >&2
+  fi
+  echo "  (Full error output is above — nothing was filtered.)" >&2
+}
+
+# Stream a command to terminal and optional log (never hide stderr)
+run_logged() {
+  if [[ "$NO_LOG" -eq 1 || -z "${LOG_FILE:-}" ]]; then
+    "$@"
+  else
+    # Preserve exit code through tee
+    set +e
+    "$@" 2>&1 | tee -a "$LOG_FILE"
+    local rc=${PIPESTATUS[0]}
+    set -e
+    return "$rc"
+  fi
+}
+
+confirm() {
+  local prompt="${1:-Continue?}"
+  if [[ "$YES" -eq 1 ]]; then
+    echo "(--yes) $prompt → yes"
+    return 0
+  fi
+  local reply
+  read -r -p "$prompt [Enter=yes / n=no] " reply || true
+  case "${reply:-}" in
+    n|N|no|NO|q|Q) return 1 ;;
+    *) return 0 ;;
+  esac
+}
+
+confirm_deploy() {
+  if [[ "$YES" -eq 1 ]]; then
+    echo "(--yes) deploy confirmation skipped"
+    return 0
+  fi
+  local token
+  if [[ "$ENV_NAME" == "production" ]]; then
+    echo ""
+    echo "⚠  PRODUCTION deploy — will replace web+job on the production host."
+    read -r -p "Type 'production' to continue: " token
+    [[ "$token" == "production" ]] || die "Aborted (typed: ${token:-empty})"
+  else
+    echo ""
+    echo "⚠  Will SSH to ${PRE_PROD_HOST} and replace pre-prod web+job containers."
+    read -r -p "Type 'deploy' to continue: " token
+    [[ "$token" == "deploy" ]] || die "Aborted (typed: ${token:-empty})"
+  fi
+}
+
+pause_wizard() {
+  local label="${1:-next phase}"
+  if [[ "$YES" -eq 1 ]]; then
+    return 0
+  fi
+  local reply
+  read -r -p "Press Enter for ${label}, or q to quit: " reply || true
+  case "${reply:-}" in
+    q|Q|quit) echo "Stopped before: $label"; exit 0 ;;
+  esac
+}
+
+# --- parse args ---
+# Only flags on the entry command, then always open the interactive menu.
+# Direct subcommands (e.g. "pre-prod deploy") are intentionally not supported.
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h|--help|help)
+        usage 0
+        ;;
+      --yes|-y) YES=1; shift ;;
+      --allow-dirty) ALLOW_DIRTY=1; shift ;;
+      --skip-login) SKIP_LOGIN=1; shift ;;
+      --no-log) NO_LOG=1; shift ;;
+      --version)
+        [[ $# -ge 2 ]] || die "--version requires a tag"
+        VERSION_OVERRIDE="$2"
+        shift 2
+        ;;
+      --version=*)
+        VERSION_OVERRIDE="${1#--version=}"
+        shift
+        ;;
+      -*)
+        die "Unknown flag: $1 (try: $0 --help)"
+        ;;
+      *)
+        die "Direct steps are not supported (got: $*).
+
+  Use the menu only:
+    $0
+    $0 --allow-dirty
+    $0 --version TAG
+
+  Pick environment and action (wizard, deploy, …) interactively.
+  See: $0 --help"
+        ;;
+    esac
+  done
+
+  interactive_menu
+}
+
+kamal_destination() {
+  # Kamal -d matches deploy.<destination>.yml
+  echo "$ENV_NAME"
+}
+
+deploy_host() {
+  if [[ "$ENV_NAME" == "pre-prod" ]]; then
+    echo "$PRE_PROD_HOST"
+  else
+    # Best-effort from config; may still be placeholder
+    local h
+    h="$(grep -E '^\s+-\s+[0-9.]+' config/deploy.production.yml 2>/dev/null | head -1 | awk '{print $2}' || true)"
+    if [[ -z "$h" || "$h" == REPLACE* ]]; then
+      h="$(grep -E 'REPLACE_WITH' config/deploy.production.yml | head -1 | awk '{print $2}' || true)"
+    fi
+    echo "${h:-REPLACE_WITH_M7G_PUBLIC_OR_PRIVATE_IP}"
+  fi
+}
+
+http_host_header() {
+  if [[ "$ENV_NAME" == "pre-prod" ]]; then
+    echo "$PRE_PROD_HTTP_HOST"
+  else
+    echo "$PROD_HTTP_HOST"
+  fi
+}
+
+secrets_files() {
+  echo ".kamal/secrets-common"
+  if [[ "$ENV_NAME" == "pre-prod" ]]; then
+    echo ".kamal/secrets.pre-prod"
+  else
+    # production destination file name
+    if [[ -f .kamal/secrets.production ]]; then
+      echo ".kamal/secrets.production"
+    elif [[ -f .kamal/secrets.prod ]]; then
+      echo ".kamal/secrets.prod"
+    else
+      echo ".kamal/secrets.production"
+    fi
+  fi
+}
+
+load_secrets() {
+  local f
+  set -a
+  for f in $(secrets_files); do
+    if [[ ! -f "$f" ]]; then
+      set +a
+      die "Missing secrets file: $f (see .kamal/secrets.example and .kamal/README.md)"
+    fi
+    # Only KEY=VALUE lines (dotenv-style). set -a exports them.
+    # shellcheck disable=SC1090
+    source <(grep -E '^[A-Za-z_][A-Za-z0-9_]*=' "$f" | sed 's/\r$//')
+  done
+  set +a
+
+  : "${KAMAL_REGISTRY_USERNAME:?KAMAL_REGISTRY_USERNAME missing in secrets}"
+  : "${KAMAL_REGISTRY_PASSWORD:?KAMAL_REGISTRY_PASSWORD missing in secrets}"
+}
+
+git_is_dirty() {
+  # porcelain non-empty = dirty
+  [[ -n "$(git status --porcelain 2>/dev/null || true)" ]]
+}
+
+# Shipping / identity actions: must start from a clean tree (unless CLI override).
+command_requires_clean_tree() {
+  case "${COMMAND:-}" in
+    wizard|preflight|version|config|deploy) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+# --allow-dirty only applies to pre-prod (never production).
+allow_dirty_effective() {
+  [[ "${ALLOW_DIRTY:-0}" -eq 1 && "${ENV_NAME:-}" == "pre-prod" ]]
+}
+
+# Hard rule at the beginning — not mid-wizard at the version phase.
+assert_clean_working_tree() {
+  command_requires_clean_tree || return 0
+
+  # Custom tag override (any env) — still ships working tree as-is
+  if [[ -n "${VERSION_OVERRIDE:-}" ]]; then
+    return 0
+  fi
+
+  # Dirty allowed only for pre-prod
+  if allow_dirty_effective; then
+    return 0
+  fi
+
+  if ! git_is_dirty; then
+    return 0
+  fi
+
+  echo "" >&2
+  echo "ERROR: Git working tree is dirty — stopped at the start (before any phase)." >&2
+  echo "  Action '$COMMAND' on '${ENV_NAME}' requires a clean tree so the image tag matches commits." >&2
+  echo "" >&2
+  echo "  Uncommitted / untracked:" >&2
+  git status --porcelain | head -30 >&2
+  echo "" >&2
+  if [[ "${ENV_NAME:-}" == "production" ]]; then
+    if [[ "${ALLOW_DIRTY:-0}" -eq 1 ]]; then
+      echo "  Note: --allow-dirty was set but is NOT allowed for production." >&2
+    fi
+    echo "  Fix: commit (or stash), then re-run:  $0" >&2
+    echo "  Production never accepts a dirty working tree." >&2
+  else
+    echo "  Fix: commit (or stash), then re-run:  $0" >&2
+    echo "  Or (pre-prod only) ship uncommitted work:" >&2
+    echo "    $0 --allow-dirty" >&2
+    echo "    $0 --version TAG" >&2
+  fi
+  exit 1
+}
+
+resolve_version() {
+  if [[ -n "$VERSION_OVERRIDE" ]]; then
+    export VERSION="$VERSION_OVERRIDE"
+    return 0
+  fi
+  if git_is_dirty; then
+    if allow_dirty_effective; then
+      export VERSION="$(git rev-parse --short HEAD)-dirty-$(date +%Y%m%d%H%M%S)"
+      echo "WARN: dirty tree; using VERSION=$VERSION (--allow-dirty, pre-prod only)"
+      return 0
+    fi
+    # Should have been caught by assert_clean_working_tree; keep as safety net
+    die "Git working tree is dirty. Commit first, or (pre-prod only) --allow-dirty / --version TAG"
+  fi
+  export VERSION="$(git rev-parse HEAD)"
+}
+
+absolute_image() {
+  echo "${REGISTRY_HOST}/${IMAGE_REPO}:${VERSION}"
+}
+
+setup_log() {
+  if [[ "$NO_LOG" -eq 1 ]]; then
+    LOG_FILE=""
+    return 0
+  fi
+  mkdir -p log/deploy
+  LOG_FILE="log/deploy/${ENV_NAME}-$(ts)-${COMMAND}.log"
+  {
+    echo "# gs-deploy log"
+    echo "# started: $(date -Iseconds 2>/dev/null || date)"
+    echo "# env=$ENV_NAME command=$COMMAND cwd=$ROOT"
+    echo "# argv: $*"
+    echo ""
+  } >"$LOG_FILE"
+  echo "Logging to: $LOG_FILE"
+}
+
+# Run kamal inside Docker (no bare-metal Ruby/Kamal on the Mac required).
+# Usage: run_kamal <kamal-subcommand> [extra kamal args…]
+# Streams full stdout/stderr (via run_logged).
+run_kamal() {
+  local dest host kamal_cmd
+  dest="$(kamal_destination)"
+  host="$(deploy_host)"
+  kamal_cmd="$1"
+  shift || true
+
+  local ssh_key="${HOME}/.ssh/global-symbols.pem"
+  [[ -f "$ssh_key" ]] || die "SSH key not found: $ssh_key"
+
+  run_logged docker run --rm -i \
+    -v "$ROOT":/rails \
+    -v "$ssh_key":/root/.ssh/global-symbols.pem:ro \
+    -w /rails \
+    -e KAMAL_REGISTRY_USERNAME \
+    -e KAMAL_REGISTRY_PASSWORD \
+    -e SECRET_KEY_BASE \
+    -e GS_DATABASE_PASSWORD \
+    -e REDIS_PASSWORD \
+    -e DIRECTUS_TOKEN_CMS \
+    -e DIRECTUS_WEBHOOK_SECRET \
+    -e MYSQL_ROOT_PASSWORD \
+    -e MYSQL_PASSWORD \
+    -e VERSION \
+    -e "GS_KAMAL_CMD=${kamal_cmd}" \
+    -e "GS_KAMAL_DEST=${dest}" \
+    -e "GS_DEPLOY_HOST=${host}" \
+    -e "GS_KAMAL_VERSION=${KAMAL_VERSION}" \
+    "$RUBY_IMAGE" \
+    bash -c '
+set -euo pipefail
+mkdir -p /root/.ssh
+chmod 700 /root/.ssh
+# Avoid HostKeyMismatch inside the container
+ssh-keyscan -H "$GS_DEPLOY_HOST" >> /root/.ssh/known_hosts 2>/dev/null || true
+chmod 600 /root/.ssh/known_hosts 2>/dev/null || true
+gem install kamal -v "$GS_KAMAL_VERSION" --no-document
+echo "+ kamal $GS_KAMAL_CMD -d $GS_KAMAL_DEST  (VERSION=${VERSION:-auto})"
+exec kamal "$GS_KAMAL_CMD" -d "$GS_KAMAL_DEST"
+'
+}
+
+# ─── phases ───────────────────────────────────────────────────────────────
+
+cmd_help() {
+  usage 0
+}
+
+cmd_preflight() {
+  phase_banner "preflight ($ENV_NAME)"
+  local ok=1
+
+  echo "• repo root: $ROOT"
+  if ! command -v docker >/dev/null 2>&1; then
+    echo "✗ docker not found on PATH"
+    ok=0
+  else
+    echo "• docker: $(docker version --format '{{.Client.Version}}' 2>/dev/null || echo present)"
+    if ! docker info >/dev/null 2>&1; then
+      echo "✗ docker daemon not reachable (is Docker Desktop running?)"
+      ok=0
+    else
+      echo "✓ docker daemon OK"
+    fi
+  fi
+
+  if ! command -v git >/dev/null 2>&1; then
+    echo "✗ git not found"
+    ok=0
+  else
+    echo "• git: $(git rev-parse --short HEAD 2>/dev/null) branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
+    if git_is_dirty; then
+      if allow_dirty_effective || [[ -n "$VERSION_OVERRIDE" ]]; then
+        echo "⚠  working tree DIRTY (allowed: pre-prod --allow-dirty and/or --version):"
+        git status --porcelain | head -20
+      else
+        echo "✗ working tree DIRTY (hard rule: commit before shipping;"
+        echo "    --allow-dirty is pre-prod only, never production):"
+        git status --porcelain | head -20
+        ok=0
+      fi
+    else
+      echo "✓ working tree clean"
+    fi
+  fi
+
+  local f
+  for f in $(secrets_files); do
+    if [[ -f "$f" ]]; then
+      echo "✓ secrets: $f"
+    else
+      echo "✗ missing: $f"
+      ok=0
+    fi
+  done
+
+  local ssh_key="${HOME}/.ssh/global-symbols.pem"
+  if [[ -f "$ssh_key" ]]; then
+    echo "✓ SSH key: $ssh_key"
+  else
+    echo "✗ SSH key missing: $ssh_key"
+    ok=0
+  fi
+
+  for f in config/deploy.yml "config/deploy.${ENV_NAME}.yml" Dockerfile; do
+    if [[ -f "$f" ]]; then
+      echo "✓ $f"
+    else
+      echo "✗ missing $f"
+      ok=0
+    fi
+  done
+
+  local host
+  host="$(deploy_host)"
+  echo "• target host: $host"
+  if [[ "$ENV_NAME" == "production" && "$host" == REPLACE* ]]; then
+    echo "✗ production host still a placeholder in config/deploy.production.yml"
+    ok=0
+  fi
+
+  if [[ "$ok" -ne 1 ]]; then
+    phase_fail "preflight" 1
+    return 1
+  fi
+  phase_ok "preflight"
+}
+
+cmd_version() {
+  phase_banner "version ($ENV_NAME)"
+  resolve_version
+  echo "VERSION=$VERSION"
+  echo "absolute image: $(absolute_image)"
+  if git_is_dirty; then
+    echo "note: tree is dirty (override or --allow-dirty in effect)"
+  fi
+  phase_ok "version"
+}
+
+cmd_login() {
+  phase_banner "login (GHCR)"
+  if [[ "$SKIP_LOGIN" -eq 1 ]]; then
+    echo "Skipping docker login (--skip-login)"
+    phase_ok "login (skipped)"
+    return 0
+  fi
+  load_secrets
+  echo "Logging in to ${REGISTRY_HOST} as ${KAMAL_REGISTRY_USERNAME} …"
+  # password only on stdin — not printed
+  set +e
+  run_logged bash -c 'echo "$KAMAL_REGISTRY_PASSWORD" | docker login "'"$REGISTRY_HOST"'" -u "$KAMAL_REGISTRY_USERNAME" --password-stdin'
+  local rc=$?
+  set -e
+  if [[ "$rc" -ne 0 ]]; then
+    phase_fail "login" "$rc"
+    return "$rc"
+  fi
+  phase_ok "login"
+}
+
+cmd_config() {
+  phase_banner "config (kamal config -d $(kamal_destination); read-only)"
+  load_secrets
+  resolve_version
+  echo "Resolved VERSION=$VERSION"
+  echo "Running kamal config (full output follows)…"
+  set +e
+  run_kamal config
+  local rc=$?
+  set -e
+  if [[ "$rc" -ne 0 ]]; then
+    phase_fail "config" "$rc"
+    return "$rc"
+  fi
+  phase_ok "config"
+}
+
+cmd_deploy() {
+  phase_banner "deploy (kamal deploy -d $(kamal_destination); TOUCHES SERVER)"
+  load_secrets
+  resolve_version
+  echo "Destination: $(kamal_destination)"
+  echo "Host:        $(deploy_host)"
+  echo "Image:       $(absolute_image)"
+  confirm_deploy
+  echo "Starting kamal deploy — full stream below (not filtered)…"
+  set +e
+  run_kamal deploy
+  local rc=$?
+  set -e
+  if [[ "$rc" -ne 0 ]]; then
+    phase_fail "deploy" "$rc"
+    return "$rc"
+  fi
+  phase_ok "deploy"
+  echo ""
+  echo "Next: smoke check, then verify on the server (hint-verify)."
+}
+
+cmd_smoke() {
+  phase_banner "smoke (HTTP check; does not change server)"
+  local host header
+  host="$(deploy_host)"
+  header="$(http_host_header)"
+  if [[ "$host" == REPLACE* ]]; then
+    die "Cannot smoke: host is still a placeholder ($host)"
+  fi
+  echo "curl -sS -D- -o /dev/null -H \"Host: ${header}\" \"http://${host}/\""
+  set +e
+  run_logged curl -sS -D- -o /dev/null --max-time 30 -H "Host: ${header}" "http://${host}/"
+  local rc=$?
+  set -e
+  if [[ "$rc" -ne 0 ]]; then
+    phase_fail "smoke" "$rc"
+    return "$rc"
+  fi
+  phase_ok "smoke"
+}
+
+cmd_hint_verify() {
+  phase_banner "hint-verify (instructions only — suite runs ON the server)"
+  local host web_filter profile
+  host="$(deploy_host)"
+  if [[ "$ENV_NAME" == "pre-prod" ]]; then
+    web_filter="gs-repo-web-pre-prod"
+    profile="pre_prod"
+  else
+    web_filter="gs-repo-web-production"
+    profile="prod"
+  fi
+  cat <<EOF
+Deploy verify ships IN the app image and must run on the app host
+(IP allowlist + RuntimeGuard). Not from this laptop as the primary path.
+
+1) SSH:
+   ssh -i ~/.ssh/global-symbols.pem ubuntu@${host}
+
+2) Inside the server:
+   WEB=\$(docker ps -q -f name=${web_filter} | head -1)
+   docker exec "\$WEB" /rails/deploy_verify/bin/run ${profile}
+
+   # or host wrapper (if present on server):
+   # script/run_deploy_verify.sh ${profile}
+
+Reports: container /tmp/deploy_verify/ (host script may copy to host /tmp/deploy_verify/)
+EOF
+  phase_ok "hint-verify"
+}
+
+cmd_wizard() {
+  banner "Global Symbols deploy wizard → ${ENV_NAME}"
+  echo "Host: $(deploy_host)"
+  echo "Each phase streams full command output. Logs: log/deploy/ (unless --no-log)."
+  echo "Quit anytime with q at a pause prompt. Re-run a single phase if one fails."
+  echo ""
+
+  local phases=(preflight version login config deploy smoke hint-verify)
+  local p
+  for p in "${phases[@]}"; do
+    case "$p" in
+      preflight)
+        cmd_preflight || return $?
+        pause_wizard "version"
+        ;;
+      version)
+        cmd_version || return $?
+        pause_wizard "login (GHCR)"
+        ;;
+      login)
+        cmd_login || return $?
+        pause_wizard "config (read-only kamal)"
+        ;;
+      config)
+        cmd_config || return $?
+        pause_wizard "deploy (TOUCHES SERVER)"
+        ;;
+      deploy)
+        cmd_deploy || return $?
+        pause_wizard "smoke"
+        ;;
+      smoke)
+        # smoke failure should not hide success of deploy; warn but continue
+        set +e
+        cmd_smoke
+        local src=$?
+        set -e
+        if [[ "$src" -ne 0 ]]; then
+          echo "WARN: smoke failed (exit $src). Deploy may still have succeeded — investigate."
+          if [[ "$YES" -eq 0 ]]; then
+            pause_wizard "hint-verify (despite smoke failure)"
+          fi
+        else
+          pause_wizard "hint-verify"
+        fi
+        ;;
+      hint-verify)
+        cmd_hint_verify || return $?
+        ;;
+    esac
+  done
+
+  banner "Wizard finished for ${ENV_NAME}"
+  if [[ -n "${LOG_FILE:-}" ]]; then
+    echo "Full log: $LOG_FILE"
+  fi
+}
+
+# ─── main ─────────────────────────────────────────────────────────────────
+
+main() {
+  parse_args "$@"
+  if [[ "$COMMAND" == "help" ]]; then
+    cmd_help
+  fi
+
+  # Hard rule first (CLI path; menu also asserts right after action pick)
+  assert_clean_working_tree
+
+  setup_log "$0" "$@"
+  banner "gs-deploy  env=${ENV_NAME}  command=${COMMAND}"
+  echo "Repo: $ROOT"
+  if [[ -n "${LOG_FILE:-}" ]]; then
+    echo "Log:  $LOG_FILE"
+  fi
+
+  case "$COMMAND" in
+    wizard)      cmd_wizard ;;
+    preflight)   cmd_preflight ;;
+    version)     cmd_version ;;
+    login)       cmd_login ;;
+    config)      cmd_config ;;
+    deploy)      cmd_deploy ;;
+    smoke)       cmd_smoke ;;
+    hint-verify) cmd_hint_verify ;;
+    *) die "internal: unhandled command $COMMAND" ;;
+  esac
+}
+
+main "$@"

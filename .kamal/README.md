@@ -1,4 +1,6 @@
-# Kamal secrets (local only)
+# Kamal secrets + deploy CLI (local only)
+
+## Secrets
 
 1. Copy examples and fill values (do not commit):
 
@@ -8,31 +10,49 @@ cp .kamal/secrets.example .kamal/secrets.pre-prod
 # edit both files
 ```
 
-2. Set `image:` and registry in `config/deploy.yml` to a registry you control.
+2. Image/registry live in `config/deploy.yml` (`ghcr.io/global-symbols/globalsymbols-repo-internal`).
 
-3. Install Kamal (once):
+## Everyday deploy (recommended)
 
-```bash
-gem install kamal
-# or: bundle add kamal --group development && bundle install
-```
-
-4. Validate config **without** touching the server:
+Always open the **interactive menu** (phases are not direct subcommands):
 
 ```bash
-kamal config -d pre-prod
-kamal envify -d pre-prod   # only if using that workflow
+script/gs-deploy
 ```
 
-5. When ready to touch the server (explicit decision):
+That presents:
+
+1. **Environment** — pre-prod or production  
+2. **Action** — full wizard, or a single phase (preflight, deploy, smoke, …)  
+3. **Confirm** — summary, then start  
+
+Safe defaults: clean git SHA as image tag, GHCR login each run, log to `log/deploy/`, wizard pauses on.
+
+**Hard rule (checked at the start):** shipping actions (`wizard`, `preflight`, `version`, `config`, `deploy`) need a **clean** git tree.
+
+To try **uncommitted** changes on **pre-prod only** (not production):
+
+```bash
+script/gs-deploy --allow-dirty
+# then pick pre-prod → wizard or deploy
+```
+
+`--allow-dirty` is **ignored / refused for production** — prod always requires a clean working tree.
+Other entry flags (optional): `--version TAG`, `--yes`, `--skip-login`, `--no-log`.
+
+All Docker/Kamal output is streamed to the terminal and tee’d under `log/deploy/`.
+
+Kamal itself runs **inside Docker** (`ruby:3.2.11-bookworm` + `kamal` gem) so you do not need a host Ruby install.
+
+After deploy, run the product suite **on the app server** (see `hint-verify` and `deploy_verify/README.md`).
+
+## First-time only (manual)
 
 ```bash
 # accessory DB first (optional separate step)
+# via Dockerized kamal, or once you have kamal available:
 kamal accessory boot db -d pre-prod
-
-# then app (first time may need setup)
 kamal setup -d pre-prod    # installs kamal-proxy etc. — CHANGES SERVER
-kamal deploy -d pre-prod   # CHANGES SERVER
 ```
 
 **Do not run setup/deploy until registry, secrets, and image name are real.**
