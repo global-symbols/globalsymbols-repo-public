@@ -12,7 +12,8 @@ FROM docker.io/library/ruby:${RUBY_VERSION}-bookworm AS base
 
 WORKDIR /rails
 
-# Runtime packages (ImageMagick for MiniMagick / CarrierWave; MySQL client lib)
+# Runtime packages (ImageMagick for MiniMagick / CarrierWave; MySQL client lib;
+# Node for ExecJS/terser at boot — assets are precompiled, but terser still loads ExecJS)
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
       curl \
@@ -22,7 +23,8 @@ RUN apt-get update -qq && \
       libyaml-0-2 \
       shared-mime-info \
       ca-certificates \
-      fonts-liberation && \
+      fonts-liberation \
+      nodejs && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 ENV RAILS_ENV="production" \
@@ -73,6 +75,9 @@ RUN SECRET_KEY_BASE="dummy_assets_precompile_key_not_for_runtime" \
 # final: runtime image
 # -----------------------------------------------------------------------------
 FROM base
+
+# Required by Kamal image checks
+LABEL service="gs-repo"
 
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --from=build /rails /rails
