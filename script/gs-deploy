@@ -31,6 +31,11 @@
 #   --skip-login       Always skip docker login
 #   --force-login      Always run docker login (even if already logged in)
 #   --no-log           Do not tee to log/deploy/ (terminal only)
+#   --push-retries N   Max build-push attempts (default 8; GHCR stall recovery)
+#
+# Env overrides for push retries:
+#   BUILD_PUSH_MAX_ATTEMPTS   default 8
+#   BUILD_PUSH_RETRY_SLEEP    seconds before first retry (default 20; +10 each try)
 #
 # Examples:
 #   script/gs-deploy
@@ -60,6 +65,9 @@ COMMAND=""
 LOG_FILE=""
 PHASE_FAILED=""
 INTERACTIVE_MENU=0
+# GHCR push often stalls mid-upload; retries resume (uploaded layers skip).
+PUSH_MAX_ATTEMPTS="${BUILD_PUSH_MAX_ATTEMPTS:-8}"
+PUSH_RETRY_SLEEP="${BUILD_PUSH_RETRY_SLEEP:-20}"
 
 # Hosts / smoke targets (must match config/deploy.*.yml)
 PRE_PROD_HOST="18.130.29.168"
@@ -327,6 +335,15 @@ parse_args() {
       --skip-login) SKIP_LOGIN=1; shift ;;
       --force-login) FORCE_LOGIN=1; shift ;;
       --no-log) NO_LOG=1; shift ;;
+      --push-retries)
+        [[ $# -ge 2 ]] || die "--push-retries requires a number"
+        PUSH_MAX_ATTEMPTS="$2"
+        shift 2
+        ;;
+      --push-retries=*)
+        PUSH_MAX_ATTEMPTS="${1#--push-retries=}"
+        shift
+        ;;
       --version)
         [[ $# -ge 2 ]] || die "--version requires a tag"
         VERSION_OVERRIDE="$2"
@@ -740,30 +757,87 @@ cmd_config() {
   phase_ok "config"
 }
 
+# True if Docker has a local image for the absolute tag (rare with buildx --push).
+local_image_present() {
+  docker image inspect "$(absolute_image)" >/dev/null 2>&1
+}
+
 # (1) Mac only: build image + push to GHCR — does not change the server.
+# GHCR often stalls mid-push; we retry. Already-uploaded layers are skipped on retry.
 cmd_build_push() {
   phase_banner "build-push (Mac → GHCR; no server change)"
   load_secrets
   resolve_version
+  local img
+  img="$(absolute_image)"
+  # Validate retry count (Bash 3.2–safe)
+  case "$PUSH_MAX_ATTEMPTS" in
+    ''|*[!0-9]*|0) PUSH_MAX_ATTEMPTS=8 ;;
+  esac
+  case "$PUSH_RETRY_SLEEP" in
+    ''|*[!0-9]*) PUSH_RETRY_SLEEP=20 ;;
+  esac
+
   echo "Destination config: $(kamal_destination)  (used for image name / arch only)"
-  echo "Image:              $(absolute_image)"
+  echo "Image:              $img"
+  echo "Push retries:       up to ${PUSH_MAX_ATTEMPTS} attempts (sleep ${PUSH_RETRY_SLEEP}s+, backoff +10s)"
   echo "What this does:"
   echo "  • Build Dockerfile on this Mac (Docker Desktop, arm64)"
   echo "  • Push image to ${REGISTRY_HOST}"
+  echo "  • On stall/fail: retry (uploaded layers stay on GHCR; rebuild uses cache)"
   echo "  • Does NOT SSH / restart containers on $(deploy_host)"
   confirm_build_push
-  echo "Starting kamal build push — full stream below (not filtered)…"
-  set +e
-  run_kamal build push
-  local rc=$?
-  set -e
-  if [[ "$rc" -ne 0 ]]; then
-    phase_fail "build-push" "$rc"
-    return "$rc"
-  fi
-  phase_ok "build-push"
-  echo ""
-  echo "Image is in GHCR. Next: rollout (pull + restart on the server)."
+
+  local attempt=1
+  local rc=1
+  local sleep_s="$PUSH_RETRY_SLEEP"
+
+  while [[ "$attempt" -le "$PUSH_MAX_ATTEMPTS" ]]; do
+    echo ""
+    banner "build-push attempt ${attempt}/${PUSH_MAX_ATTEMPTS}"
+    echo "Image: $img"
+    echo "Full command output below (not filtered)…"
+
+    set +e
+    if [[ "$attempt" -gt 1 ]] && local_image_present; then
+      echo "Local image found — docker push only (no rebuild)…"
+      run_logged docker push "$img"
+      rc=$?
+    else
+      if [[ "$attempt" -gt 1 ]]; then
+        echo "Retrying kamal build push (BuildKit cache + partial GHCR layers)…"
+      else
+        echo "Starting kamal build push…"
+      fi
+      run_kamal build push
+      rc=$?
+    fi
+    set -e
+
+    if [[ "$rc" -eq 0 ]]; then
+      phase_ok "build-push"
+      echo ""
+      echo "Image is in GHCR after attempt ${attempt}/${PUSH_MAX_ATTEMPTS}."
+      echo "Next: rollout (pull + restart on the server)."
+      return 0
+    fi
+
+    echo ""
+    echo "WARN: build-push attempt ${attempt}/${PUSH_MAX_ATTEMPTS} failed (exit ${rc})."
+    if [[ "$attempt" -ge "$PUSH_MAX_ATTEMPTS" ]]; then
+      break
+    fi
+    echo "  Waiting ${sleep_s}s then retrying (layers already on GHCR are skipped)…"
+    echo "  Tip: max-concurrent-uploads=1 should already be set in ~/.docker/daemon.json"
+    sleep "$sleep_s"
+    sleep_s=$((sleep_s + 10))
+    attempt=$((attempt + 1))
+  done
+
+  phase_fail "build-push" "$rc"
+  echo "  All ${PUSH_MAX_ATTEMPTS} attempts failed. Re-run: $0  (menu → build-push)" >&2
+  echo "  Or: $0 --push-retries 12" >&2
+  return "$rc"
 }
 
 # (2) Server: pull image already in GHCR + restart web/job.
