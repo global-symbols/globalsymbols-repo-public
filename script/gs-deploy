@@ -42,7 +42,9 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
 KAMAL_VERSION="${KAMAL_DOCKER_KAMAL_VERSION:-2.12.0}"
-RUBY_IMAGE="${KAMAL_DOCKER_RUBY_IMAGE:-ruby:3.2.11-bookworm}"
+# Official image ships kamal + docker CLI + buildx (required for build push).
+# Do not use bare ruby: — it has no docker/buildx, so kamal fails dependency check.
+KAMAL_IMAGE="${KAMAL_DOCKER_IMAGE:-ghcr.io/basecamp/kamal:v${KAMAL_VERSION}}"
 REGISTRY_HOST="ghcr.io"
 IMAGE_REPO="global-symbols/globalsymbols-repo-internal"
 
@@ -541,7 +543,9 @@ setup_log() {
 # Usage: run_kamal <kamal args…>   e.g.  run_kamal build push
 #         run_kamal deploy --skip-push
 # Streams full stdout/stderr (via run_logged).
-# Mounts host Docker socket so build/push uses Docker Desktop on the Mac.
+#
+# Uses ghcr.io/basecamp/kamal (docker CLI + buildx included). The host Docker
+# socket is mounted so builds run on Docker Desktop, not inside a nested daemon.
 run_kamal() {
   local dest host
   dest="$(kamal_destination)"
@@ -553,14 +557,14 @@ run_kamal() {
   local docker_sock="/var/run/docker.sock"
   [[ -S "$docker_sock" ]] || die "Docker socket not found at $docker_sock (is Docker Desktop running?)"
 
-  # Log the exact kamal invocation (no secrets)
-  echo "+ kamal $* -d ${dest}  (VERSION=${VERSION:-auto})"
+  # Official image expects app at /workdir
+  echo "+ docker run ${KAMAL_IMAGE}  →  kamal $* -d ${dest}  (VERSION=${VERSION:-auto})"
 
   run_logged docker run --rm -i \
-    -v "$ROOT":/rails \
+    -v "$ROOT":/workdir \
     -v "$ssh_key":/root/.ssh/global-symbols.pem:ro \
     -v "$docker_sock":/var/run/docker.sock \
-    -w /rails \
+    -w /workdir \
     -e KAMAL_REGISTRY_USERNAME \
     -e KAMAL_REGISTRY_PASSWORD \
     -e SECRET_KEY_BASE \
@@ -573,19 +577,20 @@ run_kamal() {
     -e VERSION \
     -e "GS_KAMAL_DEST=${dest}" \
     -e "GS_DEPLOY_HOST=${host}" \
-    -e "GS_KAMAL_VERSION=${KAMAL_VERSION}" \
-    "$RUBY_IMAGE" \
-    bash -c '
-set -euo pipefail
+    --entrypoint sh \
+    "$KAMAL_IMAGE" \
+    -c '
+set -eu
 mkdir -p /root/.ssh
 chmod 700 /root/.ssh
-# Avoid HostKeyMismatch inside the container (needed for rollout SSH)
+# Avoid HostKeyMismatch for rollout SSH from this container
 ssh-keyscan -H "$GS_DEPLOY_HOST" >> /root/.ssh/known_hosts 2>/dev/null || true
 chmod 600 /root/.ssh/known_hosts 2>/dev/null || true
-gem install kamal -v "$GS_KAMAL_VERSION" --no-document
+# Sanity: buildx must exist (official image includes it)
+docker buildx version >/dev/null
 echo "+ kamal $* -d $GS_KAMAL_DEST  (VERSION=${VERSION:-auto})"
 exec kamal "$@" -d "$GS_KAMAL_DEST"
-' bash "$@"
+' sh "$@"
 }
 
 # ─── phases ───────────────────────────────────────────────────────────────
