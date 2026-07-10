@@ -61,6 +61,12 @@ COPY . .
 
 # Dummy values only for image build (assets:precompile boots Rails and
 # production initializers that require ENV). Real secrets come from Kamal at runtime.
+#
+# Note: on Docker Desktop, this step can *appear* stuck after the last
+# "Writing …/public/assets/…" lines (near grape_swagger). A healthy run
+# finishes assets:precompile in ~10–30s total; if log is frozen >2–3 min
+# with 0% CPU, interrupt and retry — gs-deploy retries only after a failed
+# exit, not mid-hang. The echo below proves Rails finished vs Docker I/O hang.
 RUN SECRET_KEY_BASE="dummy_assets_precompile_key_not_for_runtime" \
     REDIS_IP="127.0.0.1" \
     REDIS_PASSWORD="dummy" \
@@ -69,7 +75,9 @@ RUN SECRET_KEY_BASE="dummy_assets_precompile_key_not_for_runtime" \
     DIRECTUS_URL="http://127.0.0.1:8055" \
     DIRECTUS_TOKEN_CMS="dummy" \
     DIRECTUS_WEBHOOK_SECRET="dummy" \
-    ./bin/rails assets:precompile
+    ./bin/rails assets:precompile && \
+    echo "=== assets:precompile finished OK ===" && \
+    ls public/assets | wc -l
 
 # -----------------------------------------------------------------------------
 # final: runtime image
