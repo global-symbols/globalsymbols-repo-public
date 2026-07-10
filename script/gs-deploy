@@ -6,6 +6,7 @@
 # Phases are NOT callable as CLI subcommands.
 #
 # Ship is split:
+#   prepare     — image tag (VERSION) + GHCR login (combined)
 #   build-push  — Mac: kamal build push (image → GHCR, no server change)
 #   rollout     — server: kamal deploy --skip-push (pull + restart web/job)
 #
@@ -154,23 +155,21 @@ interactive_menu() {
   menu_pick pick "Action for ${ENV_NAME}:" \
     "1) wizard       — full guided path (recommended)" \
     "2) preflight    — check Docker, secrets, SSH, config" \
-    "3) version      — show/resolve image tag only" \
-    "4) login        — docker login to GHCR (auto-skips if already in)" \
-    "5) config       — kamal config (read-only)" \
-    "6) build-push   — Mac: build image + push to GHCR (no server change)" \
-    "7) rollout      — server: pull image + restart web/job (TOUCHES SERVER)" \
-    "8) smoke        — HTTP smoke check" \
-    "9) hint-verify  — how to run deploy_verify on the server"
+    "3) prepare      — image tag (VERSION) + GHCR login" \
+    "4) config       — kamal config (read-only)" \
+    "5) build-push   — Mac: build image + push to GHCR (no server change)" \
+    "6) rollout      — server: pull image + restart web/job (TOUCHES SERVER)" \
+    "7) smoke        — HTTP smoke check" \
+    "8) hint-verify  — how to run deploy_verify on the server"
   case "$pick" in
     1) COMMAND="wizard" ;;
     2) COMMAND="preflight" ;;
-    3) COMMAND="version" ;;
-    4) COMMAND="login" ;;
-    5) COMMAND="config" ;;
-    6) COMMAND="build-push" ;;
-    7) COMMAND="rollout" ;;
-    8) COMMAND="smoke" ;;
-    9) COMMAND="hint-verify" ;;
+    3) COMMAND="prepare" ;;
+    4) COMMAND="config" ;;
+    5) COMMAND="build-push" ;;
+    6) COMMAND="rollout" ;;
+    7) COMMAND="smoke" ;;
+    8) COMMAND="hint-verify" ;;
   esac
 
   # Fail immediately after action choice (before Start now / any phase)
@@ -452,7 +451,7 @@ git_is_dirty() {
 # Shipping / identity actions: must start from a clean tree (unless CLI override).
 command_requires_clean_tree() {
   case "${COMMAND:-}" in
-    wizard|preflight|version|config|build-push|rollout) return 0 ;;
+    wizard|preflight|prepare|config|build-push|rollout) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -677,17 +676,6 @@ cmd_preflight() {
   phase_ok "preflight"
 }
 
-cmd_version() {
-  phase_banner "version ($ENV_NAME)"
-  resolve_version
-  echo "VERSION=$VERSION"
-  echo "absolute image: $(absolute_image)"
-  if git_is_dirty; then
-    echo "note: tree is dirty (override or --allow-dirty in effect)"
-  fi
-  phase_ok "version"
-}
-
 # True if Docker config already mentions ghcr.io (Desktop keychain / stored auth).
 # Not a network check — if push later fails with unauthorized, use --force-login.
 ghcr_session_looks_logged_in() {
@@ -697,38 +685,42 @@ ghcr_session_looks_logged_in() {
   grep -Eq '"ghcr\.io"[[:space:]]*:' "$cfg" 2>/dev/null
 }
 
-cmd_login() {
-  phase_banner "login (GHCR)"
+# Combined: resolve image tag + GHCR login (wizard step after preflight).
+cmd_prepare() {
+  phase_banner "prepare (image tag + GHCR login)"
+
+  echo "— Image tag —"
+  resolve_version
+  echo "VERSION=$VERSION"
+  echo "absolute image: $(absolute_image)"
+  if git_is_dirty; then
+    echo "note: tree is dirty (override or --allow-dirty in effect)"
+  fi
+
+  echo ""
+  echo "— GHCR login —"
   if [[ "$SKIP_LOGIN" -eq 1 ]]; then
     echo "Skipping docker login (--skip-login)."
-    phase_ok "login (skipped)"
-    return 0
-  fi
-
-  if [[ "$FORCE_LOGIN" -ne 1 ]] && ghcr_session_looks_logged_in; then
+  elif [[ "$FORCE_LOGIN" -ne 1 ]] && ghcr_session_looks_logged_in; then
     echo "Docker already has credentials for ${REGISTRY_HOST} — skipping login."
-    echo "  (Redundant when you logged in earlier this session/day.)"
     echo "  If a later push fails with unauthorized: re-run with --force-login"
-    phase_ok "login (already authenticated)"
-    return 0
+  else
+    if [[ "$FORCE_LOGIN" -eq 1 ]]; then
+      echo "Forcing docker login (--force-login)…"
+    fi
+    load_secrets
+    echo "Logging in to ${REGISTRY_HOST} as ${KAMAL_REGISTRY_USERNAME} …"
+    set +e
+    run_logged bash -c 'echo "$KAMAL_REGISTRY_PASSWORD" | docker login "'"$REGISTRY_HOST"'" -u "$KAMAL_REGISTRY_USERNAME" --password-stdin'
+    local rc=$?
+    set -e
+    if [[ "$rc" -ne 0 ]]; then
+      phase_fail "prepare" "$rc"
+      return "$rc"
+    fi
   fi
 
-  if [[ "$FORCE_LOGIN" -eq 1 ]]; then
-    echo "Forcing docker login (--force-login)…"
-  fi
-
-  load_secrets
-  echo "Logging in to ${REGISTRY_HOST} as ${KAMAL_REGISTRY_USERNAME} …"
-  # password only on stdin — not printed
-  set +e
-  run_logged bash -c 'echo "$KAMAL_REGISTRY_PASSWORD" | docker login "'"$REGISTRY_HOST"'" -u "$KAMAL_REGISTRY_USERNAME" --password-stdin'
-  local rc=$?
-  set -e
-  if [[ "$rc" -ne 0 ]]; then
-    phase_fail "login" "$rc"
-    return "$rc"
-  fi
-  phase_ok "login"
+  phase_ok "prepare"
 }
 
 cmd_config() {
@@ -857,20 +849,16 @@ cmd_wizard() {
   echo "Quit anytime with q at a pause prompt. Re-run a single phase if one fails."
   echo ""
 
-  local phases=(preflight version login config build-push rollout smoke hint-verify)
+  local phases=(preflight prepare config build-push rollout smoke hint-verify)
   local p
   for p in "${phases[@]}"; do
     case "$p" in
       preflight)
         cmd_preflight || return $?
-        pause_wizard "version"
+        pause_wizard "prepare (tag + GHCR login)"
         ;;
-      version)
-        cmd_version || return $?
-        pause_wizard "login (GHCR)"
-        ;;
-      login)
-        cmd_login || return $?
+      prepare)
+        cmd_prepare || return $?
         pause_wizard "config (read-only kamal)"
         ;;
       config)
@@ -933,8 +921,7 @@ main() {
   case "$COMMAND" in
     wizard)      cmd_wizard ;;
     preflight)   cmd_preflight ;;
-    version)     cmd_version ;;
-    login)       cmd_login ;;
+    prepare)     cmd_prepare ;;
     config)      cmd_config ;;
     build-push)  cmd_build_push ;;
     rollout)     cmd_rollout ;;
