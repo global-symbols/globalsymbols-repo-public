@@ -26,7 +26,8 @@ That presents:
 2. **Action** — full wizard, or a single phase (preflight, deploy, smoke, …)  
 3. **Confirm** — summary, then start  
 
-Safe defaults: clean git SHA as image tag, GHCR login each run, log to `log/deploy/`, wizard pauses on.
+Safe defaults: clean git SHA as image tag, log to `log/deploy/`, wizard pauses on.  
+GHCR **login is auto-skipped** when Docker already has `ghcr.io` credentials (use `--force-login` to re-auth, `--skip-login` to never login).
 
 **Hard rule (checked at the start):** shipping actions (`wizard`, `preflight`, `version`, `config`, `deploy`) need a **clean** git tree.
 

@@ -12,7 +12,8 @@
 #   script/gs-deploy --help
 #
 # Menu defaults:
-#   VERSION=git SHA if clean · login each run · log on · wizard pauses on
+#   VERSION=git SHA if clean · log on · wizard pauses on
+#   GHCR login: auto-skipped when Docker already has ghcr.io credentials
 #
 # Hard rule (early):
 #   wizard | preflight | version | config | deploy require a CLEAN git tree
@@ -23,7 +24,8 @@
 #   --allow-dirty      Allow dirty tree for pre-prod only (not production)
 #   --version TAG      Force image tag (also: export VERSION=...)
 #   --yes              Skip wizard pause prompts (still streams all output)
-#   --skip-login       Skip docker login (already authenticated)
+#   --skip-login       Always skip docker login
+#   --force-login      Always run docker login (even if already logged in)
 #   --no-log           Do not tee to log/deploy/ (terminal only)
 #
 # Examples:
@@ -44,6 +46,7 @@ IMAGE_REPO="global-symbols/globalsymbols-repo-internal"
 YES=0
 ALLOW_DIRTY=0
 SKIP_LOGIN=0
+FORCE_LOGIN=0
 NO_LOG=0
 VERSION_OVERRIDE="${VERSION:-}"
 ENV_NAME=""
@@ -173,8 +176,8 @@ interactive_menu() {
   banner "Ready"
   echo "  Environment : $ENV_NAME  (host: $(deploy_host))"
   echo "  Action      : $COMMAND"
-  echo "  Defaults    : VERSION=auto · login each run · log to log/deploy/ · wizard pauses on"
-  if [[ -n "$VERSION_OVERRIDE" || "$ALLOW_DIRTY" -eq 1 || "$SKIP_LOGIN" -eq 1 || "$NO_LOG" -eq 1 || "$YES" -eq 1 ]]; then
+  echo "  Defaults    : VERSION=auto · GHCR login if needed · log to log/deploy/ · wizard pauses on"
+  if [[ -n "$VERSION_OVERRIDE" || "$ALLOW_DIRTY" -eq 1 || "$SKIP_LOGIN" -eq 1 || "$FORCE_LOGIN" -eq 1 || "$NO_LOG" -eq 1 || "$YES" -eq 1 ]]; then
     echo "  CLI overrides in effect:"
     [[ -n "$VERSION_OVERRIDE" ]] && echo "    VERSION=$VERSION_OVERRIDE"
     if [[ "$ALLOW_DIRTY" -eq 1 ]]; then
@@ -185,6 +188,7 @@ interactive_menu() {
       fi
     fi
     [[ "$SKIP_LOGIN" -eq 1 ]] && echo "    --skip-login"
+    [[ "$FORCE_LOGIN" -eq 1 ]] && echo "    --force-login"
     [[ "$NO_LOG" -eq 1 ]] && echo "    --no-log"
     [[ "$YES" -eq 1 ]] && echo "    --yes (skip pauses)"
   fi
@@ -302,6 +306,7 @@ parse_args() {
       --yes|-y) YES=1; shift ;;
       --allow-dirty) ALLOW_DIRTY=1; shift ;;
       --skip-login) SKIP_LOGIN=1; shift ;;
+      --force-login) FORCE_LOGIN=1; shift ;;
       --no-log) NO_LOG=1; shift ;;
       --version)
         [[ $# -ge 2 ]] || die "--version requires a tag"
@@ -328,6 +333,10 @@ parse_args() {
         ;;
     esac
   done
+
+  if [[ "$SKIP_LOGIN" -eq 1 && "$FORCE_LOGIN" -eq 1 ]]; then
+    die "Use only one of --skip-login or --force-login"
+  fi
 
   interactive_menu
 }
@@ -653,13 +662,35 @@ cmd_version() {
   phase_ok "version"
 }
 
+# True if Docker config already mentions ghcr.io (Desktop keychain / stored auth).
+# Not a network check — if push later fails with unauthorized, use --force-login.
+ghcr_session_looks_logged_in() {
+  local cfg="${DOCKER_CONFIG:-$HOME/.docker}/config.json"
+  [[ -f "$cfg" ]] || return 1
+  # Match "ghcr.io" as a registry host entry (auths / credHelpers)
+  grep -Eq '"ghcr\.io"[[:space:]]*:' "$cfg" 2>/dev/null
+}
+
 cmd_login() {
   phase_banner "login (GHCR)"
   if [[ "$SKIP_LOGIN" -eq 1 ]]; then
-    echo "Skipping docker login (--skip-login)"
+    echo "Skipping docker login (--skip-login)."
     phase_ok "login (skipped)"
     return 0
   fi
+
+  if [[ "$FORCE_LOGIN" -ne 1 ]] && ghcr_session_looks_logged_in; then
+    echo "Docker already has credentials for ${REGISTRY_HOST} — skipping login."
+    echo "  (Redundant when you logged in earlier this session/day.)"
+    echo "  If a later push fails with unauthorized: re-run with --force-login"
+    phase_ok "login (already authenticated)"
+    return 0
+  fi
+
+  if [[ "$FORCE_LOGIN" -eq 1 ]]; then
+    echo "Forcing docker login (--force-login)…"
+  fi
+
   load_secrets
   echo "Logging in to ${REGISTRY_HOST} as ${KAMAL_REGISTRY_USERNAME} …"
   # password only on stdin — not printed
