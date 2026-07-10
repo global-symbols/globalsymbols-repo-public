@@ -218,6 +218,29 @@ die() {
 
 ts() { date +"%Y-%m-%dT%H-%M-%S"; }
 
+# macOS often has no GNU timeout; use perl alarm as fallback.
+# Usage: run_with_timeout SECONDS command [args…]
+run_with_timeout() {
+  local secs="$1"
+  shift
+  if command -v gtimeout >/dev/null 2>&1; then
+    gtimeout "$secs" "$@"
+  elif command -v timeout >/dev/null 2>&1; then
+    timeout "$secs" "$@"
+  else
+    perl -e 'alarm shift; exec @ARGV' "$secs" "$@"
+  fi
+}
+
+# Docker Desktop can wedge after a stalled GHCR push; never block forever.
+docker_cli_ok() {
+  run_with_timeout 8 docker version >/dev/null 2>&1
+}
+
+docker_daemon_ok() {
+  run_with_timeout 8 docker info >/dev/null 2>&1
+}
+
 banner() {
   echo ""
   echo "════════════════════════════════════════════════════════════"
@@ -636,12 +659,24 @@ cmd_preflight() {
     echo "✗ docker not found on PATH"
     ok=0
   else
-    echo "• docker: $(docker version --format '{{.Client.Version}}' 2>/dev/null || echo present)"
-    if ! docker info >/dev/null 2>&1; then
-      echo "✗ docker daemon not reachable (is Docker Desktop running?)"
+    echo "• checking docker CLI (8s timeout)…"
+    if ! docker_cli_ok; then
+      echo "✗ docker CLI not responding (timed out after 8s)"
+      echo "  Docker Desktop is often wedged after a stalled GHCR push."
+      echo "  Fix: quit any hung gs-deploy (Ctrl+C), restart Docker Desktop, re-run."
       ok=0
     else
-      echo "✓ docker daemon OK"
+      local dver
+      dver="$(run_with_timeout 8 docker version --format '{{.Client.Version}}' 2>/dev/null || echo present)"
+      echo "• docker: $dver"
+      echo "• checking docker daemon (8s timeout)…"
+      if ! docker_daemon_ok; then
+        echo "✗ docker daemon not reachable or hung"
+        echo "  Restart Docker Desktop, then re-run $0"
+        ok=0
+      else
+        echo "✓ docker daemon OK"
+      fi
     fi
   fi
 
