@@ -31,9 +31,13 @@ ssh:
   keys:
     - ~/.ssh/global-symbols.pem
 
-# Build on Apple Silicon / Graviton (t4g, m7g) — arm64
+# Build on Apple Silicon / Graviton (t4g, m7g) — arm64.
+# driver: docker uses the host Docker engine (desktop-linux) instead of a
+# separate buildx "docker-container" BuildKit VM. That path hangs less often
+# on Mac and still supports linux/arm64 natively on Apple Silicon.
 builder:
   arch: arm64
+  driver: docker
   dockerfile: Dockerfile
   context: .
 
