@@ -230,10 +230,22 @@ module DeployVerify
         end
 
         # CRUD symbolset
+        # Model requires: name, publisher, licence_id, slug (friendly_id), status draft (default).
+        # Form: name, description, licence_id, publisher, publisher_url, logo (see _form.html.haml).
         new_page = http.get("/symbolsets/new")
         csrf = Csrf.extract_token(new_page.body)
         unless csrf
           reporter.fail("crud.symbolset_new", "csrf missing on /symbolsets/new")
+          return
+        end
+
+        licence_id = extract_first_licence_id(new_page.body)
+        unless licence_id
+          reporter.fail(
+            "crud.symbolset_new",
+            "could not find a numeric symbolset[licence_id] option on /symbolsets/new",
+            detail: new_page.body[0, 400]
+          )
           return
         end
 
@@ -243,20 +255,25 @@ module DeployVerify
           form: {
             "authenticity_token" => csrf,
             "symbolset[name]" => name,
-            "symbolset[description]" => "Created by deploy_verify #{run_id}"
+            "symbolset[description]" => "Created by deploy_verify #{run_id}",
+            "symbolset[publisher]" => "Deploy Verify Bot",
+            "symbolset[licence_id]" => licence_id
           }
         )
 
         location = create.headers["location"].to_s
         unless create.redirect? && location.include?("/symbolsets/")
+          # re-render :new often embeds validation errors
+          errors = extract_flash_or_errors(create.body)
           reporter.fail(
             "crud.symbolset_create",
-            "expected redirect to symbolset, got HTTP #{create.code} loc=#{location.inspect}",
-            detail: create.body[0, 500]
+            "expected redirect to symbolset, got HTTP #{create.code} loc=#{location.inspect}" \
+            "#{errors ? "; #{errors}" : ""}",
+            detail: create.body[0, 800]
           )
           return
         end
-        reporter.pass("crud.symbolset_create", "created → #{location}")
+        reporter.pass("crud.symbolset_create", "created → #{location} (licence_id=#{licence_id})")
 
         show = http.get_follow(location)
         if show.success? && show.body.include?(run_id)
@@ -307,7 +324,8 @@ module DeployVerify
           reporter.fail("crud.symbolset_update", "#{e.class}: #{e.message}")
         end
 
-        # Delete
+        # Delete — app has no SymbolsetsController#destroy (resources still 404).
+        # Do not fail the suite; leave a draft "Deploy Test …" row for operators.
         begin
           path_only = URI.parse(location.start_with?("http") ? location : config.uri(location).to_s).path
           show2 = http.get(path_only)
@@ -321,6 +339,11 @@ module DeployVerify
           )
           if del.redirect? || del.success? || del.code == 303
             reporter.pass("crud.symbolset_delete", "delete HTTP #{del.code}")
+          elsif del.code == 404
+            reporter.skip(
+              "crud.symbolset_delete",
+              "HTTP 404 — app exposes no Symbolset destroy; left draft at #{path_only}"
+            )
           else
             reporter.fail("crud.symbolset_delete", "delete HTTP #{del.code}", detail: del.body[0, 400])
           end
@@ -338,6 +361,28 @@ module DeployVerify
         end
       rescue StandardError => e
         reporter.fail("http.get#{path}", "#{e.class}: #{e.message}")
+      end
+
+      # First non-blank <option value="N"> under symbolset[licence_id].
+      def extract_first_licence_id(html)
+        html = html.to_s
+        if (m = html.match(/name=["']symbolset\[licence_id\]["'][^>]*>(.*?)<\/select>/mi))
+          ids = m[1].scan(/<option[^>]*\svalue=["'](\d+)["']/i).flatten
+          return ids.first if ids.any?
+        end
+        html.scan(/name=["']symbolset\[licence_id\]["']/i)
+        html.scan(/<option[^>]*\svalue=["'](\d+)["'][^>]*>/i).flatten.first
+      end
+
+      def extract_flash_or_errors(html)
+        html = html.to_s
+        bits = []
+        if (m = html.match(/class=["'][^"']*alert[^"']*["'][^>]*>(.*?)<\/div>/mi))
+          bits << m[1].gsub(/<[^>]+>/, " ").squeeze(" ").strip[0, 200]
+        end
+        errs = html.scan(/field_with_errors/i)
+        bits << "field_with_errors×#{errs.size}" if errs.any?
+        bits.reject { |b| b.nil? || b.empty? }.join("; ")
       end
     end
   end

@@ -1,10 +1,13 @@
-# syntax=docker/dockerfile:1
 # =============================================================================
 # Deploy image — used for BOTH pre-prod and production (Kamal).
 # Environment differences (RAILS_ENV, Redis DBs, DATABASE_HOST, secrets) come
 # from Kamal destinations / container env, not from separate images.
 #
 # Local development uses Dockerfile.dev + docker-compose.yml (gitignored).
+#
+# Note: no "# syntax=docker/dockerfile:1" — that forces a Docker Hub pull of
+# the BuildKit frontend before any layer work and fails hard when Hub is
+# unreachable. Multi-stage + COPY --from work with the built-in parser.
 # =============================================================================
 
 ARG RUBY_VERSION=3.2.11

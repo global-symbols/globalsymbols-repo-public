@@ -26,15 +26,18 @@ That presents:
 2. **Action** — full wizard, or a single phase  
 3. **Confirm** — summary, then start  
 
-Ship is split into three actions (wizard runs them in order, with pauses):
+### Ship flow (build → push → rollout)
 
-| Action | Where | Command | Server change? |
-|--------|--------|---------|----------------|
-| **build** | Mac | `kamal build push --output=docker` | No — local image only |
-| **push** | Mac | `docker push` (auto-retries on GHCR stall) | No — upload to GHCR only |
-| **rollout** | pre-prod/prod host | `kamal deploy --skip-push` | Yes — pull image, restart web+job |
+| Action | Where | Tool | What happens |
+|--------|--------|------|----------------|
+| **build** | Mac | host `docker build` | Image tagged locally (`:VERSION` + `:latest-<env>`) |
+| **push** | Mac | host `docker push` | Upload that tag to GHCR (simple retries on fail) |
+| **rollout** | pre-prod/prod host | Kamal `deploy --skip-push` | Server **pulls** image from GHCR and **replaces** web+job |
 
-**GHCR stalls / silent hangs:** `push` retries up to 8 times. Each attempt has a **hang watchdog**: if there is **no new output for 180s**, that attempt is killed and the next retry starts (layers already on GHCR are kept). Configure with `--push-retries N`, `--push-stall SEC`, or `BUILD_PUSH_MAX_ATTEMPTS` / `BUILD_PUSH_RETRY_SLEEP` / `BUILD_PUSH_STALL_SECONDS`. Keep `"max-concurrent-uploads": 1` in `~/.docker/daemon.json`.
+Same path Kamal expects: registry image → pull on host → new containers.  
+**Build/push do not use Kamal.** Kamal (via `ghcr.io/basecamp/kamal` + Docker socket) is only for server steps (`config`, `rollout`).
+
+Push retries: up to 5 by default (`--push-retries N`, or `BUILD_PUSH_MAX_ATTEMPTS` / `BUILD_PUSH_RETRY_SLEEP`). Keep `"max-concurrent-uploads": 1` in `~/.docker/daemon.json` if GHCR stalls.
 
 Safe defaults: clean git SHA as image tag, log to `log/deploy/`, wizard pauses on.  
 GHCR **login is auto-skipped** when Docker already has `ghcr.io` credentials (use `--force-login` to re-auth, `--skip-login` to never login).
@@ -49,19 +52,27 @@ script/gs-deploy --allow-dirty
 ```
 
 `--allow-dirty` is **ignored / refused for production** — prod always requires a clean working tree.
-Other entry flags (optional): `--version TAG`, `--yes`, `--skip-login`, `--no-log`.
+Other entry flags (optional): `--version TAG`, `--yes`, `--skip-login`, `--no-log`, `--push-retries N`.
 
 All Docker/Kamal output is streamed to the terminal and tee’d under `log/deploy/`.
 
-Kamal itself runs **inside Docker** (`ghcr.io/basecamp/kamal` — docker CLI + buildx included) so you do not need a host Ruby install.
+After deploy, menu action **verify** SSHes to the app host and runs the suite inside the web container (see `deploy_verify/README.md`).
 
-After deploy, run the product suite **on the app server** (see `hint-verify` and `deploy_verify/README.md`).
+### Pre-prod deploy_verify auth/CRUD (optional but recommended)
+
+The pre-prod suite can sign in and create/update a symbolset when these secrets exist:
+
+- `DEPLOY_VERIFY_USER_EMAIL`
+- `DEPLOY_VERIFY_USER_PASSWORD`
+
+Put them in `.kamal/secrets.pre-prod` (see `secrets.example`). They are listed under `env.secret` in `config/deploy.pre-prod.yml`, so the **web** container gets them on the next rollout. `script/gs-deploy` **verify** also loads secrets and passes them into `docker exec` so CRUD runs even before the next container recreate.
+
+Create a dedicated pre-prod Devise user with the same email/password (not a personal account). Do **not** configure these on production.
 
 ## First-time only (manual)
 
 ```bash
 # accessory DB first (optional separate step)
-# via Dockerized kamal, or once you have kamal available:
 kamal accessory boot db -d pre-prod
 kamal setup -d pre-prod    # installs kamal-proxy etc. — CHANGES SERVER
 ```

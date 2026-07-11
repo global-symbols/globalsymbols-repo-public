@@ -29,7 +29,11 @@ require_relative "suites/pre_prod"
 require_relative "suites/prod"
 
 def load_env_file!(path)
+  # Optional overlay only. Prefer env already injected by Kamal into the container.
+  # Files may be absent, root-owned 0600 in an old image, or otherwise unreadable
+  # to USER rails — never fail the suite for that.
   return unless File.file?(path)
+  return unless File.readable?(path)
 
   File.foreach(path) do |line|
     line = line.strip
@@ -41,11 +45,13 @@ def load_env_file!(path)
     val = val.strip
     ENV[key] = val if ENV[key].to_s.empty? && !key.empty?
   end
+rescue Errno::EACCES, Errno::EPERM
+  warn "deploy_verify: skip unreadable env file #{path}"
 end
 
 def load_env_files!(profile)
-  # Only load host secret files if present on server (optional).
-  # Prefer env already injected into the web container by Kamal.
+  # Optional. Prefer env already injected into the web container by Kamal.
+  # Do not require .kamal/secrets* inside the image (they should not ship there).
   load_env_file!(File.join(ROOT, ".kamal", "secrets-common"))
   if profile == "pre_prod"
     load_env_file!(File.join(ROOT, ".kamal", "secrets.pre-prod"))

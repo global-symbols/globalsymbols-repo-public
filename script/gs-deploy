@@ -5,11 +5,16 @@
 # Entry point is always the interactive menu (pick env + action).
 # Phases are NOT callable as CLI subcommands.
 #
-# Ship is split:
-#   preflight   — checks + image tag + GHCR login
-#   build       — Mac: kamal build push --output=docker (local image only)
-#   push        — Mac: docker push to GHCR (retries + hang watchdog; no rebuild)
-#   rollout     — server: kamal deploy --skip-push (pull + restart web/job)
+# Ship is split (same image path Kamal expects):
+#   preflight   — ready gate: checks + VERSION + GHCR login + kamal config
+#                 (quiet scoreboard on OK; full detail in log / on failure)
+#   build       — Mac: plain `docker build` → local image (no Kamal, no GHCR)
+#   push        — Mac: plain `docker push` → GHCR (no rebuild, no server)
+#   rollout     — server: Kamal `deploy --skip-push` (pull + replace web/job) + HTTP smoke
+#   verify      — SSH to app host; run deploy_verify suite inside web container
+#
+# Build/push use the host Docker CLI only. Kamal (via Docker image) is used
+# only for server-side orchestration (preflight kamal config / rollout), not for building.
 #
 # Usage:
 #   script/gs-deploy                 # open menu (clean tree required for shipping)
@@ -32,13 +37,11 @@
 #   --skip-login       Always skip docker login
 #   --force-login      Always run docker login (even if already logged in)
 #   --no-log           Do not tee to log/deploy/ (terminal only)
-#   --push-retries N   Max push attempts (default 8; GHCR stall recovery)
-#   --push-stall SEC   Kill attempt if no new output for SEC seconds (default 180)
+#   --push-retries N   Max docker push attempts (default 5)
 #
 # Env overrides for push retries:
-#   BUILD_PUSH_MAX_ATTEMPTS   default 8
-#   BUILD_PUSH_RETRY_SLEEP    seconds before first retry (default 20; +10 each try)
-#   BUILD_PUSH_STALL_SECONDS  no-output watchdog per attempt (default 180)
+#   BUILD_PUSH_MAX_ATTEMPTS   default 5
+#   BUILD_PUSH_RETRY_SLEEP    seconds before first retry (default 15; +10 each try)
 #
 # Examples:
 #   script/gs-deploy
@@ -68,12 +71,15 @@ COMMAND=""
 LOG_FILE=""
 PHASE_FAILED=""
 INTERACTIVE_MENU=0
-# GHCR push often stalls mid-upload; retries resume (uploaded layers skip).
-PUSH_MAX_ATTEMPTS="${BUILD_PUSH_MAX_ATTEMPTS:-8}"
-PUSH_RETRY_SLEEP="${BUILD_PUSH_RETRY_SLEEP:-20}"
-# If an attempt prints nothing for this long, kill it and retry (hang detection).
-PUSH_STALL_SECONDS="${BUILD_PUSH_STALL_SECONDS:-180}"
-STALL_EXIT_CODE=124
+# Simple push retries (failed exit only — no hang-kill theatre).
+PUSH_MAX_ATTEMPTS="${BUILD_PUSH_MAX_ATTEMPTS:-5}"
+PUSH_RETRY_SLEEP="${BUILD_PUSH_RETRY_SLEEP:-15}"
+BUILD_PLATFORM="${GS_BUILD_PLATFORM:-linux/arm64}"
+# Docker Desktop on Mac can break default bridge egress (apt/curl fail) while
+# host + docker pull still work. --network=host fixes RUN apt-get during build.
+# Override: GS_BUILD_NETWORK=default|bridge|host
+BUILD_NETWORK="${GS_BUILD_NETWORK:-host}"
+SERVICE_LABEL="gs-repo"
 
 # Hosts / smoke targets (must match config/deploy.*.yml)
 PRE_PROD_HOST="18.130.29.168"
@@ -170,22 +176,18 @@ interactive_menu() {
   # --- Action ---
   menu_pick pick "Action for ${ENV_NAME}:" \
     "1) wizard       — full guided path (recommended)" \
-    "2) preflight    — checks + image tag + GHCR login" \
-    "3) config       — kamal config (read-only)" \
-    "4) build        — Mac: build image locally (no GHCR, no server)" \
-    "5) push         — Mac: push local image to GHCR (no rebuild, no server)" \
-    "6) rollout      — server: pull image + restart web/job (TOUCHES SERVER)" \
-    "7) smoke        — HTTP smoke check" \
-    "8) hint-verify  — how to run deploy_verify on the server"
+    "2) preflight    — ready checks + kamal config + tag + GHCR (quiet OK)" \
+    "3) build        — Mac: docker build → local image (no GHCR, no server)" \
+    "4) push         — Mac: docker push → GHCR (no rebuild, no server)" \
+    "5) rollout      — server: Kamal pull + restart web/job + smoke (TOUCHES SERVER)" \
+    "6) verify       — run post-deploy suite on the server (SSH + docker exec)"
   case "$pick" in
     1) COMMAND="wizard" ;;
     2) COMMAND="preflight" ;;
-    3) COMMAND="config" ;;
-    4) COMMAND="build" ;;
-    5) COMMAND="push" ;;
-    6) COMMAND="rollout" ;;
-    7) COMMAND="smoke" ;;
-    8) COMMAND="hint-verify" ;;
+    3) COMMAND="build" ;;
+    4) COMMAND="push" ;;
+    5) COMMAND="rollout" ;;
+    6) COMMAND="verify" ;;
   esac
 
   # Fail immediately after action choice (before Start now / any phase)
@@ -292,87 +294,6 @@ run_logged() {
   fi
 }
 
-# Run a command; if it produces no new output for stall_secs, kill it and
-# return STALL_EXIT_CODE (124) so the caller can retry.
-# Streams live output to the terminal and LOG_FILE (same as run_logged).
-run_with_stall_watch() {
-  local stall_secs="$1"
-  shift
-  case "$stall_secs" in
-    ''|*[!0-9]*|0) stall_secs=180 ;;
-  esac
-
-  local out
-  out=$(mktemp -t gsdeploy-stall.XXXXXX)
-  : >"$out"
-
-  set +e
-  "$@" >"$out" 2>&1 &
-  local cmd_pid=$!
-  set -e
-
-  # Live stream of the capture file
-  if [[ "$NO_LOG" -eq 1 || -z "${LOG_FILE:-}" ]]; then
-    tail -n +1 -f "$out" 2>/dev/null &
-  else
-    tail -n +1 -f "$out" 2>/dev/null | tee -a "$LOG_FILE" &
-  fi
-  local tail_pid=$!
-
-  local last_size=0
-  local last_change
-  last_change=$(date +%s)
-  local stalled=0
-  local size now
-
-  while kill -0 "$cmd_pid" 2>/dev/null; do
-    sleep 5
-    size=$(stat -f %z "$out" 2>/dev/null || echo 0)
-    now=$(date +%s)
-    if [[ "$size" -gt "$last_size" ]]; then
-      last_size=$size
-      last_change=$now
-    elif [[ $((now - last_change)) -ge "$stall_secs" ]]; then
-      echo ""
-      echo "WARN: no new output for ${stall_secs}s — treating attempt as hung"
-      echo "  Killing pid ${cmd_pid} so we can retry (partial GHCR layers are kept)."
-      stalled=1
-      # Graceful then hard kill; also try children (docker push helpers)
-      kill "$cmd_pid" 2>/dev/null || true
-      sleep 2
-      kill -9 "$cmd_pid" 2>/dev/null || true
-      pkill -P "$cmd_pid" 2>/dev/null || true
-      break
-    fi
-  done
-
-  local rc=0
-  if [[ "$stalled" -eq 1 ]]; then
-    wait "$cmd_pid" 2>/dev/null || true
-    rc=$STALL_EXIT_CODE
-  else
-    set +e
-    wait "$cmd_pid"
-    rc=$?
-    set -e
-  fi
-
-  # Stop streamer (may need a moment to flush last lines)
-  kill "$tail_pid" 2>/dev/null || true
-  wait "$tail_pid" 2>/dev/null || true
-  sleep 0.5
-  kill -9 "$tail_pid" 2>/dev/null || true
-
-  # Ensure any final bytes are in the session log (if tee missed kill race)
-  if [[ "$NO_LOG" -ne 1 && -n "${LOG_FILE:-}" && -f "$out" ]]; then
-    # Avoid huge dupes: only append if log doesn't already end with file tail
-    true
-  fi
-
-  rm -f "$out"
-  return "$rc"
-}
-
 confirm() {
   local prompt="${1:-Continue?}"
   if [[ "$YES" -eq 1 ]]; then
@@ -419,7 +340,7 @@ confirm_build() {
     return 0
   fi
   echo ""
-  echo "This builds the app image on this Mac into the local Docker store."
+  echo "This runs host 'docker build' on this Mac (local image only)."
   echo "It does NOT push to GHCR and does NOT change the server (use push, then rollout)."
   confirm_typed_token "build" "Type 'build' to continue (q=quit): "
 }
@@ -430,7 +351,7 @@ confirm_push() {
     return 0
   fi
   echo ""
-  echo "This pushes the local image for VERSION to GHCR."
+  echo "This runs host 'docker push' for VERSION → GHCR."
   echo "It does NOT rebuild and does NOT change the server (use rollout after)."
   confirm_typed_token "push" "Type 'push' to continue (q=quit): "
 }
@@ -486,15 +407,6 @@ parse_args() {
         ;;
       --push-retries=*)
         PUSH_MAX_ATTEMPTS="${1#--push-retries=}"
-        shift
-        ;;
-      --push-stall)
-        [[ $# -ge 2 ]] || die "--push-stall requires seconds"
-        PUSH_STALL_SECONDS="$2"
-        shift 2
-        ;;
-      --push-stall=*)
-        PUSH_STALL_SECONDS="${1#--push-stall=}"
         shift
         ;;
       --version)
@@ -621,7 +533,7 @@ git_is_dirty() {
 # Shipping / identity actions: must start from a clean tree (unless CLI override).
 command_requires_clean_tree() {
   case "${COMMAND:-}" in
-    wizard|preflight|config|build|push|rollout) return 0 ;;
+    wizard|preflight|build|push|rollout) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -671,21 +583,56 @@ assert_clean_working_tree() {
   exit 1
 }
 
+# Persist last resolved VERSION so dirty tags (…-dirty-TIMESTAMP) stay stable
+# across phases in one process, and so a later menu "push" can find the image
+# that "build" just produced.
+version_state_file() {
+  echo "$ROOT/tmp/gs-deploy.version"
+}
+
+pin_version() {
+  # Remember for this process + on disk for a follow-up push/rollout.
+  VERSION_OVERRIDE="$1"
+  export VERSION="$1"
+  mkdir -p "$ROOT/tmp"
+  printf '%s\n' "$1" >"$(version_state_file)"
+}
+
 resolve_version() {
+  # Explicit --version / already pinned for this process
   if [[ -n "$VERSION_OVERRIDE" ]]; then
     export VERSION="$VERSION_OVERRIDE"
     return 0
   fi
+
   if git_is_dirty; then
     if allow_dirty_effective; then
-      export VERSION="$(git rev-parse --short HEAD)-dirty-$(date +%Y%m%d%H%M%S)"
+      # Reuse last built dirty tag for push/rollout (do not mint a new timestamp).
+      # Build (and wizard first resolve via preflight/build) mints a fresh tag.
+      case "${COMMAND:-}" in
+        push|rollout)
+          local prev=""
+          if [[ -f "$(version_state_file)" ]]; then
+            prev="$(tr -d '[:space:]' <"$(version_state_file)" || true)"
+          fi
+          if [[ -n "$prev" ]]; then
+            pin_version "$prev"
+            echo "WARN: dirty tree; reusing VERSION=$VERSION from $(version_state_file)"
+            echo "  (from last build — avoids a new -dirty-TIMESTAMP that would miss the local image)"
+            return 0
+          fi
+          ;;
+      esac
+      pin_version "$(git rev-parse --short HEAD)-dirty-$(date +%Y%m%d%H%M%S)"
       echo "WARN: dirty tree; using VERSION=$VERSION (--allow-dirty, pre-prod only)"
+      echo "  Pinned for this run (and written to $(version_state_file))"
       return 0
     fi
     # Should have been caught by assert_clean_working_tree; keep as safety net
     die "Git working tree is dirty. Commit first, or (pre-prod only) --allow-dirty / --version TAG"
   fi
-  export VERSION="$(git rev-parse HEAD)"
+
+  pin_version "$(git rev-parse HEAD)"
 }
 
 absolute_image() {
@@ -715,12 +662,13 @@ destination_image() {
 }
 
 # Run kamal inside Docker (no bare-metal Ruby/Kamal on the Mac required).
-# Usage: run_kamal <kamal args…>   e.g.  run_kamal build push --output=docker
+# Usage: run_kamal <kamal args…>   e.g.  run_kamal config
 #         run_kamal deploy --skip-push
-# Streams full stdout/stderr (via run_logged).
+# Streams full stdout/stderr (via run_logged), unless KAMAL_CAPTURE_FILE is set
+# (then output goes to that file + deploy log; nothing to terminal except errors).
 #
-# Uses ghcr.io/basecamp/kamal (docker CLI + buildx included). The host Docker
-# socket is mounted so builds run on Docker Desktop, not inside a nested daemon.
+# Used for server-side Kamal (preflight kamal config / rollout). Build and push
+# use the host docker CLI. Official image + host Docker socket for SSH deploy.
 run_kamal() {
   local dest host
   dest="$(kamal_destination)"
@@ -732,40 +680,74 @@ run_kamal() {
   local docker_sock="/var/run/docker.sock"
   [[ -S "$docker_sock" ]] || die "Docker socket not found at $docker_sock (is Docker Desktop running?)"
 
-  # Official image expects app at /workdir
-  echo "+ docker run ${KAMAL_IMAGE}  →  kamal $* -d ${dest}  (VERSION=${VERSION:-auto})"
+  local banner_line="+ docker run ${KAMAL_IMAGE}  →  kamal $* -d ${dest}  (VERSION=${VERSION:-auto})"
 
-  run_logged docker run --rm -i \
-    -v "$ROOT":/workdir \
-    -v "$ssh_key":/root/.ssh/global-symbols.pem:ro \
-    -v "$docker_sock":/var/run/docker.sock \
-    -w /workdir \
-    -e KAMAL_REGISTRY_USERNAME \
-    -e KAMAL_REGISTRY_PASSWORD \
-    -e SECRET_KEY_BASE \
-    -e GS_DATABASE_PASSWORD \
-    -e REDIS_PASSWORD \
-    -e DIRECTUS_TOKEN_CMS \
-    -e DIRECTUS_WEBHOOK_SECRET \
-    -e MYSQL_ROOT_PASSWORD \
-    -e MYSQL_PASSWORD \
-    -e VERSION \
-    -e "GS_KAMAL_DEST=${dest}" \
-    -e "GS_DEPLOY_HOST=${host}" \
-    --entrypoint sh \
-    "$KAMAL_IMAGE" \
+  # shellcheck disable=SC2086
+  local -a docker_args=(
+    docker run --rm -i
+    -v "$ROOT":/workdir
+    -v "$ssh_key":/root/.ssh/global-symbols.pem:ro
+    -v "$docker_sock":/var/run/docker.sock
+    -w /workdir
+    -e KAMAL_REGISTRY_USERNAME
+    -e KAMAL_REGISTRY_PASSWORD
+    -e SECRET_KEY_BASE
+    -e GS_DATABASE_PASSWORD
+    -e REDIS_PASSWORD
+    -e DIRECTUS_TOKEN_CMS
+    -e DIRECTUS_WEBHOOK_SECRET
+    -e MYSQL_ROOT_PASSWORD
+    -e MYSQL_PASSWORD
+    -e VERSION
+    -e "GS_KAMAL_DEST=${dest}"
+    -e "GS_DEPLOY_HOST=${host}"
+    --entrypoint sh
+    "$KAMAL_IMAGE"
     -c '
 set -eu
 mkdir -p /root/.ssh
 chmod 700 /root/.ssh
-# Avoid HostKeyMismatch for rollout SSH from this container
-ssh-keyscan -H "$GS_DEPLOY_HOST" >> /root/.ssh/known_hosts 2>/dev/null || true
+# Seed known_hosts for this container (fresh each run).
+# IMPORTANT: do NOT use ssh-keyscan -H (hashed hostnames). SSHKit’s known_hosts
+# parser returns only the *first* matching hashed key type; the server then
+# offers ed25519 and Net::SSH raises HostKeyMismatch (fingerprint is the live
+# key, which “does not match” the wrong type stored first). Plain hostnames
+# collect all key types under one host entry and verify correctly.
+: > /root/.ssh/known_hosts
+if ! ssh-keyscan -T 10 -t ed25519,ecdsa,rsa "$GS_DEPLOY_HOST" >> /root/.ssh/known_hosts 2>/dev/null; then
+  echo "WARN: ssh-keyscan failed for $GS_DEPLOY_HOST — Kamal SSH may fail host-key check" >&2
+fi
 chmod 600 /root/.ssh/known_hosts 2>/dev/null || true
+# Fail fast with a clear message if we got no keys (empty file / only blanks)
+if ! grep -qE "ssh-(ed25519|rsa)|ecdsa-" /root/.ssh/known_hosts 2>/dev/null; then
+  echo "ERROR: no host keys recorded for $GS_DEPLOY_HOST (ssh-keyscan empty)" >&2
+  exit 1
+fi
 # Sanity: buildx must exist (official image includes it)
 docker buildx version >/dev/null
 echo "+ kamal $* -d $GS_KAMAL_DEST  (VERSION=${VERSION:-auto})"
 exec kamal "$@" -d "$GS_KAMAL_DEST"
 ' sh "$@"
+  )
+
+  if [[ -n "${KAMAL_CAPTURE_FILE:-}" ]]; then
+    # Quiet path (preflight): capture everything for log / failure dump
+    local cap_rc=0
+    set +e
+    {
+      echo "$banner_line"
+      "${docker_args[@]}"
+    } >"$KAMAL_CAPTURE_FILE" 2>&1
+    cap_rc=$?
+    set -e
+    if [[ "$NO_LOG" -ne 1 && -n "${LOG_FILE:-}" ]]; then
+      cat "$KAMAL_CAPTURE_FILE" >>"$LOG_FILE"
+    fi
+    return "$cap_rc"
+  fi
+
+  echo "$banner_line"
+  run_logged "${docker_args[@]}"
 }
 
 # ─── phases ───────────────────────────────────────────────────────────────
@@ -783,148 +765,276 @@ ghcr_session_looks_logged_in() {
   grep -Eq '"ghcr\.io"[[:space:]]*:' "$cfg" 2>/dev/null
 }
 
-# Checks + image tag + GHCR login (first wizard step).
+# Append a line to the deploy log only (no terminal). Used for preflight detail.
+preflight_log() {
+  if [[ "$NO_LOG" -ne 1 && -n "${LOG_FILE:-}" ]]; then
+    # shellcheck disable=SC2129
+    printf '%s\n' "$*" >>"$LOG_FILE"
+  fi
+}
+
+preflight_log_file() {
+  local f="$1"
+  [[ -f "$f" ]] || return 0
+  if [[ "$NO_LOG" -ne 1 && -n "${LOG_FILE:-}" ]]; then
+    cat "$f" >>"$LOG_FILE"
+  fi
+}
+
+# Ready gate: local checks + VERSION + GHCR login + kamal config (read-only).
+# Success → short scoreboard. Failure → comprehensive dump (terminal + log).
 cmd_preflight() {
-  phase_banner "preflight ($ENV_NAME) — checks + tag + GHCR"
+  phase_banner "preflight ($ENV_NAME) — ready checks + kamal config"
+  preflight_log "=== preflight detail env=$ENV_NAME root=$ROOT ==="
+  preflight_log "started: $(date -Iseconds 2>/dev/null || date)"
+
   local ok=1
+  local s_docker="—" s_git="—" s_secrets="—" s_ssh="—" s_files="—" s_host="—"
+  local s_version="—" s_ghcr="—" s_kamal="—"
+  local detail_tmp fail_notes=""
+  detail_tmp="$(mktemp "${TMPDIR:-/tmp}/gs-preflight.XXXXXX")"
+  # Expand path now: under set -u, locals are gone before RETURN trap runs.
+  # shellcheck disable=SC2064
+  trap "rm -f '${detail_tmp}'" RETURN
 
-  echo "— Checks —"
-  echo "• repo root: $ROOT"
+  pf_note() {
+    # accumulate multi-line failure notes for terminal dump
+    fail_notes="${fail_notes}$1"$'\n'
+    preflight_log "$1"
+  }
+
+  # ── docker ──────────────────────────────────────────────────────────────
   if ! command -v docker >/dev/null 2>&1; then
-    echo "✗ docker not found on PATH"
+    s_docker="FAIL  not on PATH"
+    pf_note "docker: not found on PATH"
+    ok=0
+  elif ! docker_cli_ok; then
+    s_docker="FAIL  CLI timeout (8s)"
+    pf_note "docker CLI not responding (timed out after 8s)"
+    pf_note "  Docker Desktop is often wedged after a stalled GHCR push."
+    pf_note "  Fix: restart Docker Desktop, re-run."
+    ok=0
+  elif ! docker_daemon_ok; then
+    s_docker="FAIL  daemon not reachable"
+    pf_note "docker daemon not reachable or hung — restart Docker Desktop"
     ok=0
   else
-    echo "• checking docker CLI (8s timeout)…"
-    if ! docker_cli_ok; then
-      echo "✗ docker CLI not responding (timed out after 8s)"
-      echo "  Docker Desktop is often wedged after a stalled GHCR push."
-      echo "  Fix: quit any hung gs-deploy (Ctrl+C), restart Docker Desktop, re-run."
-      ok=0
-    else
-      local dver
-      dver="$(run_with_timeout 8 docker version --format '{{.Client.Version}}' 2>/dev/null || echo present)"
-      echo "• docker: $dver"
-      echo "• checking docker daemon (8s timeout)…"
-      if ! docker_daemon_ok; then
-        echo "✗ docker daemon not reachable or hung"
-        echo "  Restart Docker Desktop, then re-run $0"
-        ok=0
-      else
-        echo "✓ docker daemon OK"
-      fi
-    fi
+    local dver
+    dver="$(run_with_timeout 8 docker version --format '{{.Client.Version}}' 2>/dev/null || echo present)"
+    s_docker="OK    ${dver}"
+    preflight_log "docker: client=${dver} daemon=OK"
   fi
 
+  # ── git ─────────────────────────────────────────────────────────────────
   if ! command -v git >/dev/null 2>&1; then
-    echo "✗ git not found"
+    s_git="FAIL  not found"
+    pf_note "git: not found"
     ok=0
   else
-    echo "• git: $(git rev-parse --short HEAD 2>/dev/null) branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
+    local gsha gbr
+    gsha="$(git rev-parse --short HEAD 2>/dev/null || echo '?')"
+    gbr="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '?')"
     if git_is_dirty; then
+      preflight_log "git: ${gsha} branch=${gbr} DIRTY"
+      preflight_log "$(git status --porcelain | head -50)"
       if allow_dirty_effective || [[ -n "$VERSION_OVERRIDE" ]]; then
-        echo "⚠  working tree DIRTY (allowed: pre-prod --allow-dirty and/or --version):"
-        git status --porcelain | head -20
+        s_git="OK    ${gsha} ${gbr} (dirty, allowed)"
       else
-        echo "✗ working tree DIRTY (hard rule: commit before shipping;"
-        echo "    --allow-dirty is pre-prod only, never production):"
-        git status --porcelain | head -20
+        s_git="FAIL  dirty tree (commit or --allow-dirty pre-prod)"
+        pf_note "working tree DIRTY (hard rule: commit before shipping;"
+        pf_note "  --allow-dirty is pre-prod only, never production):"
+        pf_note "$(git status --porcelain | head -20)"
         ok=0
       fi
     else
-      echo "✓ working tree clean"
+      s_git="OK    ${gsha} ${gbr} (clean)"
+      preflight_log "git: ${gsha} branch=${gbr} clean"
     fi
   fi
 
-  local f
+  # ── secrets ─────────────────────────────────────────────────────────────
+  local f secrets_ok=1 secrets_list=""
   for f in $(secrets_files); do
     if [[ -f "$f" ]]; then
-      echo "✓ secrets: $f"
+      secrets_list="${secrets_list}${secrets_list:+, }${f}"
+      preflight_log "secrets: present $f"
     else
-      echo "✗ missing: $f"
-      ok=0
+      secrets_ok=0
+      pf_note "secrets: missing $f"
     fi
   done
+  if [[ "$secrets_ok" -eq 1 ]]; then
+    s_secrets="OK    ${secrets_list}"
+  else
+    s_secrets="FAIL  missing file(s)"
+    ok=0
+  fi
 
+  # ── ssh key ─────────────────────────────────────────────────────────────
   local ssh_key="${HOME}/.ssh/global-symbols.pem"
   if [[ -f "$ssh_key" ]]; then
-    echo "✓ SSH key: $ssh_key"
+    s_ssh="OK    ${ssh_key}"
+    preflight_log "ssh key: present $ssh_key"
   else
-    echo "✗ SSH key missing: $ssh_key"
+    s_ssh="FAIL  missing ${ssh_key}"
+    pf_note "SSH key missing: $ssh_key"
     ok=0
   fi
 
+  # ── deploy files ────────────────────────────────────────────────────────
+  local files_ok=1
   for f in config/deploy.yml "config/deploy.${ENV_NAME}.yml" Dockerfile; do
     if [[ -f "$f" ]]; then
-      echo "✓ $f"
+      preflight_log "file: present $f"
     else
-      echo "✗ missing $f"
-      ok=0
+      files_ok=0
+      pf_note "missing file: $f"
     fi
   done
-
-  local host
-  host="$(deploy_host)"
-  echo "• target host: $host"
-  if [[ "$ENV_NAME" == "production" && "$host" == REPLACE* ]]; then
-    echo "✗ production host still a placeholder in config/deploy.production.yml"
+  if [[ "$files_ok" -eq 1 ]]; then
+    s_files="OK    deploy.yml + deploy.${ENV_NAME}.yml + Dockerfile"
+  else
+    s_files="FAIL  missing deploy config or Dockerfile"
     ok=0
   fi
 
+  # ── host ────────────────────────────────────────────────────────────────
+  local host
+  host="$(deploy_host)"
+  if [[ "$ENV_NAME" == "production" && "$host" == REPLACE* ]]; then
+    s_host="FAIL  placeholder in deploy.production.yml"
+    pf_note "production host still a placeholder: $host"
+    ok=0
+  else
+    s_host="OK    ${host}"
+    preflight_log "host: $host"
+  fi
+
+  # Stop before VERSION/GHCR/kamal if basics failed (fail-fast, still dump state)
   if [[ "$ok" -ne 1 ]]; then
+    s_version="SKIP"
+    s_ghcr="SKIP"
+    s_kamal="SKIP"
+    echo ""
+    echo "  docker     $s_docker"
+    echo "  git        $s_git"
+    echo "  secrets    $s_secrets"
+    echo "  ssh key    $s_ssh"
+    echo "  files      $s_files"
+    echo "  host       $s_host"
+    echo "  version    $s_version"
+    echo "  ghcr       $s_ghcr"
+    echo "  kamal cfg  $s_kamal"
+    echo ""
+    echo "── Failure detail ──"
+    printf '%s' "$fail_notes"
+    if [[ -n "${LOG_FILE:-}" && "$NO_LOG" -ne 1 ]]; then
+      echo "Full log: $LOG_FILE"
+    fi
     phase_fail "preflight" 1
     return 1
   fi
 
-  echo ""
-  echo "— Image tag —"
+  # ── image tag ───────────────────────────────────────────────────────────
   resolve_version
-  echo "VERSION=$VERSION"
-  echo "absolute image: $(absolute_image)"
+  s_version="OK    VERSION=${VERSION}"
+  preflight_log "VERSION=$VERSION"
+  preflight_log "absolute image: $(absolute_image)"
+  preflight_log "destination tag: $(destination_image)"
   if git_is_dirty; then
-    echo "note: tree is dirty (override or --allow-dirty in effect)"
+    preflight_log "note: tree is dirty (override or --allow-dirty in effect)"
   fi
 
-  echo ""
-  echo "— GHCR login —"
+  # ── GHCR login ──────────────────────────────────────────────────────────
   if [[ "$SKIP_LOGIN" -eq 1 ]]; then
-    echo "Skipping docker login (--skip-login)."
+    s_ghcr="OK    skipped (--skip-login)"
+    preflight_log "ghcr: login skipped (--skip-login)"
   elif [[ "$FORCE_LOGIN" -ne 1 ]] && ghcr_session_looks_logged_in; then
-    echo "Docker already has credentials for ${REGISTRY_HOST} — skipping login."
-    echo "  If a later push fails with unauthorized: re-run with --force-login"
+    s_ghcr="OK    already logged in"
+    preflight_log "ghcr: credentials present for ${REGISTRY_HOST} — skipped login"
   else
     if [[ "$FORCE_LOGIN" -eq 1 ]]; then
-      echo "Forcing docker login (--force-login)…"
+      preflight_log "ghcr: forcing docker login (--force-login)"
     fi
     load_secrets
-    echo "Logging in to ${REGISTRY_HOST} as ${KAMAL_REGISTRY_USERNAME} …"
+    preflight_log "ghcr: docker login ${REGISTRY_HOST} as ${KAMAL_REGISTRY_USERNAME}"
+    local login_rc=0
     set +e
-    run_logged bash -c 'echo "$KAMAL_REGISTRY_PASSWORD" | docker login "'"$REGISTRY_HOST"'" -u "$KAMAL_REGISTRY_USERNAME" --password-stdin'
-    local rc=$?
+    # Capture login output (password never printed by docker login on success)
+    bash -c 'echo "$KAMAL_REGISTRY_PASSWORD" | docker login "'"$REGISTRY_HOST"'" -u "$KAMAL_REGISTRY_USERNAME" --password-stdin' \
+      >"$detail_tmp" 2>&1
+    login_rc=$?
     set -e
-    if [[ "$rc" -ne 0 ]]; then
-      phase_fail "preflight" "$rc"
-      return "$rc"
+    preflight_log_file "$detail_tmp"
+    if [[ "$login_rc" -ne 0 ]]; then
+      s_ghcr="FAIL  docker login exit ${login_rc}"
+      pf_note "docker login to ${REGISTRY_HOST} failed (exit ${login_rc}):"
+      pf_note "$(cat "$detail_tmp")"
+      ok=0
+    else
+      s_ghcr="OK    logged in as ${KAMAL_REGISTRY_USERNAME}"
     fi
   fi
 
-  phase_ok "preflight"
-}
-
-cmd_config() {
-  phase_banner "config (kamal config -d $(kamal_destination); read-only)"
-  load_secrets
-  resolve_version
-  echo "Resolved VERSION=$VERSION"
-  echo "Running kamal config (full output follows)…"
-  set +e
-  run_kamal config
-  local rc=$?
-  set -e
-  if [[ "$rc" -ne 0 ]]; then
-    phase_fail "config" "$rc"
-    return "$rc"
+  # ── kamal config (read-only; quiet capture) ─────────────────────────────
+  if [[ "$ok" -eq 1 ]]; then
+    load_secrets
+    preflight_log "kamal config -d $(kamal_destination) (captured; not streamed on success)"
+    local kamal_rc=0
+    set +e
+    KAMAL_CAPTURE_FILE="$detail_tmp" run_kamal config
+    kamal_rc=$?
+    set -e
+    if [[ "$kamal_rc" -ne 0 ]]; then
+      s_kamal="FAIL  exit ${kamal_rc}"
+      pf_note "kamal config failed (exit ${kamal_rc}). Full captured output follows after scoreboard."
+      ok=0
+    else
+      s_kamal="OK    destination=$(kamal_destination)"
+      preflight_log "kamal config: OK"
+    fi
+  else
+    s_kamal="SKIP"
   fi
-  phase_ok "config"
+
+  # ── scoreboard (always) ─────────────────────────────────────────────────
+  echo ""
+  echo "  docker     $s_docker"
+  echo "  git        $s_git"
+  echo "  secrets    $s_secrets"
+  echo "  ssh key    $s_ssh"
+  echo "  files      $s_files"
+  echo "  host       $s_host"
+  echo "  version    $s_version"
+  echo "  image      $(absolute_image)"
+  echo "  ghcr       $s_ghcr"
+  echo "  kamal cfg  $s_kamal"
+
+  if [[ "$ok" -ne 1 ]]; then
+    echo ""
+    echo "── Failure detail ──"
+    printf '%s' "$fail_notes"
+    if [[ -f "$detail_tmp" && -s "$detail_tmp" ]]; then
+      # Full kamal/login capture on failure (comprehensive state)
+      if grep -q . "$detail_tmp" 2>/dev/null; then
+        echo "----- captured command output -----"
+        cat "$detail_tmp"
+        echo "----- end captured output -----"
+      fi
+    fi
+    preflight_log "preflight FAILED"
+    if [[ -n "${LOG_FILE:-}" && "$NO_LOG" -ne 1 ]]; then
+      echo "Full log: $LOG_FILE"
+    fi
+    phase_fail "preflight" 1
+    return 1
+  fi
+
+  preflight_log "preflight OK"
+  if [[ -n "${LOG_FILE:-}" && "$NO_LOG" -ne 1 ]]; then
+    echo "  log        $LOG_FILE"
+  fi
+  phase_ok "preflight"
 }
 
 # True if Docker has a local image for the absolute tag.
@@ -934,39 +1044,59 @@ local_image_present() {
 
 normalize_push_retry_settings() {
   case "$PUSH_MAX_ATTEMPTS" in
-    ''|*[!0-9]*|0) PUSH_MAX_ATTEMPTS=8 ;;
+    ''|*[!0-9]*|0) PUSH_MAX_ATTEMPTS=5 ;;
   esac
   case "$PUSH_RETRY_SLEEP" in
-    ''|*[!0-9]*) PUSH_RETRY_SLEEP=20 ;;
-  esac
-  case "$PUSH_STALL_SECONDS" in
-    ''|*[!0-9]*|0) PUSH_STALL_SECONDS=180 ;;
+    ''|*[!0-9]*) PUSH_RETRY_SLEEP=15 ;;
   esac
 }
 
-# (1) Mac only: build image into local Docker — no GHCR, no server.
-# Uses kamal build push --output=docker (buildx export to local store, not registry).
+# (1) Mac only: plain docker build → local image. No Kamal, no GHCR, no server.
 cmd_build() {
-  phase_banner "build (Mac local image only; no GHCR, no server)"
-  load_secrets
+  phase_banner "build (host docker build → local image; no GHCR, no server)"
   resolve_version
   local img dest_img
   img="$(absolute_image)"
   dest_img="$(destination_image)"
 
-  echo "Destination config: $(kamal_destination)  (used for image name / arch only)"
-  echo "Image:              $img"
-  echo "Also tags:          $dest_img (when Kamal applies destination tag)"
+  if ! docker_cli_ok; then
+    phase_fail "build" 1
+    echo "  docker CLI not responding. Restart Docker Desktop, then re-run build." >&2
+    return 1
+  fi
+
+  echo "Platform:  $BUILD_PLATFORM"
+  echo "Network:   $BUILD_NETWORK  (host = workaround if bridge egress is broken)"
+  echo "Image:     $img"
+  echo "Also tag:  $dest_img"
   echo "What this does:"
-  echo "  • Build Dockerfile on this Mac (Docker Desktop, arm64)"
-  echo "  • Load result into local Docker (kamal build push --output=docker)"
+  echo "  • docker build on this Mac (Dockerfile → local Docker store)"
+  echo "  • Tags VERSION + latest-${ENV_NAME} (same names Kamal will pull later)"
   echo "  • Does NOT push to ${REGISTRY_HOST}"
-  echo "  • Does NOT SSH / restart containers on $(deploy_host)"
+  echo "  • Does NOT touch $(deploy_host)"
   confirm_build
 
-  echo "Starting kamal build push --output=docker — full stream below (not filtered)…"
+  # Prove container egress before a long build (skip if network=host and host works)
+  if [[ "$BUILD_NETWORK" != "host" ]]; then
+    echo "  Checking container egress (bridge)…"
+    if ! run_with_timeout 15 docker run --rm curlimages/curl:8.5.0 \
+         -sS -o /dev/null --connect-timeout 5 https://deb.debian.org; then
+      echo "WARN: containers cannot reach the internet on the default network."
+      echo "  This Mac's Docker Desktop bridge egress is often broken; use host network:"
+      echo "    GS_BUILD_NETWORK=host  (already the default in gs-deploy)"
+    fi
+  fi
+
+  echo "Starting docker build --network=${BUILD_NETWORK} — full stream below…"
   set +e
-  run_kamal build push --output=docker
+  run_logged docker build \
+    --network "$BUILD_NETWORK" \
+    --platform "$BUILD_PLATFORM" \
+    -t "$img" \
+    -t "$dest_img" \
+    --label "service=${SERVICE_LABEL}" \
+    -f Dockerfile \
+    .
   local rc=$?
   set -e
   if [[ "$rc" -ne 0 ]]; then
@@ -976,21 +1106,19 @@ cmd_build() {
 
   if ! local_image_present; then
     phase_fail "build" 1
-    echo "  Build reported success but local image missing: $img" >&2
-    echo "  Check Docker Desktop / build output above." >&2
+    echo "  Build finished but local image missing: $img" >&2
     return 1
   fi
 
   phase_ok "build"
   echo ""
   echo "Local image ready: $img"
-  echo "Next: push (upload to GHCR), then rollout."
+  echo "Flow: build (done) → push (GHCR) → rollout (server pulls + replaces containers)."
 }
 
-# (2) Mac only: push local image to GHCR — no rebuild, no server.
-# GHCR often stalls mid-push; we retry. Already-uploaded layers are skipped on retry.
+# (2) Mac only: plain docker push → GHCR. No rebuild, no server.
 cmd_push() {
-  phase_banner "push (local image → GHCR; no rebuild, no server)"
+  phase_banner "push (host docker push → GHCR; no rebuild, no server)"
   load_secrets
   resolve_version
   local img dest_img
@@ -1005,16 +1133,15 @@ cmd_push() {
     return 1
   fi
 
-  echo "Destination config: $(kamal_destination)"
-  echo "Image:              $img"
-  echo "Also push if local: $dest_img"
-  echo "Push retries:       up to ${PUSH_MAX_ATTEMPTS} attempts (sleep ${PUSH_RETRY_SLEEP}s+, backoff +10s)"
-  echo "Hang watchdog:      kill attempt if no new output for ${PUSH_STALL_SECONDS}s, then retry"
+  echo "Image:         $img"
+  echo "Also push if:  $dest_img (when present locally)"
+  echo "Push retries:  up to ${PUSH_MAX_ATTEMPTS} (sleep ${PUSH_RETRY_SLEEP}s+, +10s each)"
+  echo "Layer concurrency: Docker daemon max-concurrent-uploads (see ~/.docker/daemon.json)"
+  echo "  Recommended: 2  (not configurable as '2 then pause 5s' — Docker has no batch delay)"
   echo "What this does:"
-  echo "  • docker push $img (and destination tag if present locally)"
-  echo "  • On fail OR silent hang: retry (partial GHCR layers kept)"
+  echo "  • docker push $img  (layers already on GHCR are skipped)"
   echo "  • Does NOT rebuild"
-  echo "  • Does NOT SSH / restart containers on $(deploy_host)"
+  echo "  • Does NOT touch $(deploy_host) — that is rollout"
   confirm_push
 
   local attempt=1
@@ -1025,15 +1152,22 @@ cmd_push() {
     echo ""
     banner "push attempt ${attempt}/${PUSH_MAX_ATTEMPTS}"
     echo "Image: $img"
-    echo "Watchdog: ${PUSH_STALL_SECONDS}s without new output → kill & retry"
-    echo "Full command output below (not filtered)…"
+
+    echo "  Pre-check: docker CLI (8s timeout)…"
+    if ! docker_cli_ok; then
+      phase_fail "push" 1
+      echo "  docker CLI not responding. Restart Docker Desktop, then re-run push." >&2
+      echo "  Tip: $0 --allow-dirty --version $VERSION   # menu → push" >&2
+      return 1
+    fi
+    echo "  Pre-check OK — docker push (live output)…"
 
     set +e
-    run_with_stall_watch "$PUSH_STALL_SECONDS" docker push "$img"
+    run_logged docker push "$img"
     rc=$?
     if [[ "$rc" -eq 0 ]] && docker image inspect "$dest_img" >/dev/null 2>&1; then
       echo "Pushing destination tag: $dest_img"
-      run_with_stall_watch "$PUSH_STALL_SECONDS" docker push "$dest_img"
+      run_logged docker push "$dest_img"
       rc=$?
     fi
     set -e
@@ -1042,21 +1176,17 @@ cmd_push() {
       phase_ok "push"
       echo ""
       echo "Image is in GHCR after attempt ${attempt}/${PUSH_MAX_ATTEMPTS}."
-      echo "Next: rollout (pull + restart on the server)."
+      echo "Next: rollout — Kamal pulls this tag on the server and replaces web+job."
       return 0
     fi
 
     echo ""
-    if [[ "$rc" -eq "$STALL_EXIT_CODE" ]]; then
-      echo "WARN: push attempt ${attempt}/${PUSH_MAX_ATTEMPTS} hung (no output ${PUSH_STALL_SECONDS}s) — will retry."
-    else
-      echo "WARN: push attempt ${attempt}/${PUSH_MAX_ATTEMPTS} failed (exit ${rc})."
-    fi
+    echo "WARN: push attempt ${attempt}/${PUSH_MAX_ATTEMPTS} failed (exit ${rc})."
     if [[ "$attempt" -ge "$PUSH_MAX_ATTEMPTS" ]]; then
       break
     fi
-    echo "  Waiting ${sleep_s}s then retrying (layers already on GHCR are skipped)…"
-    echo "  Tip: max-concurrent-uploads=1 should already be set in ~/.docker/daemon.json"
+    echo "  Waiting ${sleep_s}s then attempt $((attempt + 1))/${PUSH_MAX_ATTEMPTS}…"
+    echo "  Tip: ~/.docker/daemon.json max-concurrent-uploads (try 2 or 1); restart Docker after changes"
     sleep "$sleep_s"
     sleep_s=$((sleep_s + 10))
     attempt=$((attempt + 1))
@@ -1064,11 +1194,35 @@ cmd_push() {
 
   phase_fail "push" "$rc"
   echo "  All ${PUSH_MAX_ATTEMPTS} attempts failed. Re-run: $0  (menu → push)" >&2
-  echo "  Or: $0 --push-retries 12 --push-stall 120" >&2
+  echo "  Or: $0 --push-retries 8" >&2
   return "$rc"
 }
 
-# (3) Server: pull image already in GHCR + restart web/job.
+# Quiet HTTP smoke after rollout. Prints only PASS/FAIL (no header dump).
+# Returns 0 on success, 1 on failure. Does not change the server.
+run_smoke_check() {
+  local host header code rc
+  host="$(deploy_host)"
+  header="$(http_host_header)"
+  if [[ "$host" == REPLACE* ]]; then
+    echo "smoke: FAIL (host is still a placeholder)"
+    return 1
+  fi
+  set +e
+  code="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 30 \
+    -H "Host: ${header}" "http://${host}/" 2>/dev/null)"
+  rc=$?
+  set -e
+  if [[ "$rc" -eq 0 && "$code" =~ ^[23][0-9][0-9]$ ]]; then
+    echo "smoke: PASS"
+    return 0
+  fi
+  echo "smoke: FAIL"
+  return 1
+}
+
+# (3) Server: Kamal pulls the GHCR image and replaces live web+job containers,
+# then a quiet HTTP smoke check (PASS/FAIL only).
 cmd_rollout() {
   phase_banner "rollout (server $(deploy_host); TOUCHES SERVER)"
   load_secrets
@@ -1077,8 +1231,10 @@ cmd_rollout() {
   echo "Host:        $(deploy_host)"
   echo "Image:       $(absolute_image)"
   echo "What this does:"
-  echo "  • kamal deploy --skip-push  (no rebuild on the Mac)"
-  echo "  • SSH to host, pull image, replace web + job, healthcheck proxy"
+  echo "  • Kamal deploy --skip-push (image must already be in GHCR from push)"
+  echo "  • SSH to host, docker pull that tag, replace web + job, healthcheck proxy"
+  echo "  • HTTP smoke check after deploy (PASS/FAIL only)"
+  echo "  • Does NOT build or push from this Mac"
   confirm_rollout
   echo "Starting kamal deploy --skip-push — full stream below (not filtered)…"
   set +e
@@ -1090,58 +1246,156 @@ cmd_rollout() {
     return "$rc"
   fi
   phase_ok "rollout"
+
+  # Deploy already succeeded — smoke is advisory; report only, do not fail phase.
   echo ""
-  echo "Next: smoke check, then verify on the server (hint-verify)."
+  set +e
+  run_smoke_check
+  local smoke_rc=$?
+  set -e
+  if [[ "$smoke_rc" -ne 0 ]]; then
+    echo "WARN: smoke failed after successful rollout — investigate (menu → verify)."
+  fi
+  echo ""
+  echo "Next: verify (post-deploy suite on the server)."
 }
 
-cmd_smoke() {
-  phase_banner "smoke (HTTP check; does not change server)"
-  local host header
+confirm_verify() {
+  if [[ "$YES" -eq 1 ]]; then
+    echo "(--yes) verify confirmation skipped"
+    return 0
+  fi
+  if [[ "$ENV_NAME" == "production" ]]; then
+    echo ""
+    echo "⚠  Will SSH to production and run the post-deploy suite inside the web container."
+    confirm_typed_token "verify" "Type 'verify' to continue (q=quit): "
+  else
+    echo ""
+    echo "Will SSH to $(deploy_host) and run deploy_verify [pre_prod] in the web container."
+    confirm_typed_token "verify" "Type 'verify' to continue (q=quit): "
+  fi
+}
+
+# SSH to app host and run deploy_verify inside the live web container.
+# Suite ships in the image (/rails/deploy_verify); RuntimeGuard enforces host IP.
+# Pre-prod auth/CRUD: DEPLOY_VERIFY_USER_* from .kamal/secrets.pre-prod (and after
+# rollout, from container env via Kamal env.secret).
+cmd_verify() {
+  phase_banner "verify (post-deploy suite on $(deploy_host))"
+  local host web_filter profile header ssh_key email_q pass_q auth_note
   host="$(deploy_host)"
   header="$(http_host_header)"
-  if [[ "$host" == REPLACE* ]]; then
-    die "Cannot smoke: host is still a placeholder ($host)"
-  fi
-  echo "curl -sS -D- -o /dev/null -H \"Host: ${header}\" \"http://${host}/\""
-  set +e
-  run_logged curl -sS -D- -o /dev/null --max-time 30 -H "Host: ${header}" "http://${host}/"
-  local rc=$?
-  set -e
-  if [[ "$rc" -ne 0 ]]; then
-    phase_fail "smoke" "$rc"
-    return "$rc"
-  fi
-  phase_ok "smoke"
-}
+  ssh_key="${HOME}/.ssh/global-symbols.pem"
 
-cmd_hint_verify() {
-  phase_banner "hint-verify (instructions only — suite runs ON the server)"
-  local host web_filter profile
-  host="$(deploy_host)"
   if [[ "$ENV_NAME" == "pre-prod" ]]; then
     web_filter="gs-repo-web-pre-prod"
     profile="pre_prod"
+    # Load secrets so DEPLOY_VERIFY_USER_* are available for docker exec pass-through
+    load_secrets
   else
     web_filter="gs-repo-web-production"
     profile="prod"
   fi
-  cat <<EOF
-Deploy verify ships IN the app image and must run on the app host
-(IP allowlist + RuntimeGuard). Not from this laptop as the primary path.
 
-1) SSH:
-   ssh -i ~/.ssh/global-symbols.pem ubuntu@${host}
+  if [[ "$host" == REPLACE* ]]; then
+    phase_fail "verify" 1
+    echo "  Host is still a placeholder — cannot SSH." >&2
+    return 1
+  fi
+  if [[ ! -f "$ssh_key" ]]; then
+    phase_fail "verify" 1
+    echo "  SSH key missing: $ssh_key" >&2
+    return 1
+  fi
 
-2) Inside the server:
-   WEB=\$(docker ps -q -f name=${web_filter} | head -1)
-   docker exec "\$WEB" /rails/deploy_verify/bin/run ${profile}
+  email_q="$(printf '%q' "${DEPLOY_VERIFY_USER_EMAIL:-}")"
+  pass_q="$(printf '%q' "${DEPLOY_VERIFY_USER_PASSWORD:-}")"
+  if [[ "$ENV_NAME" == "pre-prod" && -n "${DEPLOY_VERIFY_USER_EMAIL:-}" && -n "${DEPLOY_VERIFY_USER_PASSWORD:-}" ]]; then
+    auth_note="auth/CRUD credentials: present (secrets → docker exec)"
+  elif [[ "$ENV_NAME" == "pre-prod" ]]; then
+    auth_note="auth/CRUD credentials: missing (suite will SKIP auth; set secrets.pre-prod)"
+  else
+    auth_note="auth/CRUD: n/a (prod is read-only)"
+  fi
 
-   # or host wrapper (if present on server):
-   # script/run_deploy_verify.sh ${profile}
+  echo "Host:       $host"
+  echo "Profile:    $profile"
+  echo "Container:  name filter ${web_filter}"
+  echo "Auth:       $auth_note"
+  echo "What this does:"
+  echo "  • SSH as ubuntu@${host}"
+  echo "  • docker exec into the running web container"
+  echo "  • run /rails/deploy_verify/bin/run ${profile}"
+  echo "  • Does NOT rebuild, push, or restart containers"
+  confirm_verify
 
-Reports: container /tmp/deploy_verify/ (host script may copy to host /tmp/deploy_verify/)
-EOF
-  phase_ok "hint-verify"
+  echo "Starting remote suite — full stream below…"
+  set +e
+  # Remote script mirrors script/run_deploy_verify.sh (docker exec path).
+  # Credential env expanded locally (printf %q); remote body single-quoted heredoc.
+  run_logged ssh \
+    -i "$ssh_key" \
+    -o BatchMode=yes \
+    -o IdentitiesOnly=yes \
+    -o ConnectTimeout=15 \
+    -o StrictHostKeyChecking=accept-new \
+    "ubuntu@${host}" \
+    "PROFILE='${profile}' WEB_FILTER='${web_filter}' HOST_HEADER='${header}' DEPLOY_VERIFY_USER_EMAIL=${email_q} DEPLOY_VERIFY_USER_PASSWORD=${pass_q} bash -s" <<'REMOTE'
+set -euo pipefail
+WEB="$(docker ps -q --filter "name=${WEB_FILTER}" | head -1 || true)"
+if [[ -z "${WEB:-}" ]]; then
+  WEB="$(docker ps -q --filter "label=service=gs-repo" --filter "label=role=web" | head -1 || true)"
+fi
+if [[ -z "${WEB:-}" ]]; then
+  echo "ERROR: no web container matching ${WEB_FILTER} on $(hostname)"
+  exit 2
+fi
+if ! docker exec "$WEB" test -f /rails/deploy_verify/runner.rb; then
+  echo "ERROR: deploy_verify not in image (container $WEB)."
+  echo "  Redeploy an image that includes deploy_verify/, then re-run verify."
+  exit 2
+fi
+echo "Running deploy_verify [${PROFILE}] in container ${WEB} on $(hostname)"
+export DEPLOY_VERIFY_BASE_URL="${DEPLOY_VERIFY_BASE_URL:-http://kamal-proxy}"
+export DEPLOY_VERIFY_HOST_HEADER="${DEPLOY_VERIFY_HOST_HEADER:-$HOST_HEADER}"
+# Build docker exec -e list. Only pass user creds when set so we do not
+# blank out values already injected by Kamal into the container.
+EXEC_ENV=(
+  -e DEPLOY_VERIFY_BASE_URL
+  -e DEPLOY_VERIFY_HOST_HEADER
+  -e DEPLOY_VERIFY_REPORT_DIR=/tmp/deploy_verify
+)
+if [[ -n "${DEPLOY_VERIFY_USER_EMAIL:-}" && -n "${DEPLOY_VERIFY_USER_PASSWORD:-}" ]]; then
+  export DEPLOY_VERIFY_USER_EMAIL
+  export DEPLOY_VERIFY_USER_PASSWORD
+  EXEC_ENV+=(-e DEPLOY_VERIFY_USER_EMAIL -e DEPLOY_VERIFY_USER_PASSWORD)
+  echo "Auth/CRUD: injecting DEPLOY_VERIFY_USER_* into docker exec"
+else
+  echo "Auth/CRUD: no laptop secrets; using container env if present"
+fi
+set +e
+docker exec \
+  "${EXEC_ENV[@]}" \
+  "$WEB" \
+  bash -lc "mkdir -p /tmp/deploy_verify && /rails/deploy_verify/bin/run '$PROFILE'"
+RC=$?
+set -e
+mkdir -p /tmp/deploy_verify
+docker cp "$WEB:/tmp/deploy_verify/." /tmp/deploy_verify/ 2>/dev/null || true
+echo "Reports on server: /tmp/deploy_verify/ (also in container /tmp/deploy_verify/)"
+exit "$RC"
+REMOTE
+  local rc=$?
+  set -e
+
+  if [[ "$rc" -ne 0 ]]; then
+    phase_fail "verify" "$rc"
+    echo "  Suite failed (exit $rc). Reports may be on the server under /tmp/deploy_verify/." >&2
+    return "$rc"
+  fi
+  phase_ok "verify"
+  echo ""
+  echo "Post-deploy suite passed on ${host}."
 }
 
 cmd_wizard() {
@@ -1151,16 +1405,12 @@ cmd_wizard() {
   echo "Quit anytime with q at a pause prompt. Re-run a single phase if one fails."
   echo ""
 
-  local phases=(preflight config build push rollout smoke hint-verify)
+  local phases=(preflight build push rollout verify)
   local p
   for p in "${phases[@]}"; do
     case "$p" in
       preflight)
         cmd_preflight || return $?
-        pause_wizard "config (read-only kamal)"
-        ;;
-      config)
-        cmd_config || return $?
         pause_wizard "build (Mac local image only)"
         ;;
       build)
@@ -1169,29 +1419,14 @@ cmd_wizard() {
         ;;
       push)
         cmd_push || return $?
-        pause_wizard "rollout (TOUCHES SERVER)"
+        pause_wizard "rollout (TOUCHES SERVER + smoke)"
         ;;
       rollout)
         cmd_rollout || return $?
-        pause_wizard "smoke"
+        pause_wizard "verify (post-deploy suite on server)"
         ;;
-      smoke)
-        # smoke failure should not hide success of rollout; warn but continue
-        set +e
-        cmd_smoke
-        local src=$?
-        set -e
-        if [[ "$src" -ne 0 ]]; then
-          echo "WARN: smoke failed (exit $src). Rollout may still have succeeded — investigate."
-          if [[ "$YES" -eq 0 ]]; then
-            pause_wizard "hint-verify (despite smoke failure)"
-          fi
-        else
-          pause_wizard "hint-verify"
-        fi
-        ;;
-      hint-verify)
-        cmd_hint_verify || return $?
+      verify)
+        cmd_verify || return $?
         ;;
     esac
   done
@@ -1223,12 +1458,10 @@ main() {
   case "$COMMAND" in
     wizard)      cmd_wizard ;;
     preflight)   cmd_preflight ;;
-    config)      cmd_config ;;
     build)       cmd_build ;;
     push)        cmd_push ;;
     rollout)     cmd_rollout ;;
-    smoke)       cmd_smoke ;;
-    hint-verify) cmd_hint_verify ;;
+    verify)      cmd_verify ;;
     *) die "internal: unhandled command $COMMAND" ;;
   esac
 }

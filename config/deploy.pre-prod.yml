@@ -55,6 +55,9 @@ env:
     - REDIS_PASSWORD
     - DIRECTUS_TOKEN_CMS
     - DIRECTUS_WEBHOOK_SECRET
+    # Post-deploy suite (menu → verify): Devise bot user for optional auth/CRUD
+    - DEPLOY_VERIFY_USER_EMAIL
+    - DEPLOY_VERIFY_USER_PASSWORD
 
 # MySQL 8 on the same box (pre-prod only — prod uses host MySQL on m7g)
 accessories:

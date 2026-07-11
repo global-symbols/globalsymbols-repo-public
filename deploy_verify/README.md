@@ -52,7 +52,16 @@ WEB=$(docker ps -q -f name=gs-repo-web-production | head -1)
 docker exec "$WEB" /rails/deploy_verify/bin/run prod
 ```
 
-### Optional CRUD (pre-prod only)
+### Auth / CRUD (pre-prod only)
+
+Preferred: set in `.kamal/secrets.pre-prod` and list under `env.secret` in `config/deploy.pre-prod.yml` (see `secrets.example`):
+
+- `DEPLOY_VERIFY_USER_EMAIL`
+- `DEPLOY_VERIFY_USER_PASSWORD`
+
+After rollout, the web container has them; `script/gs-deploy` **verify** also passes host secrets into `docker exec`. Create a dedicated Devise bot user in the pre-prod DB with the same credentials (not a personal account).
+
+Manual override:
 
 ```bash
 docker exec \

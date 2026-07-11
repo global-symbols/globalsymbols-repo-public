@@ -49,7 +49,10 @@ module DeployVerify
       req = klass.new(uri)
       req["User-Agent"] = "DeployVerify/1.0"
       req["Accept"] = "*/*"
-      if @config.host_header
+      # Only override Host for requests to the *app* base URL (e.g. kamal-proxy
+      # with Host: gs-test.co.uk). Cross-host calls (Directus CMS, etc.) must keep
+      # the URI host — forcing the Rails vhost caused Directus 404s.
+      if apply_app_host_header?(uri)
         req["Host"] = @config.host_header
       end
       apply_cookies(req)
@@ -72,12 +75,12 @@ module DeployVerify
 
     # Follow redirects (GET) up to limit.
     def get_follow(path, limit: 5)
-      res = get(path)
+      res = request(Net::HTTP::Get, coerce_uri(path))
       limit.times do
         break unless res.redirect?
         loc = res.headers["location"]
         break if loc.nil? || loc.empty?
-        uri = URI.join(res.uri.to_s, loc)
+        uri = rewrite_app_redirect(URI.join(res.uri.to_s, loc))
         res = request(Net::HTTP::Get, uri)
       end
       res
@@ -130,6 +133,41 @@ module DeployVerify
     end
 
     private
+
+    def coerce_uri(path)
+      return path if path.is_a?(URI)
+
+      s = path.to_s
+      return URI.parse(s) if s.start_with?("http://", "https://")
+
+      @config.uri(s)
+    end
+
+    def apply_app_host_header?(uri)
+      hdr = @config.host_header.to_s.strip
+      return false if hdr.empty?
+
+      app_host = URI.parse(@config.base_url).host.to_s
+      return false if app_host.empty?
+
+      uri.host.to_s.casecmp(app_host).zero?
+    rescue URI::InvalidURIError, ArgumentError
+      false
+    end
+
+    # Devise often redirects to the public vhost (https?://gs-test.co.uk/...).
+    # When probing via kamal-proxy, rewrite those Locations back onto base_url
+    # so the session cookie stays on the in-cluster hop.
+    def rewrite_app_redirect(uri)
+      hdr = @config.host_header.to_s.strip
+      return uri if hdr.empty?
+      return uri unless uri.host.to_s.casecmp(hdr).zero?
+
+      base = @config.base_url.to_s.sub(%r{/\z}, "")
+      URI.parse("#{base}#{uri.request_uri}")
+    rescue URI::InvalidURIError, ArgumentError
+      uri
+    end
 
     def apply_cookies(req)
       return if @cookie_jar.empty?

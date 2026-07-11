@@ -41,6 +41,13 @@ docker-compose.yml
 # Keys must never enter the image; Kamal injects secrets at runtime
 config/master.key
 config/credentials/*.key
+# Kamal secret files are root-owned 0600 on the laptop — if copied into the
+# image, USER rails cannot read them and deploy_verify used to crash on open.
+# Runtime env comes from Kamal; keep examples/docs only.
+.kamal/secrets
+.kamal/secrets-*
+.kamal/secrets.*
+!.kamal/secrets.example
 
 # CI / misc
 *.md
