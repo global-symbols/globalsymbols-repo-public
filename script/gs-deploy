@@ -11,6 +11,7 @@
 #   build       — Mac: plain `docker build` → local image (no Kamal, no GHCR)
 #   push        — Mac: plain `docker push` → GHCR (no rebuild, no server)
 #   rollout     — server: Kamal `deploy --skip-push` (pull + replace web/job) + HTTP smoke
+#   migrate     — SSH: db:migrate in live web container against live DB (skip if none pending)
 #   verify      — SSH to app host; run deploy_verify suite inside web container
 #
 # Build/push use the host Docker CLI only. Kamal (via Docker image) is used
@@ -71,6 +72,9 @@ COMMAND=""
 LOG_FILE=""
 PHASE_FAILED=""
 INTERACTIVE_MENU=0
+# Set for the full wizard only: "Press Enter for <phase>" is the gate — do not
+# ask again to type build/push/rollout/verify (except production rollout).
+WIZARD_MODE=0
 # Simple push retries (failed exit only — no hang-kill theatre).
 PUSH_MAX_ATTEMPTS="${BUILD_PUSH_MAX_ATTEMPTS:-5}"
 PUSH_RETRY_SLEEP="${BUILD_PUSH_RETRY_SLEEP:-15}"
@@ -180,14 +184,16 @@ interactive_menu() {
     "3) build        — Mac: docker build → local image (no GHCR, no server)" \
     "4) push         — Mac: docker push → GHCR (no rebuild, no server)" \
     "5) rollout      — server: Kamal pull + restart web/job + smoke (TOUCHES SERVER)" \
-    "6) verify       — run post-deploy suite on the server (SSH + docker exec)"
+    "6) migrate      — pending db:migrate in live web container (skip if none)" \
+    "7) verify       — run post-deploy suite on the server (SSH + docker exec)"
   case "$pick" in
     1) COMMAND="wizard" ;;
     2) COMMAND="preflight" ;;
     3) COMMAND="build" ;;
     4) COMMAND="push" ;;
     5) COMMAND="rollout" ;;
-    6) COMMAND="verify" ;;
+    6) COMMAND="migrate" ;;
+    7) COMMAND="verify" ;;
   esac
 
   # Fail immediately after action choice (before Start now / any phase)
@@ -334,9 +340,21 @@ confirm_typed_token() {
   done
 }
 
-confirm_build() {
+# Wizard already used "Press Enter for <phase>" — skip second typed confirm.
+# Standalone menu actions still require typing the token (safer for one-shot).
+wizard_or_yes_skip_confirm() {
   if [[ "$YES" -eq 1 ]]; then
-    echo "(--yes) build confirmation skipped"
+    echo "(--yes) confirmation skipped"
+    return 0
+  fi
+  if [[ "$WIZARD_MODE" -eq 1 ]]; then
+    return 0
+  fi
+  return 1
+}
+
+confirm_build() {
+  if wizard_or_yes_skip_confirm; then
     return 0
   fi
   echo ""
@@ -346,8 +364,7 @@ confirm_build() {
 }
 
 confirm_push() {
-  if [[ "$YES" -eq 1 ]]; then
-    echo "(--yes) push confirmation skipped"
+  if wizard_or_yes_skip_confirm; then
     return 0
   fi
   echo ""
@@ -357,20 +374,69 @@ confirm_push() {
 }
 
 confirm_rollout() {
-  if [[ "$YES" -eq 1 ]]; then
-    echo "(--yes) rollout confirmation skipped"
-    return 0
-  fi
+  # Production always requires typing "production", even in the wizard.
   if [[ "$ENV_NAME" == "production" ]]; then
+    if [[ "$YES" -eq 1 ]]; then
+      echo "(--yes) production rollout confirmation skipped"
+      return 0
+    fi
     echo ""
     echo "⚠  PRODUCTION rollout — will replace web+job on the production host."
     echo "  Uses the image already in GHCR for VERSION (must have been built + pushed)."
     confirm_typed_token "production" "Type 'production' to continue (q=quit): "
+    return 0
+  fi
+  if wizard_or_yes_skip_confirm; then
+    return 0
+  fi
+  echo ""
+  echo "⚠  Will SSH to ${PRE_PROD_HOST} and replace pre-prod web+job containers."
+  echo "  Uses the image already in GHCR for VERSION (must have been built + pushed)."
+  confirm_typed_token "rollout" "Type 'rollout' to continue (q=quit): "
+}
+
+confirm_migrate() {
+  # Production always requires typing "migrate", even in the wizard.
+  if [[ "$ENV_NAME" == "production" ]]; then
+    if [[ "$YES" -eq 1 ]]; then
+      echo "(--yes) production migrate confirmation skipped"
+      return 0
+    fi
+    echo ""
+    echo "⚠  PRODUCTION: will run bin/rails db:migrate inside the live web container"
+    echo "  against the live database. Ensure expand/contract order is intentional."
+    confirm_typed_token "migrate" "Type 'migrate' to continue (q=quit): "
+    return 0
+  fi
+  if wizard_or_yes_skip_confirm; then
+    return 0
+  fi
+  echo ""
+  echo "Will SSH to $(deploy_host) and run pending migrations in the web container (live DB)."
+  confirm_typed_token "migrate" "Type 'migrate' to continue (q=quit): "
+}
+
+confirm_verify() {
+  if wizard_or_yes_skip_confirm; then
+    return 0
+  fi
+  if [[ "$ENV_NAME" == "production" ]]; then
+    echo ""
+    echo "⚠  Will SSH to production and run the post-deploy suite inside the web container."
+    confirm_typed_token "verify" "Type 'verify' to continue (q=quit): "
   else
     echo ""
-    echo "⚠  Will SSH to ${PRE_PROD_HOST} and replace pre-prod web+job containers."
-    echo "  Uses the image already in GHCR for VERSION (must have been built + pushed)."
-    confirm_typed_token "rollout" "Type 'rollout' to continue (q=quit): "
+    echo "Will SSH to $(deploy_host) and run deploy_verify [pre_prod] in the web container."
+    confirm_typed_token "verify" "Type 'verify' to continue (q=quit): "
+  fi
+}
+
+# Kamal web container name filter for this destination.
+web_name_filter() {
+  if [[ "$ENV_NAME" == "pre-prod" ]]; then
+    echo "gs-repo-web-pre-prod"
+  else
+    echo "gs-repo-web-production"
   fi
 }
 
@@ -533,7 +599,7 @@ git_is_dirty() {
 # Shipping / identity actions: must start from a clean tree (unless CLI override).
 command_requires_clean_tree() {
   case "${COMMAND:-}" in
-    wizard|preflight|build|push|rollout) return 0 ;;
+    wizard|preflight|build|push|rollout|migrate) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -1069,11 +1135,13 @@ cmd_build() {
   echo "Network:   $BUILD_NETWORK  (host = workaround if bridge egress is broken)"
   echo "Image:     $img"
   echo "Also tag:  $dest_img"
-  echo "What this does:"
-  echo "  • docker build on this Mac (Dockerfile → local Docker store)"
-  echo "  • Tags VERSION + latest-${ENV_NAME} (same names Kamal will pull later)"
-  echo "  • Does NOT push to ${REGISTRY_HOST}"
-  echo "  • Does NOT touch $(deploy_host)"
+  if [[ "$WIZARD_MODE" -eq 0 ]]; then
+    echo "What this does:"
+    echo "  • docker build on this Mac (Dockerfile → local Docker store)"
+    echo "  • Tags VERSION + latest-${ENV_NAME} (same names Kamal will pull later)"
+    echo "  • Does NOT push to ${REGISTRY_HOST}"
+    echo "  • Does NOT touch $(deploy_host)"
+  fi
   confirm_build
 
   # Prove container egress before a long build (skip if network=host and host works)
@@ -1136,12 +1204,14 @@ cmd_push() {
   echo "Image:         $img"
   echo "Also push if:  $dest_img (when present locally)"
   echo "Push retries:  up to ${PUSH_MAX_ATTEMPTS} (sleep ${PUSH_RETRY_SLEEP}s+, +10s each)"
-  echo "Layer concurrency: Docker daemon max-concurrent-uploads (see ~/.docker/daemon.json)"
-  echo "  Recommended: 2  (not configurable as '2 then pause 5s' — Docker has no batch delay)"
-  echo "What this does:"
-  echo "  • docker push $img  (layers already on GHCR are skipped)"
-  echo "  • Does NOT rebuild"
-  echo "  • Does NOT touch $(deploy_host) — that is rollout"
+  if [[ "$WIZARD_MODE" -eq 0 ]]; then
+    echo "Layer concurrency: Docker daemon max-concurrent-uploads (see ~/.docker/daemon.json)"
+    echo "  Recommended: 2  (not configurable as '2 then pause 5s' — Docker has no batch delay)"
+    echo "What this does:"
+    echo "  • docker push $img  (layers already on GHCR are skipped)"
+    echo "  • Does NOT rebuild"
+    echo "  • Does NOT touch $(deploy_host) — that is rollout"
+  fi
   confirm_push
 
   local attempt=1
@@ -1230,11 +1300,13 @@ cmd_rollout() {
   echo "Destination: $(kamal_destination)"
   echo "Host:        $(deploy_host)"
   echo "Image:       $(absolute_image)"
-  echo "What this does:"
-  echo "  • Kamal deploy --skip-push (image must already be in GHCR from push)"
-  echo "  • SSH to host, docker pull that tag, replace web + job, healthcheck proxy"
-  echo "  • HTTP smoke check after deploy (PASS/FAIL only)"
-  echo "  • Does NOT build or push from this Mac"
+  if [[ "$WIZARD_MODE" -eq 0 ]]; then
+    echo "What this does:"
+    echo "  • Kamal deploy --skip-push (image must already be in GHCR from push)"
+    echo "  • SSH to host, docker pull that tag, replace web + job, healthcheck proxy"
+    echo "  • HTTP smoke check after deploy (PASS/FAIL only)"
+    echo "  • Does NOT build or push from this Mac"
+  fi
   confirm_rollout
   echo "Starting kamal deploy --skip-push — full stream below (not filtered)…"
   set +e
@@ -1257,23 +1329,108 @@ cmd_rollout() {
     echo "WARN: smoke failed after successful rollout — investigate (menu → verify)."
   fi
   echo ""
-  echo "Next: verify (post-deploy suite on the server)."
+  echo "Next: migrate (if pending on live DB), then verify."
 }
 
-confirm_verify() {
-  if [[ "$YES" -eq 1 ]]; then
-    echo "(--yes) verify confirmation skipped"
-    return 0
+# SSH to app host; run pending migrations in the live web container against the live DB.
+# Skips cleanly when migrate:status shows no "down" rows (no schema change needed).
+cmd_migrate() {
+  phase_banner "migrate (live DB via web container on $(deploy_host))"
+  local host web_filter ssh_key
+  host="$(deploy_host)"
+  web_filter="$(web_name_filter)"
+  ssh_key="${HOME}/.ssh/global-symbols.pem"
+
+  if [[ "$host" == REPLACE* ]]; then
+    phase_fail "migrate" 1
+    echo "  Host is still a placeholder — cannot SSH." >&2
+    return 1
   fi
-  if [[ "$ENV_NAME" == "production" ]]; then
-    echo ""
-    echo "⚠  Will SSH to production and run the post-deploy suite inside the web container."
-    confirm_typed_token "verify" "Type 'verify' to continue (q=quit): "
-  else
-    echo ""
-    echo "Will SSH to $(deploy_host) and run deploy_verify [pre_prod] in the web container."
-    confirm_typed_token "verify" "Type 'verify' to continue (q=quit): "
+  if [[ ! -f "$ssh_key" ]]; then
+    phase_fail "migrate" 1
+    echo "  SSH key missing: $ssh_key" >&2
+    return 1
   fi
+
+  echo "Host:       $host"
+  echo "Container:  name filter ${web_filter}"
+  echo "Database:   whatever DATABASE_HOST the container uses (live, not laptop)"
+  if [[ "$WIZARD_MODE" -eq 0 ]]; then
+    echo "What this does:"
+    echo "  • SSH as ubuntu@${host}"
+    echo "  • docker exec into the running web container"
+    echo "  • rails db:migrate:status → db:migrate only if pending"
+    echo "  • Does NOT rebuild, push, or restart containers"
+  fi
+  confirm_migrate
+
+  echo "Checking pending migrations on the live DB (via web container)…"
+  set +e
+  run_logged ssh \
+    -i "$ssh_key" \
+    -o BatchMode=yes \
+    -o IdentitiesOnly=yes \
+    -o ConnectTimeout=15 \
+    -o StrictHostKeyChecking=accept-new \
+    "ubuntu@${host}" \
+    "WEB_FILTER='${web_filter}' bash -s" <<'REMOTE'
+set -euo pipefail
+WEB="$(docker ps -q --filter "name=${WEB_FILTER}" | head -1 || true)"
+if [[ -z "${WEB:-}" ]]; then
+  WEB="$(docker ps -q --filter "label=service=gs-repo" --filter "label=role=web" | head -1 || true)"
+fi
+if [[ -z "${WEB:-}" ]]; then
+  echo "ERROR: no web container matching ${WEB_FILTER} on $(hostname)"
+  exit 2
+fi
+echo "Using container ${WEB} on $(hostname)"
+
+# Status against the DB this container is configured for (Kamal env).
+echo "— db:migrate:status —"
+set +e
+STATUS_OUT="$(docker exec "$WEB" bundle exec rails db:migrate:status 2>&1)"
+STATUS_RC=$?
+set -e
+echo "$STATUS_OUT"
+if [[ "$STATUS_RC" -ne 0 ]]; then
+  echo "ERROR: db:migrate:status failed (exit ${STATUS_RC})"
+  exit "$STATUS_RC"
+fi
+
+# Rails prints a "down" column for pending migrations.
+PENDING="$(printf '%s\n' "$STATUS_OUT" | grep -E '^[[:space:]]*down[[:space:]]' || true)"
+if [[ -z "$PENDING" ]]; then
+  echo "No pending migrations (all up). Skipping db:migrate."
+  exit 0
+fi
+
+echo ""
+echo "Pending migrations:"
+printf '%s\n' "$PENDING"
+echo ""
+echo "— db:migrate (live DB) —"
+set +e
+docker exec "$WEB" bundle exec rails db:migrate
+MIG_RC=$?
+set -e
+if [[ "$MIG_RC" -ne 0 ]]; then
+  echo "ERROR: db:migrate failed (exit ${MIG_RC})"
+  exit "$MIG_RC"
+fi
+echo "Migrations applied OK."
+exit 0
+REMOTE
+  local rc=$?
+  set -e
+
+  if [[ "$rc" -ne 0 ]]; then
+    phase_fail "migrate" "$rc"
+    echo "  Fix the DB/migration error on the server, then re-run menu → migrate (or wizard)." >&2
+    return "$rc"
+  fi
+  phase_ok "migrate"
+  echo ""
+  echo "Next: verify (post-deploy suite on the server)."
 }
 
 # SSH to app host and run deploy_verify inside the live web container.
@@ -1287,13 +1444,12 @@ cmd_verify() {
   header="$(http_host_header)"
   ssh_key="${HOME}/.ssh/global-symbols.pem"
 
+  web_filter="$(web_name_filter)"
   if [[ "$ENV_NAME" == "pre-prod" ]]; then
-    web_filter="gs-repo-web-pre-prod"
     profile="pre_prod"
     # Load secrets so DEPLOY_VERIFY_USER_* are available for docker exec pass-through
     load_secrets
   else
-    web_filter="gs-repo-web-production"
     profile="prod"
   fi
 
@@ -1322,11 +1478,13 @@ cmd_verify() {
   echo "Profile:    $profile"
   echo "Container:  name filter ${web_filter}"
   echo "Auth:       $auth_note"
-  echo "What this does:"
-  echo "  • SSH as ubuntu@${host}"
-  echo "  • docker exec into the running web container"
-  echo "  • run /rails/deploy_verify/bin/run ${profile}"
-  echo "  • Does NOT rebuild, push, or restart containers"
+  if [[ "$WIZARD_MODE" -eq 0 ]]; then
+    echo "What this does:"
+    echo "  • SSH as ubuntu@${host}"
+    echo "  • docker exec into the running web container"
+    echo "  • run /rails/deploy_verify/bin/run ${profile}"
+    echo "  • Does NOT rebuild, push, or restart containers"
+  fi
   confirm_verify
 
   echo "Starting remote suite — full stream below…"
@@ -1399,13 +1557,16 @@ REMOTE
 }
 
 cmd_wizard() {
+  WIZARD_MODE=1
   banner "Global Symbols deploy wizard → ${ENV_NAME}"
   echo "Host: $(deploy_host)"
   echo "Each phase streams full command output. Logs: log/deploy/ (unless --no-log)."
-  echo "Quit anytime with q at a pause prompt. Re-run a single phase if one fails."
+  echo "Press Enter to start each phase (no second type-to-confirm). q quits."
+  echo "Exception: production rollout/migrate still require typing production/migrate."
+  echo "Migrate runs only if the live DB has pending migrations (else skips)."
   echo ""
 
-  local phases=(preflight build push rollout verify)
+  local phases=(preflight build push rollout migrate verify)
   local p
   for p in "${phases[@]}"; do
     case "$p" in
@@ -1423,6 +1584,10 @@ cmd_wizard() {
         ;;
       rollout)
         cmd_rollout || return $?
+        pause_wizard "migrate (live DB via web container; skip if none pending)"
+        ;;
+      migrate)
+        cmd_migrate || return $?
         pause_wizard "verify (post-deploy suite on server)"
         ;;
       verify)
@@ -1461,6 +1626,7 @@ main() {
     build)       cmd_build ;;
     push)        cmd_push ;;
     rollout)     cmd_rollout ;;
+    migrate)     cmd_migrate ;;
     verify)      cmd_verify ;;
     *) die "internal: unhandled command $COMMAND" ;;
   esac

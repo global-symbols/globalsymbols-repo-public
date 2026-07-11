@@ -109,18 +109,22 @@ module DeployVerify
               reporter.fail("directus.gs_languages", "collection empty or missing data")
             else
               reporter.pass("directus.gs_languages", "#{rows.size} item(s) returned")
-              # recent data if date_updated present
+              # Freshness is informational only. Language rows in CMS often sit
+              # unchanged for months; that must not fail a post-deploy check.
+              # Hard requirements are connectivity + non-empty collection above.
+              # Override threshold via DEPLOY_VERIFY_DIRECTUS_RECENT_DAYS (default 90).
               updated = rows.map { |r| r["date_updated"] || r["date_created"] }.compact
               if updated.any?
                 latest = updated.map { |t| Time.parse(t.to_s) rescue nil }.compact.max
                 if latest
                   age_days = ((Time.now.utc - latest.utc) / 86_400.0)
-                  if age_days <= config.directus_recent_days
-                    reporter.pass("directus.recent_data", "newest language row ~#{age_days.round(1)} days old")
+                  thr = config.directus_recent_days
+                  if age_days <= thr
+                    reporter.pass("directus.recent_data", "newest language row ~#{age_days.round(1)} days old (≤ #{thr})")
                   else
-                    reporter.fail(
+                    reporter.skip(
                       "directus.recent_data",
-                      "newest language row is #{age_days.round(1)} days old (threshold #{config.directus_recent_days})"
+                      "newest language row ~#{age_days.round(1)} days old (threshold #{thr}; not a deploy failure)"
                     )
                   end
                 else
