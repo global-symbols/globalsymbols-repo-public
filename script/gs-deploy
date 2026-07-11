@@ -7,7 +7,8 @@
 #
 # Ship is split:
 #   preflight   — checks + image tag + GHCR login
-#   build-push  — Mac: kamal build push (image → GHCR, no server change)
+#   build       — Mac: kamal build push --output=docker (local image only)
+#   push        — Mac: docker push to GHCR (retries + hang watchdog; no rebuild)
 #   rollout     — server: kamal deploy --skip-push (pull + restart web/job)
 #
 # Usage:
@@ -31,7 +32,7 @@
 #   --skip-login       Always skip docker login
 #   --force-login      Always run docker login (even if already logged in)
 #   --no-log           Do not tee to log/deploy/ (terminal only)
-#   --push-retries N   Max build-push attempts (default 8; GHCR stall recovery)
+#   --push-retries N   Max push attempts (default 8; GHCR stall recovery)
 #   --push-stall SEC   Kill attempt if no new output for SEC seconds (default 180)
 #
 # Env overrides for push retries:
@@ -171,18 +172,20 @@ interactive_menu() {
     "1) wizard       — full guided path (recommended)" \
     "2) preflight    — checks + image tag + GHCR login" \
     "3) config       — kamal config (read-only)" \
-    "4) build-push   — Mac: build image + push to GHCR (no server change)" \
-    "5) rollout      — server: pull image + restart web/job (TOUCHES SERVER)" \
-    "6) smoke        — HTTP smoke check" \
-    "7) hint-verify  — how to run deploy_verify on the server"
+    "4) build        — Mac: build image locally (no GHCR, no server)" \
+    "5) push         — Mac: push local image to GHCR (no rebuild, no server)" \
+    "6) rollout      — server: pull image + restart web/job (TOUCHES SERVER)" \
+    "7) smoke        — HTTP smoke check" \
+    "8) hint-verify  — how to run deploy_verify on the server"
   case "$pick" in
     1) COMMAND="wizard" ;;
     2) COMMAND="preflight" ;;
     3) COMMAND="config" ;;
-    4) COMMAND="build-push" ;;
-    5) COMMAND="rollout" ;;
-    6) COMMAND="smoke" ;;
-    7) COMMAND="hint-verify" ;;
+    4) COMMAND="build" ;;
+    5) COMMAND="push" ;;
+    6) COMMAND="rollout" ;;
+    7) COMMAND="smoke" ;;
+    8) COMMAND="hint-verify" ;;
   esac
 
   # Fail immediately after action choice (before Start now / any phase)
@@ -410,14 +413,25 @@ confirm_typed_token() {
   done
 }
 
-confirm_build_push() {
+confirm_build() {
   if [[ "$YES" -eq 1 ]]; then
-    echo "(--yes) build-push confirmation skipped"
+    echo "(--yes) build confirmation skipped"
     return 0
   fi
   echo ""
-  echo "This builds the app image on this Mac and pushes it to GHCR."
-  echo "It does NOT change containers on the server yet (use rollout after)."
+  echo "This builds the app image on this Mac into the local Docker store."
+  echo "It does NOT push to GHCR and does NOT change the server (use push, then rollout)."
+  confirm_typed_token "build" "Type 'build' to continue (q=quit): "
+}
+
+confirm_push() {
+  if [[ "$YES" -eq 1 ]]; then
+    echo "(--yes) push confirmation skipped"
+    return 0
+  fi
+  echo ""
+  echo "This pushes the local image for VERSION to GHCR."
+  echo "It does NOT rebuild and does NOT change the server (use rollout after)."
   confirm_typed_token "push" "Type 'push' to continue (q=quit): "
 }
 
@@ -429,12 +443,12 @@ confirm_rollout() {
   if [[ "$ENV_NAME" == "production" ]]; then
     echo ""
     echo "⚠  PRODUCTION rollout — will replace web+job on the production host."
-    echo "  Uses the image already in GHCR for VERSION (must have been build-pushed)."
+    echo "  Uses the image already in GHCR for VERSION (must have been built + pushed)."
     confirm_typed_token "production" "Type 'production' to continue (q=quit): "
   else
     echo ""
     echo "⚠  Will SSH to ${PRE_PROD_HOST} and replace pre-prod web+job containers."
-    echo "  Uses the image already in GHCR for VERSION (must have been build-pushed)."
+    echo "  Uses the image already in GHCR for VERSION (must have been built + pushed)."
     confirm_typed_token "rollout" "Type 'rollout' to continue (q=quit): "
   fi
 }
@@ -503,7 +517,7 @@ parse_args() {
     $0 --allow-dirty
     $0 --version TAG
 
-  Pick environment and action (wizard, deploy, …) interactively.
+  Pick environment and action (wizard, build, push, rollout, …) interactively.
   See: $0 --help"
         ;;
     esac
@@ -607,7 +621,7 @@ git_is_dirty() {
 # Shipping / identity actions: must start from a clean tree (unless CLI override).
 command_requires_clean_tree() {
   case "${COMMAND:-}" in
-    wizard|preflight|config|build-push|rollout) return 0 ;;
+    wizard|preflight|config|build|push|rollout) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -695,8 +709,13 @@ setup_log() {
   echo "Logging to: $LOG_FILE"
 }
 
+# Destination floating tag Kamal also applies (e.g. latest-pre-prod).
+destination_image() {
+  echo "${REGISTRY_HOST}/${IMAGE_REPO}:latest-${ENV_NAME}"
+}
+
 # Run kamal inside Docker (no bare-metal Ruby/Kamal on the Mac required).
-# Usage: run_kamal <kamal args…>   e.g.  run_kamal build push
+# Usage: run_kamal <kamal args…>   e.g.  run_kamal build push --output=docker
 #         run_kamal deploy --skip-push
 # Streams full stdout/stderr (via run_logged).
 #
@@ -908,20 +927,12 @@ cmd_config() {
   phase_ok "config"
 }
 
-# True if Docker has a local image for the absolute tag (rare with buildx --push).
+# True if Docker has a local image for the absolute tag.
 local_image_present() {
   docker image inspect "$(absolute_image)" >/dev/null 2>&1
 }
 
-# (1) Mac only: build image + push to GHCR — does not change the server.
-# GHCR often stalls mid-push; we retry. Already-uploaded layers are skipped on retry.
-cmd_build_push() {
-  phase_banner "build-push (Mac → GHCR; no server change)"
-  load_secrets
-  resolve_version
-  local img
-  img="$(absolute_image)"
-  # Validate retry count (Bash 3.2–safe)
+normalize_push_retry_settings() {
   case "$PUSH_MAX_ATTEMPTS" in
     ''|*[!0-9]*|0) PUSH_MAX_ATTEMPTS=8 ;;
   esac
@@ -931,17 +942,80 @@ cmd_build_push() {
   case "$PUSH_STALL_SECONDS" in
     ''|*[!0-9]*|0) PUSH_STALL_SECONDS=180 ;;
   esac
+}
+
+# (1) Mac only: build image into local Docker — no GHCR, no server.
+# Uses kamal build push --output=docker (buildx export to local store, not registry).
+cmd_build() {
+  phase_banner "build (Mac local image only; no GHCR, no server)"
+  load_secrets
+  resolve_version
+  local img dest_img
+  img="$(absolute_image)"
+  dest_img="$(destination_image)"
 
   echo "Destination config: $(kamal_destination)  (used for image name / arch only)"
   echo "Image:              $img"
+  echo "Also tags:          $dest_img (when Kamal applies destination tag)"
+  echo "What this does:"
+  echo "  • Build Dockerfile on this Mac (Docker Desktop, arm64)"
+  echo "  • Load result into local Docker (kamal build push --output=docker)"
+  echo "  • Does NOT push to ${REGISTRY_HOST}"
+  echo "  • Does NOT SSH / restart containers on $(deploy_host)"
+  confirm_build
+
+  echo "Starting kamal build push --output=docker — full stream below (not filtered)…"
+  set +e
+  run_kamal build push --output=docker
+  local rc=$?
+  set -e
+  if [[ "$rc" -ne 0 ]]; then
+    phase_fail "build" "$rc"
+    return "$rc"
+  fi
+
+  if ! local_image_present; then
+    phase_fail "build" 1
+    echo "  Build reported success but local image missing: $img" >&2
+    echo "  Check Docker Desktop / build output above." >&2
+    return 1
+  fi
+
+  phase_ok "build"
+  echo ""
+  echo "Local image ready: $img"
+  echo "Next: push (upload to GHCR), then rollout."
+}
+
+# (2) Mac only: push local image to GHCR — no rebuild, no server.
+# GHCR often stalls mid-push; we retry. Already-uploaded layers are skipped on retry.
+cmd_push() {
+  phase_banner "push (local image → GHCR; no rebuild, no server)"
+  load_secrets
+  resolve_version
+  local img dest_img
+  img="$(absolute_image)"
+  dest_img="$(destination_image)"
+  normalize_push_retry_settings
+
+  if ! local_image_present; then
+    phase_fail "push" 1
+    echo "  No local image for VERSION: $img" >&2
+    echo "  Run menu action 'build' first, then re-run 'push'." >&2
+    return 1
+  fi
+
+  echo "Destination config: $(kamal_destination)"
+  echo "Image:              $img"
+  echo "Also push if local: $dest_img"
   echo "Push retries:       up to ${PUSH_MAX_ATTEMPTS} attempts (sleep ${PUSH_RETRY_SLEEP}s+, backoff +10s)"
   echo "Hang watchdog:      kill attempt if no new output for ${PUSH_STALL_SECONDS}s, then retry"
   echo "What this does:"
-  echo "  • Build Dockerfile on this Mac (Docker Desktop, arm64)"
-  echo "  • Push image to ${REGISTRY_HOST}"
-  echo "  • On fail OR silent hang: retry (uploaded layers stay on GHCR; rebuild uses cache)"
+  echo "  • docker push $img (and destination tag if present locally)"
+  echo "  • On fail OR silent hang: retry (partial GHCR layers kept)"
+  echo "  • Does NOT rebuild"
   echo "  • Does NOT SSH / restart containers on $(deploy_host)"
-  confirm_build_push
+  confirm_push
 
   local attempt=1
   local rc=1
@@ -949,29 +1023,23 @@ cmd_build_push() {
 
   while [[ "$attempt" -le "$PUSH_MAX_ATTEMPTS" ]]; do
     echo ""
-    banner "build-push attempt ${attempt}/${PUSH_MAX_ATTEMPTS}"
+    banner "push attempt ${attempt}/${PUSH_MAX_ATTEMPTS}"
     echo "Image: $img"
     echo "Watchdog: ${PUSH_STALL_SECONDS}s without new output → kill & retry"
     echo "Full command output below (not filtered)…"
 
     set +e
-    if [[ "$attempt" -gt 1 ]] && local_image_present; then
-      echo "Local image found — docker push only (no rebuild)…"
-      run_with_stall_watch "$PUSH_STALL_SECONDS" docker push "$img"
-      rc=$?
-    else
-      if [[ "$attempt" -gt 1 ]]; then
-        echo "Retrying kamal build push (BuildKit cache + partial GHCR layers)…"
-      else
-        echo "Starting kamal build push…"
-      fi
-      run_with_stall_watch "$PUSH_STALL_SECONDS" run_kamal build push
+    run_with_stall_watch "$PUSH_STALL_SECONDS" docker push "$img"
+    rc=$?
+    if [[ "$rc" -eq 0 ]] && docker image inspect "$dest_img" >/dev/null 2>&1; then
+      echo "Pushing destination tag: $dest_img"
+      run_with_stall_watch "$PUSH_STALL_SECONDS" docker push "$dest_img"
       rc=$?
     fi
     set -e
 
     if [[ "$rc" -eq 0 ]]; then
-      phase_ok "build-push"
+      phase_ok "push"
       echo ""
       echo "Image is in GHCR after attempt ${attempt}/${PUSH_MAX_ATTEMPTS}."
       echo "Next: rollout (pull + restart on the server)."
@@ -980,9 +1048,9 @@ cmd_build_push() {
 
     echo ""
     if [[ "$rc" -eq "$STALL_EXIT_CODE" ]]; then
-      echo "WARN: build-push attempt ${attempt}/${PUSH_MAX_ATTEMPTS} hung (no output ${PUSH_STALL_SECONDS}s) — will retry."
+      echo "WARN: push attempt ${attempt}/${PUSH_MAX_ATTEMPTS} hung (no output ${PUSH_STALL_SECONDS}s) — will retry."
     else
-      echo "WARN: build-push attempt ${attempt}/${PUSH_MAX_ATTEMPTS} failed (exit ${rc})."
+      echo "WARN: push attempt ${attempt}/${PUSH_MAX_ATTEMPTS} failed (exit ${rc})."
     fi
     if [[ "$attempt" -ge "$PUSH_MAX_ATTEMPTS" ]]; then
       break
@@ -994,13 +1062,13 @@ cmd_build_push() {
     attempt=$((attempt + 1))
   done
 
-  phase_fail "build-push" "$rc"
-  echo "  All ${PUSH_MAX_ATTEMPTS} attempts failed. Re-run: $0  (menu → build-push)" >&2
+  phase_fail "push" "$rc"
+  echo "  All ${PUSH_MAX_ATTEMPTS} attempts failed. Re-run: $0  (menu → push)" >&2
   echo "  Or: $0 --push-retries 12 --push-stall 120" >&2
   return "$rc"
 }
 
-# (2) Server: pull image already in GHCR + restart web/job.
+# (3) Server: pull image already in GHCR + restart web/job.
 cmd_rollout() {
   phase_banner "rollout (server $(deploy_host); TOUCHES SERVER)"
   load_secrets
@@ -1083,7 +1151,7 @@ cmd_wizard() {
   echo "Quit anytime with q at a pause prompt. Re-run a single phase if one fails."
   echo ""
 
-  local phases=(preflight config build-push rollout smoke hint-verify)
+  local phases=(preflight config build push rollout smoke hint-verify)
   local p
   for p in "${phases[@]}"; do
     case "$p" in
@@ -1093,10 +1161,14 @@ cmd_wizard() {
         ;;
       config)
         cmd_config || return $?
-        pause_wizard "build-push (Mac → GHCR, no server change)"
+        pause_wizard "build (Mac local image only)"
         ;;
-      build-push)
-        cmd_build_push || return $?
+      build)
+        cmd_build || return $?
+        pause_wizard "push (local image → GHCR)"
+        ;;
+      push)
+        cmd_push || return $?
         pause_wizard "rollout (TOUCHES SERVER)"
         ;;
       rollout)
@@ -1152,7 +1224,8 @@ main() {
     wizard)      cmd_wizard ;;
     preflight)   cmd_preflight ;;
     config)      cmd_config ;;
-    build-push)  cmd_build_push ;;
+    build)       cmd_build ;;
+    push)        cmd_push ;;
     rollout)     cmd_rollout ;;
     smoke)       cmd_smoke ;;
     hint-verify) cmd_hint_verify ;;
