@@ -384,6 +384,32 @@ confirm() {
   esac
 }
 
+# Prompt until the user types the exact expected token, or quits with q.
+# Wrong/empty input notifies and re-asks — does not abort the deploy.
+confirm_typed_token() {
+  local expected="$1"
+  local prompt="$2"
+  local token
+  while true; do
+    read -r -p "$prompt" token || true
+    case "${token:-}" in
+      q|Q|quit)
+        echo "Quit."
+        exit 0
+        ;;
+      "$expected")
+        return 0
+        ;;
+      "")
+        echo "  Need to type '${expected}' exactly (or q to quit). Empty input ignored."
+        ;;
+      *)
+        echo "  Need to type '${expected}' exactly (or q to quit). Got: ${token}"
+        ;;
+    esac
+  done
+}
+
 confirm_build_push() {
   if [[ "$YES" -eq 1 ]]; then
     echo "(--yes) build-push confirmation skipped"
@@ -392,9 +418,7 @@ confirm_build_push() {
   echo ""
   echo "This builds the app image on this Mac and pushes it to GHCR."
   echo "It does NOT change containers on the server yet (use rollout after)."
-  local token
-  read -r -p "Type 'push' to continue: " token
-  [[ "$token" == "push" ]] || die "Aborted (typed: ${token:-empty})"
+  confirm_typed_token "push" "Type 'push' to continue (q=quit): "
 }
 
 confirm_rollout() {
@@ -402,19 +426,16 @@ confirm_rollout() {
     echo "(--yes) rollout confirmation skipped"
     return 0
   fi
-  local token
   if [[ "$ENV_NAME" == "production" ]]; then
     echo ""
     echo "⚠  PRODUCTION rollout — will replace web+job on the production host."
     echo "  Uses the image already in GHCR for VERSION (must have been build-pushed)."
-    read -r -p "Type 'production' to continue: " token
-    [[ "$token" == "production" ]] || die "Aborted (typed: ${token:-empty})"
+    confirm_typed_token "production" "Type 'production' to continue (q=quit): "
   else
     echo ""
     echo "⚠  Will SSH to ${PRE_PROD_HOST} and replace pre-prod web+job containers."
     echo "  Uses the image already in GHCR for VERSION (must have been build-pushed)."
-    read -r -p "Type 'rollout' to continue: " token
-    [[ "$token" == "rollout" ]] || die "Aborted (typed: ${token:-empty})"
+    confirm_typed_token "rollout" "Type 'rollout' to continue (q=quit): "
   fi
 }
 
