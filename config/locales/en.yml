@@ -288,6 +288,7 @@ en:
     pm: "pm"
   errors:
     messages:
+      coding_framework_unavailable: "%{framework} is temporarily unavailable. Please try again later."
       wrong_size: "is the wrong size (should be %{file_size})"
       size_too_small: "is too small (minimum is %{file_size})"
       size_too_big: "is too large (maximum is %{file_size})"
@@ -873,6 +874,7 @@ en:
         alert_failure: "We couldn't find a concept called %{concept}. Try another\
           \ word."
         alert_already_exists: "%{concept} is already a concept on this symbol."
+        alert_service_unavailable: "%{framework} is temporarily unavailable. Please try again later."
       destroy:
         notice_success: "We removed the %{concept} concept from this symbol."
         alert_failure: "We couldn't remove the %{concept} concept from this symbol."

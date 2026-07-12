@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 # Ensure Directus configuration is loaded after env.rb in development
 if (Rails.env.development? || Rails.env.test?) && (DIRECTUS_URL.nil? || DIRECTUS_TOKEN_CMS.nil?)
@@ -28,75 +29,68 @@ if (Rails.env.development? || Rails.env.test?) && (DIRECTUS_URL.nil? || DIRECTUS
   end
 end
 
-# Dynamic language configuration from Directus - Live reloadable
+# Dynamic language configuration from Directus - live reloadable.
+# LanguageConfig + minimal fallback are set here (no app/services constants).
+# Loading from cache/Directus is deferred to after_initialize so Zeitwerk can
+# resolve LanguageConfigurationService (referencing it during the initializer
+# phase caused: uninitialized constant LanguageConfigurationService).
 Rails.logger.info("Setting up dynamic language configuration from Directus")
 
-# Create a module to hold language configuration that can be updated live
 module LanguageConfig
   class << self
     attr_accessor :available_locales, :language_mapping, :default_language
+
+    def apply_from_hash!(config_hash)
+      self.available_locales = config_hash["available_locales"]
+      self.language_mapping = config_hash["directus_mapping"].freeze
+      self.default_language = config_hash["default_language"].freeze
+      I18n.available_locales = available_locales
+    end
   end
 end
 
-# Initialize with minimal fallback
+# Minimal fallback until after_initialize (or if Directus/cache is unavailable)
 LanguageConfig.available_locales = [:en]
-LanguageConfig.language_mapping = { en: 'en-GB' }.freeze
-LanguageConfig.default_language = 'en-GB'.freeze
+LanguageConfig.language_mapping = { en: "en-GB" }.freeze
+LanguageConfig.default_language = "en-GB".freeze
 
-# Set initial Rails config
 I18n.available_locales = LanguageConfig.available_locales
 
-# Load language configuration
-if Rails.env.development?
-  # Synchronous loading for development (safe for single-threaded dev server)
-  begin
-    Rails.logger.info("Loading language configuration from Directus in development...")
-    LanguageConfigurationService.update_live_config
-  rescue => e
-    Rails.logger.error("Failed to load language configuration in development: #{e.message}")
-    Rails.logger.warn("Using minimal fallback language configuration")
-  end
-else
-  # Production: load from cache first, then self-heal on cache miss
-  begin
-    # Try to load from cache synchronously (fast)
-    cached_config = Rails.cache.read(LanguageConfigurationService::CACHE_KEY)
-    if cached_config.present?
-      Rails.logger.info("Loading language configuration from cache in production")
-      LanguageConfig.available_locales = cached_config['available_locales']
-      LanguageConfig.language_mapping = cached_config['directus_mapping'].freeze
-      LanguageConfig.default_language = cached_config['default_language'].freeze
-      I18n.available_locales = LanguageConfig.available_locales
-      Rails.logger.info("Language configuration loaded from cache: #{I18n.available_locales.inspect}")
-    else
-      Rails.logger.warn("No cached language configuration found in production, attempting Directus refresh")
-
-      if LanguageConfigurationService.update_live_config
-        Rails.logger.info("Language configuration refreshed during boot: #{I18n.available_locales.inspect}")
-      else
-        Rails.logger.warn("Language refresh during boot failed, using minimal fallback language configuration")
-      end
-    end
-  rescue => e
-    Rails.logger.error("Failed to load cached language configuration: #{e.message}")
-    Rails.logger.warn("Using minimal fallback language configuration")
-  end
-end
-
-# Create global variables that can be updated live
-$directus_language_mapping = LanguageConfig.language_mapping
-$directus_default_language = LanguageConfig.default_language
-
-# The LanguageConfig module has attr_accessor which creates the getter methods
-# So LanguageConfig.language_mapping returns the instance variable set by update_live_config
-
-# Define constants that reference the LanguageConfig methods
+# Live-updatable references (LanguageConfig is mutated by LanguageConfigurationService)
 DIRECTUS_LANGUAGE_MAPPING = LanguageConfig.method(:language_mapping)
 DIRECTUS_DEFAULT_LANGUAGE = LanguageConfig.method(:default_language)
 
 Rails.application.configure do
   config.i18n.default_locale = :en
-
-  # Allow translations to fall back to the default language, English.
   config.i18n.fallbacks = true
+end
+
+Rails.application.config.after_initialize do
+  # App constants (LanguageConfigurationService, DirectusService) are loadable here.
+  begin
+    if Rails.env.development?
+      Rails.logger.info("Loading language configuration from Directus in development...")
+      unless LanguageConfigurationService.update_live_config
+        Rails.logger.warn("Using minimal fallback language configuration")
+      end
+    else
+      # pre-prod / production / stage: prefer Redis cache, self-heal on miss
+      cached_config = Rails.cache.read(LanguageConfigurationService::CACHE_KEY)
+      if cached_config.present?
+        Rails.logger.info("Loading language configuration from cache")
+        LanguageConfig.apply_from_hash!(cached_config)
+        Rails.logger.info("Language configuration loaded from cache: #{I18n.available_locales.inspect}")
+      else
+        Rails.logger.warn("No cached language configuration found, attempting Directus refresh")
+        if LanguageConfigurationService.update_live_config
+          Rails.logger.info("Language configuration refreshed during boot: #{I18n.available_locales.inspect}")
+        else
+          Rails.logger.warn("Language refresh during boot failed, using minimal fallback language configuration")
+        end
+      end
+    end
+  rescue StandardError => e
+    Rails.logger.error("Failed to load language configuration after initialize: #{e.class}: #{e.message}")
+    Rails.logger.warn("Using minimal fallback language configuration")
+  end
 end

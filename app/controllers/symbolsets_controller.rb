@@ -139,6 +139,9 @@ class SymbolsetsController < ApplicationController
   end
 
   def download
+    # UI only links here when zip_bundle is attached; bots/bookmarks may still hit the URL.
+    raise ActiveRecord::RecordNotFound unless @symbolset.zip_bundle.attached?
+
     redirect_to rails_blob_path(@symbolset.zip_bundle, disposition: :attachment)
   end
 

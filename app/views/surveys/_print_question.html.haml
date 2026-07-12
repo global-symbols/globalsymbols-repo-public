@@ -13,7 +13,7 @@
     .card-body
       .row
         .col-md-3
-          %img.img-fluid.mb-3{src: image_src, alt: picto.best_label_for(locale).text}
+          %img.img-fluid.mb-3{src: image_src, alt: (picto.best_label_for(locale)&.text.presence || "Symbol #{picto.id}")}
           %table.table-bordered.table-sm
             %tbody
               - picto.labels.each do |label|
