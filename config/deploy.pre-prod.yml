@@ -17,9 +17,10 @@ servers:
       - 18.130.29.168
     cmd: bundle exec sidekiq -C config/sidekiq.yml
 
-# kamal-proxy in front of Rails. TLS via Let's Encrypt only after DNS points here.
-# Until cutover, smoke via http://18.130.29.168/ (or Host header).
-# Later: host nginx can sit in front and reverse-proxy to kamal-proxy / Go.
+# Host nginx owns public 80/443 (Board Builder static + reverse-proxy to Rails).
+# kamal-proxy stays in the deploy path on localhost only — see .kamal/proxy/options
+#   127.0.0.1:8080→80, 127.0.0.1:8443→443 — so Kamal zero-downtime cutover is unchanged.
+# Until app.gs-test.co.uk DNS cutover, smoke via http://18.130.29.168/ with Host header.
 #
 # Healthcheck: this app has no /up route; default Kamal path /up fails and aborts deploy
 # even though Puma is listening. Use /. deploy_timeout is top-level (not under proxy).

@@ -78,3 +78,13 @@ kamal setup -d pre-prod    # installs kamal-proxy etc. — CHANGES SERVER
 ```
 
 **Do not run setup/deploy until registry, secrets, and image name are real.**
+
+## Pre-prod proxy ports (nginx in front)
+
+On pre-prod (`global-symbols-ec2-test-t4`), host **nginx** owns public `80`/`443`.  
+`kamal-proxy` is bound to localhost only — see `.kamal/proxy/options`:
+
+- `127.0.0.1:8080` → proxy HTTP (Rails)
+- `127.0.0.1:8443` → proxy HTTPS
+
+Keep that options file when running `kamal proxy reboot` / setup so Kamal does not republish on public 80/443.
