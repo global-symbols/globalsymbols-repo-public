@@ -3,7 +3,7 @@ class Picto < ApplicationRecord
   belongs_to :category, inverse_of: :pictos, optional: true
   belongs_to :source, inverse_of: :pictos
 
-  has_many :cells, inverse_of: :picto
+  has_many :cells, class_name: 'Boardbuilder::Cell', inverse_of: :picto
   has_many :comments, inverse_of: :picto
   has_many :images, inverse_of: :picto, dependent: :destroy
   has_many :labels, inverse_of: :picto, dependent: :destroy
