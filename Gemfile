@@ -45,10 +45,10 @@ gem 'bootsnap', '>= 1.1.0', require: false
 gem 'devise' # User authentication
 gem 'cancancan', '3.2.1'
 
-#gem 'doorkeeper' # OAuth2
-gem 'doorkeeper', '5.4.0'
-
-gem 'doorkeeper-openid_connect' # Layer to support OIDC authentication.
+# OAuth2 / OIDC — 5.4.0 breaks on Rails 8 (find_in_batches kwargs).
+# openid_connect >= 1.8 requires doorkeeper >= 5.5, < 6.0.
+gem 'doorkeeper', '~> 5.8'
+gem 'doorkeeper-openid_connect', '~> 1.8'
 
 #gem 'activerecord-import'
 gem 'activerecord-import', '1.0.8'
