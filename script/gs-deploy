@@ -440,16 +440,32 @@ web_name_filter() {
   fi
 }
 
+# Wizard gate before a phase. Returns 0 = run phase, 1 = skip phase (when allowed).
+# Quits the process on q. Optional 2nd arg: 1 to allow "s" / "skip".
 pause_wizard() {
   local label="${1:-next phase}"
+  local allow_skip="${2:-0}"
   if [[ "$YES" -eq 1 ]]; then
     return 0
   fi
-  local reply
-  read -r -p "Press Enter for ${label}, or q to quit: " reply || true
+  local reply prompt
+  if [[ "$allow_skip" -eq 1 ]]; then
+    prompt="Press Enter for ${label}, s to skip, or q to quit: "
+  else
+    prompt="Press Enter for ${label}, or q to quit: "
+  fi
+  read -r -p "$prompt" reply || true
   case "${reply:-}" in
     q|Q|quit) echo "Stopped before: $label"; exit 0 ;;
+    s|S|skip)
+      if [[ "$allow_skip" -eq 1 ]]; then
+        echo "Skipped: $label"
+        return 1
+      fi
+      echo "Invalid input (skip not available for this phase). Continuing."
+      ;;
   esac
+  return 0
 }
 
 # --- parse args ---
@@ -1562,11 +1578,13 @@ cmd_wizard() {
   echo "Host: $(deploy_host)"
   echo "Each phase streams full command output. Logs: log/deploy/ (unless --no-log)."
   echo "Press Enter to start each phase (no second type-to-confirm). q quits."
+  echo "Migrate: Enter runs it, s skips and continues to verify, q quits."
   echo "Exception: production rollout/migrate still require typing production/migrate."
-  echo "Migrate runs only if the live DB has pending migrations (else skips)."
+  echo "Migrate also auto-skips when the live DB has no pending migrations."
   echo ""
 
   local phases=(preflight build push rollout migrate verify)
+  local skip_migrate=0
   local p
   for p in "${phases[@]}"; do
     case "$p" in
@@ -1584,10 +1602,16 @@ cmd_wizard() {
         ;;
       rollout)
         cmd_rollout || return $?
-        pause_wizard "migrate (live DB via web container; skip if none pending)"
+        if ! pause_wizard "migrate (live DB via web container; skip if none pending)" 1; then
+          skip_migrate=1
+        fi
         ;;
       migrate)
-        cmd_migrate || return $?
+        if [[ "$skip_migrate" -eq 1 ]]; then
+          echo "Skipping migrate (wizard choice); continuing to verify."
+        else
+          cmd_migrate || return $?
+        fi
         pause_wizard "verify (post-deploy suite on server)"
         ;;
       verify)
