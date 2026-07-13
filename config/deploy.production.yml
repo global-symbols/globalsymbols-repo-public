@@ -49,6 +49,8 @@ env:
     - REDIS_PASSWORD
     - DIRECTUS_TOKEN_CMS
     - DIRECTUS_WEBHOOK_SECRET
+    - AWS_ACCESS_KEY_ID
+    - AWS_SECRET_ACCESS_KEY
 
 # No MySQL accessory — primary is host mysqld; replica is on Go box (t3).
 # accessories: {}

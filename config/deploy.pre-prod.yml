@@ -56,6 +56,8 @@ env:
     - REDIS_PASSWORD
     - DIRECTUS_TOKEN_CMS
     - DIRECTUS_WEBHOOK_SECRET
+    - AWS_ACCESS_KEY_ID
+    - AWS_SECRET_ACCESS_KEY
     # Post-deploy suite (menu → verify): Devise bot user for optional auth/CRUD
     - DEPLOY_VERIFY_USER_EMAIL
     - DEPLOY_VERIFY_USER_PASSWORD
