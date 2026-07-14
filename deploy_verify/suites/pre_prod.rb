@@ -5,11 +5,14 @@ require "time"
 require "securerandom"
 require_relative "../lib/csrf"
 require_relative "../lib/redis_client"
+require_relative "../lib/http_smoke"
 
 module DeployVerify
   module Suites
     # Pre-prod post-deploy verification (smoke, Directus, Redis cache, optional CRUD).
     class PreProd
+      include DeployVerify::HttpSmoke
+
       def initialize(config, reporter, http)
         @config = config
         @reporter = reporter
@@ -18,7 +21,12 @@ module DeployVerify
       end
 
       def run
-        smoke
+        smoke_core_paths
+        smoke_api_symbolsets_json
+        smoke_search_results
+        smoke_locale_switch
+        smoke_symbol_png_download
+        password_reset_form_post
         directus
         redis_cache
         auth_and_crud
@@ -28,34 +36,38 @@ module DeployVerify
 
       attr_reader :config, :reporter, :http, :run_id
 
-      def smoke
-        reporter.section("Pre-prod HTTP smoke")
-        {
-          "/" => 200..399,
-          "/search" => 200..399,
-          "/symbolsets" => 200..399,
-          "/about" => 200..399,
-          "/users/sign_in" => 200..399,
-          "/api/v1/symbolsets" => 200..299,
-          "/api/v1/languages/active" => 200..299
-        }.each do |path, range|
-          check_get(path, range)
+      # Pre-prod only: exercise password-reset POST (sends mail). Never on prod.
+      def password_reset_form_post
+        reporter.section("Pre-prod password reset (write)")
+        unless config.auth_configured?
+          reporter.skip("auth.password_reset", "DEPLOY_VERIFY_USER_EMAIL / PASSWORD not set")
+          return
         end
 
-        res = http.get("/api/v1/symbolsets")
-        if res.success?
-          begin
-            data = res.json
-            ok = data.is_a?(Array) || (data.is_a?(Hash) && (data["symbolsets"] || data["data"]))
-            if ok
-              reporter.pass("api.symbolsets.json", "JSON structure ok")
-            else
-              reporter.fail("api.symbolsets.json", "unexpected JSON shape: #{data.class}")
-            end
-          rescue JSON::ParserError => e
-            reporter.fail("api.symbolsets.json", "invalid JSON: #{e.message}", detail: res.body[0, 500])
-          end
+        form = http.get("/users/password/new")
+        token = Csrf.extract_token(form.body)
+        unless token
+          reporter.fail("auth.password_reset_form", "csrf token not found", detail: form.body.to_s[0, 400])
+          return
         end
+
+        res = http.post(
+          "/users/password",
+          form: {
+            "authenticity_token" => token,
+            "user[email]" => config.test_email
+          }
+        )
+        body = res.body.to_s
+        if res.code >= 500 || exception_page?(body)
+          reporter.fail("auth.password_reset", "HTTP #{res.code} exception", detail: body[0, 500])
+        elsif res.redirect? || res.success?
+          reporter.pass("auth.password_reset", "HTTP #{res.code} for #{config.test_email}")
+        else
+          reporter.fail("auth.password_reset", "HTTP #{res.code}", detail: body[0, 400])
+        end
+      rescue StandardError => e
+        reporter.fail("auth.password_reset", "#{e.class}: #{e.message}")
       end
 
       def directus
@@ -354,17 +366,6 @@ module DeployVerify
         rescue StandardError => e
           reporter.fail("crud.symbolset_delete", "#{e.class}: #{e.message}")
         end
-      end
-
-      def check_get(path, range)
-        res = http.get(path)
-        if range.cover?(res.code)
-          reporter.pass("http.get#{path}", "HTTP #{res.code}")
-        else
-          reporter.fail("http.get#{path}", "HTTP #{res.code} (expected #{range})", detail: res.body[0, 300])
-        end
-      rescue StandardError => e
-        reporter.fail("http.get#{path}", "#{e.class}: #{e.message}")
       end
 
       # First non-blank <option value="N"> under symbolset[licence_id].

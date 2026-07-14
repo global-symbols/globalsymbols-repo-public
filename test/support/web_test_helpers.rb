@@ -15,6 +15,30 @@ module WebTestHelpers
     symbolset
   end
 
+  # Avoid FactoryBot Source sequence collisions with seeded `source-1` on the shared DB.
+  def managed_picto_for(symbolset)
+    source = Source.create!(
+      name: "Web Picto Src #{SecureRandom.hex(4)}",
+      slug: "web-picto-#{SecureRandom.hex(6)}",
+      authoritative: true
+    )
+    label_source = Source.create!(
+      name: "Web Label Src #{SecureRandom.hex(4)}",
+      slug: "web-label-#{SecureRandom.hex(6)}",
+      authoritative: true
+    )
+    language = Language.find_by!(iso639_1: 'en')
+
+    picto = build(:picto, symbolset: symbolset, source: source, labels_count: 0, images_count: 1)
+    picto.labels.build(
+      text: "web-label-#{SecureRandom.hex(3)}",
+      language: language,
+      source: label_source
+    )
+    picto.save!
+    picto
+  end
+
   def grant_manager_access(user, symbolset)
     create(:symbolset_user, user: user, symbolset: symbolset, role: :admin)
     symbolset

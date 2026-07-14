@@ -45,6 +45,9 @@ module LanguageConfig
       self.language_mapping = config_hash["directus_mapping"].freeze
       self.default_language = config_hash["default_language"].freeze
       I18n.available_locales = available_locales
+      # i18n skips YAML for locales not yet in available_locales. Boot starts with
+      # [:en], so reload after Directus/cache expands the list or non-en stays empty.
+      I18n.reload!
     end
   end
 end

@@ -93,7 +93,7 @@ Rails.application.configure do
 
   config.action_mailer.perform_caching = false
   config.action_mailer.default_url_options = {
-      host: 'globalsymbols.com',
+      host: 'gs-test.co.uk',
       protocol: 'https'
   }
   config.action_mailer.delivery_method = :smtp

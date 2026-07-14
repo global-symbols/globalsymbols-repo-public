@@ -43,6 +43,8 @@ env:
     REDIS_DB: "1"
     REDIS_CACHE_DB: "3"
     ASSET_HOST: https://globalsymbols.com
+    # Green-colo Flux / AI image API (UFW allows this host's public IP on :8000)
+    AZURE_API_BASE: http://5.2.17.219:8000
   secret:
     - SECRET_KEY_BASE
     - GS_DATABASE_PASSWORD
@@ -51,6 +53,14 @@ env:
     - DIRECTUS_WEBHOOK_SECRET
     - AWS_ACCESS_KEY_ID
     - AWS_SECRET_ACCESS_KEY
+    - AZURE_API_KEY
+    # Contentful knowledge base / About pages
+    - CONTENTFUL_ACCESS_TOKEN
+    - CONTENTFUL_PREVIEW_TOKEN
+    - CONTENTFUL_SPACE_ID
+    # Amazon SES SMTP (password reset / Devise mailers)
+    - SES_SMTP_USERNAME
+    - SES_SMTP_PASSWORD
 
 # No MySQL accessory — primary is host mysqld; replica is on Go box (t3).
 # accessories: {}

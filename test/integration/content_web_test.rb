@@ -101,6 +101,7 @@ class ContentWebTest < ActionDispatch::IntegrationTest
     get knowledge_base_index_path
 
     assert_response :success
+    refute_match(/we're sorry, but something went wrong/i, response.body)
   end
 
   test 'knowledge base search accepts a query' do
@@ -109,6 +110,7 @@ class ContentWebTest < ActionDispatch::IntegrationTest
     get search_knowledge_base_index_path, params: { query: 'symbol' }
 
     assert_response :success
+    refute_match(/we're sorry, but something went wrong/i, response.body)
   end
 
   private

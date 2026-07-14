@@ -521,8 +521,8 @@ module BoardBuilder
           end
 
           begin
-            azure_base = 'http://57.154.240.25:8000'
-            azure_key  = '11543801-f6f7-4395-8d84-4809effb5725'
+            azure_base = ENV['AZURE_API_BASE']
+            azure_key  = ENV['AZURE_API_KEY']
 
             Rails.logger.info("[AI] Using Azure base=#{azure_base} for remove_background (key_present=#{azure_key.present?})")
 

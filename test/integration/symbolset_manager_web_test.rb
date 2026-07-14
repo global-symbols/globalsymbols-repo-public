@@ -4,7 +4,7 @@ require 'test_helper'
 
 class SymbolsetManagerWebTest < ActionDispatch::IntegrationTest
   setup do
-    @user = create(:user)
+    @user = create(:user, email: "mgr_#{SecureRandom.hex(6)}@test.com")
     sign_in @user
     @symbolset = managed_symbolset_for(@user)
   end
@@ -20,6 +20,7 @@ class SymbolsetManagerWebTest < ActionDispatch::IntegrationTest
     get review_symbolset_path(@symbolset)
 
     assert_response :success
+    refute_match(/we're sorry, but something went wrong/i, response.body)
   end
 
   test 'manager can access new picto form' do
@@ -64,7 +65,9 @@ class SymbolsetManagerWebTest < ActionDispatch::IntegrationTest
   end
 
   test 'signed-in user without access cannot edit another users symbolset' do
-    other_set = create(:symbolset, users_count: 1)
+    other_owner = create(:user, email: "other_#{SecureRandom.hex(6)}@test.com")
+    other_set = create(:symbolset, users_count: 0)
+    create(:symbolset_user, user: other_owner, symbolset: other_set, role: :admin)
 
     get edit_symbolset_path(other_set)
 
@@ -77,5 +80,96 @@ class SymbolsetManagerWebTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to symbolset_path(@symbolset, locale: :en)
     assert_equal 'Updated via integration test', @symbolset.reload.description
+  end
+
+  test 'manager can access labels index for a picto' do
+    picto = managed_picto_for(@symbolset)
+
+    get symbolset_symbol_labels_path(@symbolset, picto)
+
+    assert_response :success
+    refute_match(/we're sorry, but something went wrong/i, response.body)
+  end
+
+  test 'manager can add a label without server error' do
+    picto = managed_picto_for(@symbolset)
+    ensure_translation_source!
+    language = Language.find_by!(iso639_1: 'en')
+
+    assert_difference('Label.count', 1) do
+      post symbolset_symbol_labels_path(@symbolset, picto),
+           params: {
+             label: {
+               text: "Regress Label #{SecureRandom.hex(3)}",
+               language_id: language.id
+             }
+           }
+    end
+
+    assert_response :redirect
+    follow_redirect!
+    assert_response :success
+    refute_match(/we're sorry, but something went wrong/i, response.body)
+  end
+
+  test 'manager can access concepts index for a picto' do
+    picto = managed_picto_for(@symbolset)
+
+    get symbolset_symbol_concepts_path(@symbolset, picto)
+
+    assert_response :success
+    refute_match(/we're sorry, but something went wrong/i, response.body)
+  end
+
+  test 'manager can add a ConceptNet concept without server error' do
+    skip 'Requires CodingFramework seed' unless CodingFramework.first
+    picto = managed_picto_for(@symbolset)
+
+    post symbolset_symbol_concepts_path(@symbolset, picto),
+         params: { concept: 'computer', iso639_3_code: 'eng' }
+
+    assert_response :redirect
+    follow_redirect!
+    assert_response :success
+    refute_match(/we're sorry, but something went wrong/i, response.body)
+  end
+
+  test 'unknown ConceptNet concept does not 500' do
+    skip 'Requires CodingFramework seed' unless CodingFramework.first
+    picto = managed_picto_for(@symbolset)
+
+    # Override the default success stub so a missing concept is a soft validation error.
+    stub_request(:get, %r{api\.conceptnet\.io/c/.+/zz_missing_concept})
+      .to_return(status: 404, body: 'Not Found', headers: { 'Content-Type' => 'text/plain' })
+
+    post symbolset_symbol_concepts_path(@symbolset, picto),
+         params: { concept: 'zz_missing_concept', iso639_3_code: 'eng' }
+
+    assert_response :redirect
+    follow_redirect!
+    assert_response :success
+    refute_match(/we're sorry, but something went wrong/i, response.body)
+    assert_match(
+      /couldn't find a concept|couldn.t reach|unavailable|try again/i,
+      flash[:alert].to_s + response.body
+    )
+  end
+
+  test 'guest is redirected away from new symbolset form' do
+    # Product expectation (regression R37): create button should be hidden for guests.
+    # Current view always renders it; cover the auth gate until UX is fixed.
+    sign_out @user
+
+    get new_symbolset_path
+    assert_redirected_to new_user_session_path(locale: :en)
+  end
+
+  private
+
+  def ensure_translation_source!
+    Source.find_or_create_by!(slug: 'translation') do |source|
+      source.name = 'Translation'
+      source.authoritative = false
+    end
   end
 end

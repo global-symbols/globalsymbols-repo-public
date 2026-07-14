@@ -4,11 +4,11 @@ FactoryBot.define do
     surname { 'Bloggs' }
     language { Language.find_by!(iso639_1: :en) }
     
-    sequence(:email) { |n| "factory_user_#{n}@test.com" }
+    sequence(:email) { |n| "factory_user_#{n}_#{SecureRandom.hex(4)}@test.com" }
     password { 'password' }
 
     trait :admin do
-      sequence(:email) { |n| "factory_admin_#{n}@test.com" }
+      sequence(:email) { |n| "factory_admin_#{n}_#{SecureRandom.hex(4)}@test.com" }
       role { :admin }
     end
 

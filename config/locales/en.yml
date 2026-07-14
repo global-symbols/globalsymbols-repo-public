@@ -655,6 +655,7 @@ en:
         archived_notice:
           heading: "Archived Symbol"
           text: "This symbol is not shown in the symbol set, search results or apps"
+        image_unavailable: "This symbol's image file isn't available right now. Please try again later."
     survey_editor:
       _add_picto_to_survey:
         button: "Add to Survey"

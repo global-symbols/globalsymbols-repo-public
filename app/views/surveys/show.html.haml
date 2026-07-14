@@ -20,9 +20,8 @@
                   = f.text_field :organisation, maxlength: 255, label_as_placeholder: true
                   = f.text_field :role, maxlength: 255, label_as_placeholder: true
 
-                  = f.primary class: 'mb-2 btn btn-primary' do
-                    = t('views.surveys.show.begin_button')
-                    %i.fas.fa-chevron-right.pl-2
+                  -# Avoid `= f.primary do` — Rails 7 HAML capture leaks page HTML into the button.
+                  = f.primary (t('views.surveys.show.begin_button') + content_tag(:i, '', class: 'fas fa-chevron-right pl-2')).html_safe, class: 'mb-2 btn btn-primary', render_as_button: true
                   %p.mb-5
                     %small.text-muted
                       = t('views.surveys.show.provide_details')

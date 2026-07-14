@@ -15,7 +15,7 @@
           %p.mb-4= t('views.picto_concepts.index.add_concept.instruction')
 
           = bootstrap_form_with url: symbolset_symbol_concepts_path, layout: :horizontal, label_col: 'col-sm-3', control_col: 'col-sm-9', local: true do |f|
-            = f.text_field :concept
+            = f.text_field :concept, label: t('dictionary.concept.one')
             .text-right
               = f.primary t('views.picto_concepts.index.add_concept.button')
 

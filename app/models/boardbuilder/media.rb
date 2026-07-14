@@ -43,8 +43,9 @@ class Boardbuilder::Media < ApplicationRecord
     begin
       content = file.read
       self.file_hash = Utils.calculate_hash(content)
-    rescue StandardError => e
-      Rails.logger.warn("could not calculate hash of media: #{e.message}")
+    rescue StandardError
+      # Missing/unreadable S3 objects are common on pre-prod (DB↔storage drift).
+      # Dedup simply skips these; do not WARN on every media list load.
       self.file_hash = nil
     end
   end

@@ -33,6 +33,5 @@
           .col
             = link_to t('dictionary.back'), symbolset_survey_path(id: @survey.id), class: 'btn btn-outline-secondary', data: { confirm: t('views.survey_response_analysis.new.cancel_confirm')}
           .col.text-right
-            = f.primary do
-              = t('views.survey_response_analysis.new.save_button')
-              %i.fas.fa-chevron-right.pl-2
+            -# Avoid `= f.primary do` — Rails 7 HAML capture leaks page HTML into the button.
+            = f.primary (t('views.survey_response_analysis.new.save_button') + content_tag(:i, '', class: 'fas fa-chevron-right pl-2')).html_safe, render_as_button: true

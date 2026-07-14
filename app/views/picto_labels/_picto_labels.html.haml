@@ -1,6 +1,6 @@
 .card.mb-5#picto_labels
   .card-header.text-center
-    = t('views.picto_labels._picto_labels.heading', {label_type: type})
+    = t('views.picto_labels._picto_labels.heading', label_type: type)
   .list-group.list-group-flush
     - if labels.any?
       - labels.each do |label|

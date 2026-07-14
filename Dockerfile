@@ -23,6 +23,7 @@ RUN apt-get update -qq && \
       default-mysql-client \
       default-libmysqlclient-dev \
       imagemagick \
+      librsvg2-bin \
       libyaml-0-2 \
       shared-mime-info \
       ca-certificates \

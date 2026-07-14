@@ -1,11 +1,14 @@
 # frozen_string_literal: true
 
 require "json"
+require_relative "../lib/http_smoke"
 
 module DeployVerify
   module Suites
     # Production post-deploy verification — read-only (GET/HEAD only).
     class Prod
+      include DeployVerify::HttpSmoke
+
       def initialize(config, reporter, http)
         @config = config
         @reporter = reporter
@@ -14,7 +17,12 @@ module DeployVerify
 
       def run
         enforce_readonly_guards!
-        smoke
+        smoke_core_paths
+        smoke_api_symbolsets_json
+        smoke_search_results
+        smoke_locale_switch
+        smoke_symbol_png_download
+        smoke_head_home
         contracts
         optional_directus_readonly
       end
@@ -40,21 +48,7 @@ module DeployVerify
         end
       end
 
-      def smoke
-        reporter.section("Prod HTTP smoke (read-only)")
-        {
-          "/" => 200..399,
-          "/search" => 200..399,
-          "/symbolsets" => 200..399,
-          "/about" => 200..399,
-          "/users/sign_in" => 200..399,
-          "/api/v1/symbolsets" => 200..299,
-          "/api/v1/languages/active" => 200..299
-        }.each do |path, range|
-          check_get(path, range)
-        end
-
-        # HEAD home
+      def smoke_head_home
         begin
           res = http.head("/")
           if (200..399).cover?(res.code)
@@ -66,8 +60,7 @@ module DeployVerify
           reporter.fail("http.head/", "#{e.class}: #{e.message}")
         end
 
-        path = config.prod_symbolset_path
-        check_get(path, 200..399)
+        check_get(config.prod_symbolset_path, 200..399)
       end
 
       def contracts
@@ -121,17 +114,6 @@ module DeployVerify
         else
           reporter.fail("directus.server_info", "HTTP #{res.code}", detail: res.body[0, 400])
         end
-      end
-
-      def check_get(path, range)
-        res = http.get(path)
-        if range.cover?(res.code)
-          reporter.pass("http.get#{path}", "HTTP #{res.code}")
-        else
-          reporter.fail("http.get#{path}", "HTTP #{res.code} (expected #{range})", detail: res.body[0, 300])
-        end
-      rescue StandardError => e
-        reporter.fail("http.get#{path}", "#{e.class}: #{e.message}")
       end
     end
   end

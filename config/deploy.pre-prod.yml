@@ -50,17 +50,29 @@ env:
     REDIS_CACHE_DB: "2"
     ASSET_HOST: https://gs-test.co.uk
     DIRECTUS_URL: https://cms.gs-test.co.uk
+    # Green-colo Flux / AI image API (UFW allows this host's public IP on :8000)
+    AZURE_API_BASE: http://5.2.17.219:8000
   secret:
     - SECRET_KEY_BASE
     - GS_DATABASE_PASSWORD
     - REDIS_PASSWORD
     - DIRECTUS_TOKEN_CMS
+    - DIRECTUS_TOKEN
     - DIRECTUS_WEBHOOK_SECRET
     - AWS_ACCESS_KEY_ID
     - AWS_SECRET_ACCESS_KEY
     # Post-deploy suite (menu → verify): Devise bot user for optional auth/CRUD
     - DEPLOY_VERIFY_USER_EMAIL
     - DEPLOY_VERIFY_USER_PASSWORD
+    # AI image generator (x-api-key to AZURE_API_BASE)
+    - AZURE_API_KEY
+    # Contentful knowledge base / About pages
+    - CONTENTFUL_ACCESS_TOKEN
+    - CONTENTFUL_PREVIEW_TOKEN
+    - CONTENTFUL_SPACE_ID
+    # Amazon SES SMTP (password reset / Devise mailers)
+    - SES_SMTP_USERNAME
+    - SES_SMTP_PASSWORD
 
 # MySQL 8 on the same box (pre-prod only — prod uses host MySQL on m7g)
 accessories:

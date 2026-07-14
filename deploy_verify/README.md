@@ -6,10 +6,27 @@ Runs **only on the matching app server** (or inside its web container).
 
 | Profile | Allowed host (private IP) | Writes |
 |---------|---------------------------|--------|
-| `pre_prod` | `172.31.30.149` (t4g) | Optional CRUD |
-| `prod` | `172.31.6.238` (+ update when m7g ships) | None |
+| `pre_prod` | `172.31.30.149` (t4g) | Optional CRUD + password-reset POST |
+| `prod` | `172.31.6.238` (+ update when m7g ships) | **None** (GET/HEAD only) |
 
 On fail: report + exit 1. No auto-remediation.
+
+## Shared smoke (both profiles, read-only)
+
+Beyond core `/`, `/search`, `/symbolsets`, `/about`, sign-in, and API paths:
+
+- CMS/content: `/contact`, `/news`, `/projects`, `/developer`, `/knowledge-base`
+- Auth: `/users/password/new` (GET only on prod)
+- Search quality: `/search?query=car` must not 500 or dump raw objects
+- Locale: `/?locale=nl` must apply Dutch chrome
+- Symbol PNG download: resolves a label via API, then `GET …/symbols/:id.png?download=1`
+
+## Pre-prod only writes
+
+When `DEPLOY_VERIFY_USER_EMAIL` / `PASSWORD` are set:
+
+- `POST /users/password` (reset for the bot user)
+- Existing symbolset CRUD
 
 ## Why it ships with the app
 

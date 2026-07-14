@@ -3,7 +3,9 @@ class CodingFrameworkSubjectValidator < ActiveModel::Validator
     # Stop here if no CodingFramework is set.
     return false unless record.coding_framework.present?
 
-    uri = URI.escape(record.api_uri)
+    # Subject is already parameterised (spaces → underscores); do not use URI.escape
+    # (removed in Ruby 3.2 and the cause of ConceptNet add 500s after the Rails upgrade).
+    uri = record.api_uri
 
     # Try to find the subject on ConceptNet.
     # If ConceptNet returns an empty result, or 404, add an error to the record.
