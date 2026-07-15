@@ -69,6 +69,16 @@ Rails.application.configure do
   Rack::MiniProfiler.config.skip_paths = ['/uploads']
   Rack::MiniProfiler.config.show_total_sql_count = true
 
+  config.after_initialize do
+    Bullet.enable = true
+    Bullet.alert = false
+    Bullet.bullet_logger = true
+    Bullet.console = true
+    Bullet.rails_logger = true
+    Bullet.add_footer = true
+    Bullet.n_plus_one_query_enable = true
+    Bullet.unused_eager_loading_enable = true
+  end
 
   # Allow OAuth silent refresh iframe from Angular on another port (e.g. localhost:4200).
   config.action_dispatch.default_headers.delete('X-Frame-Options')

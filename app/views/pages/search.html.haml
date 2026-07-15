@@ -23,6 +23,11 @@
           - @labels.each do |label|
             .col.mb-4
               = render 'picto_labels/picto_label_card', label: label, cache: true
-        = paginate @labels
+        %nav.mt-5{"aria-label" => "Search pagination"}
+          %ul.pagination.justify-content-center
+            - if (prev_link = link_to_previous_page(@labels, t('views.pagination.previous'), class: 'page-link'))
+              %li.page-item= prev_link
+            - if (next_link = link_to_next_page(@labels, t('views.pagination.next'), class: 'page-link'))
+              %li.page-item= next_link
       - else
         = render 'errors/error_notice', status: :empty, text: t('views.pages.search.no_results')

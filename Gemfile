@@ -151,6 +151,7 @@ group :development do
 
   gem 'rack-mini-profiler'
   gem 'stackprof'
+  gem 'bullet'
 
   gem 'rails_real_favicon'
 
