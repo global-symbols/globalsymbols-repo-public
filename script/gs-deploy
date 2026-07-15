@@ -88,7 +88,7 @@ SERVICE_LABEL="gs-repo"
 # Hosts / smoke targets (must match config/deploy.*.yml)
 PRE_PROD_HOST="18.130.29.168"
 PRE_PROD_HTTP_HOST="gs-test.co.uk"
-PROD_HOST="" # filled from config if not placeholder
+PROD_HOST="13.43.129.89" # m7g public IP — keep in sync with deploy.production.yml
 PROD_HTTP_HOST="globalsymbols.com"
 
 usage() {
@@ -169,7 +169,7 @@ interactive_menu() {
   # --- Environment ---
   menu_pick pick "Environment:" \
     "1) pre-prod   — t4g ${PRE_PROD_HOST} (${PRE_PROD_HTTP_HOST})" \
-    "2) production — m7g (use only when ready)" \
+    "2) production — m7g ${PROD_HOST} (${PROD_HTTP_HOST})" \
     "3) help       — print CLI reference and exit"
   case "$pick" in
     1) ENV_NAME="pre-prod" ;;
@@ -381,8 +381,9 @@ confirm_rollout() {
       return 0
     fi
     echo ""
-    echo "⚠  PRODUCTION rollout — will replace web+job on the production host."
+    echo "⚠  PRODUCTION rollout — will SSH to $(deploy_host) and replace web+job."
     echo "  Uses the image already in GHCR for VERSION (must have been built + pushed)."
+    echo "  Does NOT rebuild accessory DB or rebind kamal-proxy (already on m7g)."
     confirm_typed_token "production" "Type 'production' to continue (q=quit): "
     return 0
   fi
@@ -533,13 +534,13 @@ deploy_host() {
   if [[ "$ENV_NAME" == "pre-prod" ]]; then
     echo "$PRE_PROD_HOST"
   else
-    # Best-effort from config; may still be placeholder
+    # Prefer IP from deploy.production.yml; fall back to PROD_HOST constant.
     local h
     h="$(grep -E '^\s+-\s+[0-9.]+' config/deploy.production.yml 2>/dev/null | head -1 | awk '{print $2}' || true)"
     if [[ -z "$h" || "$h" == REPLACE* ]]; then
-      h="$(grep -E 'REPLACE_WITH' config/deploy.production.yml | head -1 | awk '{print $2}' || true)"
+      h="${PROD_HOST:-REPLACE_WITH_M7G_PUBLIC_OR_PRIVATE_IP}"
     fi
-    echo "${h:-REPLACE_WITH_M7G_PUBLIC_OR_PRIVATE_IP}"
+    echo "$h"
   fi
 }
 
