@@ -56,7 +56,7 @@ test: &test
 #     url: <%= ENV['DATABASE_URL'] %>
 #
 # Deployed envs: host/port from ENV so Kamal can point at accessory (pre-prod)
-# or host MySQL (prod). Defaults keep local-style 127.0.0.1 behaviour.
+# or Kamal MySQL accessory (pre-prod / production). Defaults keep local-style 127.0.0.1 behaviour.
 production:
   <<: *default
   database: <%= ENV.fetch('GS_DATABASE_NAME', 'gs-production') %>

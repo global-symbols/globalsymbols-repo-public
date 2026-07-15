@@ -74,7 +74,7 @@ env:
     - SES_SMTP_USERNAME
     - SES_SMTP_PASSWORD
 
-# MySQL 8 on the same box (pre-prod only — prod uses host MySQL on m7g)
+# MySQL 8 accessory on the same box (production uses the same pattern)
 accessories:
   db:
     image: mysql:8.0
