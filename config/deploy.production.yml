@@ -45,6 +45,8 @@ env:
     REDIS_DB: "1"
     REDIS_CACHE_DB: "3"
     ASSET_HOST: https://globalsymbols.com
+    # Required at boot (config/initializers/directus.rb) — same CMS host as old prod
+    DIRECTUS_URL: https://cms.globalsymbols.com
     # Green-colo Flux / AI image API (UFW allows this host's public IP on :8000)
     AZURE_API_BASE: http://5.2.17.219:8000
   secret:
