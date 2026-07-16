@@ -27,23 +27,16 @@ class SymbolsetsController < ApplicationController
     authoritative_sources = Source.where(authoritative: true)
 
     label_text_field = Label.arel_table[:text]
-    @order_nulls_last = Arel::Nodes::Case.new.when(label_text_field.eq(nil)).then(1).else(0)
+    order_nulls_last = Arel::Nodes::Case.new.when(label_text_field.eq(nil)).then(1).else(0)
 
     @pictos = @symbolset.pictos
                         .joins("LEFT OUTER JOIN `labels` ON `labels`.`picto_id` = `pictos`.`id` AND `labels`.`source_id` IN (#{authoritative_sources.pluck(:id).join(',')}) AND (`labels`.`language_id` = #{@language.id} OR `labels`.`language_id` IS NULL)")
                         .select('pictos.*, labels.text')
                         .where(archived: false, symbolset_id: @symbolset.id)
                         .accessible_by(current_ability)
+                        .order(order_nulls_last)
+                        .order('labels.text')
                         .includes(:images)
-                        .page(params[:page])
-
-    @labels = @symbolset.labels.unscoped.authoritative
-                        .joins(:picto)
-                        .where(picto: {archived: false, symbolset_id: @symbolset.id})
-                        .where(language_id: @language.id)
-                        .order(text: :asc)
-                        .accessible_by(current_ability)
-                        .includes(picto: [:images])
                         .page(params[:page])
   end
 

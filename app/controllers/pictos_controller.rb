@@ -14,7 +14,10 @@ class PictosController < ApplicationController
         add_breadcrumb(@picto.symbolset.name, symbolset_url(@picto.symbolset))
         add_breadcrumb(@picto.labels.first.text, symbolset_symbol_url(@picto.symbolset, @picto))
 
-        @alternative_pictos = @picto.alternative_pictos.accessible_by(current_ability).page params[:page]
+        @alternative_pictos = @picto.alternative_pictos
+                                    .accessible_by(current_ability)
+                                    .includes(:symbolset, :images)
+                                    .page(params[:page])
         @comment = Comment.new
         @surveys = Survey.accessible_by(current_ability, :manage)
       end
