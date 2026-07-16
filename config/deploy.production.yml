@@ -67,12 +67,14 @@ env:
     - SES_SMTP_PASSWORD
 
 # MySQL 8 accessory — same image/flags as pre-prod (parity).
-# Loopback publish matches pre-prod; widen bind + SG if Go-box replica needs VPC access.
+# Publish on m7g private IP so t3 (Go / MySQL 8 replica) can reach primary over VPC.
+# SG must allow TCP 3306 from 172.31.41.204/32 only — never 0.0.0.0/0.
+# Rails/Sidekiq still use Docker DNS gs-repo-db (unchanged).
 accessories:
   db:
     image: mysql:8.0
     host: 13.43.129.89
-    port: "127.0.0.1:3306:3306"
+    port: "172.31.5.122:3306:3306"
     env:
       clear:
         MYSQL_DATABASE: gs-production
@@ -83,6 +85,9 @@ accessories:
     volumes:
       - mysql_data:/var/lib/mysql
     cmd: >
+      --server-id=1
+      --log-bin=mysql-bin
+      --binlog-format=ROW
       --character-set-server=utf8mb4
       --collation-server=utf8mb4_unicode_ci
       --default-authentication-plugin=mysql_native_password
