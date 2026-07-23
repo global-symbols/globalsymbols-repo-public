@@ -41,9 +41,10 @@ builder:
   dockerfile: Dockerfile
   context: .
 
-# Uploads survive deploys (CarrierWave public/uploads)
+# Uploads + Active Storage (symbolset zip_bundles) survive deploys
 volumes:
   - "gs_repo_uploads:/rails/public/uploads"
+  - "gs_repo_storage:/rails/storage"
 
 # Logging
 logging:
