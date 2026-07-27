@@ -81,7 +81,7 @@ class SymbolsetsController < ApplicationController
   end
 
   def translate
-    @limit = 35
+    @limit = Symbolset::TRANSLATION_BATCH_LIMIT
 
     # Source languages must use authoritative labels and have an ISO639_1 code.
     @source_languages = Language.unscoped
@@ -106,14 +106,24 @@ class SymbolsetsController < ApplicationController
     @source_language = Language.find_by(iso639_3: translation_get_params[:source_language]) || @source_languages.first
     @destination_language = translation_get_params[:dest_language] ? Language.find_by(iso639_3: translation_get_params[:dest_language]) : nil
 
-    @pictos = @symbolset.pictos.where(archived: false).accessible_by(current_ability)
-    @total_symbols = @pictos.count
+    @total_symbols = @symbolset.pictos.where(archived: false).accessible_by(current_ability).count
+
+    # Only pictos with an authoritative source label and no authoritative dest label.
+    # Keeps the list aligned with batch translate (skips bulk-upload placeholders etc.).
+    @pictos = @symbolset
+                .pictos_for_translation(
+                  source_language: @source_language,
+                  destination_language: @destination_language,
+                  limit: @limit
+                )
+                .accessible_by(current_ability)
+                .includes(:images, labels: :source)
+
+    @translated_labels = Label.unscoped
+                              .joins(:source, picto: :symbolset)
+                              .where(pictos: { symbolset: @symbolset }, language: @destination_language, sources: { authoritative: true })
 
     @unapproved_suggestions = Label.unscoped.where(picto_id: @pictos.select(:id), language: @destination_language)
-
-    @translated_labels = Label.unscoped.joins(:source, picto: :symbolset).where(pictos: { symbolset: @symbolset }, language: @destination_language, sources: {authoritative: true})
-
-    @pictos = @pictos.where.not(id: @translated_labels.pluck(:picto_id)).includes(:images, labels: :source).limit(@limit)
 
     @scripts = [
       OpenStruct.new({ name: 'Latin', key: 'Latn'}),

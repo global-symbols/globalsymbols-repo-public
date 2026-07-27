@@ -56,6 +56,48 @@ class SymbolsetManagerWebTest < ActionDispatch::IntegrationTest
     assert_match source_language.name, response.body
   end
 
+  test 'translate page lists only pictos with source labels not bulk placeholders' do
+    source_language = add_translatable_label_to_symbolset(@symbolset)
+    dest_language = create(
+      :language,
+      azure_translate_supported: true,
+      iso639_1: format('%02d', SecureRandom.random_number(100)),
+      iso639_3: SecureRandom.hex(2)[0, 3],
+      iso639_2b: "b#{SecureRandom.hex(1)}",
+      iso639_2t: "t#{SecureRandom.hex(1)}",
+      name: "Dest #{SecureRandom.hex(3)}",
+      active: true,
+      category: 'L',
+      scope: 'I'
+    )
+
+    auth_source = Source.where(authoritative: true).first || create(:source, authoritative: true)
+    bulk = create(:picto, symbolset: @symbolset, source: auth_source)
+    other = create(
+      :language,
+      azure_translate_supported: true,
+      iso639_1: format('%02d', SecureRandom.random_number(100)),
+      iso639_3: SecureRandom.hex(2)[0, 3],
+      name: "Other #{SecureRandom.hex(3)}",
+      active: true,
+      category: 'L',
+      scope: 'I'
+    )
+    bulk.labels.first.update!(language: other, source: auth_source, text: 'Bulk Uploaded Symbol')
+
+    get translate_symbolset_path(@symbolset),
+        params: {
+          locale: :en,
+          source_language: source_language.iso639_3,
+          dest_language: dest_language.iso639_3,
+          commit: 'Find Untranslated Symbols'
+        }
+
+    assert_response :success
+    assert_match 'hello symbol', response.body
+    refute_match 'Bulk Uploaded Symbol', response.body
+  end
+
   test 'guest cannot access symbolset edit page' do
     sign_out @user
 

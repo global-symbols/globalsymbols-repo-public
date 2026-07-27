@@ -85,55 +85,75 @@ class TranslationController < ApplicationController
   end
 
   def suggest_all
-
-    @limit = 35
+    @limit = Symbolset::TRANSLATION_BATCH_LIMIT
     @symbolset = Symbolset.find(params[:translation_id])
     authorize! :manage, @symbolset
 
     @source_language = Language.find(suggestion_params[:source_language_id])
     @destination_language = Language.find(suggestion_params[:destination_language_id])
 
-    @source_labels        = Label.unscoped.joins(:picto).where(pictos: { symbolset_id: @symbolset.id}, language: @source_language)
-    @existing_dest_labels = Label.unscoped.joins(:picto).where(pictos: { symbolset_id: @symbolset.id}, language: @destination_language)
-
-    # Find source labels of pictos that do not have a label in the destination language.
-    @labels_to_translate = @source_labels.where.not(picto_id: @existing_dest_labels.select(:picto_id).pluck(:picto_id)).limit(@limit)
+    # Same population rules as the translate page (authoritative source, no dest yet).
+    # Load to an array so pluck/index stay aligned after Azure returns.
+    labels_to_translate = @symbolset
+                            .source_labels_for_batch_translation(
+                              source_language: @source_language,
+                              destination_language: @destination_language,
+                              limit: @limit
+                            )
+                            .to_a
 
     suggestion_source = Source.find_by!(slug: 'translation-suggestion')
-
     translator = BingTranslator.new(AZURE_TRANSLATOR_KEY)
 
     begin
-      translations = translator.translate_array(@labels_to_translate.pluck(:text), from: @source_language.azure_code, to: @destination_language.azure_code)
+      if labels_to_translate.any?
+        translations = translator.translate_array(
+          labels_to_translate.map(&:text),
+          from: @source_language.azure_code,
+          to: @destination_language.azure_code
+        )
 
-      translations.each_with_index do |translation, index|
+        translations.each_with_index do |translation, index|
+          next if translation.blank?
 
-        # If the Picto has an existing translation suggestion for this Language, replace the suggestion
-        # instead of creating a new one.
-        label =  Label.find_or_initialize_by({
-          language: @destination_language,
-          picto_id: @labels_to_translate[index].picto_id,
-          source: suggestion_source,
-        })
-        label.text = translation
-        label.save
+          source_label = labels_to_translate[index]
+          next unless source_label
+
+          # Replace existing suggestion for this language rather than creating duplicates.
+          label = Label.find_or_initialize_by(
+            language: @destination_language,
+            picto_id: source_label.picto_id,
+            source: suggestion_source
+          )
+          label.text = translation
+          unless label.save
+            Rails.logger.warn(
+              "suggest_all failed to save suggestion for picto #{source_label.picto_id}: #{label.errors.full_messages.join(', ')}"
+            )
+          end
+        end
       end
 
-      @translated_labels = Label.unscoped.joins(:source, picto: :symbolset).where(pictos: { symbolset: @symbolset }, language: @destination_language, sources: {authoritative: true})
-
-      @pictos = @symbolset.pictos.where(archived: false).accessible_by(current_ability).includes(:images, :labels, :source)
-      @pictos = @pictos.where.not(id: @translated_labels.pluck(:picto_id)).limit(@limit)
-
+      @pictos = @symbolset
+                  .pictos_for_translation(
+                    source_language: @source_language,
+                    destination_language: @destination_language,
+                    limit: @limit
+                  )
+                  .accessible_by(current_ability)
+                  .includes(:images, labels: :source)
 
       respond_to do |format|
         format.js { render 'suggest_all' } # Replaces the partial
       end
-
     rescue BingTranslator::Exception => e
       Sentry.capture_exception(e)
-      Sentry.capture_message("translation suggest_all failed for source lang #{@source_language.name} (#{@source_language.iso639_3}, #{@source_language.iso639_1}) to dest lang #{@dest_language.name} (#{@dest_language.iso639_3}, #{@dest_language.iso639_1})")
+      Sentry.capture_message(
+        "translation suggest_all failed for source lang #{@source_language.name} " \
+        "(#{@source_language.iso639_3}, #{@source_language.iso639_1}) to dest lang " \
+        "#{@destination_language.name} (#{@destination_language.iso639_3}, #{@destination_language.iso639_1})"
+      )
     end
-
   end
 
   def accept_all
