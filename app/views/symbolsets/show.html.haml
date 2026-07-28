@@ -14,7 +14,7 @@
     .col
       - if @pictos.length > 0
         .row.row-cols-2.row-cols-sm-4.row-cols-lg-5.text-center
-          - @pictos.order(@order_nulls_last).order('labels.text').each do |picto|
+          - @pictos.each do |picto|
             .col.mb-4
               -# = render 'pictos/picto_card', picto: label, cache: true
               %a.card.mb-4.h-100{href: symbolset_symbol_path(picto.symbolset, picto)}

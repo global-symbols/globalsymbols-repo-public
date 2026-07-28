@@ -1,15 +1,15 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '>= 2.5.1'
+ruby '~> 3.2.0'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '6.1.3.2'
+gem 'rails', '~> 8.0.0'
 # Use mysql as the database for Active Record
 #gem 'mysql2', '>= 0.4.4', '< 0.6.0'
-gem 'mysql2', '0.5.3'
+gem 'mysql2', '~> 0.5.6'
 # Use Puma as the app server
-gem 'puma', '~> 5.2.2'
+gem 'puma', '~> 6.4'
 # Use SCSS for stylesheets
 gem 'sass-rails'
 # Use Uglifier as compressor for JavaScript assets
@@ -45,10 +45,10 @@ gem 'bootsnap', '>= 1.1.0', require: false
 gem 'devise' # User authentication
 gem 'cancancan', '3.2.1'
 
-#gem 'doorkeeper' # OAuth2
-gem 'doorkeeper', '5.4.0'
-
-gem 'doorkeeper-openid_connect' # Layer to support OIDC authentication.
+# OAuth2 / OIDC — 5.4.0 breaks on Rails 8 (find_in_batches kwargs).
+# openid_connect >= 1.8 requires doorkeeper >= 5.5, < 6.0.
+gem 'doorkeeper', '~> 5.8'
+gem 'doorkeeper-openid_connect', '~> 1.8'
 
 #gem 'activerecord-import'
 gem 'activerecord-import', '1.0.8'
@@ -139,14 +139,8 @@ gem 'whenever', require: false
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
- # gem 'rspec-rails'
-gem 'rspec-core', '3.10.1'
-gem 'rspec-expectations', '3.10.1'
-gem 'rspec-mocks', '3.10.2'
-gem 'rspec-rails', '5.0.1'
 
- gem 'rails-controller-testing'
-  gem 'factory_bot_rails', '~> 6.1.0', '>= 4.8.2', require: false
+  gem 'factory_bot_rails', '~> 6.4', require: false
 
   gem 'wdm', '>= 0.1.0' if Gem.win_platform?
 end
@@ -157,13 +151,20 @@ group :development do
 
   gem 'rack-mini-profiler'
   gem 'stackprof'
+  gem 'bullet'
 
   gem 'rails_real_favicon'
 
   gem 'listen'
+
+  # Deploy tool (pre-prod / production). Not required at runtime.
+  gem 'kamal', '~> 2.5', require: false
 end
 
 group :test do
+  # Minitest 6 breaks Rails 7.1 test runner line filtering (ArgumentError).
+  gem 'minitest', '~> 5.25'
+
   # Adds support for Capybara system testing and selenium driver
   gem 'capybara', '>= 2.15', '< 4.0'
   gem 'selenium-webdriver'

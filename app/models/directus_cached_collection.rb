@@ -5,7 +5,7 @@ class DirectusCachedCollection < ApplicationRecord
   validates :parameter_sets, presence: true
 
   # Handle JSON serialization for parameter_sets since we're using text column
-  serialize :parameter_sets, JSON
+  serialize :parameter_sets, coder: JSON
 
   # Scopes for efficient querying
   scope :active, -> { where(active: true) }

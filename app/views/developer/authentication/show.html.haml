@@ -20,8 +20,8 @@
             = f.text_area :purpose, label: t('developer.authentication.purpose'), rows: 3
             .form-group
               %p.small.text-muted= t('developer.authentication.note')
-            = f.form_group do
-              = f.submit t('developer.authentication.submit'), class: 'btn btn-primary'
+            -# Avoid `= f.form_group do` — Rails 7 HAML capture can escape nested markup.
+            = f.submit t('developer.authentication.submit'), class: 'btn btn-primary'
           .mt-4
             %p.small
               = t('developer.authentication.re_request_note_html', link: link_to('Re-request', developer_authentication_re_request_path)).html_safe

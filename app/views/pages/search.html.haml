@@ -2,20 +2,19 @@
 %main.container-xl
   .row
     .col-md-8
-      = bootstrap_form_with url: search_path, local: true, method: :get, layosut: :horizontal do |f|
+      -# Avoid nesting HAML rows inside `= f.form_group do` — Rails 7 capture escapes
+      -# that markup as visible text and can double-render the fields.
+      = bootstrap_form_with url: search_path, local: true, method: :get do |f|
         = f.hidden_field :locale, value: I18n.locale
-        = f.form_group do
-          .row
-            .col-md-3
-              = f.text_field :query, wrapper: { class: 'mb-0'}, label: t('views.pages.search.search_for'), value: @search[:query], required: true
-            .col-md-3.col-6
-              = f.collection_select :language, Language.unscoped.living_and_constructed.preferred_name_order.where(active: true), :iso639_3, Proc.new {|record| t("languages.#{record.iso639_1_or_3_code}") }, {selected: @search[:language], label: t('activerecord.models.language')}, {class: 'mr-2'}
-            .col-md-3.col-6
-              = f.collection_select :symbolset, @symbolsets, :slug, :name, {selected: @search[:symbolset], include_blank: t('views.pages.search.symbolset_dropdown_any_symbol_set'), label: t('activerecord.models.symbolset')}
-            .col-md-3.mt-2rem
-              = f.primary t('views.pages.search.search')
-          -#= f.form_group layout: :horizontal do
-
+        .row
+          .col-md-3
+            = f.text_field :query, wrapper: { class: 'mb-0'}, label: t('views.pages.search.search_for'), value: @search[:query], required: true
+          .col-md-3.col-6
+            = f.collection_select :language, Language.unscoped.living_and_constructed.preferred_name_order.where(active: true), :iso639_3, Proc.new {|record| t("languages.#{record.iso639_1_or_3_code}") }, {selected: @search[:language], label: t('activerecord.models.language')}, {class: 'mr-2'}
+          .col-md-3.col-6
+            = f.collection_select :symbolset, @symbolsets, :slug, :name, {selected: @search[:symbolset], include_blank: t('views.pages.search.symbolset_dropdown_any_symbol_set'), label: t('activerecord.models.symbolset')}
+          .col-md-3.mt-2rem
+            = f.primary t('views.pages.search.search')
 
   .row
     .col
@@ -24,6 +23,11 @@
           - @labels.each do |label|
             .col.mb-4
               = render 'picto_labels/picto_label_card', label: label, cache: true
-        = paginate @labels
+        %nav.mt-5{"aria-label" => "Search pagination"}
+          %ul.pagination.justify-content-center
+            - if (prev_link = link_to_previous_page(@labels, t('views.pagination.previous'), class: 'page-link'))
+              %li.page-item= prev_link
+            - if (next_link = link_to_next_page(@labels, t('views.pagination.next'), class: 'page-link'))
+              %li.page-item= next_link
       - else
         = render 'errors/error_notice', status: :empty, text: t('views.pages.search.no_results')

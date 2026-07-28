@@ -12,7 +12,7 @@
 # Production:
 #   Set real environment variables on your server instead of using this file
 
-if Rails.env.development?
+if Rails.env.development? || Rails.env.test?
   env_file = Rails.root.join('.env.rb')
   if File.exist?(env_file)
     begin

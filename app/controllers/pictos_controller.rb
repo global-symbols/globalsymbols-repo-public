@@ -14,54 +14,38 @@ class PictosController < ApplicationController
         add_breadcrumb(@picto.symbolset.name, symbolset_url(@picto.symbolset))
         add_breadcrumb(@picto.labels.first.text, symbolset_symbol_url(@picto.symbolset, @picto))
 
-        @alternative_pictos = @picto.alternative_pictos.accessible_by(current_ability).page params[:page]
+        @alternative_pictos = @picto.alternative_pictos
+                                    .accessible_by(current_ability)
+                                    .includes(:symbolset, :images)
+                                    .page(params[:page])
         @comment = Comment.new
         @surveys = Survey.accessible_by(current_ability, :manage)
       end
 
       format.png do
-        original_format = @picto.images.last.imagefile.file.extension.downcase.to_sym
-
-        # If the original file is SVG, serve up the converted version.
-        if original_format == :svg
-          # Generate the PNG if it doesn't already exist
-          @picto.images.last.imagefile.recreate_versions! unless @picto.images.last.imagefile.svg2png.file.exists?
-          path = @picto.images.last.imagefile.svg2png.path
-        elsif original_format == :png
-          # If the original is a PNG, serve it up.
-          path = @picto.images.last.imagefile.path
+        path = png_download_path
+        if path && File.exist?(path)
+          send_file path, filename: download_filename('png'), disposition: disposition
         else
-          # Otherwise, we cannot fulfil this request
-          raise ActiveRecord::RecordNotFound
-        end
-
-        # Check if file exists before sending to prevent 502 errors
-        if File.exist?(path)
-        send_file path, filename: "#{@picto.best_label_for(locale).text}_#{@picto.id}.png", disposition: disposition
-        else
-          raise ActiveRecord::RecordNotFound
+          handle_missing_image_file
         end
       end
 
       format.svg do
-        imagefile = @picto.images.last.imagefile
-        raise ActiveRecord::RecordNotFound unless imagefile.file.extension.downcase == 'svg'
-        # Check if file exists before sending to prevent 502 errors
-        if File.exist?(imagefile.path)
-        send_file imagefile.path, filename: "#{@picto.best_label_for(locale).text}_#{@picto.id}.svg", disposition: disposition
+        path = image_download_path(extension: 'svg')
+        if path && File.exist?(path)
+          send_file path, filename: download_filename('svg'), disposition: disposition
         else
-          raise ActiveRecord::RecordNotFound
+          handle_missing_image_file
         end
       end
 
       format.jpeg do
-        imagefile = @picto.images.last.imagefile
-        raise ActiveRecord::RecordNotFound unless imagefile.file.extension.downcase == 'jpg'
-        # Check if file exists before sending to prevent 502 errors
-        if File.exist?(imagefile.path)
-        send_file imagefile.path, filename: "#{@picto.best_label_for(locale).text}_#{@picto.id}.jpg", disposition: disposition
+        path = image_download_path(extension: 'jpg')
+        if path && File.exist?(path)
+          send_file path, filename: download_filename('jpg'), disposition: disposition
         else
-          raise ActiveRecord::RecordNotFound
+          handle_missing_image_file
         end
       end
     end
@@ -153,5 +137,54 @@ class PictosController < ApplicationController
 
   def image_params
     params.permit(:download)
+  end
+
+  def download_filename(extension)
+    "#{@picto.best_label_for(locale).text}_#{@picto.id}.#{extension}"
+  end
+
+  # Resolve a PNG path from either an original PNG or a converted SVG.
+  # Returns nil when the source image or converted file is unavailable.
+  def png_download_path
+    image = @picto.images.last
+    return nil unless image&.imagefile&.file.present?
+
+    original_format = image.imagefile.file.extension.downcase.to_sym
+
+    case original_format
+    when :svg
+      return nil unless File.exist?(image.imagefile.path)
+
+      image.imagefile.recreate_versions! unless image.imagefile.svg2png.file&.exists?
+      image.imagefile.svg2png.path
+    when :png
+      image.imagefile.path
+    end
+  rescue StandardError
+    nil
+  end
+
+  # Resolve an SVG/JPG path when the original upload matches the requested format.
+  def image_download_path(extension:)
+    image = @picto.images.last
+    return nil unless image&.imagefile&.file.present?
+    return nil unless image.imagefile.file.extension.downcase == extension
+
+    image.imagefile.path
+  rescue StandardError
+    nil
+  end
+
+  # Prefer a flash + redirect for downloads; otherwise a friendly HTML 404
+  # instead of an empty image response when assets are missing (e.g. pre-prod).
+  def handle_missing_image_file
+    message = I18n.t('views.pictos.show.image_unavailable')
+
+    if params[:download].to_s == '1'
+      redirect_to symbolset_symbol_path(@symbolset, @picto), alert: message
+    else
+      flash.now[:alert] = message
+      render 'errors/not_found', status: :not_found, formats: [:html], content_type: 'text/html'
+    end
   end
 end

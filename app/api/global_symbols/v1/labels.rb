@@ -74,7 +74,7 @@ module GlobalSymbols
       end
       route_param :id do
         get do
-          present Label.authoritative.accessible_by(current_ability).find(params[:id]), with: V1::Entities::Label, expandcan: params[:expand]
+          present Label.authoritative.accessible_by(current_ability).find(params[:id]), with: V1::Entities::Label, expand: params[:expand]
         end
       end
     end

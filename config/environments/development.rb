@@ -1,16 +1,16 @@
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
-  # In the development environment your application's code is reloaded on
-  # every request. This slows down response time but is perfect for development
-  # since you don't have to restart the web server when you make code changes.
-  config.cache_classes = false
+  # Make code changes take effect immediately without server restart.
+  config.enable_reloading = true
 
   # Do not eager load code on boot.
   config.eager_load = false
 
   # Show full error reports.
   config.consider_all_requests_local = true
+
+  config.server_timing = true
 
   config.active_job.queue_adapter = :sidekiq
 
@@ -46,6 +46,9 @@ Rails.application.configure do
 
   # Highlight code that triggered database queries in logs.
   config.active_record.verbose_query_logs = true
+  config.active_record.query_log_tags_enabled = true
+
+  config.active_job.verbose_enqueue_logs = true
 
   # Debug mode disables concatenation and preprocessing of assets.
   # This option may cause significant delays in view rendering with a large
@@ -66,6 +69,16 @@ Rails.application.configure do
   Rack::MiniProfiler.config.skip_paths = ['/uploads']
   Rack::MiniProfiler.config.show_total_sql_count = true
 
+  config.after_initialize do
+    Bullet.enable = true
+    Bullet.alert = false
+    Bullet.bullet_logger = true
+    Bullet.console = true
+    Bullet.rails_logger = true
+    Bullet.add_footer = true
+    Bullet.n_plus_one_query_enable = true
+    Bullet.unused_eager_loading_enable = true
+  end
 
   # Allow OAuth silent refresh iframe from Angular on another port (e.g. localhost:4200).
   config.action_dispatch.default_headers.delete('X-Frame-Options')
@@ -84,5 +97,8 @@ Rails.application.configure do
     # No need for uploader_aws_bucket or uploader_asset_host in development
 
   config.x.openid_connect_issuer = 'http://localhost:3000'
+
+  # Allow requests from the Docker test container hitting host.docker.internal
+  config.hosts << "host.docker.internal"
 
 end

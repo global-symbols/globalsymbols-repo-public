@@ -58,9 +58,12 @@ class PagesController < ApplicationController
         .when(label_text_field.matches("%#{search_params[:query]}"))   .then(50) # "fatcat"
         .else(60) # no match
 
+    # without_count skips Kaminari's expensive COUNT(*) (same filters as the
+    # ranked LIKE query). Search UI uses prev/next links instead of page totals.
     @labels = @labels.where('text LIKE ?', "%#{search_params[:query]}%")
                      .order(order_case)
-                     .page params[:page]
+                     .page(params[:page])
+                     .without_count
   end
 
   def contentful_page

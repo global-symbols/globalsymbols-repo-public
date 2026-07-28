@@ -1,0 +1,94 @@
+# =============================================================================
+# Kamal destination: production
+# Usage:  kamal deploy -d production
+# Host:   m7g.medium  private 172.31.5.122  public 13.43.129.89
+# SSH:    global-symbols-ec2-m7
+#
+# Same shape as pre-prod (Kamal web + job + MySQL 8 accessory). Differences:
+#   - m7g.medium (not t4g.small)
+#   - Redis DB indexes 1 / 3 (pre-prod uses 0 / 2)
+#   - Hostnames / ASSET_HOST / CMS for globalsymbols.com
+#   - Go API + optional DB replica stay on t3.medium (172.31.41.204) — not Kamal
+# =============================================================================
+
+servers:
+  web:
+    hosts:
+      - 13.43.129.89
+  job:
+    hosts:
+      - 13.43.129.89
+    cmd: bundle exec sidekiq -C config/sidekiq.yml
+
+proxy:
+  host: globalsymbols.com
+  app_port: 3000
+  ssl: false
+  # ssl: true after DNS / edge plan is fixed
+  # Prefer pre-prod pattern later: host nginx on 80/443, kamal-proxy on localhost
+  healthcheck:
+    path: /
+    interval: 2
+    timeout: 5
+
+deploy_timeout: 90
+
+env:
+  clear:
+    RAILS_ENV: production
+    # Accessory DNS name on Kamal network: {service}-{accessory}
+    DATABASE_HOST: gs-repo-db
+    DATABASE_PORT: "3306"
+    GS_DATABASE_NAME: gs-production
+    GS_DATABASE_USERNAME: gs-production
+    REDIS_IP: "172.31.13.8"
+    REDIS_DB: "1"
+    REDIS_CACHE_DB: "3"
+    ASSET_HOST: https://globalsymbols.com
+    # Required at boot (config/initializers/directus.rb) — same CMS host as old prod
+    DIRECTUS_URL: https://cms.globalsymbols.com
+    # Green-colo Flux / AI image API (UFW allows this host's public IP on :8000)
+    AZURE_API_BASE: http://5.2.17.219:8000
+  secret:
+    - SECRET_KEY_BASE
+    - GS_DATABASE_PASSWORD
+    - REDIS_PASSWORD
+    - DIRECTUS_TOKEN_CMS
+    - DIRECTUS_TOKEN
+    - DIRECTUS_WEBHOOK_SECRET
+    - AWS_ACCESS_KEY_ID
+    - AWS_SECRET_ACCESS_KEY
+    - AZURE_API_KEY
+    # Contentful knowledge base / About pages
+    - CONTENTFUL_ACCESS_TOKEN
+    - CONTENTFUL_PREVIEW_TOKEN
+    - CONTENTFUL_SPACE_ID
+    # Amazon SES SMTP (password reset / Devise mailers)
+    - SES_SMTP_USERNAME
+    - SES_SMTP_PASSWORD
+
+# MySQL 8 accessory — same image/flags as pre-prod (parity).
+# Publish on m7g private IP so t3 (Go / MySQL 8 replica) can reach primary over VPC.
+# SG must allow TCP 3306 from 172.31.41.204/32 only — never 0.0.0.0/0.
+# Rails/Sidekiq still use Docker DNS gs-repo-db (unchanged).
+accessories:
+  db:
+    image: mysql:8.0
+    host: 13.43.129.89
+    port: "172.31.5.122:3306:3306"
+    env:
+      clear:
+        MYSQL_DATABASE: gs-production
+        MYSQL_USER: gs-production
+      secret:
+        - MYSQL_ROOT_PASSWORD
+        - MYSQL_PASSWORD
+    volumes:
+      - mysql_data:/var/lib/mysql
+    cmd: >
+      --server-id=1
+      --log-bin=mysql-bin
+      --binlog-format=ROW
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --default-authentication-plugin=mysql_native_password

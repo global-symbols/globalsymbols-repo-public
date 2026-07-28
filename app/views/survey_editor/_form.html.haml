@@ -5,10 +5,8 @@
   - if @survey.persisted?
     = f.date_field :close_at, help: t('views.survey_editor._form.close_at_helper')
   = f.collection_select :language_id, Language.where(active: true), :id, :name, label: t('views.survey_editor._form.language_label'), help: t('views.survey_editor._form.language_helper'), include_blank: t('views.survey_editor._form.language_blank_option')
-  = f.form_group do
-    = f.check_box :show_symbol_descriptions, custom: :switch, label: t('views.survey_editor._form.show_symbol_descriptions_label')
-    %small.text-muted
-      = t('views.survey_editor._form.show_symbol_descriptions_helper')
+  -# Avoid nesting HAML inside `= f.form_group do` — Rails 7 capture escapes that markup as visible text.
+  = f.check_box :show_symbol_descriptions, custom: :switch, label: t('views.survey_editor._form.show_symbol_descriptions_label'), help: t('views.survey_editor._form.show_symbol_descriptions_helper')
   .row.mt-5
     .col
       = link_to t('dictionary.back'), :back, class: 'btn btn-outline-secondary'

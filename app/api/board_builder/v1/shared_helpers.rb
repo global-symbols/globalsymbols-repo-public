@@ -89,7 +89,7 @@ module BoardBuilder::V1::SharedHelpers
   # this saves all cells in on single bulk SQL insert query
   def save_board_set(board_set_params)
     board_set_params = ActiveSupport::HashWithIndifferentAccess.new(board_set_params)
-    boards = board_set_params[:boards]
+    boards = board_set_params[:boards] || []
     board_set_params[:boards] = []
     board_set = Boardbuilder::BoardSet.new(board_set_params)
     board_set.users << resource_owner
@@ -130,7 +130,7 @@ module BoardBuilder::V1::SharedHelpers
           all_cells << Boardbuilder::Cell.new(cell).attributes
         end
       end
-      Boardbuilder::Cell.insert_all(all_cells)
+      Boardbuilder::Cell.insert_all(all_cells) if all_cells.any?
     end
     board_set
   end

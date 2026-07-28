@@ -8,8 +8,8 @@ missing << 'DIRECTUS_URL'   if directus_url.blank?
 missing << 'DIRECTUS_TOKEN' if directus_token.blank?
 
 if missing.any?
-  if Rails.env.development?
-    # In development, allow missing env vars - they may be loaded later by env.rb
+  if Rails.env.development? || Rails.env.test?
+    # In development/test, allow missing env vars - they may be loaded later by env.rb
     Rails.logger.warn "Directus configuration incomplete. Missing: #{missing.join(', ')}. Will check again after env.rb loads."
     DIRECTUS_URL             = nil
     DIRECTUS_TOKEN_CMS       = nil

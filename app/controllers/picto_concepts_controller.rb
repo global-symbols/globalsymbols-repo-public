@@ -17,8 +17,15 @@ class PictoConceptsController < ApplicationController
         else
           flash[:alert] = I18n.t('views.picto_concepts.create.alert_failure', concept: picto_concept_params[:concept])
         end
-      rescue ActiveRecord::RecordInvalid
-        flash[:alert] = I18n.t('views.picto_concepts.create.alert_already_exists', concept: picto_concept_params[:concept])
+      rescue ActiveRecord::RecordInvalid => e
+        if e.record.errors.details[:base]&.any? { |d| d[:error] == :coding_framework_unavailable }
+          flash[:alert] = I18n.t(
+            'views.picto_concepts.create.alert_service_unavailable',
+            framework: e.record.coding_framework&.name || 'ConceptNet'
+          )
+        else
+          flash[:alert] = I18n.t('views.picto_concepts.create.alert_already_exists', concept: picto_concept_params[:concept])
+        end
       end
     end
 
