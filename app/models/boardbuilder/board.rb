@@ -15,7 +15,7 @@ class Boardbuilder::Board < ApplicationRecord
   validates :rows, presence: true, numericality: { only_integer: true, greater_than: 0, less_than_or_equal_to: 50 }
   validates :captions_position, presence: true
 
-  enum captions_position: { hidden: 0, above: 1, below: 2, left: 3, right: 4 }
+  enum :captions_position, { hidden: 0, above: 1, below: 2, left: 3, right: 4 }
 
   after_initialize :set_defaults, if: :new_record?
 

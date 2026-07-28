@@ -1,0 +1,56 @@
+# Git / editor
+.git
+.gitignore
+.idea
+.cursor
+**/.DS_Store
+
+# Local docs and upgrade artefacts (not needed in image)
+local_docs
+local_rails_upgrade
+@log
+
+# Logs / tmp / uploads (uploads mounted at runtime)
+log/*
+tmp/*
+!log/.keep
+!tmp/.keep
+public/uploads
+public/public
+storage/*
+!storage/.keep
+
+# Node (not required at runtime; assets precompiled in build stage)
+node_modules
+yarn-error.log
+
+# Tests and local scripts noise
+test
+script
+spec
+coverage
+.byebug_history
+
+# Local-only Docker
+Dockerfile.dev
+docker-compose.yml
+.env
+.env.*
+.env.rb
+
+# Keys must never enter the image; Kamal injects secrets at runtime
+config/master.key
+config/credentials/*.key
+# Kamal secret files are root-owned 0600 on the laptop — if copied into the
+# image, USER rails cannot read them and deploy_verify used to crash on open.
+# Runtime env comes from Kamal; keep examples/docs only.
+.kamal/secrets
+.kamal/secrets-*
+.kamal/secrets.*
+!.kamal/secrets.example
+
+# CI / misc
+*.md
+!README.md
+WEBHOOK_TESTING.md
+CACHE_INSPECTOR_README.md

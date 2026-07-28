@@ -7,5 +7,5 @@ class CodingFramework < ApplicationRecord
   
   validates_uniqueness_of :name
   
-  enum structure: [:linked_data, :legacy]
+  enum :structure, [:linked_data, :legacy]
 end

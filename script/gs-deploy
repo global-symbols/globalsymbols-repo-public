@@ -1,0 +1,1669 @@
+#!/usr/bin/env bash
+# =============================================================================
+# Guided Kamal deploy CLI for Global Symbols (pre-prod / production).
+#
+# Entry point is always the interactive menu (pick env + action).
+# Phases are NOT callable as CLI subcommands.
+#
+# Ship is split (same image path Kamal expects):
+#   preflight   — ready gate: checks + VERSION + GHCR login + kamal config
+#                 (quiet scoreboard on OK; full detail in log / on failure)
+#   build       — Mac: plain `docker build` → local image (no Kamal, no GHCR)
+#   push        — Mac: plain `docker push` → GHCR (no rebuild, no server)
+#   rollout     — server: Kamal `deploy --skip-push` (pull + replace web/job) + HTTP smoke
+#   migrate     — SSH: db:migrate in live web container against live DB (skip if none pending)
+#   verify      — SSH to app host; run deploy_verify suite inside web container
+#
+# Build/push use the host Docker CLI only. Kamal (via Docker image) is used
+# only for server-side orchestration (preflight kamal config / rollout), not for building.
+#
+# Usage:
+#   script/gs-deploy                 # open menu (clean tree required for shipping)
+#   script/gs-deploy --allow-dirty   # menu; dirty tree OK for pre-prod only
+#   script/gs-deploy --version TAG   # menu, force image tag
+#   script/gs-deploy --help
+#
+# Menu defaults:
+#   VERSION=git SHA if clean · log on · wizard pauses on
+#   GHCR login: auto-skipped when Docker already has ghcr.io credentials
+#
+# Hard rule (early):
+#   shipping actions require a CLEAN git tree unless --version TAG, or
+#   --allow-dirty with environment pre-prod (never production).
+#
+# Flags (only on the initial command, before the menu):
+#   --allow-dirty      Allow dirty tree for pre-prod only (not production)
+#   --version TAG      Force image tag (also: export VERSION=...)
+#   --yes              Skip wizard pause prompts (still streams all output)
+#   --skip-login       Always skip docker login
+#   --force-login      Always run docker login (even if already logged in)
+#   --no-log           Do not tee to log/deploy/ (terminal only)
+#   --push-retries N   Max docker push attempts (default 5)
+#
+# Env overrides for push retries:
+#   BUILD_PUSH_MAX_ATTEMPTS   default 5
+#   BUILD_PUSH_RETRY_SLEEP    seconds before first retry (default 15; +10 each try)
+#
+# Examples:
+#   script/gs-deploy
+#   script/gs-deploy --allow-dirty    # then choose pre-prod in the menu
+# =============================================================================
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+
+KAMAL_VERSION="${KAMAL_DOCKER_KAMAL_VERSION:-2.12.0}"
+# Official image ships kamal + docker CLI + buildx (required for build push).
+# Do not use bare ruby: — it has no docker/buildx, so kamal fails dependency check.
+KAMAL_IMAGE="${KAMAL_DOCKER_IMAGE:-ghcr.io/basecamp/kamal:v${KAMAL_VERSION}}"
+REGISTRY_HOST="ghcr.io"
+IMAGE_REPO="global-symbols/globalsymbols-repo-internal"
+
+# --- defaults / flags ---
+YES=0
+ALLOW_DIRTY=0
+SKIP_LOGIN=0
+FORCE_LOGIN=0
+NO_LOG=0
+VERSION_OVERRIDE="${VERSION:-}"
+ENV_NAME=""
+COMMAND=""
+LOG_FILE=""
+PHASE_FAILED=""
+INTERACTIVE_MENU=0
+# Set for the full wizard only: "Press Enter for <phase>" is the gate — do not
+# ask again to type build/push/rollout/verify (except production rollout).
+WIZARD_MODE=0
+# Simple push retries (failed exit only — no hang-kill theatre).
+PUSH_MAX_ATTEMPTS="${BUILD_PUSH_MAX_ATTEMPTS:-5}"
+PUSH_RETRY_SLEEP="${BUILD_PUSH_RETRY_SLEEP:-15}"
+BUILD_PLATFORM="${GS_BUILD_PLATFORM:-linux/arm64}"
+# Docker Desktop on Mac can break default bridge egress (apt/curl fail) while
+# host + docker pull still work. --network=host fixes RUN apt-get during build.
+# Override: GS_BUILD_NETWORK=default|bridge|host
+BUILD_NETWORK="${GS_BUILD_NETWORK:-host}"
+SERVICE_LABEL="gs-repo"
+
+# Hosts / smoke targets (must match config/deploy.*.yml)
+PRE_PROD_HOST="18.130.29.168"
+PRE_PROD_HTTP_HOST="gs-test.co.uk"
+PROD_HOST="13.43.129.89" # m7g public IP — keep in sync with deploy.production.yml
+PROD_HTTP_HOST="globalsymbols.com"
+
+usage() {
+  # Print leading comment block only (stop at first non-# line)
+  awk 'NR==1{next} /^#/{sub(/^# ?/,""); print; next} {exit}' "$0"
+  exit "${1:-0}"
+}
+
+# Read a single menu choice; prints prompt to stderr, returns selection on stdout via nameref-style
+# Usage: menu_pick VAR "Prompt" "1) label" "2) label" ...
+# Sets VAR to the number chosen (1-based).
+menu_pick() {
+  local __var="$1"
+  local __prompt="$2"
+  shift 2
+  local __options=("$@")
+  local __n=${#__options[@]}
+  local __choice=""
+  local __i
+
+  while true; do
+    echo "" >&2
+    echo "$__prompt" >&2
+    for ((__i = 0; __i < __n; __i++)); do
+      echo "  ${__options[$__i]}" >&2
+    done
+    echo "" >&2
+    read -r -p "Choice [1-${__n}] (q=quit): " __choice || true
+    case "${__choice:-}" in
+      q|Q|quit)
+        echo "Quit." >&2
+        exit 0
+        ;;
+    esac
+    if [[ "$__choice" =~ ^[0-9]+$ ]] && ((__choice >= 1 && __choice <= __n)); then
+      printf -v "$__var" '%s' "$__choice"
+      return 0
+    fi
+    echo "Invalid choice. Enter a number 1-${__n}, or q to quit." >&2
+  done
+}
+
+menu_yes_no() {
+  # $1 = prompt; default no. Sets global-style via return 0/1
+  local prompt="$1"
+  local reply
+  read -r -p "$prompt [y/N]: " reply || true
+  case "${reply:-}" in
+    y|Y|yes|YES) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+# Interactive front door: no CLI flags required
+interactive_menu() {
+  INTERACTIVE_MENU=1
+  local pick
+
+  banner "Global Symbols deploy"
+  echo "Repo: $ROOT"
+  echo "Pick environment and action (q quits at any prompt)."
+  echo "Hard rule: shipping needs a clean git tree."
+  echo "  Exception: --allow-dirty is valid for pre-prod only (never production)."
+  if [[ "$ALLOW_DIRTY" -eq 1 ]]; then
+    echo "Flag: --allow-dirty is ON (pre-prod only; production will still require clean git)."
+  fi
+  if [[ -n "$VERSION_OVERRIDE" ]]; then
+    echo "Flag: --version $VERSION_OVERRIDE"
+  fi
+  if git_is_dirty 2>/dev/null; then
+    echo ""
+    echo "Git: DIRTY — for pre-prod use --allow-dirty; production must be clean."
+  else
+    echo ""
+    echo "Git: clean @ $(git rev-parse --short HEAD 2>/dev/null || echo '?')"
+  fi
+
+  # --- Environment ---
+  menu_pick pick "Environment:" \
+    "1) pre-prod   — t4g ${PRE_PROD_HOST} (${PRE_PROD_HTTP_HOST})" \
+    "2) production — m7g ${PROD_HOST} (${PROD_HTTP_HOST})" \
+    "3) help       — print CLI reference and exit"
+  case "$pick" in
+    1) ENV_NAME="pre-prod" ;;
+    2) ENV_NAME="production" ;;
+    3) usage 0 ;;
+  esac
+
+  # --- Action ---
+  menu_pick pick "Action for ${ENV_NAME}:" \
+    "1) wizard       — full guided path (recommended)" \
+    "2) preflight    — ready checks + kamal config + tag + GHCR (quiet OK)" \
+    "3) build        — Mac: docker build → local image (no GHCR, no server)" \
+    "4) push         — Mac: docker push → GHCR (no rebuild, no server)" \
+    "5) rollout      — server: Kamal pull + restart web/job + smoke (TOUCHES SERVER)" \
+    "6) migrate      — pending db:migrate in live web container (skip if none)" \
+    "7) verify       — run post-deploy suite on the server (SSH + docker exec)"
+  case "$pick" in
+    1) COMMAND="wizard" ;;
+    2) COMMAND="preflight" ;;
+    3) COMMAND="build" ;;
+    4) COMMAND="push" ;;
+    5) COMMAND="rollout" ;;
+    6) COMMAND="migrate" ;;
+    7) COMMAND="verify" ;;
+  esac
+
+  # Fail immediately after action choice (before Start now / any phase)
+  assert_clean_working_tree
+
+  # Summary before running
+  echo ""
+  banner "Ready"
+  echo "  Environment : $ENV_NAME  (host: $(deploy_host))"
+  echo "  Action      : $COMMAND"
+  echo "  Defaults    : VERSION=auto · GHCR login if needed · log to log/deploy/ · wizard pauses on"
+  if [[ -n "$VERSION_OVERRIDE" || "$ALLOW_DIRTY" -eq 1 || "$SKIP_LOGIN" -eq 1 || "$FORCE_LOGIN" -eq 1 || "$NO_LOG" -eq 1 || "$YES" -eq 1 ]]; then
+    echo "  CLI overrides in effect:"
+    [[ -n "$VERSION_OVERRIDE" ]] && echo "    VERSION=$VERSION_OVERRIDE"
+    if [[ "$ALLOW_DIRTY" -eq 1 ]]; then
+      if allow_dirty_effective; then
+        echo "    --allow-dirty (effective for pre-prod)"
+      else
+        echo "    --allow-dirty (ignored — not allowed for production)"
+      fi
+    fi
+    [[ "$SKIP_LOGIN" -eq 1 ]] && echo "    --skip-login"
+    [[ "$FORCE_LOGIN" -eq 1 ]] && echo "    --force-login"
+    [[ "$NO_LOG" -eq 1 ]] && echo "    --no-log"
+    [[ "$YES" -eq 1 ]] && echo "    --yes (skip pauses)"
+  fi
+  echo ""
+  if ! menu_yes_no "Start now?"; then
+    echo "Aborted."
+    exit 0
+  fi
+}
+
+die() {
+  echo "ERROR: $*" >&2
+  exit 1
+}
+
+ts() { date +"%Y-%m-%dT%H-%M-%S"; }
+
+# macOS often has no GNU timeout; use perl alarm as fallback.
+# Usage: run_with_timeout SECONDS command [args…]
+run_with_timeout() {
+  local secs="$1"
+  shift
+  if command -v gtimeout >/dev/null 2>&1; then
+    gtimeout "$secs" "$@"
+  elif command -v timeout >/dev/null 2>&1; then
+    timeout "$secs" "$@"
+  else
+    perl -e 'alarm shift; exec @ARGV' "$secs" "$@"
+  fi
+}
+
+# Docker Desktop can wedge after a stalled GHCR push; never block forever.
+docker_cli_ok() {
+  run_with_timeout 8 docker version >/dev/null 2>&1
+}
+
+docker_daemon_ok() {
+  run_with_timeout 8 docker info >/dev/null 2>&1
+}
+
+banner() {
+  echo ""
+  echo "════════════════════════════════════════════════════════════"
+  echo " $*"
+  echo "════════════════════════════════════════════════════════════"
+}
+
+phase_banner() {
+  echo ""
+  echo "── Phase: $* ──"
+}
+
+phase_ok() {
+  echo "── Phase OK: $* ──"
+}
+
+phase_fail() {
+  local name="$1" rc="$2"
+  PHASE_FAILED="$name"
+  echo "" >&2
+  echo "── Phase FAILED: $name (exit $rc) ──" >&2
+  echo "  Re-run:  $0${ALLOW_DIRTY:+ --allow-dirty}${VERSION_OVERRIDE:+ --version $VERSION_OVERRIDE}" >&2
+  echo "           then choose env + action '$name' (or wizard) in the menu" >&2
+  if [[ -n "${LOG_FILE:-}" && -f "$LOG_FILE" ]]; then
+    echo "  Log:     $LOG_FILE" >&2
+  fi
+  echo "  (Full error output is above — nothing was filtered.)" >&2
+}
+
+# Stream a command to terminal and optional log (never hide stderr)
+run_logged() {
+  if [[ "$NO_LOG" -eq 1 || -z "${LOG_FILE:-}" ]]; then
+    "$@"
+  else
+    # Preserve exit code through tee
+    set +e
+    "$@" 2>&1 | tee -a "$LOG_FILE"
+    local rc=${PIPESTATUS[0]}
+    set -e
+    return "$rc"
+  fi
+}
+
+confirm() {
+  local prompt="${1:-Continue?}"
+  if [[ "$YES" -eq 1 ]]; then
+    echo "(--yes) $prompt → yes"
+    return 0
+  fi
+  local reply
+  read -r -p "$prompt [Enter=yes / n=no] " reply || true
+  case "${reply:-}" in
+    n|N|no|NO|q|Q) return 1 ;;
+    *) return 0 ;;
+  esac
+}
+
+# Prompt until the user types the exact expected token, or quits with q.
+# Wrong/empty input notifies and re-asks — does not abort the deploy.
+confirm_typed_token() {
+  local expected="$1"
+  local prompt="$2"
+  local token
+  while true; do
+    read -r -p "$prompt" token || true
+    case "${token:-}" in
+      q|Q|quit)
+        echo "Quit."
+        exit 0
+        ;;
+      "$expected")
+        return 0
+        ;;
+      "")
+        echo "  Need to type '${expected}' exactly (or q to quit). Empty input ignored."
+        ;;
+      *)
+        echo "  Need to type '${expected}' exactly (or q to quit). Got: ${token}"
+        ;;
+    esac
+  done
+}
+
+# Wizard already used "Press Enter for <phase>" — skip second typed confirm.
+# Standalone menu actions still require typing the token (safer for one-shot).
+wizard_or_yes_skip_confirm() {
+  if [[ "$YES" -eq 1 ]]; then
+    echo "(--yes) confirmation skipped"
+    return 0
+  fi
+  if [[ "$WIZARD_MODE" -eq 1 ]]; then
+    return 0
+  fi
+  return 1
+}
+
+confirm_build() {
+  if wizard_or_yes_skip_confirm; then
+    return 0
+  fi
+  echo ""
+  echo "This runs host 'docker build' on this Mac (local image only)."
+  echo "It does NOT push to GHCR and does NOT change the server (use push, then rollout)."
+  confirm_typed_token "build" "Type 'build' to continue (q=quit): "
+}
+
+confirm_push() {
+  if wizard_or_yes_skip_confirm; then
+    return 0
+  fi
+  echo ""
+  echo "This runs host 'docker push' for VERSION → GHCR."
+  echo "It does NOT rebuild and does NOT change the server (use rollout after)."
+  confirm_typed_token "push" "Type 'push' to continue (q=quit): "
+}
+
+confirm_rollout() {
+  # Production always requires typing "production", even in the wizard.
+  if [[ "$ENV_NAME" == "production" ]]; then
+    if [[ "$YES" -eq 1 ]]; then
+      echo "(--yes) production rollout confirmation skipped"
+      return 0
+    fi
+    echo ""
+    echo "⚠  PRODUCTION rollout — will SSH to $(deploy_host) and replace web+job."
+    echo "  Uses the image already in GHCR for VERSION (must have been built + pushed)."
+    echo "  Does NOT rebuild accessory DB or rebind kamal-proxy (already on m7g)."
+    confirm_typed_token "production" "Type 'production' to continue (q=quit): "
+    return 0
+  fi
+  if wizard_or_yes_skip_confirm; then
+    return 0
+  fi
+  echo ""
+  echo "⚠  Will SSH to ${PRE_PROD_HOST} and replace pre-prod web+job containers."
+  echo "  Uses the image already in GHCR for VERSION (must have been built + pushed)."
+  confirm_typed_token "rollout" "Type 'rollout' to continue (q=quit): "
+}
+
+confirm_migrate() {
+  # Production always requires typing "migrate", even in the wizard.
+  if [[ "$ENV_NAME" == "production" ]]; then
+    if [[ "$YES" -eq 1 ]]; then
+      echo "(--yes) production migrate confirmation skipped"
+      return 0
+    fi
+    echo ""
+    echo "⚠  PRODUCTION: will run bin/rails db:migrate inside the live web container"
+    echo "  against the live database. Ensure expand/contract order is intentional."
+    confirm_typed_token "migrate" "Type 'migrate' to continue (q=quit): "
+    return 0
+  fi
+  if wizard_or_yes_skip_confirm; then
+    return 0
+  fi
+  echo ""
+  echo "Will SSH to $(deploy_host) and run pending migrations in the web container (live DB)."
+  confirm_typed_token "migrate" "Type 'migrate' to continue (q=quit): "
+}
+
+confirm_verify() {
+  if wizard_or_yes_skip_confirm; then
+    return 0
+  fi
+  if [[ "$ENV_NAME" == "production" ]]; then
+    echo ""
+    echo "⚠  Will SSH to production and run the post-deploy suite inside the web container."
+    confirm_typed_token "verify" "Type 'verify' to continue (q=quit): "
+  else
+    echo ""
+    echo "Will SSH to $(deploy_host) and run deploy_verify [pre_prod] in the web container."
+    confirm_typed_token "verify" "Type 'verify' to continue (q=quit): "
+  fi
+}
+
+# Kamal web container name filter for this destination.
+web_name_filter() {
+  if [[ "$ENV_NAME" == "pre-prod" ]]; then
+    echo "gs-repo-web-pre-prod"
+  else
+    echo "gs-repo-web-production"
+  fi
+}
+
+# Wizard gate before a phase. Returns 0 = run phase, 1 = skip phase (when allowed).
+# Quits the process on q. Optional 2nd arg: 1 to allow "s" / "skip".
+pause_wizard() {
+  local label="${1:-next phase}"
+  local allow_skip="${2:-0}"
+  if [[ "$YES" -eq 1 ]]; then
+    return 0
+  fi
+  local reply prompt
+  if [[ "$allow_skip" -eq 1 ]]; then
+    prompt="Press Enter for ${label}, s to skip, or q to quit: "
+  else
+    prompt="Press Enter for ${label}, or q to quit: "
+  fi
+  read -r -p "$prompt" reply || true
+  case "${reply:-}" in
+    q|Q|quit) echo "Stopped before: $label"; exit 0 ;;
+    s|S|skip)
+      if [[ "$allow_skip" -eq 1 ]]; then
+        echo "Skipped: $label"
+        return 1
+      fi
+      echo "Invalid input (skip not available for this phase). Continuing."
+      ;;
+  esac
+  return 0
+}
+
+# --- parse args ---
+# Only flags on the entry command, then always open the interactive menu.
+# Direct subcommands (e.g. "pre-prod deploy") are intentionally not supported.
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h|--help|help)
+        usage 0
+        ;;
+      --yes|-y) YES=1; shift ;;
+      --allow-dirty) ALLOW_DIRTY=1; shift ;;
+      --skip-login) SKIP_LOGIN=1; shift ;;
+      --force-login) FORCE_LOGIN=1; shift ;;
+      --no-log) NO_LOG=1; shift ;;
+      --push-retries)
+        [[ $# -ge 2 ]] || die "--push-retries requires a number"
+        PUSH_MAX_ATTEMPTS="$2"
+        shift 2
+        ;;
+      --push-retries=*)
+        PUSH_MAX_ATTEMPTS="${1#--push-retries=}"
+        shift
+        ;;
+      --version)
+        [[ $# -ge 2 ]] || die "--version requires a tag"
+        VERSION_OVERRIDE="$2"
+        shift 2
+        ;;
+      --version=*)
+        VERSION_OVERRIDE="${1#--version=}"
+        shift
+        ;;
+      -*)
+        die "Unknown flag: $1 (try: $0 --help)"
+        ;;
+      *)
+        die "Direct steps are not supported (got: $*).
+
+  Use the menu only:
+    $0
+    $0 --allow-dirty
+    $0 --version TAG
+
+  Pick environment and action (wizard, build, push, rollout, …) interactively.
+  See: $0 --help"
+        ;;
+    esac
+  done
+
+  if [[ "$SKIP_LOGIN" -eq 1 && "$FORCE_LOGIN" -eq 1 ]]; then
+    die "Use only one of --skip-login or --force-login"
+  fi
+
+  interactive_menu
+}
+
+kamal_destination() {
+  # Kamal -d matches deploy.<destination>.yml
+  echo "$ENV_NAME"
+}
+
+deploy_host() {
+  if [[ "$ENV_NAME" == "pre-prod" ]]; then
+    echo "$PRE_PROD_HOST"
+  else
+    # Prefer IP from deploy.production.yml; fall back to PROD_HOST constant.
+    local h
+    h="$(grep -E '^\s+-\s+[0-9.]+' config/deploy.production.yml 2>/dev/null | head -1 | awk '{print $2}' || true)"
+    if [[ -z "$h" || "$h" == REPLACE* ]]; then
+      h="${PROD_HOST:-REPLACE_WITH_M7G_PUBLIC_OR_PRIVATE_IP}"
+    fi
+    echo "$h"
+  fi
+}
+
+http_host_header() {
+  if [[ "$ENV_NAME" == "pre-prod" ]]; then
+    echo "$PRE_PROD_HTTP_HOST"
+  else
+    echo "$PROD_HTTP_HOST"
+  fi
+}
+
+secrets_files() {
+  echo ".kamal/secrets-common"
+  if [[ "$ENV_NAME" == "pre-prod" ]]; then
+    echo ".kamal/secrets.pre-prod"
+  else
+    # production destination file name
+    if [[ -f .kamal/secrets.production ]]; then
+      echo ".kamal/secrets.production"
+    elif [[ -f .kamal/secrets.prod ]]; then
+      echo ".kamal/secrets.prod"
+    else
+      echo ".kamal/secrets.production"
+    fi
+  fi
+}
+
+# Load KEY=VALUE secrets (macOS ships Bash 3.2 — do NOT use `source <(...)`;
+# process substitution + source does not export vars there).
+load_secrets() {
+  local f line key val
+  local files
+  files="$(secrets_files)"
+  # shellcheck disable=SC2086
+  for f in $files; do
+    if [[ ! -f "$f" ]]; then
+      die "Missing secrets file: $f (see .kamal/secrets.example and .kamal/README.md)"
+    fi
+    while IFS= read -r line || [[ -n "$line" ]]; do
+      # strip CR (Windows / some editors)
+      line="${line%$'\r'}"
+      case "$line" in
+        ''|\#*) continue ;;
+      esac
+      case "$line" in
+        *=*) ;;
+        *) continue ;;
+      esac
+      key="${line%%=*}"
+      val="${line#*=}"
+      # valid env key only
+      case "$key" in
+        ''|*[!A-Za-z0-9_]*|[0-9]*) continue ;;
+      esac
+      # export without evaluating value as shell (no source/eval)
+      export "${key}=${val}"
+    done <"$f"
+  done
+
+  if [[ -z "${KAMAL_REGISTRY_USERNAME:-}" ]]; then
+    die "KAMAL_REGISTRY_USERNAME missing or empty in secrets (check .kamal/secrets-common)"
+  fi
+  if [[ -z "${KAMAL_REGISTRY_PASSWORD:-}" ]]; then
+    die "KAMAL_REGISTRY_PASSWORD missing or empty in secrets (check .kamal/secrets-common)"
+  fi
+}
+
+git_is_dirty() {
+  # porcelain non-empty = dirty
+  [[ -n "$(git status --porcelain 2>/dev/null || true)" ]]
+}
+
+# Shipping / identity actions: must start from a clean tree (unless CLI override).
+command_requires_clean_tree() {
+  case "${COMMAND:-}" in
+    wizard|preflight|build|push|rollout|migrate) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+# --allow-dirty only applies to pre-prod (never production).
+allow_dirty_effective() {
+  [[ "${ALLOW_DIRTY:-0}" -eq 1 && "${ENV_NAME:-}" == "pre-prod" ]]
+}
+
+# Hard rule at the beginning — not mid-wizard at the version phase.
+assert_clean_working_tree() {
+  command_requires_clean_tree || return 0
+
+  # Custom tag override (any env) — still ships working tree as-is
+  if [[ -n "${VERSION_OVERRIDE:-}" ]]; then
+    return 0
+  fi
+
+  # Dirty allowed only for pre-prod
+  if allow_dirty_effective; then
+    return 0
+  fi
+
+  if ! git_is_dirty; then
+    return 0
+  fi
+
+  echo "" >&2
+  echo "ERROR: Git working tree is dirty — stopped at the start (before any phase)." >&2
+  echo "  Action '$COMMAND' on '${ENV_NAME}' requires a clean tree so the image tag matches commits." >&2
+  echo "" >&2
+  echo "  Uncommitted / untracked:" >&2
+  git status --porcelain | head -30 >&2
+  echo "" >&2
+  if [[ "${ENV_NAME:-}" == "production" ]]; then
+    if [[ "${ALLOW_DIRTY:-0}" -eq 1 ]]; then
+      echo "  Note: --allow-dirty was set but is NOT allowed for production." >&2
+    fi
+    echo "  Fix: commit (or stash), then re-run:  $0" >&2
+    echo "  Production never accepts a dirty working tree." >&2
+  else
+    echo "  Fix: commit (or stash), then re-run:  $0" >&2
+    echo "  Or (pre-prod only) ship uncommitted work:" >&2
+    echo "    $0 --allow-dirty" >&2
+    echo "    $0 --version TAG" >&2
+  fi
+  exit 1
+}
+
+# Persist last resolved VERSION so dirty tags (…-dirty-TIMESTAMP) stay stable
+# across phases in one process, and so a later menu "push" can find the image
+# that "build" just produced.
+version_state_file() {
+  echo "$ROOT/tmp/gs-deploy.version"
+}
+
+pin_version() {
+  # Remember for this process + on disk for a follow-up push/rollout.
+  VERSION_OVERRIDE="$1"
+  export VERSION="$1"
+  mkdir -p "$ROOT/tmp"
+  printf '%s\n' "$1" >"$(version_state_file)"
+}
+
+resolve_version() {
+  # Explicit --version / already pinned for this process
+  if [[ -n "$VERSION_OVERRIDE" ]]; then
+    export VERSION="$VERSION_OVERRIDE"
+    return 0
+  fi
+
+  if git_is_dirty; then
+    if allow_dirty_effective; then
+      # Reuse last built dirty tag for push/rollout (do not mint a new timestamp).
+      # Build (and wizard first resolve via preflight/build) mints a fresh tag.
+      case "${COMMAND:-}" in
+        push|rollout)
+          local prev=""
+          if [[ -f "$(version_state_file)" ]]; then
+            prev="$(tr -d '[:space:]' <"$(version_state_file)" || true)"
+          fi
+          if [[ -n "$prev" ]]; then
+            pin_version "$prev"
+            echo "WARN: dirty tree; reusing VERSION=$VERSION from $(version_state_file)"
+            echo "  (from last build — avoids a new -dirty-TIMESTAMP that would miss the local image)"
+            return 0
+          fi
+          ;;
+      esac
+      pin_version "$(git rev-parse --short HEAD)-dirty-$(date +%Y%m%d%H%M%S)"
+      echo "WARN: dirty tree; using VERSION=$VERSION (--allow-dirty, pre-prod only)"
+      echo "  Pinned for this run (and written to $(version_state_file))"
+      return 0
+    fi
+    # Should have been caught by assert_clean_working_tree; keep as safety net
+    die "Git working tree is dirty. Commit first, or (pre-prod only) --allow-dirty / --version TAG"
+  fi
+
+  pin_version "$(git rev-parse HEAD)"
+}
+
+absolute_image() {
+  echo "${REGISTRY_HOST}/${IMAGE_REPO}:${VERSION}"
+}
+
+setup_log() {
+  if [[ "$NO_LOG" -eq 1 ]]; then
+    LOG_FILE=""
+    return 0
+  fi
+  mkdir -p log/deploy
+  LOG_FILE="log/deploy/${ENV_NAME}-$(ts)-${COMMAND}.log"
+  {
+    echo "# gs-deploy log"
+    echo "# started: $(date -Iseconds 2>/dev/null || date)"
+    echo "# env=$ENV_NAME command=$COMMAND cwd=$ROOT"
+    echo "# argv: $*"
+    echo ""
+  } >"$LOG_FILE"
+  echo "Logging to: $LOG_FILE"
+}
+
+# Destination floating tag Kamal also applies (e.g. latest-pre-prod).
+destination_image() {
+  echo "${REGISTRY_HOST}/${IMAGE_REPO}:latest-${ENV_NAME}"
+}
+
+# Run kamal inside Docker (no bare-metal Ruby/Kamal on the Mac required).
+# Usage: run_kamal <kamal args…>   e.g.  run_kamal config
+#         run_kamal deploy --skip-push
+# Streams full stdout/stderr (via run_logged), unless KAMAL_CAPTURE_FILE is set
+# (then output goes to that file + deploy log; nothing to terminal except errors).
+#
+# Used for server-side Kamal (preflight kamal config / rollout). Build and push
+# use the host docker CLI. Official image + host Docker socket for SSH deploy.
+run_kamal() {
+  local dest host
+  dest="$(kamal_destination)"
+  host="$(deploy_host)"
+
+  local ssh_key="${HOME}/.ssh/global-symbols.pem"
+  [[ -f "$ssh_key" ]] || die "SSH key not found: $ssh_key"
+
+  local docker_sock="/var/run/docker.sock"
+  [[ -S "$docker_sock" ]] || die "Docker socket not found at $docker_sock (is Docker Desktop running?)"
+
+  local banner_line="+ docker run ${KAMAL_IMAGE}  →  kamal $* -d ${dest}  (VERSION=${VERSION:-auto})"
+
+  # shellcheck disable=SC2086
+  local -a docker_args=(
+    docker run --rm -i
+    -v "$ROOT":/workdir
+    -v "$ssh_key":/root/.ssh/global-symbols.pem:ro
+    -v "$docker_sock":/var/run/docker.sock
+    -w /workdir
+    -e KAMAL_REGISTRY_USERNAME
+    -e KAMAL_REGISTRY_PASSWORD
+    -e SECRET_KEY_BASE
+    -e GS_DATABASE_PASSWORD
+    -e REDIS_PASSWORD
+    -e DIRECTUS_TOKEN_CMS
+    -e DIRECTUS_TOKEN
+    -e DIRECTUS_WEBHOOK_SECRET
+    -e AWS_ACCESS_KEY_ID
+    -e AWS_SECRET_ACCESS_KEY
+    -e AZURE_API_KEY
+    -e CONTENTFUL_ACCESS_TOKEN
+    -e CONTENTFUL_PREVIEW_TOKEN
+    -e CONTENTFUL_SPACE_ID
+    -e SES_SMTP_USERNAME
+    -e SES_SMTP_PASSWORD
+    -e MYSQL_ROOT_PASSWORD
+    -e MYSQL_PASSWORD
+    -e VERSION
+    -e "GS_KAMAL_DEST=${dest}"
+    -e "GS_DEPLOY_HOST=${host}"
+    --entrypoint sh
+    "$KAMAL_IMAGE"
+    -c '
+set -eu
+mkdir -p /root/.ssh
+chmod 700 /root/.ssh
+# Seed known_hosts for this container (fresh each run).
+# IMPORTANT: do NOT use ssh-keyscan -H (hashed hostnames). SSHKit’s known_hosts
+# parser returns only the *first* matching hashed key type; the server then
+# offers ed25519 and Net::SSH raises HostKeyMismatch (fingerprint is the live
+# key, which “does not match” the wrong type stored first). Plain hostnames
+# collect all key types under one host entry and verify correctly.
+: > /root/.ssh/known_hosts
+if ! ssh-keyscan -T 10 -t ed25519,ecdsa,rsa "$GS_DEPLOY_HOST" >> /root/.ssh/known_hosts 2>/dev/null; then
+  echo "WARN: ssh-keyscan failed for $GS_DEPLOY_HOST — Kamal SSH may fail host-key check" >&2
+fi
+chmod 600 /root/.ssh/known_hosts 2>/dev/null || true
+# Fail fast with a clear message if we got no keys (empty file / only blanks)
+if ! grep -qE "ssh-(ed25519|rsa)|ecdsa-" /root/.ssh/known_hosts 2>/dev/null; then
+  echo "ERROR: no host keys recorded for $GS_DEPLOY_HOST (ssh-keyscan empty)" >&2
+  exit 1
+fi
+# Sanity: buildx must exist (official image includes it)
+docker buildx version >/dev/null
+echo "+ kamal $* -d $GS_KAMAL_DEST  (VERSION=${VERSION:-auto})"
+exec kamal "$@" -d "$GS_KAMAL_DEST"
+' sh "$@"
+  )
+
+  if [[ -n "${KAMAL_CAPTURE_FILE:-}" ]]; then
+    # Quiet path (preflight): capture everything for log / failure dump
+    local cap_rc=0
+    set +e
+    {
+      echo "$banner_line"
+      "${docker_args[@]}"
+    } >"$KAMAL_CAPTURE_FILE" 2>&1
+    cap_rc=$?
+    set -e
+    if [[ "$NO_LOG" -ne 1 && -n "${LOG_FILE:-}" ]]; then
+      cat "$KAMAL_CAPTURE_FILE" >>"$LOG_FILE"
+    fi
+    return "$cap_rc"
+  fi
+
+  echo "$banner_line"
+  run_logged "${docker_args[@]}"
+}
+
+# ─── phases ───────────────────────────────────────────────────────────────
+
+cmd_help() {
+  usage 0
+}
+
+# True if Docker config already mentions ghcr.io (Desktop keychain / stored auth).
+# Not a network check — if push later fails with unauthorized, use --force-login.
+ghcr_session_looks_logged_in() {
+  local cfg="${DOCKER_CONFIG:-$HOME/.docker}/config.json"
+  [[ -f "$cfg" ]] || return 1
+  # Match "ghcr.io" as a registry host entry (auths / credHelpers)
+  grep -Eq '"ghcr\.io"[[:space:]]*:' "$cfg" 2>/dev/null
+}
+
+# Append a line to the deploy log only (no terminal). Used for preflight detail.
+preflight_log() {
+  if [[ "$NO_LOG" -ne 1 && -n "${LOG_FILE:-}" ]]; then
+    # shellcheck disable=SC2129
+    printf '%s\n' "$*" >>"$LOG_FILE"
+  fi
+}
+
+preflight_log_file() {
+  local f="$1"
+  [[ -f "$f" ]] || return 0
+  if [[ "$NO_LOG" -ne 1 && -n "${LOG_FILE:-}" ]]; then
+    cat "$f" >>"$LOG_FILE"
+  fi
+}
+
+# Ready gate: local checks + VERSION + GHCR login + kamal config (read-only).
+# Success → short scoreboard. Failure → comprehensive dump (terminal + log).
+cmd_preflight() {
+  phase_banner "preflight ($ENV_NAME) — ready checks + kamal config"
+  preflight_log "=== preflight detail env=$ENV_NAME root=$ROOT ==="
+  preflight_log "started: $(date -Iseconds 2>/dev/null || date)"
+
+  local ok=1
+  local s_docker="—" s_git="—" s_secrets="—" s_ssh="—" s_files="—" s_host="—"
+  local s_version="—" s_ghcr="—" s_kamal="—"
+  local detail_tmp fail_notes=""
+  detail_tmp="$(mktemp "${TMPDIR:-/tmp}/gs-preflight.XXXXXX")"
+  # Expand path now: under set -u, locals are gone before RETURN trap runs.
+  # shellcheck disable=SC2064
+  trap "rm -f '${detail_tmp}'" RETURN
+
+  pf_note() {
+    # accumulate multi-line failure notes for terminal dump
+    fail_notes="${fail_notes}$1"$'\n'
+    preflight_log "$1"
+  }
+
+  # ── docker ──────────────────────────────────────────────────────────────
+  if ! command -v docker >/dev/null 2>&1; then
+    s_docker="FAIL  not on PATH"
+    pf_note "docker: not found on PATH"
+    ok=0
+  elif ! docker_cli_ok; then
+    s_docker="FAIL  CLI timeout (8s)"
+    pf_note "docker CLI not responding (timed out after 8s)"
+    pf_note "  Docker Desktop is often wedged after a stalled GHCR push."
+    pf_note "  Fix: restart Docker Desktop, re-run."
+    ok=0
+  elif ! docker_daemon_ok; then
+    s_docker="FAIL  daemon not reachable"
+    pf_note "docker daemon not reachable or hung — restart Docker Desktop"
+    ok=0
+  else
+    local dver
+    dver="$(run_with_timeout 8 docker version --format '{{.Client.Version}}' 2>/dev/null || echo present)"
+    s_docker="OK    ${dver}"
+    preflight_log "docker: client=${dver} daemon=OK"
+  fi
+
+  # ── git ─────────────────────────────────────────────────────────────────
+  if ! command -v git >/dev/null 2>&1; then
+    s_git="FAIL  not found"
+    pf_note "git: not found"
+    ok=0
+  else
+    local gsha gbr
+    gsha="$(git rev-parse --short HEAD 2>/dev/null || echo '?')"
+    gbr="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '?')"
+    if git_is_dirty; then
+      preflight_log "git: ${gsha} branch=${gbr} DIRTY"
+      preflight_log "$(git status --porcelain | head -50)"
+      if allow_dirty_effective || [[ -n "$VERSION_OVERRIDE" ]]; then
+        s_git="OK    ${gsha} ${gbr} (dirty, allowed)"
+      else
+        s_git="FAIL  dirty tree (commit or --allow-dirty pre-prod)"
+        pf_note "working tree DIRTY (hard rule: commit before shipping;"
+        pf_note "  --allow-dirty is pre-prod only, never production):"
+        pf_note "$(git status --porcelain | head -20)"
+        ok=0
+      fi
+    else
+      s_git="OK    ${gsha} ${gbr} (clean)"
+      preflight_log "git: ${gsha} branch=${gbr} clean"
+    fi
+  fi
+
+  # ── secrets ─────────────────────────────────────────────────────────────
+  local f secrets_ok=1 secrets_list=""
+  for f in $(secrets_files); do
+    if [[ -f "$f" ]]; then
+      secrets_list="${secrets_list}${secrets_list:+, }${f}"
+      preflight_log "secrets: present $f"
+    else
+      secrets_ok=0
+      pf_note "secrets: missing $f"
+    fi
+  done
+  if [[ "$secrets_ok" -eq 1 ]]; then
+    s_secrets="OK    ${secrets_list}"
+  else
+    s_secrets="FAIL  missing file(s)"
+    ok=0
+  fi
+
+  # ── ssh key ─────────────────────────────────────────────────────────────
+  local ssh_key="${HOME}/.ssh/global-symbols.pem"
+  if [[ -f "$ssh_key" ]]; then
+    s_ssh="OK    ${ssh_key}"
+    preflight_log "ssh key: present $ssh_key"
+  else
+    s_ssh="FAIL  missing ${ssh_key}"
+    pf_note "SSH key missing: $ssh_key"
+    ok=0
+  fi
+
+  # ── deploy files ────────────────────────────────────────────────────────
+  local files_ok=1
+  for f in config/deploy.yml "config/deploy.${ENV_NAME}.yml" Dockerfile; do
+    if [[ -f "$f" ]]; then
+      preflight_log "file: present $f"
+    else
+      files_ok=0
+      pf_note "missing file: $f"
+    fi
+  done
+  if [[ "$files_ok" -eq 1 ]]; then
+    s_files="OK    deploy.yml + deploy.${ENV_NAME}.yml + Dockerfile"
+  else
+    s_files="FAIL  missing deploy config or Dockerfile"
+    ok=0
+  fi
+
+  # ── host ────────────────────────────────────────────────────────────────
+  local host
+  host="$(deploy_host)"
+  if [[ "$ENV_NAME" == "production" && "$host" == REPLACE* ]]; then
+    s_host="FAIL  placeholder in deploy.production.yml"
+    pf_note "production host still a placeholder: $host"
+    ok=0
+  else
+    s_host="OK    ${host}"
+    preflight_log "host: $host"
+  fi
+
+  # Stop before VERSION/GHCR/kamal if basics failed (fail-fast, still dump state)
+  if [[ "$ok" -ne 1 ]]; then
+    s_version="SKIP"
+    s_ghcr="SKIP"
+    s_kamal="SKIP"
+    echo ""
+    echo "  docker     $s_docker"
+    echo "  git        $s_git"
+    echo "  secrets    $s_secrets"
+    echo "  ssh key    $s_ssh"
+    echo "  files      $s_files"
+    echo "  host       $s_host"
+    echo "  version    $s_version"
+    echo "  ghcr       $s_ghcr"
+    echo "  kamal cfg  $s_kamal"
+    echo ""
+    echo "── Failure detail ──"
+    printf '%s' "$fail_notes"
+    if [[ -n "${LOG_FILE:-}" && "$NO_LOG" -ne 1 ]]; then
+      echo "Full log: $LOG_FILE"
+    fi
+    phase_fail "preflight" 1
+    return 1
+  fi
+
+  # ── image tag ───────────────────────────────────────────────────────────
+  resolve_version
+  s_version="OK    VERSION=${VERSION}"
+  preflight_log "VERSION=$VERSION"
+  preflight_log "absolute image: $(absolute_image)"
+  preflight_log "destination tag: $(destination_image)"
+  if git_is_dirty; then
+    preflight_log "note: tree is dirty (override or --allow-dirty in effect)"
+  fi
+
+  # ── GHCR login ──────────────────────────────────────────────────────────
+  if [[ "$SKIP_LOGIN" -eq 1 ]]; then
+    s_ghcr="OK    skipped (--skip-login)"
+    preflight_log "ghcr: login skipped (--skip-login)"
+  elif [[ "$FORCE_LOGIN" -ne 1 ]] && ghcr_session_looks_logged_in; then
+    s_ghcr="OK    already logged in"
+    preflight_log "ghcr: credentials present for ${REGISTRY_HOST} — skipped login"
+  else
+    if [[ "$FORCE_LOGIN" -eq 1 ]]; then
+      preflight_log "ghcr: forcing docker login (--force-login)"
+    fi
+    load_secrets
+    preflight_log "ghcr: docker login ${REGISTRY_HOST} as ${KAMAL_REGISTRY_USERNAME}"
+    local login_rc=0
+    set +e
+    # Capture login output (password never printed by docker login on success)
+    bash -c 'echo "$KAMAL_REGISTRY_PASSWORD" | docker login "'"$REGISTRY_HOST"'" -u "$KAMAL_REGISTRY_USERNAME" --password-stdin' \
+      >"$detail_tmp" 2>&1
+    login_rc=$?
+    set -e
+    preflight_log_file "$detail_tmp"
+    if [[ "$login_rc" -ne 0 ]]; then
+      s_ghcr="FAIL  docker login exit ${login_rc}"
+      pf_note "docker login to ${REGISTRY_HOST} failed (exit ${login_rc}):"
+      pf_note "$(cat "$detail_tmp")"
+      ok=0
+    else
+      s_ghcr="OK    logged in as ${KAMAL_REGISTRY_USERNAME}"
+    fi
+  fi
+
+  # ── kamal config (read-only; quiet capture) ─────────────────────────────
+  if [[ "$ok" -eq 1 ]]; then
+    load_secrets
+    preflight_log "kamal config -d $(kamal_destination) (captured; not streamed on success)"
+    local kamal_rc=0
+    set +e
+    KAMAL_CAPTURE_FILE="$detail_tmp" run_kamal config
+    kamal_rc=$?
+    set -e
+    if [[ "$kamal_rc" -ne 0 ]]; then
+      s_kamal="FAIL  exit ${kamal_rc}"
+      pf_note "kamal config failed (exit ${kamal_rc}). Full captured output follows after scoreboard."
+      ok=0
+    else
+      s_kamal="OK    destination=$(kamal_destination)"
+      preflight_log "kamal config: OK"
+    fi
+  else
+    s_kamal="SKIP"
+  fi
+
+  # ── scoreboard (always) ─────────────────────────────────────────────────
+  echo ""
+  echo "  docker     $s_docker"
+  echo "  git        $s_git"
+  echo "  secrets    $s_secrets"
+  echo "  ssh key    $s_ssh"
+  echo "  files      $s_files"
+  echo "  host       $s_host"
+  echo "  version    $s_version"
+  echo "  image      $(absolute_image)"
+  echo "  ghcr       $s_ghcr"
+  echo "  kamal cfg  $s_kamal"
+
+  if [[ "$ok" -ne 1 ]]; then
+    echo ""
+    echo "── Failure detail ──"
+    printf '%s' "$fail_notes"
+    if [[ -f "$detail_tmp" && -s "$detail_tmp" ]]; then
+      # Full kamal/login capture on failure (comprehensive state)
+      if grep -q . "$detail_tmp" 2>/dev/null; then
+        echo "----- captured command output -----"
+        cat "$detail_tmp"
+        echo "----- end captured output -----"
+      fi
+    fi
+    preflight_log "preflight FAILED"
+    if [[ -n "${LOG_FILE:-}" && "$NO_LOG" -ne 1 ]]; then
+      echo "Full log: $LOG_FILE"
+    fi
+    phase_fail "preflight" 1
+    return 1
+  fi
+
+  preflight_log "preflight OK"
+  if [[ -n "${LOG_FILE:-}" && "$NO_LOG" -ne 1 ]]; then
+    echo "  log        $LOG_FILE"
+  fi
+  phase_ok "preflight"
+}
+
+# True if Docker has a local image for the absolute tag.
+local_image_present() {
+  docker image inspect "$(absolute_image)" >/dev/null 2>&1
+}
+
+normalize_push_retry_settings() {
+  case "$PUSH_MAX_ATTEMPTS" in
+    ''|*[!0-9]*|0) PUSH_MAX_ATTEMPTS=5 ;;
+  esac
+  case "$PUSH_RETRY_SLEEP" in
+    ''|*[!0-9]*) PUSH_RETRY_SLEEP=15 ;;
+  esac
+}
+
+# (1) Mac only: plain docker build → local image. No Kamal, no GHCR, no server.
+cmd_build() {
+  phase_banner "build (host docker build → local image; no GHCR, no server)"
+  resolve_version
+  local img dest_img
+  img="$(absolute_image)"
+  dest_img="$(destination_image)"
+
+  if ! docker_cli_ok; then
+    phase_fail "build" 1
+    echo "  docker CLI not responding. Restart Docker Desktop, then re-run build." >&2
+    return 1
+  fi
+
+  echo "Platform:  $BUILD_PLATFORM"
+  echo "Network:   $BUILD_NETWORK  (host = workaround if bridge egress is broken)"
+  echo "Image:     $img"
+  echo "Also tag:  $dest_img"
+  if [[ "$WIZARD_MODE" -eq 0 ]]; then
+    echo "What this does:"
+    echo "  • docker build on this Mac (Dockerfile → local Docker store)"
+    echo "  • Tags VERSION + latest-${ENV_NAME} (same names Kamal will pull later)"
+    echo "  • Does NOT push to ${REGISTRY_HOST}"
+    echo "  • Does NOT touch $(deploy_host)"
+  fi
+  confirm_build
+
+  # Prove container egress before a long build (skip if network=host and host works)
+  if [[ "$BUILD_NETWORK" != "host" ]]; then
+    echo "  Checking container egress (bridge)…"
+    if ! run_with_timeout 15 docker run --rm curlimages/curl:8.5.0 \
+         -sS -o /dev/null --connect-timeout 5 https://deb.debian.org; then
+      echo "WARN: containers cannot reach the internet on the default network."
+      echo "  This Mac's Docker Desktop bridge egress is often broken; use host network:"
+      echo "    GS_BUILD_NETWORK=host  (already the default in gs-deploy)"
+    fi
+  fi
+
+  echo "Starting docker build --network=${BUILD_NETWORK} — full stream below…"
+  set +e
+  run_logged docker build \
+    --network "$BUILD_NETWORK" \
+    --platform "$BUILD_PLATFORM" \
+    -t "$img" \
+    -t "$dest_img" \
+    --label "service=${SERVICE_LABEL}" \
+    -f Dockerfile \
+    .
+  local rc=$?
+  set -e
+  if [[ "$rc" -ne 0 ]]; then
+    phase_fail "build" "$rc"
+    return "$rc"
+  fi
+
+  if ! local_image_present; then
+    phase_fail "build" 1
+    echo "  Build finished but local image missing: $img" >&2
+    return 1
+  fi
+
+  phase_ok "build"
+  echo ""
+  echo "Local image ready: $img"
+  echo "Flow: build (done) → push (GHCR) → rollout (server pulls + replaces containers)."
+}
+
+# (2) Mac only: plain docker push → GHCR. No rebuild, no server.
+cmd_push() {
+  phase_banner "push (host docker push → GHCR; no rebuild, no server)"
+  load_secrets
+  resolve_version
+  local img dest_img
+  img="$(absolute_image)"
+  dest_img="$(destination_image)"
+  normalize_push_retry_settings
+
+  if ! local_image_present; then
+    phase_fail "push" 1
+    echo "  No local image for VERSION: $img" >&2
+    echo "  Run menu action 'build' first, then re-run 'push'." >&2
+    return 1
+  fi
+
+  echo "Image:         $img"
+  echo "Also push if:  $dest_img (when present locally)"
+  echo "Push retries:  up to ${PUSH_MAX_ATTEMPTS} (sleep ${PUSH_RETRY_SLEEP}s+, +10s each)"
+  if [[ "$WIZARD_MODE" -eq 0 ]]; then
+    echo "Layer concurrency: Docker daemon max-concurrent-uploads (see ~/.docker/daemon.json)"
+    echo "  Recommended: 2  (not configurable as '2 then pause 5s' — Docker has no batch delay)"
+    echo "What this does:"
+    echo "  • docker push $img  (layers already on GHCR are skipped)"
+    echo "  • Does NOT rebuild"
+    echo "  • Does NOT touch $(deploy_host) — that is rollout"
+  fi
+  confirm_push
+
+  local attempt=1
+  local rc=1
+  local sleep_s="$PUSH_RETRY_SLEEP"
+
+  while [[ "$attempt" -le "$PUSH_MAX_ATTEMPTS" ]]; do
+    echo ""
+    banner "push attempt ${attempt}/${PUSH_MAX_ATTEMPTS}"
+    echo "Image: $img"
+
+    echo "  Pre-check: docker CLI (8s timeout)…"
+    if ! docker_cli_ok; then
+      phase_fail "push" 1
+      echo "  docker CLI not responding. Restart Docker Desktop, then re-run push." >&2
+      echo "  Tip: $0 --allow-dirty --version $VERSION   # menu → push" >&2
+      return 1
+    fi
+    echo "  Pre-check OK — docker push (live output)…"
+
+    set +e
+    run_logged docker push "$img"
+    rc=$?
+    if [[ "$rc" -eq 0 ]] && docker image inspect "$dest_img" >/dev/null 2>&1; then
+      echo "Pushing destination tag: $dest_img"
+      run_logged docker push "$dest_img"
+      rc=$?
+    fi
+    set -e
+
+    if [[ "$rc" -eq 0 ]]; then
+      phase_ok "push"
+      echo ""
+      echo "Image is in GHCR after attempt ${attempt}/${PUSH_MAX_ATTEMPTS}."
+      echo "Next: rollout — Kamal pulls this tag on the server and replaces web+job."
+      return 0
+    fi
+
+    echo ""
+    echo "WARN: push attempt ${attempt}/${PUSH_MAX_ATTEMPTS} failed (exit ${rc})."
+    if [[ "$attempt" -ge "$PUSH_MAX_ATTEMPTS" ]]; then
+      break
+    fi
+    echo "  Waiting ${sleep_s}s then attempt $((attempt + 1))/${PUSH_MAX_ATTEMPTS}…"
+    echo "  Tip: ~/.docker/daemon.json max-concurrent-uploads (try 2 or 1); restart Docker after changes"
+    sleep "$sleep_s"
+    sleep_s=$((sleep_s + 10))
+    attempt=$((attempt + 1))
+  done
+
+  phase_fail "push" "$rc"
+  echo "  All ${PUSH_MAX_ATTEMPTS} attempts failed. Re-run: $0  (menu → push)" >&2
+  echo "  Or: $0 --push-retries 8" >&2
+  return "$rc"
+}
+
+# Quiet HTTP smoke after rollout. Prints only PASS/FAIL (no header dump).
+# Returns 0 on success, 1 on failure. Does not change the server.
+run_smoke_check() {
+  local host header code rc
+  host="$(deploy_host)"
+  header="$(http_host_header)"
+  if [[ "$host" == REPLACE* ]]; then
+    echo "smoke: FAIL (host is still a placeholder)"
+    return 1
+  fi
+  set +e
+  code="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 30 \
+    -H "Host: ${header}" "http://${host}/" 2>/dev/null)"
+  rc=$?
+  set -e
+  if [[ "$rc" -eq 0 && "$code" =~ ^[23][0-9][0-9]$ ]]; then
+    echo "smoke: PASS"
+    return 0
+  fi
+  echo "smoke: FAIL"
+  return 1
+}
+
+# (3) Server: Kamal pulls the GHCR image and replaces live web+job containers,
+# then a quiet HTTP smoke check (PASS/FAIL only).
+cmd_rollout() {
+  phase_banner "rollout (server $(deploy_host); TOUCHES SERVER)"
+  load_secrets
+  resolve_version
+  echo "Destination: $(kamal_destination)"
+  echo "Host:        $(deploy_host)"
+  echo "Image:       $(absolute_image)"
+  if [[ "$WIZARD_MODE" -eq 0 ]]; then
+    echo "What this does:"
+    echo "  • Kamal deploy --skip-push (image must already be in GHCR from push)"
+    echo "  • SSH to host, docker pull that tag, replace web + job, healthcheck proxy"
+    echo "  • HTTP smoke check after deploy (PASS/FAIL only)"
+    echo "  • Does NOT build or push from this Mac"
+  fi
+  confirm_rollout
+  echo "Starting kamal deploy --skip-push — full stream below (not filtered)…"
+  set +e
+  run_kamal deploy --skip-push
+  local rc=$?
+  set -e
+  if [[ "$rc" -ne 0 ]]; then
+    phase_fail "rollout" "$rc"
+    return "$rc"
+  fi
+  phase_ok "rollout"
+
+  # Deploy already succeeded — smoke is advisory; report only, do not fail phase.
+  echo ""
+  set +e
+  run_smoke_check
+  local smoke_rc=$?
+  set -e
+  if [[ "$smoke_rc" -ne 0 ]]; then
+    echo "WARN: smoke failed after successful rollout — investigate (menu → verify)."
+  fi
+  echo ""
+  echo "Next: migrate (if pending on live DB), then verify."
+}
+
+# SSH to app host; run pending migrations in the live web container against the live DB.
+# Skips cleanly when migrate:status shows no "down" rows (no schema change needed).
+cmd_migrate() {
+  phase_banner "migrate (live DB via web container on $(deploy_host))"
+  local host web_filter ssh_key
+  host="$(deploy_host)"
+  web_filter="$(web_name_filter)"
+  ssh_key="${HOME}/.ssh/global-symbols.pem"
+
+  if [[ "$host" == REPLACE* ]]; then
+    phase_fail "migrate" 1
+    echo "  Host is still a placeholder — cannot SSH." >&2
+    return 1
+  fi
+  if [[ ! -f "$ssh_key" ]]; then
+    phase_fail "migrate" 1
+    echo "  SSH key missing: $ssh_key" >&2
+    return 1
+  fi
+
+  echo "Host:       $host"
+  echo "Container:  name filter ${web_filter}"
+  echo "Database:   whatever DATABASE_HOST the container uses (live, not laptop)"
+  if [[ "$WIZARD_MODE" -eq 0 ]]; then
+    echo "What this does:"
+    echo "  • SSH as ubuntu@${host}"
+    echo "  • docker exec into the running web container"
+    echo "  • rails db:migrate:status → db:migrate only if pending"
+    echo "  • Does NOT rebuild, push, or restart containers"
+  fi
+  confirm_migrate
+
+  echo "Checking pending migrations on the live DB (via web container)…"
+  set +e
+  run_logged ssh \
+    -i "$ssh_key" \
+    -o BatchMode=yes \
+    -o IdentitiesOnly=yes \
+    -o ConnectTimeout=15 \
+    -o StrictHostKeyChecking=accept-new \
+    "ubuntu@${host}" \
+    "WEB_FILTER='${web_filter}' bash -s" <<'REMOTE'
+set -euo pipefail
+WEB="$(docker ps -q --filter "name=${WEB_FILTER}" | head -1 || true)"
+if [[ -z "${WEB:-}" ]]; then
+  WEB="$(docker ps -q --filter "label=service=gs-repo" --filter "label=role=web" | head -1 || true)"
+fi
+if [[ -z "${WEB:-}" ]]; then
+  echo "ERROR: no web container matching ${WEB_FILTER} on $(hostname)"
+  exit 2
+fi
+echo "Using container ${WEB} on $(hostname)"
+
+# Status against the DB this container is configured for (Kamal env).
+echo "— db:migrate:status —"
+set +e
+STATUS_OUT="$(docker exec "$WEB" bundle exec rails db:migrate:status 2>&1)"
+STATUS_RC=$?
+set -e
+echo "$STATUS_OUT"
+if [[ "$STATUS_RC" -ne 0 ]]; then
+  echo "ERROR: db:migrate:status failed (exit ${STATUS_RC})"
+  exit "$STATUS_RC"
+fi
+
+# Rails prints a "down" column for pending migrations.
+PENDING="$(printf '%s\n' "$STATUS_OUT" | grep -E '^[[:space:]]*down[[:space:]]' || true)"
+if [[ -z "$PENDING" ]]; then
+  echo "No pending migrations (all up). Skipping db:migrate."
+  exit 0
+fi
+
+echo ""
+echo "Pending migrations:"
+printf '%s\n' "$PENDING"
+echo ""
+echo "— db:migrate (live DB) —"
+set +e
+docker exec "$WEB" bundle exec rails db:migrate
+MIG_RC=$?
+set -e
+if [[ "$MIG_RC" -ne 0 ]]; then
+  echo "ERROR: db:migrate failed (exit ${MIG_RC})"
+  exit "$MIG_RC"
+fi
+echo "Migrations applied OK."
+exit 0
+REMOTE
+  local rc=$?
+  set -e
+
+  if [[ "$rc" -ne 0 ]]; then
+    phase_fail "migrate" "$rc"
+    echo "  Fix the DB/migration error on the server, then re-run menu → migrate (or wizard)." >&2
+    return "$rc"
+  fi
+  phase_ok "migrate"
+  echo ""
+  echo "Next: verify (post-deploy suite on the server)."
+}
+
+# SSH to app host and run deploy_verify inside the live web container.
+# Suite ships in the image (/rails/deploy_verify); RuntimeGuard enforces host IP.
+# Pre-prod auth/CRUD: DEPLOY_VERIFY_USER_* from .kamal/secrets.pre-prod (and after
+# rollout, from container env via Kamal env.secret).
+cmd_verify() {
+  phase_banner "verify (post-deploy suite on $(deploy_host))"
+  local host web_filter profile header ssh_key email_q pass_q auth_note
+  host="$(deploy_host)"
+  header="$(http_host_header)"
+  ssh_key="${HOME}/.ssh/global-symbols.pem"
+
+  web_filter="$(web_name_filter)"
+  if [[ "$ENV_NAME" == "pre-prod" ]]; then
+    profile="pre_prod"
+    # Load secrets so DEPLOY_VERIFY_USER_* are available for docker exec pass-through
+    load_secrets
+  else
+    profile="prod"
+  fi
+
+  if [[ "$host" == REPLACE* ]]; then
+    phase_fail "verify" 1
+    echo "  Host is still a placeholder — cannot SSH." >&2
+    return 1
+  fi
+  if [[ ! -f "$ssh_key" ]]; then
+    phase_fail "verify" 1
+    echo "  SSH key missing: $ssh_key" >&2
+    return 1
+  fi
+
+  email_q="$(printf '%q' "${DEPLOY_VERIFY_USER_EMAIL:-}")"
+  pass_q="$(printf '%q' "${DEPLOY_VERIFY_USER_PASSWORD:-}")"
+  if [[ "$ENV_NAME" == "pre-prod" && -n "${DEPLOY_VERIFY_USER_EMAIL:-}" && -n "${DEPLOY_VERIFY_USER_PASSWORD:-}" ]]; then
+    auth_note="auth/CRUD credentials: present (secrets → docker exec)"
+  elif [[ "$ENV_NAME" == "pre-prod" ]]; then
+    auth_note="auth/CRUD credentials: missing (suite will SKIP auth; set secrets.pre-prod)"
+  else
+    auth_note="auth/CRUD: n/a (prod is read-only)"
+  fi
+
+  echo "Host:       $host"
+  echo "Profile:    $profile"
+  echo "Container:  name filter ${web_filter}"
+  echo "Auth:       $auth_note"
+  if [[ "$WIZARD_MODE" -eq 0 ]]; then
+    echo "What this does:"
+    echo "  • SSH as ubuntu@${host}"
+    echo "  • docker exec into the running web container"
+    echo "  • run /rails/deploy_verify/bin/run ${profile}"
+    echo "  • Does NOT rebuild, push, or restart containers"
+  fi
+  confirm_verify
+
+  echo "Starting remote suite — full stream below…"
+  set +e
+  # Remote script mirrors script/run_deploy_verify.sh (docker exec path).
+  # Credential env expanded locally (printf %q); remote body single-quoted heredoc.
+  run_logged ssh \
+    -i "$ssh_key" \
+    -o BatchMode=yes \
+    -o IdentitiesOnly=yes \
+    -o ConnectTimeout=15 \
+    -o StrictHostKeyChecking=accept-new \
+    "ubuntu@${host}" \
+    "PROFILE='${profile}' WEB_FILTER='${web_filter}' HOST_HEADER='${header}' DEPLOY_VERIFY_USER_EMAIL=${email_q} DEPLOY_VERIFY_USER_PASSWORD=${pass_q} bash -s" <<'REMOTE'
+set -euo pipefail
+WEB="$(docker ps -q --filter "name=${WEB_FILTER}" | head -1 || true)"
+if [[ -z "${WEB:-}" ]]; then
+  WEB="$(docker ps -q --filter "label=service=gs-repo" --filter "label=role=web" | head -1 || true)"
+fi
+if [[ -z "${WEB:-}" ]]; then
+  echo "ERROR: no web container matching ${WEB_FILTER} on $(hostname)"
+  exit 2
+fi
+if ! docker exec "$WEB" test -f /rails/deploy_verify/runner.rb; then
+  echo "ERROR: deploy_verify not in image (container $WEB)."
+  echo "  Redeploy an image that includes deploy_verify/, then re-run verify."
+  exit 2
+fi
+echo "Running deploy_verify [${PROFILE}] in container ${WEB} on $(hostname)"
+export DEPLOY_VERIFY_BASE_URL="${DEPLOY_VERIFY_BASE_URL:-http://kamal-proxy}"
+export DEPLOY_VERIFY_HOST_HEADER="${DEPLOY_VERIFY_HOST_HEADER:-$HOST_HEADER}"
+# Build docker exec -e list. Only pass user creds when set so we do not
+# blank out values already injected by Kamal into the container.
+EXEC_ENV=(
+  -e DEPLOY_VERIFY_BASE_URL
+  -e DEPLOY_VERIFY_HOST_HEADER
+  -e DEPLOY_VERIFY_REPORT_DIR=/tmp/deploy_verify
+)
+if [[ -n "${DEPLOY_VERIFY_USER_EMAIL:-}" && -n "${DEPLOY_VERIFY_USER_PASSWORD:-}" ]]; then
+  export DEPLOY_VERIFY_USER_EMAIL
+  export DEPLOY_VERIFY_USER_PASSWORD
+  EXEC_ENV+=(-e DEPLOY_VERIFY_USER_EMAIL -e DEPLOY_VERIFY_USER_PASSWORD)
+  echo "Auth/CRUD: injecting DEPLOY_VERIFY_USER_* into docker exec"
+else
+  echo "Auth/CRUD: no laptop secrets; using container env if present"
+fi
+set +e
+docker exec \
+  "${EXEC_ENV[@]}" \
+  "$WEB" \
+  bash -lc "mkdir -p /tmp/deploy_verify && /rails/deploy_verify/bin/run '$PROFILE'"
+RC=$?
+set -e
+mkdir -p /tmp/deploy_verify
+docker cp "$WEB:/tmp/deploy_verify/." /tmp/deploy_verify/ 2>/dev/null || true
+echo "Reports on server: /tmp/deploy_verify/ (also in container /tmp/deploy_verify/)"
+exit "$RC"
+REMOTE
+  local rc=$?
+  set -e
+
+  if [[ "$rc" -ne 0 ]]; then
+    phase_fail "verify" "$rc"
+    echo "  Suite failed (exit $rc). Reports may be on the server under /tmp/deploy_verify/." >&2
+    return "$rc"
+  fi
+  phase_ok "verify"
+  echo ""
+  echo "Post-deploy suite passed on ${host}."
+}
+
+cmd_wizard() {
+  WIZARD_MODE=1
+  banner "Global Symbols deploy wizard → ${ENV_NAME}"
+  echo "Host: $(deploy_host)"
+  echo "Each phase streams full command output. Logs: log/deploy/ (unless --no-log)."
+  echo "Press Enter to start each phase (no second type-to-confirm). q quits."
+  echo "Migrate: Enter runs it, s skips and continues to verify, q quits."
+  echo "Exception: production rollout/migrate still require typing production/migrate."
+  echo "Migrate also auto-skips when the live DB has no pending migrations."
+  echo ""
+
+  local phases=(preflight build push rollout migrate verify)
+  local skip_migrate=0
+  local p
+  for p in "${phases[@]}"; do
+    case "$p" in
+      preflight)
+        cmd_preflight || return $?
+        pause_wizard "build (Mac local image only)"
+        ;;
+      build)
+        cmd_build || return $?
+        pause_wizard "push (local image → GHCR)"
+        ;;
+      push)
+        cmd_push || return $?
+        pause_wizard "rollout (TOUCHES SERVER + smoke)"
+        ;;
+      rollout)
+        cmd_rollout || return $?
+        if ! pause_wizard "migrate (live DB via web container; skip if none pending)" 1; then
+          skip_migrate=1
+        fi
+        ;;
+      migrate)
+        if [[ "$skip_migrate" -eq 1 ]]; then
+          echo "Skipping migrate (wizard choice); continuing to verify."
+        else
+          cmd_migrate || return $?
+        fi
+        pause_wizard "verify (post-deploy suite on server)"
+        ;;
+      verify)
+        cmd_verify || return $?
+        ;;
+    esac
+  done
+
+  banner "Wizard finished for ${ENV_NAME}"
+  if [[ -n "${LOG_FILE:-}" ]]; then
+    echo "Full log: $LOG_FILE"
+  fi
+}
+
+# ─── main ─────────────────────────────────────────────────────────────────
+
+main() {
+  parse_args "$@"
+  if [[ "$COMMAND" == "help" ]]; then
+    cmd_help
+  fi
+
+  # Hard rule first (CLI path; menu also asserts right after action pick)
+  assert_clean_working_tree
+
+  setup_log "$0" "$@"
+  banner "gs-deploy  env=${ENV_NAME}  command=${COMMAND}"
+  echo "Repo: $ROOT"
+  if [[ -n "${LOG_FILE:-}" ]]; then
+    echo "Log:  $LOG_FILE"
+  fi
+
+  case "$COMMAND" in
+    wizard)      cmd_wizard ;;
+    preflight)   cmd_preflight ;;
+    build)       cmd_build ;;
+    push)        cmd_push ;;
+    rollout)     cmd_rollout ;;
+    migrate)     cmd_migrate ;;
+    verify)      cmd_verify ;;
+    *) die "internal: unhandled command $COMMAND" ;;
+  esac
+}
+
+main "$@"

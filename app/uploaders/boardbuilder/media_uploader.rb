@@ -53,12 +53,37 @@ class Boardbuilder::MediaUploader < CarrierWave::Uploader::Base
   end
 
   def store_dimensions
-    if file && model
-      model.width, model.height = ::MiniMagick::Image.open(file.file)[:dimensions]
-    end
+    return unless file && model
+
+    path = file.file.to_s
+    model.width, model.height = if svg_path?(path) || file.content_type == 'image/svg+xml'
+                                  # Debian ImageMagick's internal SVG coder fails on Designer SVGs that
+                                  # embed PNGs as data URIs; rsvg-convert handles those correctly.
+                                  dimensions_via_rsvg(path)
+                                else
+                                  MiniMagick::Image.open(path)[:dimensions]
+                                end
+  rescue MiniMagick::Invalid, MiniMagick::Error => e
+    Rails.logger.warn("[Boardbuilder::MediaUploader] store_dimensions failed for #{path}: #{e.message}")
   end
 
   private
+
+  def svg_path?(path)
+    path.to_s.downcase.end_with?('.svg', '.svgz')
+  end
+
+  def dimensions_via_rsvg(path)
+    return unless system('which', 'rsvg-convert', out: File::NULL, err: File::NULL)
+
+    Tempfile.create(['bb_media_dims', '.png']) do |tmp|
+      tmp.close
+      ok = system('rsvg-convert', '-o', tmp.path, path, out: File::NULL, err: File::NULL)
+      return nil unless ok && File.size?(tmp.path)
+
+      return MiniMagick::Image.open(tmp.path)[:dimensions]
+    end
+  end
 
   def not_svg?(file)
     file.content_type != 'image/svg+xml'

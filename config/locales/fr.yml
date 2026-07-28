@@ -925,7 +925,7 @@ fr:
       blank: ne peut pas être vide
       empty: ne peut pas être vide
       accepted: doit être accepté
-      confirmation: ne correspond pas à %{attribut}
+      confirmation: ne correspond pas à %{attribute}
       invalid: n’est pas valide
       exclusion: est réservé
       inclusion: n’est pas inclus dans la liste

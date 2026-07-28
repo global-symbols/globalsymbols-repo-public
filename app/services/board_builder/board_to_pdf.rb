@@ -153,12 +153,11 @@ module BoardBuilder
                 begin
                   header_image_url = BoardBuilder::BoardToPdf.resolve_image_url(board.header_media.file.url)
                   header_image_start = Time.now
-                  header_image = nil
-                  header_image = BoardBuilder::BoardToPdf.fetch_response_with_redirects(
-                    :get,
+                  header_image = BoardBuilder::BoardToPdf.load_image_payload(
                     header_image_url,
-                    timeout: 8,
-                    open_timeout: 3
+                    timeout: 12,
+                    open_timeout: 5,
+                    skip_head: true
                   )
                   header_image_load_time = Time.now - header_image_start
                   image_load_count += 1
@@ -364,31 +363,15 @@ module BoardBuilder
                       # Move the cursor, so we can draw the image or a failure message.
                       move_cursor_to image_y
 
-                      # Resolve the image URL dynamically based on current environment
+                      # Resolve the image URL dynamically based on current environment.
+                      # Prefer local public/uploads files when present to avoid self-HTTP timeouts.
                       resolved_image_url = BoardBuilder::BoardToPdf.resolve_image_url(cell.image_url)
                       cell_image_start = Time.now
-                      image = nil
-                      begin
-                        # Pre-flight check: HEAD request to verify image exists
-                        head_response = BoardBuilder::BoardToPdf.fetch_response_with_redirects(
-                          :head,
-                          resolved_image_url,
-                          timeout: 2,
-                          open_timeout: 1
-                        )
-
-                        if head_response.status >= 400
-                          Rails.logger.warn("Image not found (#{head_response.status}): #{resolved_image_url}")
-                          raise Faraday::ResourceNotFound.new("HTTP #{head_response.status}")
-                        end
-
-                        image = BoardBuilder::BoardToPdf.fetch_response_with_redirects(
-                          :get,
-                          resolved_image_url,
-                          timeout: 5,
-                          open_timeout: 2
-                        )
-                      end
+                      image = BoardBuilder::BoardToPdf.load_image_payload(
+                        resolved_image_url,
+                        timeout: 10,
+                        open_timeout: 4
+                      )
                       cell_image_load_time = Time.now - cell_image_start
                       image_load_count += 1
 
@@ -523,11 +506,89 @@ module BoardBuilder
       image_url
     end
 
+    # Faraday-compatible payload used by PDF rendering (body + content-type header).
+    LocalImagePayload = Struct.new(:body, :content_type, keyword_init: true) do
+      def headers
+        { 'content-type' => content_type }
+      end
+    end
+
+    # Load image bytes for PDF: prefer local public/uploads files over HTTP self-fetch.
+    def self.load_image_payload(url, timeout:, open_timeout:, skip_head: false)
+      local_path = local_uploads_file_path(url)
+      if local_path
+        begin
+          return LocalImagePayload.new(
+            body: File.binread(local_path),
+            content_type: content_type_for_path(local_path)
+          )
+        rescue SystemCallError => e
+          raise Faraday::Error, "Failed to read local image #{local_path}: #{e.message}"
+        end
+      end
+
+      unless skip_head
+        head_response = fetch_response_with_redirects(
+          :head,
+          url,
+          timeout: timeout,
+          open_timeout: open_timeout
+        )
+        if head_response.status >= 400
+          Rails.logger.warn("Image not found (#{head_response.status}): #{url}")
+          raise Faraday::ResourceNotFound.new("HTTP #{head_response.status}")
+        end
+      end
+
+      fetch_response_with_redirects(
+        :get,
+        url,
+        timeout: timeout,
+        open_timeout: open_timeout
+      )
+    end
+
+    # Map https://…/uploads/... or /uploads/... to a file under public/ when present.
+    # Returns absolute path string or nil (missing file, non-uploads URL, traversal).
+    def self.local_uploads_file_path(image_url)
+      return nil if image_url.blank?
+
+      path =
+        begin
+          uri = URI.parse(image_url)
+          # Relative paths URI.parse keeps in path; absolute URLs use path only.
+          uri.path.presence
+        rescue URI::InvalidURIError
+          image_url.start_with?('/') ? image_url : nil
+        end
+
+      return nil unless path&.start_with?('/uploads/')
+
+      relative = URI::DEFAULT_PARSER.unescape(path.delete_prefix('/'))
+      full = Rails.public_path.join(relative).expand_path
+      public_root = Rails.public_path.expand_path
+      return nil unless full.to_s.start_with?(public_root.to_s + File::SEPARATOR)
+      return nil unless full.file?
+
+      full.to_s
+    end
+
+    def self.content_type_for_path(path)
+      case File.extname(path).downcase
+      when '.svg' then 'image/svg+xml'
+      when '.png' then 'image/png'
+      when '.jpg', '.jpeg' then 'image/jpeg'
+      when '.gif' then 'image/gif'
+      when '.webp' then 'image/webp'
+      else 'application/octet-stream'
+      end
+    end
+
     def self.fetch_response_with_redirects(method, url, timeout:, open_timeout:, limit: 3)
       raise Faraday::Error, "Too many redirects fetching #{url}" if limit.negative?
 
       started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-      encoded_url = URI.encode(url)
+      encoded_url = URI::DEFAULT_PARSER.escape(url)
       log_outbound_http_event(
         event: 'outbound_http_start',
         service: 'board_pdf',

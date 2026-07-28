@@ -126,6 +126,10 @@ class LanguageConfigurationService
         I18n.available_locales = language_config['available_locales']
       end
 
+      # Reload translations so newly available locales are loaded from YAML.
+      # Without this, i18n leaves non-en locale trees empty after an early [:en]-only init.
+      I18n.reload!
+
       Rails.logger.info("Live language configuration updated: #{I18n.available_locales.inspect}")
       true
     rescue => e

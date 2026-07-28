@@ -27,23 +27,16 @@ class SymbolsetsController < ApplicationController
     authoritative_sources = Source.where(authoritative: true)
 
     label_text_field = Label.arel_table[:text]
-    @order_nulls_last = Arel::Nodes::Case.new.when(label_text_field.eq(nil)).then(1).else(0)
+    order_nulls_last = Arel::Nodes::Case.new.when(label_text_field.eq(nil)).then(1).else(0)
 
     @pictos = @symbolset.pictos
                         .joins("LEFT OUTER JOIN `labels` ON `labels`.`picto_id` = `pictos`.`id` AND `labels`.`source_id` IN (#{authoritative_sources.pluck(:id).join(',')}) AND (`labels`.`language_id` = #{@language.id} OR `labels`.`language_id` IS NULL)")
                         .select('pictos.*, labels.text')
                         .where(archived: false, symbolset_id: @symbolset.id)
                         .accessible_by(current_ability)
+                        .order(order_nulls_last)
+                        .order('labels.text')
                         .includes(:images)
-                        .page(params[:page])
-
-    @labels = @symbolset.labels.unscoped.authoritative
-                        .joins(:picto)
-                        .where(picto: {archived: false, symbolset_id: @symbolset.id})
-                        .where(language_id: @language.id)
-                        .order(text: :asc)
-                        .accessible_by(current_ability)
-                        .includes(picto: [:images])
                         .page(params[:page])
   end
 
@@ -88,7 +81,7 @@ class SymbolsetsController < ApplicationController
   end
 
   def translate
-    @limit = 35
+    @limit = Symbolset::TRANSLATION_BATCH_LIMIT
 
     # Source languages must use authoritative labels and have an ISO639_1 code.
     @source_languages = Language.unscoped
@@ -99,7 +92,7 @@ class SymbolsetsController < ApplicationController
                                   labels: {
                                     pictos: {
                                       archived: false,
-                                      symbolsets: @symbolset
+                                      symbolset: @symbolset
                                     },
                                     sources: { authoritative: true }
                                   }
@@ -113,17 +106,24 @@ class SymbolsetsController < ApplicationController
     @source_language = Language.find_by(iso639_3: translation_get_params[:source_language]) || @source_languages.first
     @destination_language = translation_get_params[:dest_language] ? Language.find_by(iso639_3: translation_get_params[:dest_language]) : nil
 
-    @pictos = @symbolset.pictos.where(archived: false).accessible_by(current_ability)
-    @total_symbols = @pictos.count
+    @total_symbols = @symbolset.pictos.where(archived: false).accessible_by(current_ability).count
 
-    @sources = Label.joins(:picto).where(pictos: @pictos).group(:language_id).includes(:language)
-    @sources_counts = @sources.count
+    # Only pictos with an authoritative source label and no authoritative dest label.
+    # Keeps the list aligned with batch translate (skips bulk-upload placeholders etc.).
+    @pictos = @symbolset
+                .pictos_for_translation(
+                  source_language: @source_language,
+                  destination_language: @destination_language,
+                  limit: @limit
+                )
+                .accessible_by(current_ability)
+                .includes(:images, labels: :source)
 
-    @unapproved_suggestions = Label.unscoped.where(picto: @pictos, language: @destination_language)
+    @translated_labels = Label.unscoped
+                              .joins(:source, picto: :symbolset)
+                              .where(pictos: { symbolset: @symbolset }, language: @destination_language, sources: { authoritative: true })
 
-    @translated_labels = Label.unscoped.joins(:source, picto: :symbolset).where(pictos: { symbolset: @symbolset }, language: @destination_language, sources: {authoritative: true})
-
-    @pictos = @pictos.where.not(id: @translated_labels.pluck(:picto_id)).includes(:images, labels: :source).limit(@limit)
+    @unapproved_suggestions = Label.unscoped.where(picto_id: @pictos.select(:id), language: @destination_language)
 
     @scripts = [
       OpenStruct.new({ name: 'Latin', key: 'Latn'}),
@@ -142,6 +142,9 @@ class SymbolsetsController < ApplicationController
   end
 
   def download
+    # UI only links here when zip_bundle is attached; bots/bookmarks may still hit the URL.
+    raise ActiveRecord::RecordNotFound unless @symbolset.zip_bundle.attached?
+
     redirect_to rails_blob_path(@symbolset.zip_bundle, disposition: :attachment)
   end
 

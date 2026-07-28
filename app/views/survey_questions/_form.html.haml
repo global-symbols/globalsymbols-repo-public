@@ -37,6 +37,5 @@
           %i.fas.fa-chevron-left.pr-2
           = t('views.survey_questions._form.button_previous_question')
     .col.text-right
-      = f.primary do
-        = t('views.survey_questions._form.button_save_answer')
-        %i.fas.fa-chevron-right.pl-2
+      -# Avoid `= f.primary do` — Rails 7 HAML capture leaks page HTML into the button.
+      = f.primary (t('views.survey_questions._form.button_save_answer') + content_tag(:i, '', class: 'fas fa-chevron-right pl-2')).html_safe, render_as_button: true

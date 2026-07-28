@@ -87,9 +87,11 @@ class Users::RegistrationsController < Devise::RegistrationsController
   #   super(resource)
   # end
   
-  # See https://github.com/doorkeeper-gem/doorkeeper/wiki/Running-Doorkeeper-with-Devise
+  # Require a signed-in user for account edit/update/destroy/password.
+  # Without force authenticate, resource can be nil and bootstrap_form_for 500s
+  # (ActionView::Template::Error: First argument in form cannot contain nil).
   def authenticate_scope!
-    # send(:"authenticate_#{resource_name}!", force: true)
+    send(:"authenticate_#{resource_name}!", force: true)
     self.resource = send(:"current_#{resource_name}")
   end
 

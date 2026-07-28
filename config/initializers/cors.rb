@@ -4,7 +4,11 @@ Rails.application.configure do
 
     # Endpoints accessible from BoardBuilder
     allow do
-      origins 'localhost:4200', 'localhost:9095', 'boardbuilder.globalsymbols.com', 'app.globalsymbols.com', 'app-dev.globalsymbols.com', 'gsboardbuilderdev.z33.web.core.windows.net', /global-symbols-boardbuilder-[\w-]+.web.app/, 'app-new.globalsymbols.com', 'grid.asterics.eu'
+      origins 'localhost:4200', 'host.docker.internal', 'localhost:9095',
+              'app.gs-test.co.uk', 'https://app.gs-test.co.uk',
+              'boardbuilder.globalsymbols.com', 'app.globalsymbols.com', 'app-dev.globalsymbols.com',
+              'gsboardbuilderdev.z33.web.core.windows.net', /global-symbols-boardbuilder-[\w-]+.web.app/,
+              'app-new.globalsymbols.com', 'grid.asterics.eu'
 
       # Allow CORS to required API methods
       resource '/api/*', headers: :any, methods: [:get, :post, :patch, :delete]

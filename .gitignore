@@ -16,7 +16,7 @@
 # Ignore uploaded files in development
 /storage/*
 /public/uploads/*
-/public/public/uploads/development/boardbuilder/media/*
+/public/public/uploads/**
 
 /node_modules
 /yarn-error.log
@@ -48,6 +48,20 @@
 
 /vendor
 
-# Ignore Docker-related files
-Dockerfile
+# Local-only docs and upgrade notes (not committed)
+/local_docs/
+/local_rails_upgrade/
+
+# Local-only Docker (deploy Dockerfile is committed for Kamal / pre-prod / prod)
+Dockerfile.dev
 docker-compose.yml
+
+# Kamal secrets (examples are committed; real files are not)
+.kamal/secrets
+.kamal/secrets-common
+.kamal/secrets.*
+!.kamal/secrets.example
+!.kamal/README.md
+
+# Deploy verify reports
+/tmp/deploy_verify/

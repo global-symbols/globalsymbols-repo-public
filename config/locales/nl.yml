@@ -760,7 +760,7 @@ nl:
       blank: kan niet leeg zijn
       empty: kan niet leeg zijn
       accepted: moet worden geaccepteerd
-      confirmation: komt niet overeen met %{attribuut}
+      confirmation: komt niet overeen met %{attribute}
       invalid: is ongeldig
       exclusion: is gereserveerd
       inclusion: is niet opgenomen in de lijst
