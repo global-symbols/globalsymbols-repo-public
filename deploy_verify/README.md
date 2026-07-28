@@ -7,7 +7,7 @@ Runs **only on the matching app server** (or inside its web container).
 | Profile | Allowed host (private IP) | Writes |
 |---------|---------------------------|--------|
 | `pre_prod` | `172.31.30.149` (t4g) | Optional CRUD + password-reset POST |
-| `prod` | `172.31.6.238` (old) / `172.31.5.122` (m7g) | **None** (GET/HEAD only) |
+| `prod` | `172.31.5.122` (m7g, live) — also allows legacy `172.31.6.238` if still used for rollback checks | **None** (GET/HEAD only) |
 
 On fail: report + exit 1. No auto-remediation.
 

@@ -11,8 +11,8 @@ module DeployVerify
 
     # Private IPs for target hosts (topology). Override with DEPLOY_VERIFY_ALLOWED_IPS.
     PRE_PROD_IPS = %w[172.31.30.149].freeze
-    # Old prod Rails (t2) until cutover; new Kamal prod is m7g.
-    PROD_IPS = %w[172.31.6.238 172.31.5.122].freeze
+    # Live Kamal prod is m7g; legacy t2 kept allowlisted for optional rollback checks.
+    PROD_IPS = %w[172.31.5.122 172.31.6.238].freeze
 
     def self.assert!(profile)
       new(profile).assert!
