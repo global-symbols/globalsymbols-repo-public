@@ -21,9 +21,9 @@ module BoardBuilder
       board_set.thumbnail&.file&.url
     end
 
-    expose :obz_file_map do |board_set|
+    expose :obz_file_map do |board_set, options|
       boards = board_set.boards.sort_by{|e| e[:index]}
-      BoardBuilder::Util::BoardsToObz.boards_to_obz_file_map(boards)
+      BoardBuilder::Util::BoardsToObz.boards_to_obz_file_map(boards, embed_images: options[:embed_images] || false)
     end
 
     expose :owner do |board_set|

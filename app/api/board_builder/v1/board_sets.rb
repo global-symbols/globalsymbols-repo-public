@@ -53,6 +53,7 @@ module BoardBuilder::V1
            is_array: false
       params do
         requires :id, type: Integer, desc: 'ID of the BoardSet'
+        optional :embed_images, type: Boolean, default: false, desc: 'When true, images are downloaded and embedded in the archive instead of referenced by URL. Produces a fully self-contained OBZ file.'
       end
       get 'public/obz/:id' do
         board_set = Boardbuilder::BoardSet.includes(boards: :cells).where(id: params[:id], public: true).first
@@ -60,7 +61,7 @@ module BoardBuilder::V1
           board_set.download_count += 1
           board_set.save!
         end
-        present board_set, with: Entities::BoardSetObz
+        present board_set, with: Entities::BoardSetObz, embed_images: params[:embed_images]
       end
 
       desc 'Returns featured BoardSets',
@@ -101,6 +102,22 @@ module BoardBuilder::V1
           present boardset, with: Entities::BoardSet, expand: params[:expand], readonly: !(can? :manage, boardset), boards_with_cells: boardset.boards
         end
 
+        desc 'Returns a specific BoardSet belonging to the current user in OBZ format',
+             success: Entities::BoardSetObz,
+             is_array: false
+        params do
+          requires :id, type: Integer, desc: 'BoardSet ID'
+          optional :embed_images, type: Boolean, default: false, desc: 'When true, images are downloaded and embedded in the archive instead of referenced by URL. Produces a fully self-contained OBZ file.'
+        end
+        oauth2 'boardset:read'
+        get :obz do
+          board_set = Boardbuilder::BoardSet.accessible_by(current_ability)
+                                            .includes(boards: :cells)
+                                            .find(params[:id])
+          board_set.download_count += 1
+          board_set.save!
+          present board_set, with: Entities::BoardSetObz, embed_images: params[:embed_images]
+        end
 
         desc 'Updates a BoardSet belonging to the current user',
              success: Entities::BoardSet,
@@ -199,6 +216,7 @@ module BoardBuilder::V1
         board_set = save_board_set(filtered_params)
         present board_set, with: Entities::BoardSet, expand: 'boards'
       end
+
     end
   end
 end
